@@ -7,7 +7,7 @@ extern char D_00195F36[];
 extern char D_00195F38[];
 
 extern int inpstr_update(void);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_0012B2EB();
 extern int func_0012B3ED();
 extern void inpstr_begin_text(int, short);
@@ -33,7 +33,7 @@ L53AE2:;
     if (inpstr_update() == 0) goto L53AF2;
     *(int *)&l_10 = 1;
 L53AF2:;
-    func_000A1023(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 364, 4);
+    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 364, 4);
     goto L53AC8;
 L53B15:;
     func_0012B3ED();

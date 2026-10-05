@@ -31,10 +31,10 @@ extern int texture_archive_for_climate(int, unsigned short);
 extern int climate_category(void);
 extern int rand_range(int, int);
 extern int object_find(int, int);
-extern int func_0009DC25();
-extern int func_0009DC49();
-extern int func_000A0040();
-extern int func_000A1023();
+extern int rand();
+extern int srand();
+extern int mc_memset();
+extern int mc_memcpy();
 extern int func_0012A608();
 extern void shop_generate_stock(int, int, int, int, int);
 extern void func_0007E815(int, int);
@@ -54,7 +54,7 @@ int engine_pick_object(int a1, int a2, int a3)
     if (a2 <= l_14) goto L13FA8;
     return 0;
 L13FA8:;
-    func_000A0040(a3, 0, 18, (int)D_001702D4, 38, 4);
+    mc_memset(a3, 0, 18, (int)D_001702D4, 38, 4);
     *(int *)D_00196484 = a3;
     if (*(int *)((char *)(*(int *)D_00195C88 = func_0012A608(a1, a2)) + 4) != 1) goto L13FEC;
     return 0;
@@ -227,11 +227,11 @@ void dungeon_choose_textures(void)
     int l_1C;
     int l_18;
 
-    l_18 = func_0009DC25();
-    func_0009DC49(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    l_18 = rand();
+    srand(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     l_1C = (int)(unsigned char)*(signed char *)(climate_texture_sets + climate_category());
     if (l_1C == 1) return;
-    func_000A1023((int)D_00179966, (int)D_0017995C, 10, (int)D_001702D4, 279, 10);
+    mc_memcpy((int)D_00179966, (int)D_0017995C, 10, (int)D_001702D4, 279, 10);
     l_24 = 0;
 L147F8:;
     if (l_24 < 5) goto L14808;
@@ -248,7 +248,7 @@ L14821:;
     *(short *)(D_00179966 + (l_24 * 2)) = l_20;
     goto L14800;
 L14841:;
-    func_0009DC49(l_18);
+    srand(l_18);
 }
 
 void interior_stock_shelves(int a1, int a2)

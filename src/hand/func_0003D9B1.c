@@ -3,8 +3,8 @@ extern char D_00170D55[];       /* __FILE__ */
 extern short D_00199664;
 extern void parse_expand(char *, char *);
 extern int font_char_width(unsigned char);
-extern void func_000A0024(void *, char *, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_free(void *, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 
 char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, char *text)
 {
@@ -20,15 +20,15 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
     if (!(flags & 8))
         parse_expand(src, text);
     else
-        func_000A0AD9(text, src, 4, D_00170D55, 169);
+        mc_strncpy(text, src, 4, D_00170D55, 169);
     D_00199664 = saved;
     if (src != 0 && src != (char *)0x97979797) {
-        func_000A0024(src, D_00170D55, 173);
+        mc_free(src, D_00170D55, 173);
         src = (char *)0x97979797;
     }
     if (!(flags & ~8)) {
         if (buf != 0 && buf != (char *)0x97979797) {
-            func_000A0024(buf, D_00170D55, 177);
+            mc_free(buf, D_00170D55, 177);
             buf = (char *)0x97979797;
         }
         return text;
@@ -95,7 +95,7 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
         }
     }
     if (text != 0 && text != (char *)0x97979797) {
-        func_000A0024(text, D_00170D55, 265);
+        mc_free(text, D_00170D55, 265);
         text = (char *)0x97979797;
     }
     return buf;

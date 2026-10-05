@@ -51,7 +51,7 @@ extern void text_draw_colored(char *, short, short, int, unsigned char);
 extern void text_draw_centered_colored(char *, short, short, int, unsigned char);
 extern int chargen_draw(void);
 extern char *func_000A0DD9(int, char *, int);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern void func_0012DB50(int);
 extern int func_00144F68();
 extern void func_00144FB4(int, int, int, int, char *);
@@ -68,7 +68,7 @@ int chargen_screen_loop(int first, int last)
 
     for (;;) {
         chargen_draw();
-        func_000A1023(655360, screen_buffer, 64000, D_00176F41, 238, 4);
+        mc_memcpy(655360, screen_buffer, 64000, D_00176F41, 238, 4);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 &&
             mouse_x > *(short *)chargen_buttons && mouse_x < *(short *)D_00188020 &&
             mouse_y > *(short *)D_0018801E && mouse_y < *(short *)D_00188022) {

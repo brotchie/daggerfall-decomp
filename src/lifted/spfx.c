@@ -64,10 +64,10 @@ extern int object_free_single(int);
 extern int object_delete(int);
 extern int object_create_child(int, int, int);
 extern int inventory_open(int, int, int);
-extern int func_0009DC25();
-extern int func_0009DC49();
-extern int func_000A0040();
-extern int func_000A0AD9();
+extern int rand();
+extern int srand();
+extern int mc_memset();
+extern int mc_strncpy();
 extern int func_000A0DF4();
 extern int spell_find_effect_type();
 extern void damage_creature_death(int);
@@ -114,7 +114,7 @@ L8932A:;
     if (l_18 == 0) goto L893A0;
     if (((int)(unsigned char)*(signed char *)((char *)l_18)) != 9) goto L89395;
     l_1C = l_18 + 71;
-    func_000A0AD9(l_14, l_1C + 47, 4, (int)D_00176D55, 284);
+    mc_strncpy(l_14, l_1C + 47, 4, (int)D_00176D55, 284);
     *(int *)(D_00190EE4 + (l_10 << 2)) = l_18;
     *(int *)(text_macro_fpc + (l_10++ << 2)) = l_14;
     l_14 += func_000A0DF4(l_1C + 47) + 1;
@@ -1007,7 +1007,7 @@ L8B12D:;
 L8B147:;
     map_goto_location(*(int *)D_001A99FC, *(int *)D_001A9A04, *(int *)D_001A99F8, *(int *)D_001A9A00);
     player_position_restore(1);
-    func_000A0040((int)saved_positions, 0, 48, (int)D_00176D55, 1342, 48);
+    mc_memset((int)saved_positions, 0, 48, (int)D_00176D55, 1342, 48);
 L8B18A:;
     *(int *)spfx_popup_handler = 0;
     return;
@@ -1136,10 +1136,10 @@ int func_0008B43B(unsigned char a1, unsigned char a2, int a3)
     int l_24;
     int l_20;
 
-    l_24 = func_0009DC25();
-    func_0009DC49(a3);
+    l_24 = rand();
+    srand(a3);
     l_20 = name_generate((int)(unsigned char)a1, (int)(unsigned char)a2);
-    func_0009DC49(l_24);
+    srand(l_24);
     return l_20;
 }
 

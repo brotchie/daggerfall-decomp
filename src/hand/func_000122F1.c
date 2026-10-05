@@ -19,7 +19,7 @@ struct res {                /* a file loaded whole into memory */
 extern char D_00170129[];        /* __FILE__ */
 extern char *func_000A0DD9(int, signed char *, int);       /* itoa */
 extern unsigned func_000A0DF4(signed char *);              /* strlen */
-extern void func_000A0E0D(char *, char *, int, char *, int, int);
+extern void mc_memmove(char *, char *, int, char *, int, int);
 
 int profile_set_number(struct res *r, int value)
 {
@@ -48,13 +48,13 @@ int profile_set_number(struct res *r, int value)
     len = func_000A0DF4(buf);
     if (len < n) {
         cnt = (r->buf + r->size) - q - (n - len);
-        func_000A0E0D(q, q + (n - len), cnt, D_00170129, 768, 4);
+        mc_memmove(q, q + (n - len), cnt, D_00170129, 768, 4);
         r->size -= n - len;
     } else if (len > n) {
         if ((len - n) + r->size > r->bufsize)
             return 0;
         cnt = (r->buf + r->size) - q + (len - n);
-        func_000A0E0D(q + (len - n), q, cnt, D_00170129, 786, 4);
+        mc_memmove(q + (len - n), q, cnt, D_00170129, 786, 4);
         r->size += len - n;
     }
     i = 0;

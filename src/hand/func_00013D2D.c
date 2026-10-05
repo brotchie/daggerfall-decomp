@@ -7,12 +7,12 @@ extern char *D_00178E54;
 extern struct bits8 D_001940DA;
 extern int D_00196470;
 extern char *D_00196474;
-extern void func_000A0024(void *, char *, int);
+extern void mc_free(void *, char *, int);
 
 void func_00013D2D(char *a1)
 {
     if (D_00178E54 != 0 && D_00178E54 != (char *)0x97979797) {
-        func_000A0024(D_00178E54, D_001702CC, 52);
+        mc_free(D_00178E54, D_001702CC, 52);
         D_00178E54 = (char *)0x97979797;
     }
     D_00178E54 = D_001940DA.b3 ? a1 : 0;

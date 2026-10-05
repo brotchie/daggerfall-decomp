@@ -20,9 +20,9 @@ extern char people_count[];
 extern int collide_line_of_sight(int, int);
 extern int is_guard_sprite(int);
 extern int object_delete(int);
-extern int func_000A0040();
+extern int mc_memset();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
+extern int mc_sprintf(int, ...);
 extern int func_000A134C();
 extern int func_000CDCB8();
 extern void person_place(int);
@@ -50,7 +50,7 @@ L410A4:;
     goto L4107C;
 L410A6:;
     *(int *)people_count = 0;
-    func_000A0040((int)people_list, 0, 120, (int)D_00170DC0, 554, 120);
+    mc_memset((int)people_list, 0, 120, (int)D_00170DC0, 554, 120);
 }
 
 int func_00041347(void)
@@ -142,6 +142,6 @@ L415C4:;
     l_18 = ((((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) - l_18) - 1;
     func_000A134C((int)(short)*(short *)&l_1C, (int)(short)*(short *)&l_18, 244);
     func_000A0ED9(677, (int)D_00170DC0);
-    func_000A0F5C((int)text_buffer, (int)D_00170DD6, l_1C, l_18);
+    mc_sprintf((int)text_buffer, (int)D_00170DD6, l_1C, l_18);
     text_draw((int)text_buffer, 0, (int)&*(signed char *)((char *)(((int)(unsigned char)*(signed char *)(*(char **)current_location + 33)) << 6) + 2));
 }

@@ -19,12 +19,12 @@ extern char D_001A9AB1[];
 
 extern int font_char_width(unsigned char);
 extern int font_text_width(int);
-extern int func_000A0AD9();
-extern int func_000A0D13();
+extern int mc_strncpy();
+extern int atoi();
 extern int func_000A0DD9();
 extern int func_000A0DF4();
-extern int func_000A0E0D();
-extern int func_000A1023();
+extern int mc_memmove();
+extern int mc_memcpy();
 extern int func_0012B3ED();
 extern int func_00142790();
 extern int func_001427A8();
@@ -59,7 +59,7 @@ void inpstr_begin_number(int a1)
     *(signed char *)input_digits_only = 1;
     func_000A0DD9(a1, (int)D_001A9AA0, 10);
     *(int *)inpstr_text = (int)D_001A9AA0;
-    func_000A0AD9((int)D_00190B44, *(int *)inpstr_text, 160, (int)D_00176E2C, 110);
+    mc_strncpy((int)D_00190B44, *(int *)inpstr_text, 160, (int)D_00176E2C, 110);
     *(short *)inpstr_cursor = func_000A0DF4((int)D_001A9AA0);
     *(short *)inpstr_max_length = 8;
     *(signed char *)D_001A9AB1 = *(signed char *)D_0012DA50;
@@ -71,7 +71,7 @@ int inpstr_handle_key(unsigned char a1)
     goto L8C89D;
 case 13:
     func_0012B3ED();
-    return func_000A0D13(*(int *)inpstr_text);
+    return atoi(*(int *)inpstr_text);
 case 131:
     *(short *)inpstr_cursor = 0;
     goto L8C9BE;
@@ -93,13 +93,13 @@ L8C7DB:;
     goto L8C9BE;
 case 8:
     if (*(short *)inpstr_cursor == 0) goto L8C836;
-    func_000A1023((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) - 1, (int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 217, 4);
+    mc_memcpy((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) - 1, (int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 217, 4);
     (*(short *)inpstr_cursor)--;
 L8C836:;
     goto L8C9BE;
 case 127:
     if (((unsigned)((int)(short)*(short *)inpstr_cursor)) >= func_000A0DF4(*(int *)inpstr_text)) goto L8C898;
-    func_000A1023((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) + 1), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 226, 4);
+    mc_memcpy((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) + 1), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 226, 4);
 L8C898:;
     goto L8C9BE;
 default:
@@ -125,7 +125,7 @@ L8C8E9:;
     *(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor))) = 0;
     goto L8C9BE;
 L8C95D:;
-    func_000A0E0D((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) + 1, (int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 245, 4);
+    mc_memmove((int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)) + 1, (int)(*(char **)inpstr_text + ((int)(short)*(short *)inpstr_cursor)), (int)&*(signed char *)((char *)(func_000A0DF4(*(int *)inpstr_text) - ((int)(short)*(short *)inpstr_cursor)) + 1), (int)D_00176E2C, 245, 4);
     *(signed char *)((char *)(int)(*(char **)inpstr_text + ((int)(short)(*(short *)inpstr_cursor)++))) = a1;
 L8C9BE:;
     return -2023406815;

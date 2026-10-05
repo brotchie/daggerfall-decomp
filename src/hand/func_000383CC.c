@@ -11,7 +11,7 @@ extern void spellmaker_pick_effect_cb(int);
 extern int spellmaker_find_effect(short);
 extern void msgbox_show_rsc(int, int);
 extern void picklist_open_strings(char *);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern int func_000A0DF4(char *);
 
 int spellmaker_add_effect(void)
@@ -41,7 +41,7 @@ int spellmaker_add_effect(void)
         if (!((spell_effect_target_class[i] == 2 || mode == 2) || spell_effect_target_class[i] == mode))
             continue;
         list[cnt++] = i;
-        func_000A0AD9(str, spell_effect_names[i], 4, D_00170B13, 1108);
+        mc_strncpy(str, spell_effect_names[i], 4, D_00170B13, 1108);
         str = func_000A0DF4(str) + str + 1;
     }
     *str = 0;

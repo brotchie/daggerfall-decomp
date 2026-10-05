@@ -53,8 +53,8 @@ extern int object_find_by_id(int, int);
 extern int trade_adjust_price(int, int);
 extern int marker_find_nth(int, int, int);
 extern int marker_find_random(int, int);
-extern int func_000A0024();
-extern int func_000A1023();
+extern int mc_free();
+extern int mc_memcpy();
 extern int func_0012B136();
 extern int func_00142790();
 extern void msgbox_show_string(int, int);
@@ -96,7 +96,7 @@ L1F107:;
 L1F12C:;
     goto L1F14C;
 L1F12E:;
-    func_000A0024(*(int *)tavern_menu_image, (int)D_00170569, 117);
+    mc_free(*(int *)tavern_menu_image, (int)D_00170569, 117);
     *(int *)tavern_menu_image = -1751672937;
 L1F14C:;
     *(signed char *)D_00196272 = 0;
@@ -295,12 +295,12 @@ void func_0001F6E2(int a1)
     if (func_0001FBF5(a1) == 0) return;
     l_18 = object_create_child(*(int *)nonworld_root, 0, 107);
     *(signed char *)((char *)l_18) = 58;
-    func_000A1023(l_18 + 7, a1 + 7, 12, (int)D_00170569, 317, 4);
+    mc_memcpy(l_18 + 7, a1 + 7, 12, (int)D_00170569, 317, 4);
     *(short *)((char *)l_18 + 27) = *(short *)((char *)a1 + 27);
     *(int *)((char *)l_18 + 31) = *(int *)((char *)a1 + 31);
     *(int *)((char *)l_18 + 39) = *(int *)(*(char **)((char *)a1 + 67) + 31);
     *(int *)((char *)l_18 + 43) = *(int *)D_00190BE4;
-    func_000A1023(l_18 + 71, a1 + 71, 107, (int)D_00170569, 322, 4);
+    mc_memcpy(l_18 + 71, a1 + 71, 107, (int)D_00170569, 322, 4);
 }
 
 void func_0001F7B3(int a1)
@@ -314,8 +314,8 @@ void func_0001F7B3(int a1)
     *(signed char *)((char *)l_18) = 2;
     *(short *)((char *)l_18 + 27) = *(short *)((char *)a1 + 27);
     *(int *)((char *)l_18 + 31) = *(int *)((char *)a1 + 31);
-    func_000A1023(l_18 + 7, a1 + 7, 12, (int)D_00170569, 347, 4);
-    func_000A1023(l_18 + 71, a1 + 71, 107, (int)D_00170569, 348, 4);
+    mc_memcpy(l_18 + 7, a1 + 7, 12, (int)D_00170569, 347, 4);
+    mc_memcpy(l_18 + 71, a1 + 71, 107, (int)D_00170569, 348, 4);
     object_delete(a1);
 }
 
@@ -334,7 +334,7 @@ void func_0001F89F(void)
     *(signed char *)((char *)l_18) = 57;
     *(short *)((char *)l_18 + 23) = *(short *)D_00195B84;
     *(int *)((char *)l_18 + 31) = *(int *)(*(char **)D_00195AC4 + 31);
-    func_000A1023(l_18 + 71, *(int *)D_00196ABC, *(int *)D_00195B84 * 26, (int)D_00170569, 369, 4);
+    mc_memcpy(l_18 + 71, *(int *)D_00196ABC, *(int *)D_00195B84 * 26, (int)D_00170569, 369, 4);
 L1F93F:;
     object_foreach(*(int *)D_00195AC4, (int)func_0001F6E2);
 }
@@ -365,7 +365,7 @@ L1F9BF:;
     goto L1F9AA;
 L1F9C7:;
     if (*(int *)((char *)(int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)) + 20) != *(int *)((char *)(int)(*(char **)D_00196ABC + (l_1C * 26)) + 20)) goto L1FA1A;
-    func_000A1023((int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)), (int)(*(char **)D_00196ABC + (l_1C * 26)), 26, (int)D_00170569, 388, 4);
+    mc_memcpy((int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)), (int)(*(char **)D_00196ABC + (l_1C * 26)), 26, (int)D_00170569, 388, 4);
     goto L1FA1C;
 L1FA1A:;
     goto L1F9BF;
@@ -396,7 +396,7 @@ void func_0001FAB2(void)
     *(int *)D_00195AF4 = 0;
     object_find(*(int *)nonworld_root, (int)func_0001FA3A);
     if (*(int *)D_00195AF4 == 0) return;
-    func_000A1023((int)(*(char **)D_00196ABC + (*(int *)D_00195B84 * 26)), (int)&*(signed char *)(*(char **)D_00195AF4 + 71), ((int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 23)) * 26, (int)D_00170569, 417, 4);
+    mc_memcpy((int)(*(char **)D_00196ABC + (*(int *)D_00195B84 * 26)), (int)&*(signed char *)(*(char **)D_00195AF4 + 71), ((int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 23)) * 26, (int)D_00170569, 417, 4);
     *(int *)D_00195B84 += (int)(unsigned short)*(short *)(*(char **)D_00195AF4 + 23);
 }
 
@@ -417,7 +417,7 @@ L1FB74:;
 L1FBAE:;
     goto L1FBE9;
 L1FBB0:;
-    func_000A1023((int)(*(char **)D_00196ABC + ((*(int *)D_00195B84)++ * 26)), (int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)), 26, (int)D_00170569, 428, 4);
+    mc_memcpy((int)(*(char **)D_00196ABC + ((*(int *)D_00195B84)++ * 26)), (int)(*(char **)(*(char **)current_location + 43) + (l_18 * 26)), 26, (int)D_00170569, 428, 4);
 L1FBE9:;
     goto L1FB6C;
 }

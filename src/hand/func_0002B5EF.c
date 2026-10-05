@@ -28,7 +28,7 @@ extern int key_pressed_once(unsigned char);
 extern int func_0012DB50();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, ...);
+extern int mc_sprintf(char *, ...);
 
 #pragma pack(1)
 struct Rec { char b0, b1; unsigned char flag, idx; int val; };
@@ -107,12 +107,12 @@ void quest_debug_overlay(void)
                         l_3C = l_1C->idx;
                     if (l_3C) COLOR = 240;
                     func_000A0ED9(888, D_001707F0);
-                    func_000A0F5C(text_buffer, D_00170819, l_44, l_3C ? D_0017080E : D_00170813);
+                    mc_sprintf(text_buffer, D_00170819, l_44, l_3C ? D_0017080E : D_00170813);
                     break;
                 case 6:
                     l_18 = l_44->data;
                     func_000A0ED9(892, D_001707F0);
-                    func_000A0F5C(text_buffer, D_00170823, l_44, *(int *)game_minutes - *(int *)(l_18 + 13), *(int *)(l_18 + 17));
+                    mc_sprintf(text_buffer, D_00170823, l_44, *(int *)game_minutes - *(int *)(l_18 + 13), *(int *)(l_18 + 17));
                     break;
                 }
                 if (l_40) {
@@ -120,10 +120,10 @@ void quest_debug_overlay(void)
                         l_40 = *(char **)(l_40 + 51);
                         COLOR = 240;
                         func_000A0ED9(904, D_001707F0);
-                        func_000A0F5C(text_buffer, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
+                        mc_sprintf(text_buffer, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
                     } else {
                         func_000A0ED9(907, D_001707F0);
-                        func_000A0F5C(text_buffer, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
+                        mc_sprintf(text_buffer, D_00170832, l_44, *(int *)(l_40 + 7), *(int *)(l_40 + 11), *(int *)(l_40 + 15));
                     }
                 }
                 NEXTLINE();
@@ -145,16 +145,16 @@ void quest_debug_overlay(void)
             if (l_3C) COLOR = 240;
             else COLOR = 145;
             func_000A0ED9(935, D_001707F0);
-            func_000A0F5C(text_buffer, D_00170847, l_38, l_3C ? D_0017080E : D_00170813);
+            mc_sprintf(text_buffer, D_00170847, l_38, l_3C ? D_0017080E : D_00170813);
             NEXTLINE();
         }
     }
     COLOR = 112;
     func_000A0ED9(942, D_001707F0);
-    func_000A0F5C(text_buffer, D_00170856, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 11), *(int *)(*(char **)player_object + 15));
+    mc_sprintf(text_buffer, D_00170856, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 11), *(int *)(*(char **)player_object + 15));
     NEXTLINE();
     func_000A0ED9(945, D_001707F0);
-    func_000A0F5C(text_buffer, D_0017086D, CUR + 6);
+    mc_sprintf(text_buffer, D_0017086D, CUR + 6);
     text_draw(text_buffer, l_34 >= l_30 ? 160 : 0, l_34 % l_30 * LINEH);
     func_0012DB50(4);
 }

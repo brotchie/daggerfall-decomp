@@ -34,11 +34,11 @@ extern int hud_message_add(char *);
 extern int rand_range(int, int);
 extern unsigned char *object_create_child(int, int, int);
 extern void object_foreach(unsigned char *, void (*)(int));
-extern int func_000A0040();
-extern int func_000A1023();
+extern int mc_memset();
+extern int mc_memcpy();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, ...);
+extern int mc_sprintf(char *, ...);
 
 void damage_creature_death(unsigned char *a1)
 {
@@ -96,7 +96,7 @@ found:
     quest_raise_event(2, a1, 0);
     l_2C = a1 + 71;
     func_000A0ED9(587, D_001709E4);
-    func_000A0F5C(text_buffer, D_001709ED, l_2C);
+    mc_sprintf(text_buffer, D_001709ED, l_2C);
     hud_message_add(text_buffer);
     *a1 = 44;
     if (l_2C[506] < 43) {
@@ -109,8 +109,8 @@ found:
     }
     collide_flags = 0;
     D_001940D7 |= 32;
-    func_000A1023(&l_4C, a1 + 7, 12, D_001709E4, 605, 4);
-    func_000A0040(&l_4C.f12, 0, 12, D_001709E4, 606, 4);
+    mc_memcpy(&l_4C, a1 + 7, 12, D_001709E4, 605, 4);
+    mc_memset(&l_4C.f12, 0, 12, D_001709E4, 606, 4);
     l_4C.name = D_00187B44;
     collide_move_object(a1, 0, &l_4C, 0);
     player_on_ground = l_20;

@@ -5,7 +5,7 @@ extern char D_0012DA44[];
 extern char D_00176E38[];
 
 extern int font_text_width(int);
-extern int func_000A0024();
+extern int mc_free();
 extern int func_000A0DF4();
 
 void picklist_update_thumb(int a1)
@@ -28,7 +28,7 @@ void picklist_free(int a1)
 L8CF40:;
     goto L8CF61;
 L8CF42:;
-    func_000A0024(*(int *)((char *)a1 + 51), (int)D_00176E38, 110);
+    mc_free(*(int *)((char *)a1 + 51), (int)D_00176E38, 110);
     *(int *)((char *)a1 + 51) = -1751672937;
 L8CF61:;
     if (*(int *)((char *)a1 + 55) == 0) goto L8CF76;
@@ -36,7 +36,7 @@ L8CF61:;
 L8CF76:;
     goto L8CF97;
 L8CF78:;
-    func_000A0024(*(int *)((char *)a1 + 55), (int)D_00176E38, 111);
+    mc_free(*(int *)((char *)a1 + 55), (int)D_00176E38, 111);
     *(int *)((char *)a1 + 55) = -1751672937;
 L8CF97:;
     if (*(int *)((char *)a1 + 47) == 0) goto L8CFAC;
@@ -44,7 +44,7 @@ L8CF97:;
 L8CFAC:;
     goto L8CFCD;
 L8CFAE:;
-    func_000A0024(*(int *)((char *)a1 + 47), (int)D_00176E38, 114);
+    mc_free(*(int *)((char *)a1 + 47), (int)D_00176E38, 114);
     *(int *)((char *)a1 + 47) = -1751672937;
 L8CFCD:;
     *(signed char *)((char *)a1) = 0;

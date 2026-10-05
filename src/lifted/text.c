@@ -95,11 +95,11 @@ extern int inpstr_update(void);
 extern int object_delete(int);
 extern int object_create_child(int, int, int);
 extern int object_new_id(int);
-extern int func_0009DC25();
+extern int rand();
 extern int func_0009DEAC();
-extern int func_000A0024();
-extern int func_000A00AF();
-extern int func_000A1023();
+extern int mc_free();
+extern int mc_malloc();
+extern int mc_memcpy();
 extern int func_000C7FD9();
 extern int func_000C808D();
 extern int func_000CDD81();
@@ -160,7 +160,7 @@ void msgbox_show_more_pages(int a1)
 {
 L3E953:;
     if (*(int *)msgbox_next_page == 0) goto L3EA3A;
-    func_000A1023(*(int *)D_00147954, *(int *)screen_buffer, 64000, (int)D_00170D55, 607, 4);
+    mc_memcpy(*(int *)D_00147954, *(int *)screen_buffer, 64000, (int)D_00170D55, 607, 4);
     *(signed char *)msgbox_kind = 1;
     mode_push();
     *(signed char *)game_mode = 8;
@@ -173,7 +173,7 @@ L3E9AB:;
     *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
 L3E9BC:;
     if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L3EA01;
-    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00170D55, 618, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00170D55, 618, 4);
     keys_world_actions();
     msgbox_update();
     player_movement_update();
@@ -199,7 +199,7 @@ L3EA3A:;
     *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 0);
 L3EA65:;
     if (((int)(unsigned char)*(signed char *)game_mode) != 8) return;
-    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00170D55, 641, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00170D55, 641, 4);
     keys_world_actions();
     msgbox_update();
     player_movement_update();
@@ -213,8 +213,8 @@ void msgbox_show_quest_text(int a1, short a2, int a3)
 
     if (*(signed char *)msgbox_kind != 0) return;
     *(int *)current_quest = a1;
-    *(int *)msgbox_saved_screen = func_000A00AF(64000, (int)D_00170D55, 735);
-    func_000A1023(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 736, 4);
+    *(int *)msgbox_saved_screen = mc_malloc(64000, (int)D_00170D55, 735);
+    mc_memcpy(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 736, 4);
     func_0012DB50(4);
     if (((int)(short)*(short *)&a3) != 5) goto L3EE8D;
     *(signed char *)D_00196271 = 0;
@@ -271,8 +271,8 @@ void msgbox_show_rsc(int a1, int a2)
 
     if (*(signed char *)msgbox_kind != 0) return;
     func_00080637();
-    *(int *)msgbox_saved_screen = func_000A00AF(64000, (int)D_00170D55, 824);
-    func_000A1023(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 825, 4);
+    *(int *)msgbox_saved_screen = mc_malloc(64000, (int)D_00170D55, 824);
+    mc_memcpy(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 825, 4);
     func_0012DB50(4);
     if (((int)(short)*(short *)&a2) != 5) goto L3F130;
     *(signed char *)D_00196271 = 0;
@@ -299,8 +299,8 @@ void msgbox_open_rsc(int a1, int a2)
 
     if (*(signed char *)msgbox_kind != 0) return;
     func_00080637();
-    *(int *)msgbox_saved_screen = func_000A00AF(64000, (int)D_00170D55, 854);
-    func_000A1023(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 855, 4);
+    *(int *)msgbox_saved_screen = mc_malloc(64000, (int)D_00170D55, 854);
+    mc_memcpy(*(int *)msgbox_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170D55, 855, 4);
     func_0012DB50(4);
     if (((int)(short)*(short *)&a2) != 5) goto L3F212;
     *(signed char *)D_00196271 = 0;
@@ -326,7 +326,7 @@ void msgbox_wait(void)
     *(signed char *)mouse_buttons = (*(signed char *)mouse_buttons_prev = 1);
 L3F27D:;
     if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L3F2F8;
-    func_000A1023(*(int *)screen_buffer, *(int *)msgbox_saved_screen, 64000, (int)D_00170D55, 882, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)msgbox_saved_screen, 64000, (int)D_00170D55, 882, 4);
     if (*(signed char *)key_down_ctrl == 0) goto L3F2C0;
     if (*(signed char *)key_down_x != 0) goto L3F2C2;
 L3F2C0:;
@@ -353,7 +353,7 @@ L3F2F8:;
 L3F31E:;
     goto L3F33E;
 L3F320:;
-    func_000A0024(*(int *)msgbox_saved_screen, (int)D_00170D55, 893);
+    mc_free(*(int *)msgbox_saved_screen, (int)D_00170D55, 893);
     *(int *)msgbox_saved_screen = -1751672937;
 L3F33E:;
     if (*(signed char *)mouse_buttons == 0) return;
@@ -443,7 +443,7 @@ void msgbox_close(void)
 L3F58E:;
     goto L3F5AE;
 L3F590:;
-    func_000A0024(*(int *)msgbox_image, (int)D_00170D55, 950);
+    mc_free(*(int *)msgbox_image, (int)D_00170D55, 950);
     *(int *)msgbox_image = -1751672937;
 L3F5AE:;
     *(int *)msgbox_image = 0;
@@ -471,7 +471,7 @@ void func_0003F699(void)
 L3F6BC:;
     goto L3F6DC;
 L3F6BE:;
-    func_000A0024(*(int *)msgbox_spop_tiles, (int)D_00170D55, 977);
+    mc_free(*(int *)msgbox_spop_tiles, (int)D_00170D55, 977);
     *(int *)msgbox_spop_tiles = -1751672937;
 L3F6DC:;
     if (*(int *)msgbox_mpop_tiles == 0) goto L3F6F1;
@@ -479,7 +479,7 @@ L3F6DC:;
 L3F6F1:;
     return;
 L3F6F3:;
-    func_000A0024(*(int *)msgbox_mpop_tiles, (int)D_00170D55, 978);
+    mc_free(*(int *)msgbox_mpop_tiles, (int)D_00170D55, 978);
     *(int *)msgbox_mpop_tiles = -1751672937;
 }
 
@@ -810,7 +810,7 @@ L3FE9E:;
 L3FEFF:;
     goto L3FF53;
 L3FF01:;
-    if ((func_0009DC25() & 255) == 0) goto L3FF4A;
+    if ((rand() & 255) == 0) goto L3FF4A;
     l_3C = func_00040794((int)(*(char **)((char *)a1 + 7) + ((int)(short)*(short *)(D_0017B657 + ((((int)(short)*(short *)((char *)a1 + 3)) >> 9) << 2)))), ((int)(short)*(short *)(D_0017B659 + ((((int)(short)*(short *)((char *)a1 + 3)) >> 9) << 2))) + *(int *)((char *)a1 + 15));
     goto L3FF51;
 L3FF4A:;
@@ -823,7 +823,7 @@ L3FF5A:;
     l_38 = 0;
     l_2C = (int)(short)*(short *)((char *)a1 + 3);
     if (l_3C != 0) goto L3FF94;
-    *(short *)((char *)a1 + 3) = *(short *)(D_0017B64F + ((func_0009DC25() % 4) * 2));
+    *(short *)((char *)a1 + 3) = *(short *)(D_0017B64F + ((rand() % 4) * 2));
 L3FF94:;
     if (l_3C != 0) goto L4004C;
     *(short *)((char *)a1 + 3) = (((int)(short)*(short *)((char *)a1 + 3)) + 512) % 2048;
@@ -888,7 +888,7 @@ void person_place(int a1)
     l_18 = a1 + 71;
     *(signed char *)((char *)a1) = 53;
     *(signed char *)((char *)a1 + 21) |= 1;
-    *(short *)((char *)a1 + 23) = func_0009DC25() % ((int)(unsigned short)*(short *)(*(char **)current_location + 41));
+    *(short *)((char *)a1 + 23) = rand() % ((int)(unsigned short)*(short *)(*(char **)current_location + 41));
     *(int *)((char *)a1 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     *(short *)((char *)a1 + 29) = 0;
     *(short *)((char *)a1 + 25) = 0;

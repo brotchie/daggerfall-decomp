@@ -76,8 +76,8 @@ extern struct obj *object_find_item(struct obj *, short, short);
 extern void inv_store_item(struct obj *);
 extern int marker_find_nth(struct obj *, int, int);
 extern void player_to_nearest_marker(struct obj *, int);
-extern int func_0009DC25(void);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern int rand(void);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 void disease_toggle_memberships_cb(struct obj *a1)
 {
@@ -116,7 +116,7 @@ void disease_become_vampire(void)
     time_pass(30240);
     D_00196294 = saved;
     if (region_dungeon_type_counts != 0) {
-        func_0001E34D(&s, 0, func_0009DC25() % region_dungeon_type_counts);
+        func_0001E34D(&s, 0, rand() % region_dungeon_type_counts);
         map_goto_location(current_region, 3, s.obj->f27, 0);
         if (marker_find_nth(D_00195AC4, 9, 0) != 0)
             player_to_nearest_marker(D_00195AC4, 9);
@@ -137,7 +137,7 @@ void disease_become_vampire(void)
     o2->flags = 3;
     p = (struct item *)o1->data;
     p->cond = 100;
-    func_000A1023(o2->data, player_class, 74, D_00175970, 407, 4);
+    mc_memcpy(o2->data, player_class, 74, D_00175970, 407, 4);
     for (i = 0; i < 8; i++) {
         if (i == 1)
             continue;

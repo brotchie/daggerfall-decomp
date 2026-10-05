@@ -13,7 +13,7 @@ extern char D_00170464[];       /* __FILE__ */
 extern int player_entity;
 extern int D_001966FC[];
 extern struct obj *object_create_child(int, int, int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 
 unsigned short bio_person_add(char *name, char *text, int kind)
 {
@@ -25,7 +25,7 @@ unsigned short bio_person_add(char *name, char *text, int kind)
     o->type = kind + 45;
     o->flags |= 3;
     o->id = D_001966FC[kind]++;
-    func_000A1023(o->name, name, 560, D_00170464, 1334, 4);
-    func_000A1023(o->text, text, 74, D_00170464, 1335, 4);
+    mc_memcpy(o->name, name, 560, D_00170464, 1334, 4);
+    mc_memcpy(o->text, text, 74, D_00170464, 1335, 4);
     return o->id;
 }

@@ -41,9 +41,9 @@ extern int climate_category(void);
 extern void music_play(char *);
 extern char *func_00078463(void);
 extern int location_contains(int, int);
-extern int func_0009DC25(void);
-extern void func_0009DC49(int);
-extern char *func_000A1079(char *, int, int);
+extern int rand(void);
+extern void srand(int);
+extern char *memchr(char *, int, int);
 struct mob { char pad[137]; int flags; };
 struct ctl { unsigned short f0; };
 extern char *D_0018767C[];
@@ -139,7 +139,7 @@ void music_choose_song(void)
 
     if (D_00187CA8 == 0)
         return;
-    seed = func_0009DC25();
+    seed = rand();
     if (player_environment == 3) {
         if (D_001962A1) {
             music_play(D_001A4FA8[10]);
@@ -148,63 +148,63 @@ void music_choose_song(void)
             if (p) {
                 music_play(p);
             } else {
-                func_0009DC49((current_region << 8) ^ D_00195AC4->region);
-                music_play(D_001A4FB0[func_0009DC25() % 15]);
+                srand((current_region << 8) ^ D_00195AC4->region);
+                music_play(D_001A4FB0[rand() % 15]);
             }
         }
     } else if (player_environment == 1) {
         climate = climate_category();
-        func_0009DC49(game_minutes / 1440);
+        srand(game_minutes / 1440);
         if (D_00196280 == 0) {
-            music_play(D_001A4FA0[func_0009DC25() % 7]);
+            music_play(D_001A4FA0[rand() % 7]);
         } else if (!location_contains(player_object->x, player_object->z) || (current_location->kind != 4 && current_location->kind <= 9 ? 1 : 0)) {
             switch (climate_weathers[climate]) {
             case 0:
-                music_play(D_001A4FA8[func_0009DC25() % 7]);
+                music_play(D_001A4FA8[rand() % 7]);
                 break;
             case 1:
-                music_play(D_001A4FA8[func_0009DC25() % 9]);
+                music_play(D_001A4FA8[rand() % 9]);
                 break;
             case 2:
             case 3:
             case 6:
-                music_play(D_001A4FA8[func_0009DC25() % 5 + 7]);
+                music_play(D_001A4FA8[rand() % 5 + 7]);
                 break;
             case 4:
-                music_play(D_001A4FA8[func_0009DC25() % 3 + 12]);
+                music_play(D_001A4FA8[rand() % 3 + 12]);
                 break;
             case 5:
-                music_play(D_001A4FA8[func_0009DC25() % 3 + 15]);
+                music_play(D_001A4FA8[rand() % 3 + 15]);
                 break;
             }
         } else if (location_contains(player_object->x, player_object->z) && (current_location->kind == 4 || current_location->kind >= 9)) {
-            music_play(D_001A4FA0[func_0009DC25() % 7]);
+            music_play(D_001A4FA0[rand() % 7]);
         } else {
             switch (climate_weathers[climate]) {
             case 0:
-                music_play(D_001A4FA8[func_0009DC25() % 7]);
+                music_play(D_001A4FA8[rand() % 7]);
                 break;
             case 1:
-                music_play(D_001A4FA8[func_0009DC25() % 9]);
+                music_play(D_001A4FA8[rand() % 9]);
                 break;
             case 2:
             case 3:
             case 6:
-                music_play(D_001A4FA8[func_0009DC25() % 5 + 7]);
+                music_play(D_001A4FA8[rand() % 5 + 7]);
                 break;
             case 4:
-                music_play(D_001A4FA8[func_0009DC25() % 3 + 12]);
+                music_play(D_001A4FA8[rand() % 3 + 12]);
                 break;
             case 5:
-                music_play(D_001A4FA8[func_0009DC25() % 3 + 15]);
+                music_play(D_001A4FA8[rand() % 3 + 15]);
                 break;
             }
         }
     } else {
-        func_0009DC49(D_00195F5E);
+        srand(D_00195F5E);
         if (trespassing) {
-            music_play(D_001A4FAC[func_0009DC25() % 7]);
-            func_0009DC49(seed);
+            music_play(D_001A4FAC[rand() % 7]);
+            srand(seed);
             return;
         }
         switch (current_building->kind) {
@@ -223,7 +223,7 @@ void music_choose_song(void)
             break;
         case 11:
             if (current_building->type == 40) {
-                if (func_0009DC25() & 1)
+                if (rand() & 1)
                     music_play(D_001A3F5E == 0 ? D_001767EE : D_001767FA);
                 else
                     music_play(D_001A3F5E == 0 ? D_00176807 : D_001767FA);
@@ -235,10 +235,10 @@ void music_choose_song(void)
             if (D_00196263) {
                 music_play(D_001A3F5E == 0 ? D_00176823 : D_0017682A);
             } else {
-                p = func_000A1079(D_001789E8, current_building->type, 8);
+                p = memchr(D_001789E8, current_building->type, 8);
                 idx = p - D_001789E8;
                 if (p == 0) {
-                    p = func_000A1079(D_001789F0, current_building->type, 8);
+                    p = memchr(D_001789F0, current_building->type, 8);
                     if (p == 0) {
                         music_play(D_001A3F5E == 0 ? D_00176823 : D_0017682A);
                         break;
@@ -254,7 +254,7 @@ void music_choose_song(void)
         case 16:
             /* a random pick from one choice: the code generator folds `% 1` to 0 and drops the
              * then-branch, but its ?: temp keeps the frame slot at [ebp-0x50] */
-            if (func_0009DC25() % 1)
+            if (rand() % 1)
                 music_play(D_001A3F5E == 0 ? D_00176833 : D_0017683A);
             else
                 music_play(D_001A3F5E == 0 ? D_00176833 : D_0017683A);
@@ -264,5 +264,5 @@ void music_choose_song(void)
             break;
         }
     }
-    func_0009DC49(seed);
+    srand(seed);
 }

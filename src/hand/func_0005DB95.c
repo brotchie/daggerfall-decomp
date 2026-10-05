@@ -12,7 +12,7 @@ extern char *compass_image;
 extern struct Img *compass_box_image;
 extern char game_mode;
 extern int ai_angle_diff(int, int, int *);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int func_000C808D();
 extern int func_00144F68();
 
@@ -32,7 +32,7 @@ void hud_draw_heading_strip(int a1)
         func_00144F68(compass_box_image->x, compass_box_image->y, compass_box_image->w, compass_box_image->h, compass_box_image->data);
         off = ((short)(player_object->angle & 0x7ff) << 5) / 256;
         for (i = 185; i <= 197; i++)
-            func_000A1023(screen_buffer + (i * 320 + 253), (i - 185) * 322 + (compass_image + off), 65, D_00175898, 440, 4);
+            mc_memcpy(screen_buffer + (i * 320 + 253), (i - 185) * 322 + (compass_image + off), 65, D_00175898, 440, 4);
         if (detect_target != 0) {
             dir = ai_angle_diff(player_object->angle, func_000C808D(player_object->x, player_object->z, detect_target->x, detect_target->z), &dist);
             dir = (dir << 5) / 256;
@@ -50,5 +50,5 @@ void hud_draw_heading_strip(int a1)
     func_00144F68(compass_box_image->x - 250, compass_box_image->y - 11, compass_box_image->w, compass_box_image->h, compass_box_image->data);
     off = ((D_000C23BC & 2047) << 5) / 256;
     for (i = 174; i <= 186; i++)
-        func_000A1023(screen_buffer + (i * 320 + 3), (i - 174) * 322 + (compass_image + off), 65, D_00175898, 460, 4);
+        mc_memcpy(screen_buffer + (i * 320 + 3), (i - 174) * 322 + (compass_image + off), 65, D_00175898, 460, 4);
 }

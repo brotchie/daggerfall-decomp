@@ -23,7 +23,7 @@ extern void func_000CDD81(int);
 extern void func_0012DB50(int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void sheet_show_career_skills(short a1, short a2)
 {
@@ -44,7 +44,7 @@ void sheet_show_career_skills(short a1, short a2)
     }
     if (D_00199644) {
         func_000A0ED9(327, D_00170C67);
-        func_000A0F5C(text_buffer, D_00170CC0, player_character->level / 10 + 1, player_character->level / 5 + 1);
+        mc_sprintf(text_buffer, D_00170CC0, player_character->level / 10 + 1, player_character->level / 5 + 1);
         D_001903A5 = 96;
         func_000A1054(p, text_buffer, D_00170C67, 329, 4);
     }

@@ -5,12 +5,12 @@ extern char namegen_part_offsets[];
 extern char namegen_part_counts[];
 extern char namegen_syllable[];
 
-extern int func_0009DC25();
-extern int func_000A006E();
+extern int rand();
+extern int lseek();
 extern int func_000A00CB();
 
 void namegen_read_part(short a1, short a2)
 {
-    func_000A006E((int)(short)a1, *(int *)(namegen_part_offsets + (((int)(short)a2) << 2)) + ((func_0009DC25() % *(int *)(namegen_part_counts + (((int)(short)a2) << 2))) * 10), 0);
+    lseek((int)(short)a1, *(int *)(namegen_part_offsets + (((int)(short)a2) << 2)) + ((rand() % *(int *)(namegen_part_counts + (((int)(short)a2) << 2))) * 10), 0);
     func_000A00CB((int)(short)a1, (int)namegen_syllable, 10);
 }

@@ -33,8 +33,8 @@ extern char *object_create_child(char *, int, int);
 extern void object_foreach(int, void (*)());
 extern char *object_find_by_id(char *, int);
 extern void object_delete_quest_objects(char *, int);
-extern int func_0009DC25(void);
-extern void func_0009DC49(int);
+extern int rand(void);
+extern void srand(int);
 extern int func_000C7FD9(int, int, int, int);
 
 #endif

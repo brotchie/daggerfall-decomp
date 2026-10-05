@@ -28,7 +28,7 @@ extern int D_001A3F34;
 extern unsigned char sound_enabled;
 extern void func_00068BA8(int, int);
 extern void sound_volume_pan(char *, char *, int *, int *, char *);
-extern void func_000A0040(void *, int, int, char *, int, int);
+extern void mc_memset(void *, int, int, char *, int, int);
 extern short func_000A2460(int, int);
 extern int func_000A2504(int, struct voice *);
 extern void func_000A2687(int, int);
@@ -82,7 +82,7 @@ int sound_play_sample(int a1, int a2, int a3, int a4)
         sound_volume_pan(sound_channels[i].buf, sound_channels[i].ptr + 7, &vol, &x, sound_channels[i].ptr);
     else
         sound_volume_pan(sound_channels[i].buf, sound_channels[i].buf, &vol, &x, sound_channels[i].ptr);
-    func_000A0040(&sound_channels[i], 0, 240, D_00175ACC, 246, 4);
+    mc_memset(&sound_channels[i], 0, 240, D_00175ACC, 246, 4);
     sound_channels[i].prio = a4;
     sound_channels[i].sample = a1;
     sound_channels[i].len = a2;

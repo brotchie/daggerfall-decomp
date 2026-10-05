@@ -11,10 +11,10 @@ extern struct save *current_quest;
 extern int text_rsc_load(int, int, int);
 extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 int func_0003E6B1(struct save *s, short a2, short a3, short a4)
 {
@@ -27,13 +27,13 @@ int func_0003E6B1(struct save *s, short a2, short a3, short a4)
         return 0;
     if (s->num != 0) {
         func_000A0ED9(545, D_00170D55);
-        func_000A0F5C(text_rsc_buffer, D_00170DA2, s->num);
+        mc_sprintf(text_rsc_buffer, D_00170DA2, s->num);
     } else {
-        func_000A1023(text_rsc_buffer, s->name, 8, D_00170D55, 547, 2048);
+        mc_memcpy(text_rsc_buffer, s->name, 8, D_00170D55, 547, 2048);
     }
     D_00190FEC = 0;
     func_000A0ED9(550, D_00170D55);
-    func_000A0F5C(text_buffer, D_00170DA7, text_rsc_buffer);
+    mc_sprintf(text_buffer, D_00170DA7, text_rsc_buffer);
     if ((D_00195D6C = disk_open_data(text_buffer)) > 0) {
         res = text_rsc_load(a2, 0, a4);
         func_0009DEA7(D_00195D6C);

@@ -7,11 +7,11 @@ extern char text_rsc_buffer[];
 extern char current_quest[];
 
 extern int text_qrc_load(int, short, short, short);
-extern int func_000A0024();
-extern int func_000A0AD9();
+extern int mc_free();
+extern int mc_strncpy();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 #pragma aux func_000A0ED9 parm routine [];
 
 void quest_load_text(int a1, int a2, short a3, int a4)
@@ -22,20 +22,20 @@ void quest_load_text(int a1, int a2, short a3, int a4)
     *(int *)current_quest = a1;
     if (*(short *)((char *)a1 + 4) == 0) goto L4A79D;
     func_000A0ED9(2016, (int)D_0017110C);
-    func_000A0F5C((int)l_2C, (int)D_001711A4, (int)(short)*(short *)((char *)a1 + 4));
+    mc_sprintf((int)l_2C, (int)D_001711A4, (int)(short)*(short *)((char *)a1 + 4));
     goto L4A7BC;
 L4A79D:;
-    func_000A1023((int)l_2C, a1 + 6, 8, (int)D_0017110C, 2018, 13);
+    mc_memcpy((int)l_2C, a1 + 6, 8, (int)D_0017110C, 2018, 13);
 L4A7BC:;
     *(signed char *)((char *)l_2C + 8) = 0;
     l_10 = text_qrc_load((int)l_2C, (int)(short)*(short *)&a2, (int)(short)a3, (int)(short)*(short *)&a4);
     if (l_10 == 0) return;
-    func_000A0AD9((int)text_rsc_buffer, l_10, 2048, (int)D_0017110C, 2022);
+    mc_strncpy((int)text_rsc_buffer, l_10, 2048, (int)D_0017110C, 2022);
     if (l_10 == 0) goto L4A808;
     if (l_10 != (-1751672937)) goto L4A80A;
 L4A808:;
     return;
 L4A80A:;
-    func_000A0024(l_10, (int)D_0017110C, 2023);
+    mc_free(l_10, (int)D_0017110C, 2023);
     l_10 = -1751672937;
 }

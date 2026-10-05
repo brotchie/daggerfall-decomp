@@ -14,10 +14,10 @@ extern int faction_find_type_in_region(int, short);
 extern int faction_find(short);
 extern int flats_cfg_find(int);
 extern int func_0008B48B(int);
-extern int func_0009DC25();
-extern int func_0009DC49();
-extern int func_000A0040();
-extern int func_000A0AD9();
+extern int rand();
+extern int srand();
+extern int mc_memset();
+extern int mc_strncpy();
 
 int npc_talk_record_build(int a1)
 {
@@ -27,10 +27,10 @@ int npc_talk_record_build(int a1)
     int l_20;
     int l_1C;
 
-    l_24 = func_0009DC25();
+    l_24 = rand();
     l_20 = flats_cfg_find((int)(unsigned short)*(short *)((char *)a1 + 27));
     l_2C = a1 + 71;
-    func_000A0040((int)npc_record_buffer, 0, 560, (int)D_0017573C, 226, 4);
+    mc_memset((int)npc_record_buffer, 0, 560, (int)D_0017573C, 226, 4);
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 53) goto L59A0D;
     *(short *)D_0019995C = ((int)(unsigned short)*(short *)D_0019995C) | ((((int)(unsigned short)(*(short *)((char *)a1 + 25) & 16384)) != 0) ? 1 : 0);
     goto L59A4F;
@@ -66,12 +66,12 @@ L59AC0:;
 L59AE4:;
     goto L59B07;
 L59AE6:;
-    func_000A0AD9((int)npc_record_buffer, l_1C + 3, 32, (int)D_0017573C, 245);
+    mc_strncpy((int)npc_record_buffer, l_1C + 3, 32, (int)D_0017573C, 245);
     goto L59B2A;
 L59B07:;
-    func_000A0AD9((int)npc_record_buffer, func_0008B48B(a1), 32, (int)D_0017573C, 247);
+    mc_strncpy((int)npc_record_buffer, func_0008B48B(a1), 32, (int)D_0017573C, 247);
 L59B2A:;
-    func_0009DC49(*(int *)((char *)a1 + 31));
+    srand(*(int *)((char *)a1 + 31));
     l_28 = 1;
 L59B3C:;
     if (l_28 < 5) goto L59B4C;
@@ -80,9 +80,9 @@ L59B44:;
     l_28++;
     goto L59B3C;
 L59B4C:;
-    *(short *)(D_001999AD + (l_28 * 2)) = func_0009DC25();
+    *(short *)(D_001999AD + (l_28 * 2)) = rand();
     goto L59B44;
 L59B5F:;
-    func_0009DC49(l_24);
+    srand(l_24);
     return (int)npc_record_buffer;
 }

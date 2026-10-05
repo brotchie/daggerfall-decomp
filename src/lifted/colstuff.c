@@ -65,8 +65,8 @@ extern char collide_flags[];
 
 extern int object_find_open(int, int);
 extern int door_start_swing(int, int);
-extern int func_000A1023();
-extern int func_000A132C();
+extern int mc_memcpy();
+extern int memcmp();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_0014A300();
@@ -106,9 +106,9 @@ L21A49:;
     *(int *)D_00196B10 = *(int *)((char *)a1 + 7);
     *(int *)D_00196B14 = *(int *)((char *)a1 + 11);
     *(int *)D_00196B18 = *(int *)((char *)a1 + 15);
-    func_000A1023((int)D_00196B28, a2, 12, (int)D_00170710, 61, 4);
+    mc_memcpy((int)D_00196B28, a2, 12, (int)D_00170710, 61, 4);
     if (a3 == 0) goto L21AA6;
-    func_000A1023((int)D_00196B34, a3, 12, (int)D_00170710, 63, 4);
+    mc_memcpy((int)D_00196B34, a3, 12, (int)D_00170710, 63, 4);
 L21AA6:;
     collide_for_each_nearby(a1, (int)func_00021B04);
     if (((int)(short)(*(short *)collide_flags & 10)) != 0) goto L21AEF;
@@ -509,9 +509,9 @@ L22A22:;
 L22A24:;
     *(int *)D_00196D60 = *(int *)((char *)a1 + 11) + 1000;
 L22A34:;
-    func_000A1023((int)D_00196B28, a3, 12, (int)D_00170710, 474, 4);
+    mc_memcpy((int)D_00196B28, a3, 12, (int)D_00170710, 474, 4);
     if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L22A79;
-    if (func_000A132C(a3, a1 + 7, 12) == 0) goto L22A7B;
+    if (memcmp(a3, a1 + 7, 12) == 0) goto L22A7B;
 L22A79:;
     goto L22A82;
 L22A7B:;
@@ -935,8 +935,8 @@ L23C5E:;
 int collide_line_of_sight(int a1, int a2)
 {
     *(signed char *)itemmaker_slot_kinds = 0;
-    func_000A1023((int)D_00196B10, a1 + 7, 12, (int)D_00170710, 923, 4);
-    func_000A1023((int)D_00196B1C, a2 + 7, 12, (int)D_00170710, 924, 4);
+    mc_memcpy((int)D_00196B10, a1 + 7, 12, (int)D_00170710, 923, 4);
+    mc_memcpy((int)D_00196B1C, a2 + 7, 12, (int)D_00170710, 924, 4);
     *(int *)D_00196B14 -= 40;
     *(int *)D_00196B20 -= 40;
     *(int *)D_00195CD0 = (int)object_find_open;
@@ -1054,9 +1054,9 @@ int func_00023FA5(int a1, int a2, int a3)
 L24052:;
     *(int *)D_00196D60 = *(int *)((char *)a1 + 11) + 1000;
 L24062:;
-    func_000A1023((int)D_00196B28, a3, 12, (int)D_00170710, 1021, 4);
+    mc_memcpy((int)D_00196B28, a3, 12, (int)D_00170710, 1021, 4);
     if (((int)(short)(*(short *)collide_flags & 4)) == 0) goto L240A7;
-    if (func_000A132C(a3, a1 + 7, 12) == 0) goto L240A9;
+    if (memcmp(a3, a1 + 7, 12) == 0) goto L240A9;
 L240A7:;
     goto L240B0;
 L240A9:;
@@ -1232,8 +1232,8 @@ L24541:;
 
 int func_0002455D(int a1)
 {
-    func_000A1023((int)D_00196B10, a1 + 7, 12, (int)D_00170710, 1143, 4);
-    func_000A1023((int)D_00196B1C, a1 + 7, 12, (int)D_00170710, 1144, 4);
+    mc_memcpy((int)D_00196B10, a1 + 7, 12, (int)D_00170710, 1143, 4);
+    mc_memcpy((int)D_00196B1C, a1 + 7, 12, (int)D_00170710, 1144, 4);
     *(int *)D_00196B14 -= 20;
     *(int *)D_00196B20 += 40;
     *(int *)D_00196D60 = 100000;

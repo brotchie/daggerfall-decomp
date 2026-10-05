@@ -15,7 +15,7 @@ struct Obj {
 };
 extern int game_minutes;
 extern void qaction_place_foe(struct Obj *, int);
-extern int func_0009DC25(void);
+extern int rand(void);
 
 void quest_op09_spawn_repeat(int a1, struct Obj *o)
 {
@@ -27,7 +27,7 @@ void quest_op09_spawn_repeat(int a1, struct Obj *o)
     if (game_minutes - o->last < o->interval)
         return;
     o->last = game_minutes;
-    if (func_0009DC25() % 100 > o->chance)
+    if (rand() % 100 > o->chance)
         return;
     if (o->charges != -1)
         o->charges--;

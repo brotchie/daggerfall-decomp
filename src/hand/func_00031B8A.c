@@ -87,9 +87,9 @@ extern void location_pick_random_town(char *);
 extern struct Item *object_create_child(int, int, int);
 extern int object_reparent(struct Item *, struct Item *);
 extern int object_new_id(int);
-extern int func_0009DC25(void);
-extern int func_000A0AD9(char *, char *, int, char *, int);
-extern int func_000A1023(void *, void *, int, char *, int, int);
+extern int rand(void);
+extern int mc_strncpy(char *, char *, int, char *, int);
+extern int mc_memcpy(void *, void *, int, char *, int, int);
 
 int quest_init_person(struct Req *r)
 {
@@ -124,7 +124,7 @@ int quest_init_person(struct Req *r)
                 sub->f18 = 510;
             if (sub->f18 == 0)
                 sub->f18 = faction_find_type_in_region(current_region, 15)->f21;
-            func_000A1023(&it->sub, sub, 26, D_00170A64, 64, 4);
+            mc_memcpy(&it->sub, sub, 26, D_00170A64, 64, 4);
         } else if (D_00195CE8->sub.f0 != 0) {
             it->sub.f18 = D_00195CE8->sub.f0;
         }
@@ -132,8 +132,8 @@ int quest_init_person(struct Req *r)
             it->f19 = D_00195CE8->sub.f0;
         else
             it->f19 = sub->f18;
-        func_000A0AD9(it->name, (char *)current_location, 4, D_00170A64, 76);
-        func_000A1023(&it->pos, &D_00195CE8->pos, 12, D_00170A64, 77, 4);
+        mc_strncpy(it->name, (char *)current_location, 4, D_00170A64, 76);
+        mc_memcpy(&it->pos, &D_00195CE8->pos, 12, D_00170A64, 77, 4);
         it->type = 41;
         it->id = D_00195CE8->id;
         r->obj = it;
@@ -255,7 +255,7 @@ int quest_init_person(struct Req *r)
         }
     }
     if ((int)(short)(r->flags & 0xff) == 255)
-        r->flags = (r->flags & 0xff00) + (func_0009DC25() & 1);
+        r->flags = (r->flags & 0xff00) + (rand() & 1);
     tries = 0;
 retry:
     if ((int)(short)(r->flags & 0xff) == 0) {
@@ -277,7 +277,7 @@ retry:
     if ((int)(short)(r->flags & 0x600) != 0)
         D_001970DD = (int)(short)(r->flags & 0x200) != 0 ? 1 : 0;
     else
-        D_001970DD = func_0009DC25() & 1;
+        D_001970DD = rand() & 1;
     if ((int)(short)(r->flags & 0x100) == 0) {
         for (found = i = 0, e = list; i < n; i++, e++) {
             if (e->a != 65535 && func_000339B2(e, r, &rec->recs[e->a], 0) != 0)
@@ -313,13 +313,13 @@ retry:
     }
     if (found == 0)
         return 0;
-    i = func_0009DC25() % found;
+    i = rand() % found;
     if (any != 0 && quest_object_in_use((src->f1f & 0xffff0000) + (buf[i] & 0xffff)) != 0 && ++tries < 100)
         goto retry;
     it = object_create_child(nonworld_root, 0, 58);
-    func_000A1023(&it->pos, &src->pos, 12, D_00170A64, 307, 4);
-    func_000A1023(&it->sub, &rec->recs[(unsigned)buf[i] >> 16], 26, D_00170A64, 308, 4);
-    func_000A0AD9(it->name, (char *)rec, 4, D_00170A64, 309);
+    mc_memcpy(&it->pos, &src->pos, 12, D_00170A64, 307, 4);
+    mc_memcpy(&it->sub, &rec->recs[(unsigned)buf[i] >> 16], 26, D_00170A64, 308, 4);
+    mc_strncpy(it->name, (char *)rec, 4, D_00170A64, 309);
     if (it->sub.f18 == 0)
         it->sub.f18 = faction_find_type_in_region(current_region, 15)->f21;
     if (npc != 0)

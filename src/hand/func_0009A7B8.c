@@ -18,7 +18,7 @@ extern unsigned char D_001940D5;
 extern struct obj *player_object;
 extern struct obj *marker_find_nearest(int, int);
 extern int func_0009DEAC(int);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 void func_0009A7B8(void)
 {
@@ -33,10 +33,10 @@ void func_0009A7B8(void)
     if (p == 0 || p->type != 43) return;
     q = marker_find_nearest(p->f63, 19);
     if (q == 0) return;
-    func_000A1023(&a, q, 71, D_00177358, 521, 4);
+    mc_memcpy(&a, q, 71, D_00177358, 521, 4);
     q = marker_find_nearest(p->f63, 20);
     if (q == 0) return;
-    func_000A1023(&b, q, 71, D_00177358, 525, 4);
+    mc_memcpy(&b, q, 71, D_00177358, 525, 4);
     if (func_0009DEAC(player_object->y - a.y) > func_0009DEAC(player_object->y - b.y)) {
         player_object->x = a.x;
         player_object->y = a.y;

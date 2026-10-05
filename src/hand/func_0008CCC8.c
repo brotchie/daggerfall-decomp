@@ -16,9 +16,9 @@ struct list {
 extern char D_00176E38[];
 extern struct bits8 D_001940D8;
 extern void picklist_update_thumb(struct list *);
-extern void func_000A0AD9(char *, char *, int, char *, int);
-extern void func_000A0E0D(void *, void *, int, char *, int, int);
-extern int func_000A0E3B(char *, char *);
+extern void mc_strncpy(char *, char *, int, char *, int);
+extern void mc_memmove(void *, void *, int, char *, int, int);
+extern int stricmp(char *, char *);
 
 void picklist_add(struct list *l, char *name, short val)
 {
@@ -27,25 +27,25 @@ void picklist_add(struct list *l, char *name, short val)
 
     if (D_001940D8.b0) {
         if (l->count == 0) {
-            func_000A0AD9(l->items->name, name, 40, D_00176E38, 70);
+            mc_strncpy(l->items->name, name, 40, D_00176E38, 70);
             l->items->val = val;
             l->items->idx = l->count;
         } else {
             for (i = 0; i < l->count; i++) {
-                if (func_000A0E3B(l->items[i].name, name) >= 0) {
-                    func_000A0E0D(&l->items[i + 1], &l->items[i], (l->count - i) * 44, D_00176E38, 80, 4);
-                    func_000A0AD9(l->items[i].name, name, 40, D_00176E38, 81);
+                if (stricmp(l->items[i].name, name) >= 0) {
+                    mc_memmove(&l->items[i + 1], &l->items[i], (l->count - i) * 44, D_00176E38, 80, 4);
+                    mc_strncpy(l->items[i].name, name, 40, D_00176E38, 81);
                     l->items[i].val = val;
                     l->items[i].idx = l->count;
                     goto done;
                 }
             }
-            func_000A0AD9(l->items[l->count].name, name, 40, D_00176E38, 87);
+            mc_strncpy(l->items[l->count].name, name, 40, D_00176E38, 87);
             l->items[l->count].val = val;
             l->items[l->count].idx = l->count;
         }
     } else {
-        func_000A0AD9(l->items[l->count].name, name, 40, D_00176E38, 94);
+        mc_strncpy(l->items[l->count].name, name, 40, D_00176E38, 94);
         l->items[l->count].val = val;
         l->items[l->count].idx = l->count;
     }

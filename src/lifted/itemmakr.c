@@ -95,13 +95,13 @@ extern int object_free_single(int);
 extern int object_delete(int);
 extern int inv_draw_item_cell(int, int, int);
 extern int func_0009DEA7();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A0AD9();
-extern int func_000A0B42();
+extern int mc_free();
+extern int mc_memset();
+extern int mc_strncpy();
+extern int write();
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
+extern int mc_sprintf(int, ...);
 extern int func_000A1054();
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
@@ -139,12 +139,12 @@ void itemmaker_reset(void)
     *(int *)itemmaker_item_object = 0;
     *(int *)itemmaker_item = 0;
     *(int *)inv_left_scroll = 0;
-    func_000A0040((int)itemmaker_slot_kinds, -1, 10, (int)D_001756A3, 77, 128);
-    func_000A0040((int)D_00190CEE, -1, 30, (int)D_001756A3, 78, 4);
-    func_000A0040((int)D_00190D02, -1, 30, (int)D_001756A3, 79, 4);
-    func_000A0040((int)D_00199868, -1, 120, (int)D_001756A3, 80, 120);
-    func_000A0040((int)itemmaker_slots, 0, 40, (int)D_001756A3, 81, 40);
-    func_000A0040((int)D_00199910, 0, 10, (int)D_001756A3, 82, 10);
+    mc_memset((int)itemmaker_slot_kinds, -1, 10, (int)D_001756A3, 77, 128);
+    mc_memset((int)D_00190CEE, -1, 30, (int)D_001756A3, 78, 4);
+    mc_memset((int)D_00190D02, -1, 30, (int)D_001756A3, 79, 4);
+    mc_memset((int)D_00199868, -1, 120, (int)D_001756A3, 80, 120);
+    mc_memset((int)itemmaker_slots, 0, 40, (int)D_001756A3, 81, 40);
+    mc_memset((int)D_00199910, 0, 10, (int)D_001756A3, 82, 10);
 }
 
 int itemmaker_close(void)
@@ -161,7 +161,7 @@ L56209:;
 L56225:;
     goto L56245;
 L56227:;
-    func_000A0024(*(int *)window_image, (int)D_001756A3, 141);
+    mc_free(*(int *)window_image, (int)D_001756A3, 141);
     *(int *)window_image = -1751672937;
 L56245:;
     if (*(int *)spellshop_icons == 0) goto L5625A;
@@ -169,7 +169,7 @@ L56245:;
 L5625A:;
     goto L5627A;
 L5625C:;
-    func_000A0024(*(int *)spellshop_icons, (int)D_001756A3, 142);
+    mc_free(*(int *)spellshop_icons, (int)D_001756A3, 142);
     *(int *)spellshop_icons = -1751672937;
 L5627A:;
     *(signed char *)D_001940D8 &= 251;
@@ -188,7 +188,7 @@ void itemmaker_enter_name(void)
 L56847:;
     l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(242, (int)D_001756A3);
-    func_000A0F5C(l_18, (int)D_001756BE, *(int *)D_0017D1EA);
+    mc_sprintf(l_18, (int)D_001756BE, *(int *)D_0017D1EA);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
     inpstr_begin_text(*(int *)itemmaker_item, 23);
     msgbox_show_string(l_18, 2);
@@ -356,7 +356,7 @@ L57211:;
 L57213:;
     itemmaker_clear_soul_slots();
 L57218:;
-    func_000A0040(((int)D_00199868) + (((int)(short)a1) * 10), -1, 10, (int)D_001756A3, 511, 4);
+    mc_memset(((int)D_00199868) + (((int)(short)a1) * 10), -1, 10, (int)D_001756A3, 511, 4);
     *(signed char *)(itemmaker_slot_kinds + ((int)(short)a1)) = 255;
     *(short *)(D_001998E2 + (((int)(short)a1) << 2)) = 0;
 }
@@ -375,7 +375,7 @@ L57294:;
 L572B3:;
     *(signed char *)(text_rsc_buffer + *(int *)D_00195B84) = *(signed char *)((char *)a1 + 27);
     *(int *)(D_00190EE4 + ((*(int *)D_00195B84)++ << 2)) = *(int *)D_00190EDC;
-    func_000A0AD9(*(int *)D_00190EDC, *(int *)(monster_names + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)), 4, (int)D_001756A3, 526);
+    mc_strncpy(*(int *)D_00190EDC, *(int *)(monster_names + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2)), 4, (int)D_001756A3, 526);
     l_18 = *(int *)D_00190EDC;
     l_18 += func_000A0DF4(*(int *)(monster_names + (((int)(unsigned short)*(short *)((char *)a1 + 27)) << 2))) + 1;
     *(int *)D_00190EDC = l_18;
@@ -754,7 +754,7 @@ void func_00057F42(void)
 
     if (*(signed char *)cfg_item_file == 0) return;
     l_18 = disk_create((int)cfg_item_file);
-    func_000A0B42(l_18, *(int *)itemmaker_item, 107);
+    write(l_18, *(int *)itemmaker_item, 107);
     func_0009DEA7(l_18);
 }
 
@@ -774,10 +774,10 @@ L58498:;
     *(signed char *)(D_00199910 + l_18) = 0;
     *(signed char *)(itemmaker_slot_kinds + l_18) = 255;
     *(short *)(itemmaker_slots + (l_18 << 2)) = (*(short *)(D_001998E2 + (l_18 << 2)) = 0);
-    func_000A0040(((int)D_00199868) + (l_18 * 10), -1, 10, (int)D_001756A3, 939, 4);
+    mc_memset(((int)D_00199868) + (l_18 * 10), -1, 10, (int)D_001756A3, 939, 4);
     goto L58490;
 L58503:;
-    func_000A0040((int)D_001998CC, -1, 20, (int)D_001756A3, 942, 4);
+    mc_memset((int)D_001998CC, -1, 20, (int)D_001756A3, 942, 4);
 }
 
 void func_0005852D(int a1)
@@ -785,7 +785,7 @@ void func_0005852D(int a1)
     int l_18;
 
     *(short *)inv_left_count = (*(short *)D_001AA586 = 0);
-    func_000A0040((int)inv_left_rows, 0, 20, (int)D_001756A3, 951, 20);
+    mc_memset((int)inv_left_rows, 0, 20, (int)D_001756A3, 951, 20);
     if (*(int *)inv_left_container == *(int *)player_entity) goto L58596;
     inv_draw_item_cell(*(int *)inv_left_container, 0, a1);
     *(int *)D_001AA578 = *(int *)inv_left_container;
@@ -1024,7 +1024,7 @@ L58BD0:;
     if (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) == (-1)) goto L58BC8;
     if (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) >= 15) goto L58CD5;
     func_000A0ED9(1128, (int)D_001756A3);
-    func_000A0F5C((int)text_buffer, (int)D_00175734, *(int *)(enchant_power_names + (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) << 2)));
+    mc_sprintf((int)text_buffer, (int)D_00175734, *(int *)(enchant_power_names + (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) << 2)));
     if (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 69)) == (-1)) goto L58CD0;
     if (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) >= 3) goto L58C8D;
     func_000A1054((int)text_buffer, spell_name_by_id((int)(unsigned char)*(signed char *)((char *)((l_20 << 2) + a1) + 69)), (int)D_001756A3, 1132, 160);
@@ -1035,7 +1035,7 @@ L58CD0:;
     goto L58DAB;
 L58CD5:;
     func_000A0ED9(1139, (int)D_001756A3);
-    func_000A0F5C((int)text_buffer, (int)D_00175734, *(int *)(D_00180ACE + (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) << 2)));
+    mc_sprintf((int)text_buffer, (int)D_00175734, *(int *)(D_00180ACE + (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) << 2)));
     if (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 69)) == (-1)) goto L58DAB;
     if (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) != 15) goto L58D68;
     func_000A1054((int)text_buffer, *(int *)(monster_names + (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 69)) << 2)), (int)D_001756A3, 1143, 160);
@@ -1044,7 +1044,7 @@ L58D68:;
     func_000A1054((int)text_buffer, *(int *)((char *)(int)(*(char **)(D_0018586F + (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 67)) << 2)) + (((int)(short)*(short *)((char *)((l_20 << 2) + a1) + 69)) << 2))), (int)D_001756A3, 1145, 160);
 L58DAB:;
     func_000A1054((int)text_buffer, (int)D_00175738, (int)D_001756A3, 1148, 160);
-    func_000A0AD9(l_1C, (int)text_buffer, 4, (int)D_001756A3, 1149);
+    mc_strncpy(l_1C, (int)text_buffer, 4, (int)D_001756A3, 1149);
     l_1C += func_000A0DF4(l_1C);
     goto L58BC8;
 L58DF5:;

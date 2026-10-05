@@ -84,19 +84,19 @@ extern int object_reparent(int, int);
 extern int object_find_item(int, int, int);
 extern int object_new_id(int);
 extern int func_0009DA1C(int, int);
-extern int func_0009DAEE(int, ...);
-extern int func_0009DC25();
-extern int func_0009DC49();
-extern int func_0009DC59(int, ...);
+extern int printf(int, ...);
+extern int rand();
+extern int srand();
+extern int open(int, ...);
 extern int func_0009DEA7();
-extern int func_000A0040();
+extern int mc_memset();
 extern int func_000A00CB();
-extern int func_000A0AD9();
+extern int mc_strncpy();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern int func_000A148C(int, ...);
-extern int func_000A16F8(int, ...);
+extern int fprintf(int, ...);
 extern int func_000C7FD9();
 extern int func_000CAE1C();
 extern void pickpocket_attempt(int);
@@ -129,19 +129,19 @@ void kludge_print_build(int a1)
     int l_18;
 
     func_000A0ED9(78, (int)D_00171044);
-    func_000A0F5C((int)text_buffer, (int)D_0017104D, (int)D_001917E4);
-    l_1C = func_0009DC59((int)text_buffer, 512);
+    mc_sprintf((int)text_buffer, (int)D_0017104D, (int)D_001917E4);
+    l_1C = open((int)text_buffer, 512);
     if (l_1C >= 0) goto L44D9E;
     func_000A0ED9(81, (int)D_00171044);
-    func_000A0F5C((int)text_buffer, (int)D_0017104D, (int)D_00191834);
-    l_1C = func_0009DC59((int)text_buffer, 512);
+    mc_sprintf((int)text_buffer, (int)D_0017104D, (int)D_00191834);
+    l_1C = open((int)text_buffer, 512);
     if (l_1C < 0) return;
 L44D9E:;
     func_000A00CB(l_1C, (int)text_buffer, 80);
-    func_000A16F8((int)D_001903BA, (int)D_0017105A, (int)&l_18);
+    fprintf((int)D_001903BA, (int)D_0017105A, (int)&l_18);
     if (a1 == 0) goto L44DEF;
     func_0009DA1C(90, (int)D_00171044);
-    func_0009DAEE((int)D_0017105D, l_18);
+    printf((int)D_0017105D, l_18);
     goto L44E0E;
 L44DEF:;
     func_000A0ED9(92, (int)D_00171044);
@@ -188,7 +188,7 @@ void show_rumor(void)
 
 void kludge_good_merchant_rep(void)
 {
-    *(short *)(*(char **)player_character + 147) = (func_0009DC25() % 50) + 10;
+    *(short *)(*(char **)player_character + 147) = (rand() % 50) + 10;
 }
 
 void kludge_jump_month(void)
@@ -223,7 +223,7 @@ L44FBE:;
     l_20 = object_create_child(l_20, 0, 89);
     *(signed char *)((char *)l_20) = 9;
     *(int *)((char *)l_20 + 31) = object_new_id(100);
-    func_000A1023(l_20 + 71, (int)(*(char **)spell_records + (((int)(short)l_18) * 89)), 89, (int)D_00171044, 165, 4);
+    mc_memcpy(l_20 + 71, (int)(*(char **)spell_records + (((int)(short)l_18) * 89)), 89, (int)D_00171044, 165, 4);
     goto L44FB6;
 }
 
@@ -239,8 +239,8 @@ void kludge_make_test_character(int a1)
     int l_1C;
     int l_18;
 
-    l_18 = func_0009DC25();
-    func_0009DC49(12345);
+    l_18 = rand();
+    srand(12345);
     *(signed char *)D_001940D9 |= 8;
     if (*(signed char *)cfg_gender == 0) goto L45086;
     if (a1 != 0) goto L45088;
@@ -261,9 +261,9 @@ L450C0:;
     disk_read_file((int)D_00171077, *(int *)player_class);
     *(short *)(*(char **)player_class + 14) = 0;
     *(short *)(*(char **)player_class + 11) = 0;
-    func_000A0AD9(*(int *)player_character, (int)D_00171083, 32, (int)D_00171044, 197);
-    func_000A1023(*(int *)player_character + 32, (int)D_0017BAE2, 16, (int)D_00171044, 198, 16);
-    func_000A1023(*(int *)player_character + 48, *(int *)player_character + 32, 16, (int)D_00171044, 199, 16);
+    mc_strncpy(*(int *)player_character, (int)D_00171083, 32, (int)D_00171044, 197);
+    mc_memcpy(*(int *)player_character + 32, (int)D_0017BAE2, 16, (int)D_00171044, 198, 16);
+    mc_memcpy(*(int *)player_character + 48, *(int *)player_character + 32, 16, (int)D_00171044, 199, 16);
     *(signed char *)(*(char **)player_character + 66) = 0;
     l_1C = 0;
 L45183:;
@@ -360,7 +360,7 @@ L45268:;
     inv_store_item(l_38);
     l_38 = object_create_child(l_38, 0, 109);
     *(signed char *)((char *)l_38) = 31;
-    func_000A1023(l_38 + 71, (int)potion_recipes, 109, (int)D_00171044, 289, 4);
+    mc_memcpy(l_38 + 71, (int)potion_recipes, 109, (int)D_00171044, 289, 4);
     l_38 = object_create_child(*(int *)D_001959DC, 0, 107);
     *(signed char *)((char *)l_38) = 2;
     l_20 = l_38 + 71;
@@ -383,7 +383,7 @@ L45268:;
     item_make_artifact(l_20, (int)(unsigned char)*(signed char *)cfg_artifact);
     player_refresh_paperdoll();
     *(signed char *)D_001940D9 &= 247;
-    func_0009DC49(l_18);
+    srand(l_18);
 }
 
 void starting_equipment_give(void)
@@ -475,13 +475,13 @@ void func_00045B7F(void)
     *(short *)(*(char **)player_character + 247) = 80;
     l_1C = object_create_child(*(int *)D_00195AC4, 0, 659);
     *(signed char *)((char *)l_1C) = 18;
-    l_18 = func_0009DC25() % 20;
+    l_18 = rand() % 20;
     *(signed char *)itemmaker_slot_kinds = 2;
     *(signed char *)D_00190CE5 = *(signed char *)&l_18;
     monster_init(l_1C, l_18);
     *(signed char *)itemmaker_slot_kinds = 3;
     func_000A0ED9(448, (int)D_00171044);
-    func_000A0F5C((int)text_buffer, (int)D_00171096, *(int *)(monster_names + (l_18 << 2)));
+    mc_sprintf((int)text_buffer, (int)D_00171096, *(int *)(monster_names + (l_18 << 2)));
     hud_message_add((int)text_buffer);
     *(signed char *)itemmaker_slot_kinds = 4;
     pickpocket_attempt(l_1C);
@@ -503,7 +503,7 @@ void func_00045C9D(void)
 {
     int l_18;
 
-    func_000A0040(*(int *)player_character + 367, 0, 108, (int)D_00171044, 469, 108);
+    mc_memset(*(int *)player_character + 367, 0, 108, (int)D_00171044, 469, 108);
     l_18 = *(int *)(*(char **)player_entity + 63);
 L45CD8:;
     if (l_18 == 0) return;
@@ -532,7 +532,7 @@ L45D33:;
     if (*(int *)(D_00132F6C + (l_24 << 2)) == 0) goto L45D2B;
     l_18 = *(int *)(D_00132F6C + (l_24 << 2)) - 22;
     func_000A0ED9(487, (int)D_00171044);
-    func_000A0F5C((int)text_buffer, (int)D_001710BA, *(int *)((char *)l_18 + 8), *(int *)(D_00132F6C + (l_24 << 2)) + 2);
+    mc_sprintf((int)text_buffer, (int)D_001710BA, *(int *)((char *)l_18 + 8), *(int *)(D_00132F6C + (l_24 << 2)) + 2);
     text_draw((int)text_buffer, (l_20 / 25) * 160, (l_20 % 25) << 3);
     l_20++;
     l_1C += *(int *)((char *)l_18 + 8);
@@ -540,7 +540,7 @@ L45D33:;
 L45DD7:;
     *(signed char *)D_0012B508 = 245;
     func_000A0ED9(494, (int)D_00171044);
-    func_000A0F5C((int)text_buffer, (int)D_001710C3, l_1C);
+    mc_sprintf((int)text_buffer, (int)D_001710C3, l_1C);
     text_draw((int)text_buffer, (l_20 / 25) * 160, (l_20 % 25) << 3);
 }
 
@@ -683,7 +683,7 @@ L460B2:;
     l_20++;
     goto L460B2;
 L460D8:;
-    func_000A1023(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_00171044, 582, 4);
+    mc_memcpy(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_00171044, 582, 4);
     l_24++;
     goto L46064;
 }

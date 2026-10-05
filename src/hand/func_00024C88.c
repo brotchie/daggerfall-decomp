@@ -68,11 +68,11 @@ extern int disk_read_file(char *, char *);
 extern struct thing *object_create_child(struct thing *, int, int);
 extern void inv_store_item(struct thing *);
 extern void inv_merge_arrows(struct thing *, struct thing *, int);
-extern void func_000A0040(void *, int, int, char *, int, int);
-extern int func_000A0D13(unsigned char *);
+extern void mc_memset(void *, int, int, char *, int, int);
+extern int atoi(unsigned char *);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 unsigned char *career_answer_effect(unsigned char *a1)
 {
@@ -87,52 +87,52 @@ unsigned char *career_answer_effect(unsigned char *a1)
     while (*a1 <= 32)
         a1++;
     if (*(unsigned short *)a1 == 0x5047)
-        player_character->gold += func_000A0D13(career_skip_word(a1));
+        player_character->gold += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x6672) {
         a1 += 2;
-        f = faction_find(func_000A0D13(a1));
+        f = faction_find(atoi(a1));
         if (f != 0)
-            f->rep += func_000A0D13(career_skip_word(a1));
+            f->rep += atoi(career_skip_word(a1));
     } else if (*(unsigned short *)a1 == 0x7272)
-        region_legal_reputation[D_00190D68].f0 += func_000A0D13(career_skip_word(a1));
+        region_legal_reputation[D_00190D68].f0 += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x494D) {
         a1 = career_skip_word(a1);
         if (*a1 == '+')
-            func_000252C7(func_000A0D13(a1));
+            func_000252C7(atoi(a1));
         else
-            func_000252E2(func_000A0D13(a1));
+            func_000252E2(atoi(a1));
     } else if (*(unsigned short *)a1 == 0x5252)
-        player_character->f548 += func_000A0D13(career_skip_word(a1));
+        player_character->f548 += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x4452)
-        bio_modifiers += func_000A0D13(career_skip_word(a1));
+        bio_modifiers += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x524D)
-        D_0018DDD8 += func_000A0D13(career_skip_word(a1));
+        D_0018DDD8 += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x4854)
-        D_0018DDDC += func_000A0D13(career_skip_word(a1));
+        D_0018DDDC += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x5052)
-        D_0018DDE0 += func_000A0D13(career_skip_word(a1));
+        D_0018DDE0 += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x5446)
-        D_0018DDE4 += func_000A0D13(career_skip_word(a1));
+        D_0018DDE4 += atoi(career_skip_word(a1));
     else if (*(unsigned short *)a1 == 0x4541 || *(unsigned short *)a1 == 0x4641 || *(unsigned short *)a1 == 0x4F41) {
         c = a1[1];
         p = (struct npc *)(D_00147954 + 70000);
         q = D_00147954 + 75000;
-        func_000A0040(p, 0, 560, D_00170738, 279, 4);
-        func_000A0040(q, 0, 74, D_00170738, 280, 4);
+        mc_memset(p, 0, 560, D_00170738, 279, 4);
+        mc_memset(q, 0, 74, D_00170738, 280, 4);
         a1 = career_skip_word(a1);
         if (*a1 == 'F')
             p->flags |= 1;
         else if (*a1 == 'O')
             p->flags |= (player_character->flags & 1) ^ 1;
         a1 = career_skip_word(a1);
-        p->f67 = func_000A0D13(a1);
+        p->f67 = atoi(a1);
         a1 = career_skip_word(a1);
-        n = func_000A0D13(a1);
+        n = atoi(a1);
         p->f549 = n;
         a1 = career_skip_word(a1);
-        p->f129 = func_000A0D13(a1);
+        p->f129 = atoi(a1);
         func_000A0ED9(292, D_00170738);
-        func_000A0F5C(text_buffer, D_00170765, n);
+        mc_sprintf(text_buffer, D_00170765, n);
         disk_read_file(text_buffer, q);
         if (c == 'E') {
             parse_expand(D_00170773, p);
@@ -143,14 +143,14 @@ unsigned char *career_answer_effect(unsigned char *a1)
         }
     } else if (*(unsigned short *)a1 == 0x5449) {
         a1 = career_skip_word(a1);
-        n = func_000A0D13(a1);
+        n = atoi(a1);
         o = object_create_child(player_entity, 0, 107);
         o->type = 2;
         o->f21 = 1;
         a1 = career_skip_word(a1);
         m = &o->mob;
-        D_001962AB = func_000A0D13(career_skip_word(a1)) + 1;
-        item_make(n, func_000A0D13(a1), m);
+        D_001962AB = atoi(career_skip_word(a1)) + 1;
+        item_make(n, atoi(a1), m);
         if (m->f32 == 3 && m->f34 == 18) {
             m->f49 = 1;
             inv_merge_arrows(player_entity, o, 1);
@@ -159,19 +159,19 @@ unsigned char *career_answer_effect(unsigned char *a1)
     } else if (*a1 == '&')
         D_00190D6A = 0;
     else if (*a1 == '#')
-        D_00190BE4[D_00190CAC] = func_000A0D13(a1 + 1);
+        D_00190BE4[D_00190CAC] = atoi(a1 + 1);
     else if (*a1 == '!')
-        D_00190BE4[D_00190CAC + 12] = func_000A0D13(a1 + 1);
+        D_00190BE4[D_00190CAC + 12] = atoi(a1 + 1);
     else if (*a1 == '?')
-        D_00190BE4[D_00190CAC + 24] = func_000A0D13(a1 + 1);
+        D_00190BE4[D_00190CAC + 24] = atoi(a1 + 1);
     else if (D_00178630[(unsigned char)(*a1 + 1)] & 0x20) {
-        n = func_000A0D13(a1);
+        n = atoi(a1);
         if (n >= 35)
             n = 0;
-        player_character->skills[n].v += func_000A0D13(career_skip_word(a1));
+        player_character->skills[n].v += atoi(career_skip_word(a1));
     } else if (*a1 == 'r' && D_00178630[(unsigned char)(a1[1] + 1)] & 0x20) {
-        n = func_000A0D13(a1 + 1);
-        player_character->f145[n] += func_000A0D13(career_skip_word(a1));
+        n = atoi(a1 + 1);
+        player_character->f145[n] += atoi(career_skip_word(a1));
     }
     while (*a1 != '\n')
         a1++;

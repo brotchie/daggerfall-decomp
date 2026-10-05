@@ -48,7 +48,7 @@ extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
+extern int mc_sprintf(int, ...);
 extern int func_000A1D3C();
 extern void archive_close(int);
 extern void msgbox_show_string(int, int);
@@ -70,7 +70,7 @@ void trade_haggle_show_offer(void)
     *(signed char *)D_00196034 = 19;
     *(signed char *)D_00196035 = 46;
     func_000A0ED9(131, (int)D_00175A30);
-    func_000A0F5C((int)text_buffer, (int)D_00175A38, (int)*(double *)trade_haggle_asking);
+    mc_sprintf((int)text_buffer, (int)D_00175A38, (int)*(double *)trade_haggle_asking);
     msgbox_show_string((int)text_buffer, 5);
 }
 
@@ -81,7 +81,7 @@ void trade_counter_offer(void)
     *(signed char *)D_0012B508 = 146;
     l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(141, (int)D_00175A30);
-    func_000A0F5C(l_18, (int)D_00175A6A);
+    mc_sprintf(l_18, (int)D_00175A6A);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
     msgbox_show_string(l_18, 2);
     inpstr_begin_number((int)*(double *)trade_haggle_asking);

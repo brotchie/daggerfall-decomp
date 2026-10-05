@@ -69,15 +69,15 @@ extern int rmb_add_building(int, int);
 extern int region_find_location(int);
 extern int object_create_child(int, int, int);
 extern int func_00097B2A(void);
-extern int func_0009DC25();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A006E();
-extern int func_000A00AF();
+extern int rand();
+extern int mc_free();
+extern int mc_memset();
+extern int lseek();
+extern int mc_malloc();
 extern int func_000A00CB();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern int func_000C2D81();
 extern int func_0012DB50();
 extern int func_00135DE4();
@@ -116,9 +116,9 @@ void region_locations_load_discovered(int a1)
 
     l_2C = *(int *)D_00196A9C;
     l_28 = *(int *)D_00195C44;
-    l_18 = func_000A00AF(4096, (int)D_001704CC, 57);
+    l_18 = mc_malloc(4096, (int)D_001704CC, 57);
     func_000A0ED9(59, (int)D_001704CC);
-    func_000A0F5C(l_18, (int)D_001704D7, a1);
+    mc_sprintf(l_18, (int)D_001704D7, a1);
     l_24 = archive_open((int)cfg_mapsave_file, 0, 1);
     l_20 = archive_find_record(l_24, l_18, 12);
     archive_read_record(l_24, l_20, l_28);
@@ -146,7 +146,7 @@ L1DBDE:;
 L1DBED:;
     return;
 L1DBEF:;
-    func_000A0024(l_18, (int)D_001704CC, 72);
+    mc_free(l_18, (int)D_001704CC, 72);
     l_18 = -1751672937;
 }
 
@@ -161,7 +161,7 @@ void region_locations_save_discovered(int a1)
 
     l_2C = *(int *)D_00196A9C;
     l_28 = *(int *)D_00195C44;
-    l_18 = func_000A00AF(4096, (int)D_001704CC, 88);
+    l_18 = mc_malloc(4096, (int)D_001704CC, 88);
     l_1C = 0;
 L1DC51:;
     if (l_1C < *(int *)D_00196A28) goto L1DC73;
@@ -172,7 +172,7 @@ L1DC5E:;
     l_28++;
     goto L1DC51;
 L1DC73:;
-    *(signed char *)((char *)l_28) = func_0009DC25() & -193;
+    *(signed char *)((char *)l_28) = rand() & -193;
     if (((struct bf8_6_1 *)((char *)l_2C + 7))->f == 0) goto L1DC91;
     *(signed char *)((char *)l_28) |= 64;
 L1DC91:;
@@ -182,7 +182,7 @@ L1DCA0:;
     goto L1DC5E;
 L1DCA2:;
     func_000A0ED9(97, (int)D_001704CC);
-    func_000A0F5C(l_18, (int)D_001704D7, a1);
+    mc_sprintf(l_18, (int)D_001704D7, a1);
     l_24 = archive_open((int)cfg_mapsave_file, 0, 1);
     l_20 = archive_find_record(l_24, l_18, 12);
     archive_write_record(l_24, l_20, *(int *)D_00195C44);
@@ -192,7 +192,7 @@ L1DCA2:;
 L1DD14:;
     return;
 L1DD16:;
-    func_000A0024(l_18, (int)D_001704CC, 103);
+    mc_free(l_18, (int)D_001704CC, 103);
     l_18 = -1751672937;
 }
 
@@ -210,19 +210,19 @@ void maploads_load_region(int a1)
 L1DD75:;
     goto L1DD95;
 L1DD77:;
-    func_000A0024(*(int *)D_00196A9C, (int)D_001704CC, 123);
+    mc_free(*(int *)D_00196A9C, (int)D_001704CC, 123);
     *(int *)D_00196A9C = -1751672937;
 L1DD95:;
     *(short *)D_00196ABA = a1;
     func_000A0ED9(127, (int)D_001704CC);
-    func_000A0F5C((int)text_buffer, (int)D_001704E4, a1);
+    mc_sprintf((int)text_buffer, (int)D_001704E4, a1);
     l_20 = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
     l_1C = archive_record_size(*(int *)maps_bsa, l_20);
     *(int *)D_00196A28 = ((unsigned)l_1C) / 17;
-    l_24 = (*(int *)D_00196A9C = func_000A00AF(l_1C, (int)D_001704CC, 133));
+    l_24 = (*(int *)D_00196A9C = mc_malloc(l_1C, (int)D_001704CC, 133));
     archive_read_record(*(int *)maps_bsa, l_20, *(int *)D_00196A9C);
-    func_000A0040((int)region_location_type_counts, 0, 56, (int)D_001704CC, 137, 56);
-    func_000A0040((int)region_dungeon_type_counts, 0, 76, (int)D_001704CC, 138, 76);
+    mc_memset((int)region_location_type_counts, 0, 56, (int)D_001704CC, 137, 56);
+    mc_memset((int)region_dungeon_type_counts, 0, 76, (int)D_001704CC, 138, 76);
     *(int *)region_dungeon_count = 0;
     l_18 = 0;
 L1DE78:;
@@ -252,7 +252,7 @@ void region_load_location_names(int a1)
     int l_18;
 
     func_000A0ED9(170, (int)D_001704CC);
-    func_000A0F5C((int)text_buffer, (int)D_001704F2, a1);
+    mc_sprintf((int)text_buffer, (int)D_001704F2, a1);
     *(int *)D_00196A7C = *(int *)D_00147954;
     l_24 = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
     archive_read_record(*(int *)maps_bsa, l_24, *(int *)D_00147954);
@@ -274,13 +274,13 @@ void location_read_record(int a1, int a2)
     int l_14;
 
     func_000A00CB(a2, a1 + 4, 4);
-    *(int *)((char *)a1 + 8) = func_000A00AF(*(int *)((char *)a1 + 4) * 6, (int)D_001704CC, 219);
+    *(int *)((char *)a1 + 8) = mc_malloc(*(int *)((char *)a1 + 4) * 6, (int)D_001704CC, 219);
     func_000A00CB(a2, *(int *)((char *)a1 + 8), *(int *)((char *)a1 + 4) * 6);
-    *(int *)((char *)a1 + 12) = func_000A00AF(119, (int)D_001704CC, 223);
+    *(int *)((char *)a1 + 12) = mc_malloc(119, (int)D_001704CC, 223);
     *(int *)((char *)a1 + 16) = (int)(*(char **)((char *)a1 + 12) + 71);
     func_000A00CB(a2, *(int *)((char *)a1 + 12), 119);
     if (*(short *)(*(char **)((char *)a1 + 16) + 41) == 0) return;
-    *(int *)(*(char **)((char *)a1 + 16) + 43) = func_000A00AF(((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 16) + 41)) * 26, (int)D_001704CC, 231);
+    *(int *)(*(char **)((char *)a1 + 16) + 43) = mc_malloc(((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 16) + 41)) * 26, (int)D_001704CC, 231);
     func_000A00CB(a2, *(int *)(*(char **)((char *)a1 + 16) + 43), ((int)(unsigned short)*(short *)(*(char **)((char *)a1 + 16) + 41)) * 26);
 }
 
@@ -293,14 +293,14 @@ void location_load_dungeon(int a1, int a2)
 
     l_14 = *(int *)D_00195C44;
     func_000A0ED9(248, (int)D_001704CC);
-    func_000A0F5C((int)text_buffer, (int)D_00170500, (int)(unsigned char)*(signed char *)current_region);
+    mc_sprintf((int)text_buffer, (int)D_00170500, (int)(unsigned char)*(signed char *)current_region);
     l_1C = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
     l_18 = archive_record_offset(*(int *)maps_bsa, l_1C);
-    func_000A006E(*(int *)maps_bsa, l_18, 0);
+    lseek(*(int *)maps_bsa, l_18, 0);
     func_000A00CB(*(int *)maps_bsa, (int)&l_20, 4);
     func_000A00CB(*(int *)maps_bsa, l_14, l_20 << 3);
     l_18 = *(int *)((char *)((a2 << 3) + l_14));
-    func_000A006E(*(int *)maps_bsa, l_18, 1);
+    lseek(*(int *)maps_bsa, l_18, 1);
     *(int *)((char *)a1) = a2;
     location_read_record(a1, *(int *)maps_bsa);
     if (((int)loaded_location) != a1) return;
@@ -320,10 +320,10 @@ void location_load_dungeon_by_id(int a1, int a2)
 
     l_14 = *(int *)D_00195C44;
     func_000A0ED9(287, (int)D_001704CC);
-    func_000A0F5C((int)text_buffer, (int)D_00170500, (int)(unsigned char)*(signed char *)current_region);
+    mc_sprintf((int)text_buffer, (int)D_00170500, (int)(unsigned char)*(signed char *)current_region);
     l_1C = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
     l_18 = archive_record_offset(*(int *)maps_bsa, l_1C);
-    func_000A006E(*(int *)maps_bsa, l_18, 0);
+    lseek(*(int *)maps_bsa, l_18, 0);
     func_000A00CB(*(int *)maps_bsa, (int)&l_24, 4);
     func_000A00CB(*(int *)maps_bsa, l_14, l_24 << 3);
     l_20 = 0;
@@ -340,7 +340,7 @@ L1E2BE:;
     if (l_20 != l_24) goto L1E2D0;
     fatal_error((int)D_0017050E);
 L1E2D0:;
-    func_000A006E(*(int *)maps_bsa, *(int *)((char *)l_14), 1);
+    lseek(*(int *)maps_bsa, *(int *)((char *)l_14), 1);
     *(int *)((char *)a1) = l_20;
     location_read_record(a1, *(int *)maps_bsa);
     if (((int)loaded_location) != a1) return;
@@ -359,12 +359,12 @@ void location_load_exterior(int a1, int a2)
     int l_14;
 
     func_000A0ED9(361, (int)D_001704CC);
-    func_000A0F5C((int)text_buffer, (int)D_00170522, (int)(unsigned char)*(signed char *)current_region);
+    mc_sprintf((int)text_buffer, (int)D_00170522, (int)(unsigned char)*(signed char *)current_region);
     l_20 = archive_find_record(*(int *)maps_bsa, (int)text_buffer, 13);
     l_1C = archive_record_offset(*(int *)maps_bsa, l_20);
-    func_000A006E(*(int *)maps_bsa, (a2 << 2) + l_1C, 0);
+    lseek(*(int *)maps_bsa, (a2 << 2) + l_1C, 0);
     func_000A00CB(*(int *)maps_bsa, (int)&l_14, 4);
-    func_000A006E(*(int *)maps_bsa, l_14 + ((*(int *)D_00196A28 << 2) + l_1C), 0);
+    lseek(*(int *)maps_bsa, l_14 + ((*(int *)D_00196A28 << 2) + l_1C), 0);
     *(int *)((char *)a1) = a2;
     location_read_record(a1, *(int *)maps_bsa);
     if (((int)loaded_location) != a1) return;
@@ -456,8 +456,8 @@ void func_0001E928(int a1)
     *(int *)((char *)l_34 + 31) = *(int *)(*(char **)D_00195AC4 + 31);
     l_30 = l_34 + 71;
     l_2C = l_30 + (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66);
-    func_000A1023(l_30, *(int *)(*(char **)rmb_block + 1731), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66, (int)D_001704CC, 565, 4);
-    func_000A1023(l_2C, *(int *)(*(char **)rmb_block + 1735), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17, (int)D_001704CC, 566, 4);
+    mc_memcpy(l_30, *(int *)(*(char **)rmb_block + 1731), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) * 66, (int)D_001704CC, 565, 4);
+    mc_memcpy(l_2C, *(int *)(*(char **)rmb_block + 1735), ((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 2)) * 17, (int)D_001704CC, 566, 4);
     l_24 = 0;
 L1EA25:;
     if (((int)(unsigned char)*(signed char *)(*(char **)rmb_block + 1)) > l_24) goto L1EA48;
@@ -520,7 +520,7 @@ default:
 L1EBFC:;
     goto L1EAA3;
 L1EC01:;
-    func_000A1023(a1 + 71, (int)&*(signed char *)(*(char **)rmb_block + 6347), 429, (int)D_001704CC, 607, 4);
+    mc_memcpy(a1 + 71, (int)&*(signed char *)(*(char **)rmb_block + 6347), 429, (int)D_001704CC, 607, 4);
 }
 }
 }

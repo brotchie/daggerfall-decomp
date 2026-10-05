@@ -82,7 +82,7 @@ extern int spfx_disease_daily(int);
 extern int func_0008AC9B(int);
 extern int object_find_by_id(int, int);
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
+extern int mc_sprintf(int, ...);
 extern void region_flag_set(int, int);
 extern void region_flag_clear(int, int);
 extern void faction_politics_update(int);
@@ -125,7 +125,7 @@ int calendar_format_date(int a1, int a2)
 
     *(int *)&l_14 = ((unsigned)(((unsigned)(((unsigned)a1) % 518400)) / 1440)) % 30;
     func_000A0ED9(79, (int)D_001711AC);
-    func_000A0F5C(a2, *(int *)D_001830E2, ((int)(short)l_14) + 1, *(int *)(ordinal_suffixes + (((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14) << 2)), *(int *)(month_names + ((((unsigned)(((unsigned)a1) % 518400)) / 43200) << 2)));
+    mc_sprintf(a2, *(int *)D_001830E2, ((int)(short)l_14) + 1, *(int *)(ordinal_suffixes + (((((int)(short)l_14) > 3) ? 3 : (int)(short)l_14) << 2)), *(int *)(month_names + ((((unsigned)(((unsigned)a1) % 518400)) / 43200) << 2)));
     return a2;
 }
 

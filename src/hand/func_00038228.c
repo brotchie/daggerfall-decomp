@@ -16,9 +16,9 @@ extern short func_00037D5A(void);
 extern void spellmaker_pick_subtype_cb(int);
 extern short spellmaker_find_effect(short);
 extern void picklist_open_strings(char *);
-extern int func_000A0AD9();
+extern int mc_strncpy();
 extern int func_000A0DF4();
-extern int func_000A1023();
+extern int mc_memcpy();
 
 void spellmaker_pick_effect_cb(short a1)
 {
@@ -35,7 +35,7 @@ void spellmaker_pick_effect_cb(short a1)
             (*(char *)(*(char **)selected_spell + 7))++;
     }
     if (*(int *)(spell_effect_subtype_names + a1 * 48) == 0) {
-        func_000A1023(spell_effect_cost_current, spell_effect_costs + (*(unsigned char *)(spell_effect_cost_index + a1 * 12) << 3), 8, D_00170B13, 1058, 8);
+        mc_memcpy(spell_effect_cost_current, spell_effect_costs + (*(unsigned char *)(spell_effect_cost_index + a1 * 12) << 3), 8, D_00170B13, 1058, 8);
         *(short *)D_00199628 = 0;
         *(char *)spellmaker_settings_kind = *(char *)(spell_effect_settings + a1 * 12);
     } else {
@@ -46,7 +46,7 @@ void spellmaker_pick_effect_cb(short a1)
         j = 0;
         while (*(int *)(spell_effect_subtype_names + a1 * 48 + j * 4) != 0) {
             *(*(char **)D_00195C44 + j + 32000) = j;
-            func_000A0AD9(s, *(int *)(spell_effect_subtype_names + a1 * 48 + j++ * 4), 4, D_00170B13, 1071);
+            mc_strncpy(s, *(int *)(spell_effect_subtype_names + a1 * 48 + j++ * 4), 4, D_00170B13, 1071);
             s = s + func_000A0DF4(s) + 1;
         }
         *s = 0;

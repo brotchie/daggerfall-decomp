@@ -56,14 +56,14 @@ extern void func_0005EA8F(struct item *);
 extern void item_init_book(struct item *, short);
 extern void item_make_magic(struct item *, int);
 extern int rand_range(int, int);
-extern int func_0009DC25(void);
-extern void func_000A0040(void *, int, int, char *, int, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern int rand(void);
+extern void mc_memset(void *, int, int, char *, int, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
 #pragma aux func_000A18C3 parm routine [];
 extern int func_000A18C3(char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 #define PFLAGS (*(short *)(player_character + 64))
 
@@ -99,13 +99,13 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
         func_000A0ED9(58, D_001758B8);
         func_000A18C3(D_001758C0);
         func_000A0ED9(59, D_001758B8);
-        func_000A0F5C(D_001911E4, D_001758C1, orig, idx);
+        mc_sprintf(D_001911E4, D_001758C1, orig, idx);
         fatal_error(D_001911E4);
     }
     def = &item_templates[idx];
     if (def->f46 == 32512)
         it->sub = 0;
-    func_000A0AD9(it->name, def->name, 32, D_001758B8, 68);
+    mc_strncpy(it->name, def->name, 32, D_001758B8, 68);
     it->type = type;
     it->sub = sub;
     it->f36 = def->f34;
@@ -133,11 +133,11 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
     }
     it->f54 = it->f55 = 0;
     if (type == 1 && (sub == 4 || sub == 5)) {
-        if ((func_0009DC25() & 3) != 0) {
+        if ((rand() & 3) != 0) {
             if (sub == 4)
-                it->f56 = (func_0009DC25() & 1) + 24;
+                it->f56 = (rand() & 1) + 24;
             else
-                it->f56 = (func_0009DC25() & 1) + 26;
+                it->f56 = (rand() & 1) + 26;
         }
     } else {
         it->f56 = 18;
@@ -146,11 +146,11 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
     it->f61 = def->f38;
     it->f65 = def->f41;
     it->f66 = def->f42;
-    func_000A0040(it->f67, -1, 40, D_001758B8, 118, 40);
+    mc_memset(it->f67, -1, 40, D_001758B8, 118, 40);
     D_0019626D = def->f40;
     D_00195F28 = def->f42;
     if (type == 27 && sub == 4)
-        it->f49 = func_0009DC25() % 20;
+        it->f49 = rand() % 20;
     if (type == 6 || type == 12 || type == 2) {
         func_0005E636(it);
         func_0005E5D7(it, *(unsigned char *)(player_character + 67));
@@ -169,5 +169,5 @@ void item_init_from_template(unsigned short idx, short type, short sub, struct i
     if (type == 7)
         item_init_book(it, sub);
     if (type == 13)
-        it->f63 = func_0009DC25();
+        it->f63 = rand();
 }

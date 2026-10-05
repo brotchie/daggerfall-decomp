@@ -14,7 +14,7 @@ extern int ground_texture_archive;
 extern int nature_texture_archive;
 extern struct rec131 region_flats[];
 extern int climate_category(void);
-extern void func_000A1023(char *, unsigned char *, int, char *, int, int);
+extern void mc_memcpy(char *, unsigned char *, int, char *, int, int);
 
 void climate_set_textures(void)
 {
@@ -23,7 +23,7 @@ void climate_set_textures(void)
 
     if (region_flats[climate_index].f2[0] > 50)
         region_flats[climate_index].f2[0] = 50;
-    func_000A1023(D_000C2BB8, region_flats[climate_index].f2, 129, D_00176C94, 1455, 4);
+    mc_memcpy(D_000C2BB8, region_flats[climate_index].f2, 129, D_00176C94, 1455, 4);
     ground_texture_archive = climate_texture_sets[climate_index] * 100 + 2;
     nature_texture_archive = region_flats[climate_index].f0;
     l_1C = climate_category();

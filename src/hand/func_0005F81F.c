@@ -23,12 +23,12 @@ extern unsigned short D_00195F22;
 extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
 extern int func_000A00CB(int, void *, int);
-extern int func_000A0D13(char *);
+extern int atoi(char *);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void books_scan(void)
 {
@@ -40,12 +40,12 @@ void books_scan(void)
     D_00195F22 = 0;
     buf = D_00195C44;
     func_000A0ED9(694, D_001758B8);
-    func_000A0F5C(text_buffer, D_00175913, books_path, D_0017590A);
+    mc_sprintf(text_buffer, D_00175913, books_path, D_0017590A);
     rc = func_000A13DA(text_buffer, 0, &ff);
     while (rc == 0) {
-        D_0018E044[D_00195F22].id = func_000A0D13(ff.name + 3);
+        D_0018E044[D_00195F22].id = atoi(ff.name + 3);
         func_000A0ED9(699, D_001758B8);
-        func_000A0F5C(text_buffer, D_0017591E, ff.name);
+        mc_sprintf(text_buffer, D_0017591E, ff.name);
         fd = disk_open_data(text_buffer);
         func_000A00CB(fd, buf, 234);
         func_0009DEA7(fd);

@@ -13,7 +13,7 @@ struct win {
 #pragma pack()
 extern char D_00176E38[];
 extern void picklist_save_background(struct win *);
-extern char *func_000A00AF(int, char *, int);
+extern char *mc_malloc(int, char *, int);
 
 void picklist_init(struct win *a1, short a2, short a3, short a4, short a5, short a6, short a7, short a8, short a9, short a10, short a11, short a12, short a13, short a14, short a15, short a16, short a17, unsigned char a18, unsigned char a19, unsigned char a20, unsigned char a21, unsigned char a22)
 {
@@ -43,9 +43,9 @@ void picklist_init(struct win *a1, short a2, short a3, short a4, short a5, short
     a1->z41 = 0;
     a1->last = a1->a17 - 1;
     a1->z43 = 0;
-    a1->buf0 = func_000A00AF(35200, D_00176E38, 40);
+    a1->buf0 = mc_malloc(35200, D_00176E38, 40);
     if (a1->kind == 0) return;
-    a1->buf1 = func_000A00AF(a1->a4 * a1->a5, D_00176E38, 44);
-    a1->buf2 = func_000A00AF(a1->a16 * a1->a17, D_00176E38, 45);
+    a1->buf1 = mc_malloc(a1->a4 * a1->a5, D_00176E38, 44);
+    a1->buf2 = mc_malloc(a1->a16 * a1->a17, D_00176E38, 45);
     picklist_save_background(a1);
 }

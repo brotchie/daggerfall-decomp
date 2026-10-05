@@ -61,7 +61,7 @@ extern void rumor_file_open(void);
 extern void rumor_file_close(void);
 extern void rumor_file_purge(void);
 extern int rand_range(int, int);
-extern int func_0009DC25(void);
+extern int rand(void);
 
 void faction_politics_update(int a1)
 {
@@ -237,7 +237,7 @@ void faction_politics_update(int a1)
                     rumor_add_faction(f, 0, 12, f->id, 1480);
                 f->f43 = rand_range(0, 50) + 20;
                 f->f39 <<= 16;
-                f->f39 = (f->f39 & 0xffff0000) | func_0009DC25();
+                f->f39 = (f->f39 & 0xffff0000) | rand();
                 if (faction_player_related(f))
                     rumor_add_faction(f, 0, 100, 0, 1406);
             }

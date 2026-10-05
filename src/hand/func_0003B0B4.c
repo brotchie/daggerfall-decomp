@@ -19,7 +19,7 @@ extern void msgbox_show_rsc(int, int);
 extern void msgbox_update(void);
 extern void keys_world_actions(void);
 extern int disk_read_file(char *, char *);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_0012B136();
 extern int func_0012B2D3();
 extern int func_00143914();
@@ -38,7 +38,7 @@ int chargen_popup_choice(short a1, short a2, short a3, char *a4, unsigned char a
     D_00196091 = 0;
     if (a4 != 0) {
         disk_read_file(a4, D_00195C44);
-        func_000A1023(screen_buffer, D_00195C44, 64000, D_00170B88, 399, 4);
+        mc_memcpy(screen_buffer, D_00195C44, 64000, D_00170B88, 399, 4);
     } else {
         func_00143914(0);
     }
@@ -50,7 +50,7 @@ int chargen_popup_choice(short a1, short a2, short a3, char *a4, unsigned char a
         func_0012B136();
         msgbox_update();
         func_0012B2D3(mouse_x, mouse_y);
-        func_000A1023(655360, screen_buffer, 64000, D_00170B88, 412, 4);
+        mc_memcpy(655360, screen_buffer, 64000, D_00170B88, 412, 4);
     }
     return D_00196271 - 1;
 }

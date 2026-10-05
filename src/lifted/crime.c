@@ -38,8 +38,8 @@ extern int gold_can_afford(int);
 extern int gold_total_alias(void);
 extern int object_delete(int);
 extern int player_to_random_marker(int, int);
-extern int func_000A0024();
-extern int func_000A1023();
+extern int mc_free();
+extern int mc_memcpy();
 extern void faction_change_reputation(int, int);
 extern void prison_serve_sentence(short);
 extern void skill_add_uses(int, int);
@@ -60,7 +60,7 @@ void court_frame(void)
     int l_18;
 
     if (court_open(0) == 0) return;
-    func_000A1023(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_001706E1, 172, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_001706E1, 172, 4);
     if (((int)(unsigned char)*(signed char *)game_mode) == 8) return;
     *(signed char *)D_001940D5 |= 64;
     *(short *)D_00195F34 = 194;
@@ -213,7 +213,7 @@ void court_close(void)
 L216E4:;
     goto L21704;
 L216E6:;
-    func_000A0024(*(int *)window_image, (int)D_001706E1, 350);
+    mc_free(*(int *)window_image, (int)D_001706E1, 350);
     *(int *)window_image = -1751672937;
 L21704:;
     court_remove_creatures();

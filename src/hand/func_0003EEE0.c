@@ -13,10 +13,10 @@ extern char *msgbox_saved_screen;
 extern int msgbox_render_quest_text(struct save *, short, char *, int);
 extern void msgbox_wait(void);
 extern void mode_push(void);
-extern void func_000A0040(void *, int, int, char *, int, int);
-extern void *func_000A00AF(int, char *, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_memset(void *, int, int, char *, int, int);
+extern void *mc_malloc(int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern void func_0012B136(void);
 extern void func_0012DB50(int);
 
@@ -27,10 +27,10 @@ void msgbox_show_qrc_text(char *a1, short a2, short a3)
 
     if (msgbox_kind != 0)
         return;
-    msgbox_saved_screen = func_000A00AF(64000, D_00170D55, 765);
-    func_000A1023(msgbox_saved_screen, screen_buffer, 64000, D_00170D55, 766, 4);
-    func_000A0040(&s, 0, 60, D_00170D55, 768, 4);
-    func_000A0AD9(s.name, a1, 9, D_00170D55, 769);
+    msgbox_saved_screen = mc_malloc(64000, D_00170D55, 765);
+    mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, D_00170D55, 766, 4);
+    mc_memset(&s, 0, 60, D_00170D55, 768, 4);
+    mc_strncpy(s.name, a1, 9, D_00170D55, 769);
     func_0012DB50(4);
     if (a3 == 5) {
         D_00196271 = 0;

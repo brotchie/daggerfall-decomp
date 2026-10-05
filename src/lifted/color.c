@@ -20,8 +20,8 @@ extern char D_001AA600[];
 extern char doors_moving[];
 
 extern int sound_play(int, int, int);
-extern int func_000A00AF();
-extern int func_000A1023();
+extern int mc_malloc();
+extern int mc_memcpy();
 extern int func_000CE663();
 extern int func_000CE66C();
 extern int func_0014AA92();
@@ -34,7 +34,7 @@ void func_00099689(void)
     int l_1C;
     int l_18;
 
-    *(int *)D_001AA5FC = func_000A00AF(8448, (int)D_00177350, 59);
+    *(int *)D_001AA5FC = mc_malloc(8448, (int)D_00177350, 59);
     *(int *)D_001AA600 = func_000CE66C(*(int *)D_001AA5FC, 256);
     l_1C = 0;
 L996CB:;
@@ -88,7 +88,7 @@ L9987E:;
     l_1C++;
     goto L99876;
 L99886:;
-    func_000A1023((int)(*(char **)D_001AA600 + ((l_1C << 8) + 4096)) + 112, ((int)D_001886D2) + (l_1C << 4), 16, (int)D_00177350, 87, 4);
+    mc_memcpy((int)(*(char **)D_001AA600 + ((l_1C << 8) + 4096)) + 112, ((int)D_001886D2) + (l_1C << 4), 16, (int)D_00177350, 87, 4);
     goto L9987E;
 }
 

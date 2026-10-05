@@ -41,12 +41,12 @@ extern void class_question_answer_anim(short);
 extern short class_question_get_answer(void);
 extern int class_question_pick_class(void);
 extern char *disk_read_file(char *, int);
-extern void func_000A0024(char *, char *, int);
-extern void func_000A0040(void *, int, int, char *, int, int);
+extern void mc_free(char *, char *, int);
+extern void mc_memset(void *, int, int, char *, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern int mc_sprintf(char *, char *, ...);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern void func_000CD33A(unsigned char *, int, int);
 extern void func_000CD367(char *);
 extern void func_0012B136(void);
@@ -63,17 +63,17 @@ int class_questions_run(void)
     unsigned char rgb[4];
 
     tries = 10;
-    func_000A0040(screen_buffer, 0, 64000, D_0017539B, 79, 4);
-    func_000A1023((void *)0xa0000, screen_buffer, 64000, D_0017539B, 80, 4);
-    func_000A0040(class_questions_asked, 0, 10, D_0017539B, 81, 10);
-    func_000A0040(class_answer_counts, 0, 3, D_0017539B, 82, 3);
+    mc_memset(screen_buffer, 0, 64000, D_0017539B, 79, 4);
+    mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 80, 4);
+    mc_memset(class_questions_asked, 0, 10, D_0017539B, 81, 10);
+    mc_memset(class_answer_counts, 0, 3, D_0017539B, 82, 3);
     rgb[0] = rgb[1] = rgb[2] = 0;
     D_00147964.b0 = 0;
     disk_read_file(D_001753A6, (int)D_00195C44);
     for (sel = 0; sel < 768; sel++)
         (sel + D_00195C44)[64000] <<= 2;
     func_000CD367(D_00195C44 + 64000);
-    func_000A1023(screen_buffer, D_00195C44, 64000, D_0017539B, 90, 4);
+    mc_memcpy(screen_buffer, D_00195C44, 64000, D_0017539B, 90, 4);
     h.a = disk_read_file(D_001753B3, 0);
     h.b = disk_read_file(D_001753C0, 0);
     while (tries-- != 0) {
@@ -100,30 +100,30 @@ int class_questions_run(void)
                 func_000CD33A(rgb, D_0018528E[sel], 1);
                 done = 1;
             }
-            func_000A1023((void *)0xa0000, screen_buffer, 64000, D_0017539B, 122, 4);
+            mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 122, 4);
         }
     }
     func_00143914(0);
-    func_000A1023((void *)0xa0000, screen_buffer, 64000, D_0017539B, 127, 4);
+    mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 127, 4);
     palette_restore();
     sel = D_00185291[class_question_pick_class()];
     if (chargen_popup_choice(sel + 2100, 4, 5, 0, 21, 49) != 0)
         sel = -1;
     if (sel != -1) {
         func_000A0ED9(134, D_0017539B);
-        func_000A0F5C(text_buffer, D_001753CD, sel);
+        mc_sprintf(text_buffer, D_001753CD, sel);
         disk_read_file(text_buffer, player_class);
     }
     if (h.a != 0 && h.a != (char *)0x97979797) {
-        func_000A0024(h.a, D_0017539B, 138);
+        mc_free(h.a, D_0017539B, 138);
         h.a = (char *)0x97979797;
     }
     if (h.b != 0 && h.b != (char *)0x97979797) {
-        func_000A0024(h.b, D_0017539B, 139);
+        mc_free(h.b, D_0017539B, 139);
         h.b = (char *)0x97979797;
     }
-    func_000A0040(screen_buffer, 0, 64000, D_0017539B, 140, 4);
-    func_000A1023((void *)0xa0000, screen_buffer, 64000, D_0017539B, 141, 4);
+    mc_memset(screen_buffer, 0, 64000, D_0017539B, 140, 4);
+    mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 141, 4);
     palette_restore();
     return sel;
 }

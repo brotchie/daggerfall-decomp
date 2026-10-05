@@ -16,7 +16,7 @@ extern char D_00196285[];
 extern char politic_pak[];
 extern char climate_pak[];
 
-extern int func_000A0024();
+extern int mc_free();
 extern int func_000C2D81();
 extern void func_0001DF7F(int);
 extern void region_unload(void);
@@ -32,7 +32,7 @@ void region_free_tables(void)
 L1FEE0:;
     goto L1FF00;
 L1FEE2:;
-    func_000A0024(*(int *)politic_pak, (int)D_001705F8, 33);
+    mc_free(*(int *)politic_pak, (int)D_001705F8, 33);
     *(int *)politic_pak = -1751672937;
 L1FF00:;
     if (*(int *)climate_pak == 0) goto L1FF15;
@@ -40,7 +40,7 @@ L1FF00:;
 L1FF15:;
     return;
 L1FF17:;
-    func_000A0024(*(int *)climate_pak, (int)D_001705F8, 34);
+    mc_free(*(int *)climate_pak, (int)D_001705F8, 34);
     *(int *)climate_pak = -1751672937;
 }
 

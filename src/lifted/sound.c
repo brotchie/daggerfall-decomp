@@ -50,12 +50,12 @@ extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
 extern int func_0009E2BB();
 extern int func_0009E61A();
-extern int func_000A0024();
-extern int func_000A0040();
+extern int mc_free();
+extern int mc_memset();
 extern int func_000A0517();
-extern int func_000A0AD9();
-extern int func_000A0E3B();
-extern int func_000A1023();
+extern int mc_strncpy();
+extern int stricmp();
+extern int mc_memcpy();
 extern int func_000A1D3C();
 extern int func_000A2460();
 extern int func_000A2504();
@@ -77,7 +77,7 @@ void func_00068BA8(int a1, int a2)
 {
     *(int *)(D_001A3BE4 + (a2 * 268)) = a1;
     if (a1 == 0) return;
-    func_000A1023((((int)sound_channels) + (a2 * 268)) + 256, a1 + 7, 12, (int)D_00175ACC, 95, 4);
+    mc_memcpy((((int)sound_channels) + (a2 * 268)) + 256, a1 + 7, 12, (int)D_00175ACC, 95, 4);
 }
 
 void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
@@ -88,7 +88,7 @@ void sound_volume_pan(int a1, int a2, int a3, int a4, int a5)
     int l_10;
     int l_C;
 
-    func_000A1023(a1, a2, 12, (int)D_00175ACC, 148, 4);
+    mc_memcpy(a1, a2, 12, (int)D_00175ACC, 148, 4);
     a1 = *(int *)player_object + 7;
     l_18 = func_000C7FF4(*(int *)((char *)a1 + 4) - *(int *)((char *)a2 + 4), func_000C7FD9(*(int *)((char *)a1), *(int *)((char *)a1 + 8), *(int *)((char *)a2), *(int *)((char *)a2 + 8)));
     l_C = l_18;
@@ -171,7 +171,7 @@ L69353:;
 L69365:;
     l_24 = 32767;
     l_20 = 32768;
-    func_000A0040(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 291, 4);
+    mc_memset(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 291, 4);
     *(int *)(D_001A3BDC + (l_28 * 268)) = 127;
     *(int *)(sound_channels + (l_28 * 268)) = a1;
     *(int *)(D_001A3AF4 + (l_28 * 268)) = a2;
@@ -232,7 +232,7 @@ L6958A:;
     if (l_28 != 3) goto L6959C;
     return -1;
 L6959C:;
-    func_000A0040(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 336, 4);
+    mc_memset(((int)sound_channels) + (l_28 * 268), 0, 240, (int)D_00175ACC, 336, 4);
     *(int *)(D_001A3BDC + (l_28 * 268)) = 90;
     *(int *)(sound_channels + (l_28 * 268)) = a1;
     *(int *)(D_001A3AF4 + (l_28 * 268)) = a2;
@@ -265,9 +265,9 @@ L69726:;
 void music_play(int a1)
 {
     if (*(signed char *)sound_enabled == 0) return;
-    if (func_000A0E3B((int)music_current, a1) == 0) return;
+    if (stricmp((int)music_current, a1) == 0) return;
     music_stop();
-    func_000A0AD9((int)music_current, a1, 13, (int)D_00175ACC, 374);
+    mc_strncpy((int)music_current, a1, 13, (int)D_00175ACC, 374);
     *(int *)D_001A3F30 = sos_load_song((int)music_current);
     if (*(int *)D_0018DC34 == 0) goto L697CF;
     dpmi_lock_region(*(int *)D_0018DC34, func_000A277F(*(int *)D_0018DC34));
@@ -290,7 +290,7 @@ L69805:;
 L69847:;
     goto L69867;
 L69849:;
-    func_000A0024(*(int *)D_001A3F48, (int)D_00175ACC, 393);
+    mc_free(*(int *)D_001A3F48, (int)D_00175ACC, 393);
     *(int *)D_001A3F48 = -1751672937;
 L69867:;
     *(int *)D_0018DC34 = 0;

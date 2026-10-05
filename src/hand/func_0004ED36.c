@@ -130,12 +130,12 @@ extern void intrface_set_regions(void);
 extern void model_heap_init(int);
 extern void object_foreach_open();
 extern void func_00099689(void);
-extern int func_0009DC49(int);
+extern int srand(int);
 extern int func_0009DEA7(int);
-extern char *func_000A00AF(int, char *, int);
+extern char *mc_malloc(int, char *, int);
 extern int func_000A00CB(int, void *, int);
-extern int func_000A1004(char *);
-extern int func_000A1023(void *, void *, int, char *, int, int);
+extern int unlink(char *);
+extern int mc_memcpy(void *, void *, int, char *, int, int);
 extern int func_000C5200();
 extern int func_000C9BF7();
 extern int func_000C9EA7();
@@ -154,7 +154,7 @@ extern int func_00152C40();
 extern int func_00153500();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void init_game_data(void)
 {
@@ -166,7 +166,7 @@ void init_game_data(void)
     int flag;
 
     flag = 0;
-    func_0009DC49(*(int *)0x46c);
+    srand(*(int *)0x46c);
     func_0012DB28(0, 1);
     func_0012DB28(1, 2);
     func_0012DB28(2, 3);
@@ -185,17 +185,17 @@ void init_game_data(void)
     D_00195C84 = disk_read_file(D_001750A0, 0);
     D_00195D74 = disk_read_file(D_001750AD, 0);
     func_000A0ED9(85, D_00175040);
-    func_000A0F5C(text_buffer, D_001750BA, D_001917E4);
-    func_000A1004(text_buffer);
+    mc_sprintf(text_buffer, D_001750BA, D_001917E4);
+    unlink(text_buffer);
     spell_cast_anims_load();
     hud_compass_image = disk_read_file(D_001750C6, 0);
     D_00190908 = disk_read_file(D_001750D3, 0);
     D_0019090C = disk_read_file(D_001750E0, 0);
     D_00190910 = disk_read_file(D_001750ED, 0);
     hud_mode_icons = disk_read_file(D_001750FA, 0);
-    D_00195B78 = func_000A00AF(2048, D_00175040, 95);
-    D_00195B64 = func_000A00AF(24625, D_00175040, 96);
-    D_00195B74 = func_000A00AF(24625, D_00175040, 97);
+    D_00195B78 = mc_malloc(2048, D_00175040, 95);
+    D_00195B64 = mc_malloc(24625, D_00175040, 96);
+    D_00195B74 = mc_malloc(24625, D_00175040, 97);
     D_001940D8 |= 8;
     D_00195D04 = disk_read_file(D_00175107, 0);
     D_00195D08 = disk_read_file(D_00175114, 0);
@@ -226,7 +226,7 @@ void init_game_data(void)
     D_00152A02 = 1;
     func_00152C40();
     D_00152A02 = 2;
-    func_000A1023(key_map, default_key_map, 38, D_00175040, 145, 38);
+    mc_memcpy(key_map, default_key_map, 38, D_00175040, 145, 38);
     fd = disk_open_data(D_001788E4);
     if (fd > 0) {
         func_000A00CB(fd, mouse_control_mode, 54);
@@ -239,7 +239,7 @@ void init_game_data(void)
             w = 6;
         func_000CE88D(w, h);
         func_0009DEA7(fd);
-        func_000A1023(D_00152A04, D_00195E82, 46, D_00175040, 158, 4);
+        mc_memcpy(D_00152A04, D_00195E82, 46, D_00175040, 158, 4);
         D_00152A02 = joystick_setting;
     } else {
         func_000CE8A0(&mouse_sensitivity_x, &mouse_sensitivity_y);
@@ -254,21 +254,21 @@ void init_game_data(void)
     D_00195998 = game_minutes = 523530;
     for (i = 0; i < 20; i++)
         weather_roll();
-    func_000A1004(D_001751AF);
+    unlink(D_001751AF);
     faction_load_file();
     for (i = 0; i < 62; i++)
         region_price_adjustment[i].timer = rand_range(0, 500) + 750;
     if (func_00068A1D() == 0)
         flag = 1;
     func_0012F500();
-    D_00199804 = func_000A00AF(512, D_00175040, 186);
+    D_00199804 = mc_malloc(512, D_00175040, 186);
     disk_read_file(D_001751B8, D_0013695D = func_000CE66C(D_00199804, 256));
-    D_001997F0 = func_000A00AF(4352, D_00175040, 190);
+    D_001997F0 = mc_malloc(4352, D_00175040, 190);
     func_000CDC4B(D_00136925 = func_000CE66C(D_001997F0, 256));
     D_00195D20 = func_000C9EA7();
-    D_00195D24 = func_000A00AF(16640, D_00175040, 196);
+    D_00195D24 = mc_malloc(16640, D_00175040, 196);
     disk_read_file(D_001751C2, D_00195CF4 = func_000CE66C(D_00195D24, 256));
-    D_00195CF8 = func_000A00AF(16640, D_00175040, 200);
+    D_00195CF8 = mc_malloc(16640, D_00175040, 200);
     disk_read_file(D_001751CB, D_00195D18 = func_000CE66C(D_00195CF8, 256));
     func_000C9EB2();
     D_00195C40 = *(int *)0x46c;

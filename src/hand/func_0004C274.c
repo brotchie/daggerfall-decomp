@@ -17,11 +17,11 @@ extern char *D_00195C44;
 extern char D_001961F5[];
 extern int func_0004C4A0(unsigned char *, int);
 extern int rand_range(int, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern int func_000A0DF4(char *);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 
@@ -35,7 +35,7 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
     p = D_00195C44;
     n = 0;
     func_000A0ED9(323, D_00174F47);
-    func_000A0F5C(text_buffer, D_00174F69, D_00191834);
+    mc_sprintf(text_buffer, D_00174F69, D_00191834);
     rc = func_000A13DA(text_buffer, 0, &ff);
     while (rc == 0) {
         if (ff.name[0] != a1 && ff.name[0] != a2)
@@ -50,7 +50,7 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
         rc = func_000A13F7(&ff);
     }
     func_000A0ED9(338, D_00174F47);
-    func_000A0F5C(text_buffer, D_00174F69, D_001917E4);
+    mc_sprintf(text_buffer, D_00174F69, D_001917E4);
     rc = func_000A13DA(text_buffer, 0, &ff);
     while (rc == 0) {
         if (ff.name[0] != a1 && ff.name[0] != a2)
@@ -72,6 +72,6 @@ int quest_pick_file(unsigned char a1, unsigned char a2, unsigned char a3, unsign
         p += func_000A0DF4(p) + 1;
         n--;
     }
-    func_000A0AD9(D_001961F5, p, 13, D_00174F47, 365);
+    mc_strncpy(D_001961F5, p, 13, D_00174F47, 365);
     return 1;
 }

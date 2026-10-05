@@ -8,7 +8,7 @@ extern int archive_find_record(int, int, int);
 extern int archive_read_record(int, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
+extern int mc_sprintf(int, ...);
 
 struct span {
     int f0;
@@ -30,7 +30,7 @@ void monster_reload_anim_cb(unsigned char *a1)
     l_24 = (struct span *)(l_20 + 74);
     l_1C = l_24->cur - l_24->start;
     func_000A0ED9(196, (int)D_00176844);
-    func_000A0F5C((int)text_buffer, (int)D_0017685B, l_28[503]);
+    mc_sprintf((int)text_buffer, (int)D_0017685B, l_28[503]);
     l_18 = archive_find_record(*(int *)D_00195AC8, (int)text_buffer, 8);
     ((char **)D_00190704)[l_28[75]] = l_24->start = (char *)archive_read_record(*(int *)D_00195AC8, l_18, 0);
     if (l_24->cur == 0) return;

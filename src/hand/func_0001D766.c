@@ -21,10 +21,10 @@ extern void quest_load_text(char *, int, int, int);
 extern int disk_open_rw(char *);
 extern int disk_file_exists(char *);
 extern int func_0009DEA7(int);
-extern int func_000A0040();
-extern int func_000A006E(int, int, int);
-extern int func_000A0AD9();
-extern int func_000A0B42(int, void *, int);
+extern int mc_memset();
+extern int lseek(int, int, int);
+extern int mc_strncpy();
+extern int write(int, void *, int);
 extern int func_000A0DF4(char *);
 
 void rumor_add_quest(char *a1, int a2, int a3, int a4)
@@ -39,17 +39,17 @@ void rumor_add_quest(char *a1, int a2, int a3, int a4)
     quest_load_text(a1, a2, 0, 0);
     if (text_rsc_buffer[0] == 0) return;
     if ((rumor_file = disk_open_rw(D_001704BB)) < 0) return;
-    func_000A006E(rumor_file, 0, 2);
+    lseek(rumor_file, 0, 2);
     l_10 = (a4 & 2) ? 180 : 30;
-    func_000A0040(&r, 0, 34, D_00170464, 1808, 4);
-    func_000A0AD9(r.name, a1 + 6, 9, D_00170464, 1809);
+    mc_memset(&r, 0, 34, D_00170464, 1808, 4);
+    mc_strncpy(r.name, a1 + 6, 9, D_00170464, 1809);
     r.kind = a1[0];
     r.a2 = a2;
     r.a3 = a3;
     r.flags = a4;
     r.ptr = game_minutes + l_10 * 1440;
     r.len = func_000A0DF4(text_rsc_buffer) + 1;
-    func_000A0B42(rumor_file, &r, 34);
-    func_000A0B42(rumor_file, text_rsc_buffer, r.len);
+    write(rumor_file, &r, 34);
+    write(rumor_file, text_rsc_buffer, r.len);
     func_0009DEA7(rumor_file);
 }

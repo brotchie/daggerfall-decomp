@@ -12,7 +12,7 @@ extern int cast_player_spell(int);
 extern int object_delete(int);
 extern int object_create_child(int, int, int);
 extern int object_new_id(int);
-extern int func_000A1023();
+extern int mc_memcpy();
 
 int cast_item_used_spell(int a1)
 {
@@ -30,7 +30,7 @@ L5A973:;
 L5A97B:;
     *(signed char *)((char *)l_1C) = 9;
     *(int *)((char *)l_1C + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    func_000A1023(l_1C + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_001757F4, 103, 4);
+    mc_memcpy(l_1C + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_001757F4, 103, 4);
     l_20 = spell_cost(l_1C + 71, *(int *)player_character);
     if (cast_player_spell(l_1C) == 0) goto L5A9E5;
     object_delete(l_1C);

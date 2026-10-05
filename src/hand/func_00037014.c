@@ -44,8 +44,8 @@ extern void sound_play(int, int, int);
 extern void text_draw_colored(char *, int, int, int, unsigned char);
 extern void func_0007EC8F(short, short, int, char *, char *);
 extern int gold_total_alias(void);
-extern void func_000A0040(char *, int, int, char *, int, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_memset(char *, int, int, char *, int, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern char *func_000A0DD9(int, char *, int);
 extern void func_000A1054(char *, char *, char *, int, int);
 extern short spell_cost_formula_dispatch(int);
@@ -81,7 +81,7 @@ void spellmaker_update(void)
     for (i = 0; i < 3; i++) {
         if (P[i * 2] == 255)
             continue;
-        func_000A0AD9(text_buffer, *(char **)(spell_effect_names + P[i * 2] * 4), 160, D_00170B13, 641);
+        mc_strncpy(text_buffer, *(char **)(spell_effect_names + P[i * 2] * 4), 160, D_00170B13, 641);
         if (P[i * 2 + 1] != 255 && *(int *)(spell_effect_subtype_names + P[i * 2] * 48 + P[i * 2 + 1] * 4) != 0) {
             func_000A1054(text_buffer, D_00170B1C, D_00170B13, 644, 160);
             func_000A1054(text_buffer, *(char **)(spell_effect_subtype_names + P[i * 2] * 48 + P[i * 2 + 1] * 4), D_00170B13, 645, 160);
@@ -103,9 +103,9 @@ void spellmaker_update(void)
                 *(short *)(P + 8 + *(short *)spell_effect_slot * 2) = spell_cost_formula_dispatch(*(unsigned char *)(spell_effect_cost_formula + P[*(short *)spell_effect_slot * 2]) - 1);
         } else {
             P[*(short *)D_0019962C * 2] = P[*(short *)D_0019962C * 2 + 1] = 255;
-            func_000A0040((char *)P + 14 + *(short *)D_0019962C * 3, 1, 3, D_00170B13, 681, 3);
-            func_000A0040((char *)P + 23 + *(short *)D_0019962C * 3, 1, 3, D_00170B13, 682, 3);
-            func_000A0040((char *)P + 32 + *(short *)D_0019962C * 5, 1, 5, D_00170B13, 683, 5);
+            mc_memset((char *)P + 14 + *(short *)D_0019962C * 3, 1, 3, D_00170B13, 681, 3);
+            mc_memset((char *)P + 23 + *(short *)D_0019962C * 3, 1, 3, D_00170B13, 682, 3);
+            mc_memset((char *)P + 32 + *(short *)D_0019962C * 5, 1, 5, D_00170B13, 683, 5);
             *(short *)(P + 8 + *(short *)D_0019962C * 2) = 0;
         }
         *(short *)D_0019962C = -1;

@@ -15,12 +15,12 @@ extern char D_001768DF[];
 extern char D_0017696F[];
 extern char D_00176977[];
 extern char D_001917E4[];
-extern int func_000A1004(char *);
+extern int unlink(char *);
 extern unsigned func_000A13DA(char *, unsigned, struct find_t *);
 extern unsigned func_000A13F7(struct find_t *);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void automap_delete_files(void)
 {
@@ -28,21 +28,21 @@ void automap_delete_files(void)
     unsigned rc;
 
     func_000A0ED9(835, D_00176884);
-    func_000A0F5C(D_00147954, D_0017696F, D_001917E4);
+    mc_sprintf(D_00147954, D_0017696F, D_001917E4);
     rc = func_000A13DA(D_00147954, 0, &ff);
     while (rc == 0) {
         func_000A0ED9(839, D_00176884);
-        func_000A0F5C(D_00147954, D_001768DF, D_001917E4, ff.name);
-        func_000A1004(D_00147954);
+        mc_sprintf(D_00147954, D_001768DF, D_001917E4, ff.name);
+        unlink(D_00147954);
         rc = func_000A13F7(&ff);
     }
     func_000A0ED9(844, D_00176884);
-    func_000A0F5C(D_00147954, D_00176977, D_001917E4);
+    mc_sprintf(D_00147954, D_00176977, D_001917E4);
     rc = func_000A13DA(D_00147954, 0, &ff);
     while (rc == 0) {
         func_000A0ED9(848, D_00176884);
-        func_000A0F5C(D_00147954, D_001768DF, D_001917E4, ff.name);
-        func_000A1004(D_00147954);
+        mc_sprintf(D_00147954, D_001768DF, D_001917E4, ff.name);
+        unlink(D_00147954);
         rc = func_000A13F7(&ff);
     }
 }

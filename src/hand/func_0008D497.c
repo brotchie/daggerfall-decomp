@@ -22,7 +22,7 @@ extern char D_00176E38[];
 extern char D_001A9AF3;
 extern void text_draw(char *, int, int);
 extern void picklist_clip_text(char *, short);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern void func_000CE4FA(int, int, int, int);
 extern void func_00144D00(int, int, int, int);
 extern void func_00144ED8(int, int, int, int, int, int);
@@ -66,7 +66,7 @@ void picklist_draw(struct listbox *a1, int a2)
     l_24 = a1->top;
     l_18 = 1;
     while (l_24 < a1->count && l_18 < a1->h - l_14) {
-        func_000A0AD9(l_88, a1->items[l_24].name, 80, D_00176E38, 236);
+        mc_strncpy(l_88, a1->items[l_24].name, 80, D_00176E38, 236);
         picklist_clip_text(l_88, a1->w);
         if (l_24 != a1->sel || D_001A9AF3 != 0) {
             D_0012B508 = l_24 != a1->sel ? 156 : 0;

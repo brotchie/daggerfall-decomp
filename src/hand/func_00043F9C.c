@@ -18,7 +18,7 @@ extern void options_mouse_draw(int);
 extern int sound_play(int, char *, int);
 extern int disk_read_file(char *, int);
 extern void cursor_draw_arrow(void);
-extern void func_000A0024(int, char *, int);
+extern void mc_free(int, char *, int);
 extern void func_000CDD81(int);
 extern void func_000CE8A0(unsigned char *, unsigned char *);
 extern void func_0012B136(void);
@@ -52,15 +52,15 @@ int options_mouse_screen(void)
         func_000CDD81(0);
     }
     if (D_00195B60 != 0 && D_00195B60 != 0x97979797) {
-        func_000A0024(D_00195B60, D_00170EE8, 468);
+        mc_free(D_00195B60, D_00170EE8, 468);
         D_00195B60 = 0x97979797;
     }
     if (D_00195B5C != 0 && D_00195B5C != 0x97979797) {
-        func_000A0024(D_00195B5C, D_00170EE8, 469);
+        mc_free(D_00195B5C, D_00170EE8, 469);
         D_00195B5C = 0x97979797;
     }
     if (l_1C != 0 && l_1C != 0x97979797) {
-        func_000A0024(l_1C, D_00170EE8, 470);
+        mc_free(l_1C, D_00170EE8, 470);
         l_1C = 0x97979797;
     }
     return 0;

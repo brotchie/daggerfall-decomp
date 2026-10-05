@@ -42,7 +42,7 @@ extern struct obj *object_create_in_block(struct obj *, unsigned char, int, int,
 extern int func_00135E90();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void dungeon_load_rdb_block(struct rec *r)
 {
@@ -56,7 +56,7 @@ void dungeon_load_rdb_block(struct rec *r)
     D_00199608 = r;
     D_001995E8 = D_00195C44;
     func_000A0ED9(59, D_00170AB4);
-    func_000A0F5C(text_buffer, D_00170ABC, D_0017A844[r->kind], r->num);
+    mc_sprintf(text_buffer, D_00170ABC, D_0017A844[r->kind], r->num);
     n = archive_find_record(blocks_bsa, text_buffer, 13);
     archive_read_record(blocks_bsa, n, D_001995E8);
     D_001995F8 = 16;
@@ -95,7 +95,7 @@ void dungeon_load_rdb_block(struct rec *r)
     }
     o = object_create_in_block(D_001995D4[0][0], 60, 512, 0, 0);
     func_000A0ED9(107, D_00170AB4);
-    func_000A0F5C(text_buffer, D_00170AC7, D_0017A844[r->kind], r->num);
+    mc_sprintf(text_buffer, D_00170AC7, D_0017A844[r->kind], r->num);
     n = archive_find_record(blocks_bsa, text_buffer, 13);
     archive_read_record(blocks_bsa, n, (char *)o + 71);
     o->x = D_001995D4[0][0]->x;

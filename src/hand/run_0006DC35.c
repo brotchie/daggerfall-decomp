@@ -135,11 +135,11 @@ extern void object_foreach(int, int);
 extern int potionmaker_open(int);
 extern void inventory_open_container(int, int, int);
 extern void inv_store_item(int);
-extern int func_000A0024();
-extern int func_000A0AD9();
+extern int mc_free();
+extern int mc_strncpy();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
+extern int mc_sprintf(int, ...);
 
 void guild_join_or_promote(int a1, int a2)
 {
@@ -249,7 +249,7 @@ void guild_service_dispatch(int a1)
 L6DCEE:;
     l_28 = (((int)guild_membership != 0) ? 1 : 0);
     func_000A0ED9(163, (int)D_00175EAA);
-    func_000A0F5C((int)text_buffer, (int)D_00175EB3, l_28 + 48);
+    mc_sprintf((int)text_buffer, (int)D_00175EB3, l_28 + 48);
     l_18 = disk_read_file((int)text_buffer, 0);
     l_30 = guild_menu(l_18, l_28, l_1C);
     switch (l_30) {
@@ -260,7 +260,7 @@ case 0:
 L6DD8B:;
     goto L6DDA6;
 L6DD8D:;
-    func_000A0024(l_18, (int)D_00175EAA, 170);
+    mc_free(l_18, (int)D_00175EAA, 170);
     l_18 = -1751672937;
 L6DDA6:;
     return;
@@ -271,7 +271,7 @@ case 1:
 L6DDC2:;
     goto L6DDDD;
 L6DDC4:;
-    func_000A0024(l_18, (int)D_00175EAA, 174);
+    mc_free(l_18, (int)D_00175EAA, 174);
     l_18 = -1751672937;
 L6DDDD:;
     return;
@@ -281,7 +281,7 @@ case 2:
 L6DDF1:;
     goto L6DE0C;
 L6DDF3:;
-    func_000A0024(l_18, (int)D_00175EAA, 177);
+    mc_free(l_18, (int)D_00175EAA, 177);
     l_18 = -1751672937;
 L6DE0C:;
     goto L6DE67;
@@ -291,7 +291,7 @@ case 3:
 L6DE1D:;
     goto L6DE38;
 L6DE1F:;
-    func_000A0024(l_18, (int)D_00175EAA, 180);
+    mc_free(l_18, (int)D_00175EAA, 180);
     l_18 = -1751672937;
 L6DE38:;
     return;
@@ -301,7 +301,7 @@ default:
 L6DE4C:;
     goto L6DE67;
 L6DE4E:;
-    func_000A0024(l_18, (int)D_00175EAA, 183);
+    mc_free(l_18, (int)D_00175EAA, 183);
     l_18 = -1751672937;
 L6DE67:;
 }
@@ -570,8 +570,8 @@ L6E6EB:;
     D_001A41E4 = (struct obj *)((char *)bank_houses_for_sale[l_30].p - 71);
     D_001A41DC = bank_houses_for_sale[l_30].f4;
     msgbox_show_rsc(462, 1);
-    func_000A0AD9((int)saved_region_name, *(int *)(region_names + (((int)(unsigned char)*(signed char *)current_region) << 2)), 32, (int)D_00175EAA, 413);
-    func_000A0AD9((int)saved_location_name, *(int *)current_location, 32, (int)D_00175EAA, 414);
+    mc_strncpy((int)saved_region_name, *(int *)(region_names + (((int)(unsigned char)*(signed char *)current_region) << 2)), 32, (int)D_00175EAA, 413);
+    mc_strncpy((int)saved_location_name, *(int *)current_location, 32, (int)D_00175EAA, 414);
     goto L6E7AE;
 default:
     l_20 = 1;

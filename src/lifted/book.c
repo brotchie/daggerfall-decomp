@@ -67,13 +67,13 @@ extern int object_free_single(int);
 extern int object_delete(int);
 extern int inventory_open(int, int, int);
 extern int func_0009DEA7();
-extern int func_000A0024();
-extern int func_000A00AF();
+extern int mc_free();
+extern int mc_malloc();
 extern int func_000A00CB();
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern int func_0012DBCC();
 extern int func_00144FB4();
 extern void msgbox_show_string(int, int);
@@ -94,11 +94,11 @@ void spell_tick_spell(int, int);
 void book_open(short a1)
 {
     func_000A0ED9(37, (int)D_001757A8);
-    func_000A0F5C((int)text_buffer, (int)D_001757AF, (int)(short)a1);
+    mc_sprintf((int)text_buffer, (int)D_001757AF, (int)(short)a1);
     *(short *)book_file = disk_open_data((int)text_buffer);
     func_000A00CB((int)(short)*(short *)book_file, (int)book_header, 234);
     func_000A00CB((int)(short)*(short *)book_file, (int)book_page_count, 2);
-    *(int *)book_page_offsets = func_000A00AF(((int)(short)*(short *)book_page_count) << 2, (int)D_001757A8, 43);
+    *(int *)book_page_offsets = mc_malloc(((int)(short)*(short *)book_page_count) << 2, (int)D_001757A8, 43);
     func_000A00CB((int)(short)*(short *)book_file, *(int *)book_page_offsets, ((int)(short)*(short *)book_page_count) << 2);
     *(int *)window_image = disk_read_file((int)D_001757C1, 0);
     func_0005A230();
@@ -116,7 +116,7 @@ void book_update(void)
 
     if (((int)(short)*(short *)book_file) < 1) return;
     *(signed char *)D_001940D8 |= 16;
-    func_000A1023(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_001757A8, 65, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_001757A8, 65, 4);
     book_draw_page((int)(short)*(short *)book_page);
     if (*(short *)D_00190D68 == 0) goto L59CE9;
     if (((int)(unsigned char)*(signed char *)game_mode) != 8) goto L59CEB;
@@ -184,7 +184,7 @@ L59E39:;
 L59E7A:;
     goto L59E9A;
 L59E7C:;
-    func_000A0024(*(int *)window_image, (int)D_001757A8, 101);
+    mc_free(*(int *)window_image, (int)D_001757A8, 101);
     *(int *)window_image = -1751672937;
 L59E9A:;
     if (*(int *)book_page_offsets == 0) goto L59EAF;
@@ -192,7 +192,7 @@ L59E9A:;
 L59EAF:;
     goto L59ECF;
 L59EB1:;
-    func_000A0024(*(int *)book_page_offsets, (int)D_001757A8, 102);
+    mc_free(*(int *)book_page_offsets, (int)D_001757A8, 102);
     *(int *)book_page_offsets = -1751672937;
 L59ECF:;
     func_0005A230();
@@ -221,7 +221,7 @@ L5A1A5:;
 void func_0005A1C8(int a1)
 {
     func_000A0ED9(218, (int)D_001757A8);
-    func_000A0F5C((int)text_buffer, (int)D_001757CE, a1);
+    mc_sprintf((int)text_buffer, (int)D_001757CE, a1);
     *(int *)(D_00199C2C + (((int)(short)(*(short *)D_00199D5E)++) << 2)) = disk_read_file((int)text_buffer, 0);
 }
 
@@ -242,7 +242,7 @@ L5A25B:;
 L5A27C:;
     goto L5A2A9;
 L5A27E:;
-    func_000A0024(*(int *)(D_00199C2C + (l_18 << 2)), (int)D_001757A8, 228);
+    mc_free(*(int *)(D_00199C2C + (l_18 << 2)), (int)D_001757A8, 228);
     *(int *)(D_00199C2C + (l_18 << 2)) = -1751672937;
 L5A2A9:;
     goto L5A253;
@@ -289,7 +289,7 @@ void book_goto_page_prompt(void)
     *(signed char *)D_0012B508 = 146;
     l_18 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(268, (int)D_001757A8);
-    func_000A0F5C(l_18, (int)D_001757D7, *(int *)D_0017D1E6);
+    mc_sprintf(l_18, (int)D_001757D7, *(int *)D_0017D1E6);
     *(signed char *)((char *)(func_000A0DF4(l_18) + l_18) + 1) = 0;
     msgbox_show_string(l_18, 2);
     inpstr_begin_number(((int)(short)*(short *)book_page) + 1);

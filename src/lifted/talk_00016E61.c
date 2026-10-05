@@ -7,7 +7,7 @@ extern char talk_answer_lines[];
 extern char talk_answer_line_count[];
 extern char talk_answer_scroll[];
 
-extern int func_000A0AD9();
+extern int mc_strncpy();
 extern void text_draw_colored(int, int, int, int, unsigned char);
 
 void talk_draw_answer(int a1, int a2, int a3, int a4)
@@ -25,7 +25,7 @@ void talk_draw_answer(int a1, int a2, int a3, int a4)
     l_18 = *(int *)talk_answer_scroll;
 L16EAC:;
     if (l_18 >= *(int *)talk_answer_line_count) return;
-    func_000A0AD9((int)text_rsc_buffer, *(int *)((char *)(int)(*(char **)talk_answer_lines + (l_18++ << 2))), 2048, (int)D_001703F0, 1192);
+    mc_strncpy((int)text_rsc_buffer, *(int *)((char *)(int)(*(char **)talk_answer_lines + (l_18++ << 2))), 2048, (int)D_001703F0, 1192);
     if (((int)(unsigned char)(*(signed char *)text_rsc_buffer & 128)) == 0) goto L16F00;
     l_14 = 96;
     goto L16F07;

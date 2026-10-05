@@ -19,32 +19,32 @@ struct res {                /* a file loaded whole into memory */
 };
 extern char D_00170129[];        /* __FILE__ */
 extern void func_0009DEA7(int);
-extern void func_000A0024(void *, char *, int);
-extern int func_000A006E(int, int, int);
-extern void *func_000A00AF(int, char *, int);
+extern void mc_free(void *, char *, int);
+extern int lseek(int, int, int);
+extern void *mc_malloc(int, char *, int);
 extern int func_000A00CB(int, void *, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
-extern int func_0009DC59(char *, ...);
+extern void mc_strncpy(char *, char *, int, char *, int);
+extern int open(char *, ...);
 
 int profile_open(struct res *r, char *name)
 {
     int fd;
 
-    func_000A0AD9(r->name, name, 4, D_00170129, 77);
-    fd = func_0009DC59(name, 512);
+    mc_strncpy(r->name, name, 4, D_00170129, 77);
+    fd = open(name, 512);
     if (fd == -1)
         return 0;
-    r->size = func_000A006E(fd, 0, 2);
+    r->size = lseek(fd, 0, 2);
     r->bufsize = r->size + 1024;
-    func_000A006E(fd, 0, 0);
-    if ((r->buf = func_000A00AF(r->bufsize, D_00170129, 94)) == 0) {
+    lseek(fd, 0, 0);
+    if ((r->buf = mc_malloc(r->bufsize, D_00170129, 94)) == 0) {
         func_0009DEA7(fd);
         return 0;
     }
     if (func_000A00CB(fd, r->buf, r->size) != r->size) {
         func_0009DEA7(fd);
         if (r->buf != 0 && r->buf != (char *)0x97979797) {
-            func_000A0024(r->buf, D_00170129, 110);
+            mc_free(r->buf, D_00170129, 110);
             r->buf = (char *)0x97979797;
         }
         return 0;

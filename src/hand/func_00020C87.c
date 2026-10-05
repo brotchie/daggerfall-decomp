@@ -44,8 +44,8 @@ extern void object_free_pending(void);
 extern int gold_total(void);
 extern void map_goto_location(int, int, int, int);
 extern void object_foreach(struct who *, void (*)(int));
-extern int func_0009DC25(void);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern int rand(void);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int func_000CDD81();
 
 int court_open(int n)
@@ -94,7 +94,7 @@ int court_open(int n)
             gold = crime_fine_table[n].max;
         cnt = gold / 40;
         for (gold = i = court_prison_days = 0; i < cnt; i++) {
-            if (func_0009DC25() & 1)
+            if (rand() & 1)
                 gold += 40;
             else
                 court_prison_days += 3;
@@ -107,7 +107,7 @@ int court_open(int n)
         game_mode = 21;
         D_00196272 = 1;
         window_image = disk_read_file(D_001706D4, 0);
-        func_000A1023(screen_buffer, window_image, 64000, D_001706E1, 114, 4);
+        mc_memcpy(screen_buffer, window_image, 64000, D_001706E1, 114, 4);
         func_000CDD81(1);
         D_00190CAC = gold;
         D_00187CA8 = 0;

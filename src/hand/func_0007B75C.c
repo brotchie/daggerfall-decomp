@@ -13,7 +13,7 @@ extern char D_00195B5C[];
 extern char window_image[];
 extern char D_00195C44[];
 extern void text_draw_centered_colored(int, int, int, int, unsigned char);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_00144F68();
 extern int func_001532B4();
 
@@ -21,7 +21,7 @@ void saveload_draw(int a1, int a2, int a3)
 {
     int l_10;
 
-    func_000A1023(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_00176884, 977, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)window_image, 64000, (int)D_00176884, 977, 4);
     if (a1 == 0) goto L7B7D9;
     func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00195B5C), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
 L7B7D9:;

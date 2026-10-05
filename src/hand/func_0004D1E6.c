@@ -27,13 +27,13 @@ extern int sound_play(int, char *, int);
 extern int disk_read_file(char *, int);
 extern int disk_open_rw(char *);
 extern int disk_create(char *);
-extern void func_000A0040(char *, int, int, char *, int, int);
-extern long func_000A006E(int, long, int);
-extern char *func_000A00AF(int, char *, int);
+extern void mc_memset(char *, int, int, char *, int, int);
+extern long lseek(int, long, int);
+extern char *mc_malloc(int, char *, int);
 extern int func_000A00CB(int, char *, int);
-extern int func_000A0B42(int, char *, int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
-extern int func_000A1235(int);
+extern int write(int, char *, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
+extern int filelength(int);
 
 int func_0004D1E6(short a1)
 {
@@ -43,20 +43,20 @@ int func_0004D1E6(short a1)
         D_001940D5 |= 8;
         D_001997C4 = 0;
         D_001997D0 = 0;
-        note_page = func_000A00AF(3640, D_00174FAC, 67);
-        D_001997D8 = func_000A00AF(3640, D_00174FAC, 68);
+        note_page = mc_malloc(3640, D_00174FAC, 67);
+        D_001997D8 = mc_malloc(3640, D_00174FAC, 68);
         if ((D_001997E8 = disk_open_rw(D_00174FB3)) < 1) {
-            func_000A0040(D_00195C44, 0, 3640, D_00174FAC, 72, 4);
+            mc_memset(D_00195C44, 0, 3640, D_00174FAC, 72, 4);
             if ((D_001997E8 = disk_create(D_00174FB3)) < 1)
                 fatal_error(D_00174FC0);
-            func_000A0B42(D_001997E8, D_00195C44, 3640);
-            func_000A006E(D_001997E8, 0, 0);
+            write(D_001997E8, D_00195C44, 3640);
+            lseek(D_001997E8, 0, 0);
         }
         func_000A00CB(D_001997E8, note_page, 3640);
-        func_000A1023(D_001997D8, note_page, 3640, D_00174FAC, 79, 4);
+        mc_memcpy(D_001997D8, note_page, 3640, D_00174FAC, 79, 4);
         note_tool = 0;
         D_001997E2 = note_tool;
-        D_001997BC = func_000A1235(D_001997E8);
+        D_001997BC = filelength(D_001997E8);
         if (D_001997ED == 0) {
             game_mode = 9;
             window_image = disk_read_file(D_00174FDF, 0);

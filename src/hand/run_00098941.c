@@ -34,7 +34,7 @@ extern void player_horse_sounds_stop(void);
 extern int func_00098B20(void);
 extern void func_00098A15(void);
 extern void travel_find_transport(void);
-extern int func_000A0024(char *, char *, int);
+extern int mc_free(char *, char *, int);
 extern int func_000CDD81();
 extern int func_0012B136();
 extern int func_00144F68();
@@ -123,11 +123,11 @@ void transport_menu(void)
         func_000CDD81(0);
     }
     if (D_00195B5C != 0 && D_00195B5C != FREED) {
-        func_000A0024(D_00195B5C, D_0017704C, 2870);
+        mc_free(D_00195B5C, D_0017704C, 2870);
         D_00195B5C = FREED;
     }
     if (D_00195B60 != 0 && D_00195B60 != FREED) {
-        func_000A0024(D_00195B60, D_0017704C, 2871);
+        mc_free(D_00195B60, D_0017704C, 2871);
         D_00195B60 = FREED;
     }
 }

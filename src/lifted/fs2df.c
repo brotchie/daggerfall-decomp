@@ -29,7 +29,7 @@ extern char link_count[];
 
 extern int spellmaker_new(void);
 extern int disk_read_file(int, int);
-extern int func_000A0040();
+extern int mc_memset();
 short func_00036A41(int);
 void func_000361B7(int);
 void func_00036AA7(int);
@@ -171,7 +171,7 @@ L36C60:;
 void func_00036C6F(int a1, int a2, int a3, unsigned char a4)
 {
     *(int *)D_001995EC = (*(int *)D_001995E4 = ((int)D_00199D78) + ((*(int *)link_count)++ * 39));
-    func_000A0040(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
+    mc_memset(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
     *(short *)(*(char **)D_001995EC) = *(short *)D_00199618;
     if (a2 == 0) goto L36D3C;
     *(signed char *)(*(char **)D_001995EC + 2) = *(signed char *)((char *)a1 + 14);
@@ -205,7 +205,7 @@ void func_00036DC9(int a1, int a2, int a3, unsigned char a4)
 {
     (*(signed char *)(*(char **)D_001995E4 + 10))++;
     *(int *)D_001995EC = ((int)D_00199D78) + ((*(int *)link_count)++ * 39);
-    func_000A0040(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
+    mc_memset(*(int *)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
     *(short *)(*(char **)D_001995EC) = *(short *)D_00199618;
     if (a2 == 0) goto L36E94;
     *(signed char *)(*(char **)D_001995EC + 2) = *(signed char *)((char *)a1 + 14);

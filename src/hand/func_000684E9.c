@@ -17,8 +17,8 @@ extern char D_001A3AE4[];
 extern void trade_haggle_show_offer(void);
 extern void func_0006899B(void);
 extern void mode_push(void);
-#pragma aux func_000A1A0A parm routine [] value [8087];
-extern double func_000A1A0A(double);
+#pragma aux exp parm routine [] value [8087];
+extern double exp(double);
 
 void func_000684E9(int a1, int a2, int a3, int a4)
 {
@@ -29,7 +29,7 @@ void func_000684E9(int a1, int a2, int a3, int a4)
         /* the original multiplied by a literal (fmul [const]); with the constant as an extern
          * D_ symbol 10.0a would emit fld/fmulp when storing straight to memory, and the
          * (float) conversion (a no-op on the x87 stack) keeps the result in ST(0) instead */
-        *(double *)D_001A3ABC = (float)(func_000A1A0A(a2 * *(double *)D_00175A08) * *(double *)D_00175A10);
+        *(double *)D_001A3ABC = (float)(exp(a2 * *(double *)D_00175A08) * *(double *)D_00175A10);
     }
     *(double *)trade_haggle_asking = a1 * a2;
     *(double *)D_001A3AAC = ((((1.0 - (*(short *)(*(char **)D_001A3AE0 + 42) * *(double *)D_00175A18)) + (*(short *)(*(char **)D_001A3AE0 + 147) * *(double *)D_00175A18)) - (*(short *)(*(char **)D_001A3AE0 + 283) * *(double *)D_00175A20)) - ((21 - *(unsigned char *)(*(char **)current_building + 25)) * *(double *)D_00175A28)) * *(double *)trade_haggle_asking;

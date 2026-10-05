@@ -2,7 +2,7 @@
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_delete_item;
 extern char D_00170129[];
-extern int func_000A0E0D();
+extern int mc_memmove();
 struct stream;
 extern int profile_find_item(struct stream *, ...);
 
@@ -28,7 +28,7 @@ int profile_delete_item(struct stream *s, int a2)
     p = s->buf;
     while (p[n] != 10) n++;
     n++;
-    func_000A0E0D(p, p + n, s->start + s->len - (p + n), D_00170129, 1119, 4);
+    mc_memmove(p, p + n, s->start + s->len - (p + n), D_00170129, 1119, 4);
     s->len -= n;
     s->flags |= 128;
     return 1;

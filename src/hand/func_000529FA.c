@@ -6,8 +6,8 @@ struct image {
     unsigned char *data;        /* 0x1e */
 };
 extern char D_00175404[];        /* __FILE__ */
-extern void func_000A0040(unsigned char *, int, int, char *, int, int);
-extern void func_000A1023(unsigned char *, unsigned char *, int, char *, int, int);
+extern void mc_memset(unsigned char *, int, int, char *, int, int);
+extern void mc_memcpy(unsigned char *, unsigned char *, int, char *, int, int);
 
 void flc_decode_lc(unsigned char *a1, struct image *a2)
 {
@@ -32,11 +32,11 @@ void flc_decode_lc(unsigned char *a1, struct image *a2)
                 cnt = *a1;
                 a1++;
                 if (cnt < 0) {
-                    func_000A0040(a2->data + a2->pitch * y + col, *a1, -cnt, D_00175404, 492, 4);
+                    mc_memset(a2->data + a2->pitch * y + col, *a1, -cnt, D_00175404, 492, 4);
                     col -= cnt;
                     a1++;
                 } else if (cnt > 0) {
-                    func_000A1023(a2->data + a2->pitch * y + col, a1, cnt, D_00175404, 498, 4);
+                    mc_memcpy(a2->data + a2->pitch * y + col, a1, cnt, D_00175404, 498, 4);
                     col += cnt;
                     a1 += cnt;
                 }

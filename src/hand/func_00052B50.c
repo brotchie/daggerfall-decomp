@@ -7,7 +7,7 @@ struct flc {
 };
 extern char D_00175404[];   /* __FILE__ */
 extern void func_000CE483(unsigned char *, unsigned short, int);   /* fill with a word */
-extern void func_000A1023(unsigned char *, unsigned char *, int, char *, int, int); /* copy */
+extern void mc_memcpy(unsigned char *, unsigned char *, int, char *, int, int); /* copy */
 
 /* decode an FLC DELTA_FLC (word-oriented delta) chunk into f->buf */
 void flc_decode_ss2(unsigned char *src, struct flc *f)
@@ -42,7 +42,7 @@ void flc_decode_ss2(unsigned char *src, struct flc *f)
                     x -= count * 2;
                     src += 2;
                 } else if (count > 0) {
-                    func_000A1023(f->buf + f->pitch * line + x, src, count * 2, D_00175404, 564, 4);
+                    mc_memcpy(f->buf + f->pitch * line + x, src, count * 2, D_00175404, 564, 4);
                     x += count * 2;
                     src += count * 2;
                 }

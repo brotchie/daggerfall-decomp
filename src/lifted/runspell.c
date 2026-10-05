@@ -77,9 +77,9 @@ extern int object_create_child(int, int, int);
 extern int object_reparent(int, int);
 extern int object_find_item(int, int, int);
 extern int object_new_id(int);
-extern int func_000A0040();
-extern int func_000A0AD9();
-extern int func_000A1023();
+extern int mc_memset();
+extern int mc_strncpy();
+extern int mc_memcpy();
 extern int func_000C2000();
 extern int func_000C2043();
 extern int func_000C7FD9();
@@ -123,7 +123,7 @@ L5AA53:;
 L5AA5B:;
     *(signed char *)((char *)l_18) = 9;
     *(int *)((char *)l_18 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    func_000A1023(l_18 + 71, (int)(*(char **)spell_records + (l_1C * 89)), 89, (int)D_001757F4, 121, 4);
+    mc_memcpy(l_18 + 71, (int)(*(char **)spell_records + (l_1C * 89)), 89, (int)D_001757F4, 121, 4);
     *(signed char *)((char *)l_18 + 143) = 250;
     l_1C = spell_cost(l_18 + 71, *(int *)player_character);
     if (cast_item_spell_at(l_18, a2) == 0) goto L5AAD2;
@@ -149,7 +149,7 @@ L5AB46:;
     *(signed char *)((char *)l_14) = 9;
     *(int *)((char *)l_14 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     *(int *)((char *)l_14 + 47) = a1;
-    func_000A1023(l_14 + 71, (int)(*(char **)spell_records + (l_18 * 89)), 89, (int)D_001757F4, 144, 4);
+    mc_memcpy(l_14 + 71, (int)(*(char **)spell_records + (l_18 * 89)), 89, (int)D_001757F4, 144, 4);
     if (*(signed char *)D_00196292 == 0) goto L5ABA7;
     *(signed char *)((char *)l_14 + 143) = 250;
 L5ABA7:;
@@ -311,7 +311,7 @@ L5B376:;
     l_24 = object_create_child(*(int *)(*(char **)player_object + 67), 0, 89);
     *(signed char *)((char *)l_24) = 9;
     *(int *)((char *)l_24 + 31) = object_new_id(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
-    func_000A1023(l_24 + 71, l_28 + 71, 89, (int)D_001757F4, 443, 4);
+    mc_memcpy(l_24 + 71, l_28 + 71, 89, (int)D_001757F4, 443, 4);
     if (cast_player_spell(l_24) == 0) goto L5B3F4;
     object_delete(l_24);
 L5B3F4:;
@@ -549,12 +549,12 @@ L5BE03:;
     *(short *)((char *)a1 + 3) = ((((int)(short)*(short *)(*(char **)camera_object + 3)) + ((((((int)(short)*(short *)mouse_x) + 6) - ((int)(short)*(short *)D_000CEA30)) * 160) / 100)) + *(int *)D_001959BC) & 2047;
 L5BE89:;
     *(short *)(*(char **)((char *)l_34 + 12) + 5) = (*(short *)((char *)a1 + 5) = 0);
-    func_000A0040((int)l_40, 0, 12, (int)D_001757F4, 711, 4);
+    mc_memset((int)l_40, 0, 12, (int)D_001757F4, 711, 4);
     func_000CE70D((int)(short)*(short *)((char *)a1 + 1), (int)(short)*(short *)((char *)a1 + 3), 1024, (int)l_40);
     *(int *)l_40 += *(int *)((char *)a1 + 7);
     *(int *)((char *)l_40 + 4) += *(int *)((char *)a1 + 11);
     *(int *)((char *)l_40 + 8) += *(int *)((char *)a1 + 15);
-    func_000A0040((int)l_34, 0, 12, (int)D_001757F4, 717, 4);
+    mc_memset((int)l_34, 0, 12, (int)D_001757F4, 717, 4);
     func_000C2000(a1 + 7, (int)l_40, a1 + 118);
     func_000C2043(a1 + 118, 110, (int)l_34);
     *(int *)((char *)a1 + 7) += *(int *)l_34;
@@ -764,7 +764,7 @@ void func_0005CA28(int a1)
 {
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 9) return;
     if (*(signed char *)(*(char **)D_00199D64 + 73) != *(signed char *)((char *)a1 + 144)) return;
-    func_000A0AD9(*(int *)D_00199D64 + 47, a1 + 118, 25, (int)D_001757F4, 958);
+    mc_strncpy(*(int *)D_00199D64 + 47, a1 + 118, 25, (int)D_001757F4, 958);
 }
 
 void func_0005CA87(int a1)
@@ -789,7 +789,7 @@ L5CADA:;
     object_foreach(*(int *)((char *)l_18 + 63), (int)func_0005CA28);
     return;
 L5CB14:;
-    func_000A0AD9(a1 + 47, (int)&*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 47), 25, (int)D_001757F4, 974);
+    mc_strncpy(a1 + 47, (int)&*(signed char *)((char *)(int)(*(char **)spell_records + (l_1C * 89)) + 47), 25, (int)D_001757F4, 974);
 }
 
 void spell_hud_draw_icons(void)

@@ -134,17 +134,17 @@ extern int disk_read_file(int, int);
 extern int disk_create(int);
 extern int picklist_update(void);
 extern int func_0009DEA7();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A00AF();
-extern int func_000A0AD9();
-extern int func_000A0B42();
+extern int mc_free();
+extern int mc_memset();
+extern int mc_malloc();
+extern int mc_strncpy();
+extern int write();
 extern int func_000A0DF4();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern int func_000A1054();
-extern int func_000A1079();
+extern int memchr();
 extern int func_000CE483();
 extern int func_0012B136();
 extern int func_0012B2D3();
@@ -177,7 +177,7 @@ void classmaker_run(void)
     short l_1C;
     short l_18;
 
-    func_000A0040(*(int *)player_class + 16, -1, 12, (int)D_00175420, 88, 12);
+    mc_memset(*(int *)player_class + 16, -1, 12, (int)D_00175420, 88, 12);
     *(signed char *)(*(char **)player_class + 52) = 8;
     *(short *)(*(char **)player_class + 4) = 5120;
     func_000CE483(*(int *)player_class + 58, 50, 16);
@@ -193,13 +193,13 @@ void classmaker_run(void)
     disk_read_file((int)classmaker_file, *(int *)player_class);
 L52EBC:;
     disk_read_file((int)D_00175429, *(int *)screen_buffer);
-    *(int *)text_macro_fae = func_000A00AF(64000, (int)D_00175420, 105);
-    func_000A1023(*(int *)text_macro_fae, *(int *)screen_buffer, 64000, (int)D_00175420, 106, 4);
+    *(int *)text_macro_fae = mc_malloc(64000, (int)D_00175420, 105);
+    mc_memcpy(*(int *)text_macro_fae, *(int *)screen_buffer, 64000, (int)D_00175420, 106, 4);
     *(int *)text_macro_fe = disk_read_file((int)D_00175436, 0);
-    *(int *)text_macro_fpc = func_000A00AF(5520, (int)D_00175420, 109);
+    *(int *)text_macro_fpc = mc_malloc(5520, (int)D_00175420, 109);
     func_00144E84(219, 46, 40, 138, *(int *)text_macro_fpc, 0);
     *(int *)text_macro_fa = disk_read_file((int)D_00175443, 0);
-    *(int *)text_macro_fnpc = func_000A00AF(((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 4)) * ((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 6)), (int)D_00175420, 113);
+    *(int *)text_macro_fnpc = mc_malloc(((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 4)) * ((int)(unsigned short)*(short *)(*(char **)text_macro_fa + 6)), (int)D_00175420, 113);
     *(int *)text_macro_fea = disk_read_file((int)D_00175450, 0);
     *(int *)D_00190E00 = disk_read_file((int)D_0017545D, 0);
     *(int *)text_macro_fpa = disk_read_file((int)D_0017546A, 0);
@@ -350,7 +350,7 @@ L53367:;
     classmaker_specials_screen();
 L5336C:;
     classmaker_update_advancement();
-    func_000A1023(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 205, 4);
+    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 205, 4);
     l_24 = 1132;
     if (*(int *)D_00190BE4 == *(int *)((char *)l_24)) goto L533BE;
     (*(short *)D_00190D74)++;
@@ -360,15 +360,15 @@ L533BE:;
     goto L52FD3;
 L533C3:;
     *(signed char *)D_001940D8 &= 254;
-    func_000A0024(*(int *)text_macro_fpc, (int)D_00175420, 217);
-    func_000A0024(*(int *)text_macro_fe, (int)D_00175420, 218);
-    func_000A0024(*(int *)text_macro_fnpc, (int)D_00175420, 219);
-    func_000A0024(*(int *)text_macro_fa, (int)D_00175420, 220);
-    func_000A0024(*(int *)text_macro_fae, (int)D_00175420, 221);
-    func_000A0024(*(int *)text_macro_fea, (int)D_00175420, 222);
-    func_000A0024(*(int *)text_macro_fpa, (int)D_00175420, 223);
-    func_000A0024(*(int *)D_00190E00, (int)D_00175420, 224);
-    func_000A0040((int)text_macro_fpc, 0, 512, (int)D_00175420, 226, 512);
+    mc_free(*(int *)text_macro_fpc, (int)D_00175420, 217);
+    mc_free(*(int *)text_macro_fe, (int)D_00175420, 218);
+    mc_free(*(int *)text_macro_fnpc, (int)D_00175420, 219);
+    mc_free(*(int *)text_macro_fa, (int)D_00175420, 220);
+    mc_free(*(int *)text_macro_fae, (int)D_00175420, 221);
+    mc_free(*(int *)text_macro_fea, (int)D_00175420, 222);
+    mc_free(*(int *)text_macro_fpa, (int)D_00175420, 223);
+    mc_free(*(int *)D_00190E00, (int)D_00175420, 224);
+    mc_memset((int)text_macro_fpc, 0, 512, (int)D_00175420, 226, 512);
 }
 
 void classmaker_exit_button(void)
@@ -377,7 +377,7 @@ void classmaker_exit_button(void)
     msgbox_show_rsc(301, 1);
     return;
 L539FF:;
-    if (func_000A1079(*(int *)player_class + 16, -1, 12) == 0) goto L53A2B;
+    if (memchr(*(int *)player_class + 16, -1, 12) == 0) goto L53A2B;
     msgbox_show_rsc(300, 1);
     return;
 L53A2B:;
@@ -581,7 +581,7 @@ L5419C:;
 L541A3:;
     keys_world_actions();
     func_0012B136();
-    func_000A1023(*(int *)screen_buffer, a2, 64000, (int)D_00175420, 558, 4);
+    mc_memcpy(*(int *)screen_buffer, a2, 64000, (int)D_00175420, 558, 4);
     l_14 = picklist_update();
     if (((int)(short)l_14) <= (-1)) goto L54210;
 L541DD:;
@@ -596,7 +596,7 @@ L54207:;
 L54210:;
     *(signed char *)D_00147964 &= 254;
     func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    func_000A1023(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 568, 4);
+    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 568, 4);
     goto L541A3;
 }
 
@@ -695,7 +695,7 @@ L544CA:;
     return 0;
 L544E0:;
     func_0012B2D3((int)(short)*(short *)mouse_x, (int)(short)*(short *)mouse_y);
-    func_000A1023(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 655, 4);
+    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00175420, 655, 4);
     goto L54492;
 }
 
@@ -866,7 +866,7 @@ void classmaker_save_file(void)
 
     if (*(signed char *)classmaker_file == 0) return;
     l_18 = disk_create((int)classmaker_file);
-    func_000A0B42(l_18, *(int *)player_class, 74);
+    write(l_18, *(int *)player_class, 74);
     func_0009DEA7(l_18);
 }
 
@@ -1202,10 +1202,10 @@ void career_specials_line(int a1, int a2)
 {
     if (a2 == 0) goto L55DDA;
     func_000A0ED9(1221, (int)D_00175420);
-    func_000A0F5C((int)text_buffer, (int)D_001755DC, a1, a2);
+    mc_sprintf((int)text_buffer, (int)D_001755DC, a1, a2);
     goto L55DF6;
 L55DDA:;
-    func_000A0AD9((int)text_buffer, a1, 160, (int)D_00175420, 1223);
+    mc_strncpy((int)text_buffer, a1, 160, (int)D_00175420, 1223);
 L55DF6:;
     func_000A1054(*(int *)D_0019981C, (int)text_buffer, (int)D_00175420, 1225, 4);
     func_000A1054(*(int *)D_0019981C, (int)D_001755E2, (int)D_00175420, 1226, 4);

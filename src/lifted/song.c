@@ -21,11 +21,11 @@ extern char player_character[];
 extern char D_00195C44[];
 
 extern int rand_range(int, int);
-extern int func_0009DC25();
-extern int func_0009DC49();
-extern int func_000A0AD9();
+extern int rand();
+extern int srand();
+extern int mc_strncpy();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
+extern int mc_sprintf(int, ...);
 extern int func_000A1054();
 extern int func_000CE790();
 extern void parse_rsc_text(int, int, int);
@@ -38,15 +38,15 @@ void func_000209F3(int a1)
     int l_18;
 
     if (a1 != 0) return;
-    l_1C = func_0009DC25();
-    func_0009DC49(l_1C);
+    l_1C = rand();
+    srand(l_1C);
     parse_rsc_text(850, 0, 0);
-    func_000A0AD9((int)text_buffer, (int)text_rsc_buffer, 160, (int)D_001706B6, 42);
+    mc_strncpy((int)text_buffer, (int)text_rsc_buffer, 160, (int)D_001706B6, 42);
     parse_rsc_text(851, 0, 0);
     func_000A1054((int)text_buffer, (int)text_rsc_buffer, (int)D_001706B6, 44, 160);
     func_000A0ED9(45, (int)D_001706B6);
-    func_000A0F5C((int)text_rsc_buffer, (int)D_001706BD, (int)text_buffer, l_1C);
-    func_000A0AD9(*(int *)D_00195C44 + 50000, (int)text_rsc_buffer, 4, (int)D_001706B6, 46);
+    mc_sprintf((int)text_rsc_buffer, (int)D_001706BD, (int)text_buffer, l_1C);
+    mc_strncpy(*(int *)D_00195C44 + 50000, (int)text_rsc_buffer, 4, (int)D_001706B6, 46);
     l_1C = 0;
 L20AC5:;
     if (l_1C < 26) goto L20AD5;
@@ -58,7 +58,7 @@ L20AD5:;
     *(short *)(D_00190D64 + (l_1C * 2)) = rand_range(0, 21) + 900;
     goto L20ACD;
 L20AF6:;
-    l_1C = func_0009DC25() % 10;
+    l_1C = rand() % 10;
     l_18 = func_000CE790(*(int *)D_00179EA8, 33, l_1C);
 L20B21:;
     if (((int)(unsigned char)*(signed char *)((char *)l_18)) == 33) goto L20B91;
@@ -75,16 +75,16 @@ void func_00020BBB(int a1)
 {
     int l_1C;
 
-    *(signed char *)D_00190D1F = func_0009DC25() & -255;
+    *(signed char *)D_00190D1F = rand() & -255;
     if (a1 == 0) goto L20BF9;
     *(int *)D_00190CD4 = 0;
     *(signed char *)D_00190D20 = *(signed char *)(*(char **)player_character + 64) & 1;
     goto L20C0F;
 L20BF9:;
-    *(int *)D_00190CD4 = func_0009DC25();
-    *(signed char *)D_00190D20 = func_0009DC25() & -255;
+    *(int *)D_00190CD4 = rand();
+    *(signed char *)D_00190D20 = rand() & -255;
 L20C0F:;
-    *(int *)D_00190CD8 = func_0009DC25();
+    *(int *)D_00190CD8 = rand();
     if (*(signed char *)D_00190D20 == 0) goto L20C2B;
     l_1C = 0;
     goto L20C32;
@@ -92,7 +92,7 @@ L20C2B:;
     l_1C = 1;
 L20C32:;
     *(signed char *)D_00190D21 = *(signed char *)&l_1C;
-    *(int *)D_00190CDC = func_0009DC25();
+    *(int *)D_00190CDC = rand();
     *(signed char *)D_00190D22 = 0;
 }
 }

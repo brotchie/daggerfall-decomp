@@ -103,7 +103,7 @@ extern void func_0012B49E(short, short);
 extern void func_00135E90(void);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 extern short steer_weight_down;
 extern short steer_weight_right;
 extern short steer_weight_left;
@@ -172,7 +172,7 @@ void keys_world_actions(void)
         if (o == 0 || ((struct item *)o)->type == 3) {
             weapon_active_hand ^= 1;
             func_000A0ED9(96, D_00170E38);
-            func_000A0F5C(text_buffer, D_0018323C, weapon_active_hand ? D_00183240 : D_00183244);
+            mc_sprintf(text_buffer, D_0018323C, weapon_active_hand ? D_00183240 : D_00183244);
             D_00195F2E = 20;
             D_0012B508 = 146;
             hud_message_add(text_buffer);
@@ -283,7 +283,7 @@ void interaction_mode_cycle(int a1)
 {
     interaction_mode = (interaction_mode + a1) & 3;
     func_000A0ED9(231, D_00170E38);
-    func_000A0F5C(text_buffer, D_0017D1EE, D_0017D1CA[interaction_mode]);
+    mc_sprintf(text_buffer, D_0017D1EE, D_0017D1CA[interaction_mode]);
     hud_status_set(text_buffer);
 }
 

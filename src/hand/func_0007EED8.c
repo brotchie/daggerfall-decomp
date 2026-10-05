@@ -3,7 +3,7 @@
 extern char D_00176A10[];
 extern char D_00196281[];
 extern int func_0007EF86(int, int);
-extern int func_000A0040();
+extern int mc_memset();
 
 void func_0007EED8(void)
 {
@@ -13,6 +13,6 @@ void func_0007EED8(void)
     int b;
 
     if (*D_00196281 == 0) return;
-    func_000A0040(&s, 0, 12, D_00176A10, 1044, 4);
+    mc_memset(&s, 0, 12, D_00176A10, 1044, 4);
     func_0007EF86(0x5301, 0);
 }

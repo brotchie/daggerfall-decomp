@@ -54,10 +54,10 @@ extern int object_create_child(int, int, int);
 extern int object_random_child_of_type(int, int);
 extern int object_new_id(int);
 extern int func_0009DEAC();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A1023();
-extern int func_000A1079();
+extern int mc_free();
+extern int mc_memset();
+extern int mc_memcpy();
+extern int memchr();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
@@ -79,7 +79,7 @@ void func_000622EB(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_10 = a1 + 71;
-    func_000A1023((int)D_00196167, a1, 71, (int)D_00175934, 426, 4);
+    mc_memcpy((int)D_00196167, a1, 71, (int)D_00175934, 426, 4);
     if (*(int *)((char *)l_10 + 517) != 1000) goto L62382;
     func_0006243B(a1, a2, a3);
     if (((int)(short)(*(short *)collide_flags & 10)) != 0) goto L62368;
@@ -107,7 +107,7 @@ L623E5:;
     *(int *)((char *)l_10 + 517) = 1000;
     *(signed char *)((char *)l_10 + 521) ^= 1;
 L623FC:;
-    func_000A1023(a1, (int)D_00196167, 71, (int)D_00175934, 457, 4);
+    mc_memcpy(a1, (int)D_00196167, 71, (int)D_00175934, 457, 4);
     func_0006243B(a1, a2, *(int *)((char *)l_10 + 513) & 2047);
 }
 
@@ -162,7 +162,7 @@ L624FE:;
 L62578:;
     *(short *)((char *)l_80 + 28) &= 65534;
 L6257D:;
-    func_000A1023((int)l_60, (int)D_00196D54, 12, (int)D_00175934, 512, 4);
+    mc_memcpy((int)l_60, (int)D_00196D54, 12, (int)D_00175934, 512, 4);
     *(int *)D_00196D54 = *(int *)((char *)a1 + 7);
     *(int *)D_00196D58 = *(int *)((char *)a1 + 11) - (*(int *)vertical_velocity / 256);
     *(int *)D_00196D5C = *(int *)((char *)a1 + 15);
@@ -171,7 +171,7 @@ L6257D:;
 L625F0:;
     collide_move_object(a1, 0, (int)l_80, 0);
     *(signed char *)player_on_ground = l_10;
-    func_000A1023((int)D_00196D54, (int)l_60, 12, (int)D_00175934, 521, 4);
+    mc_memcpy((int)D_00196D54, (int)l_60, 12, (int)D_00175934, 521, 4);
     if (*(int *)((char *)l_60 + 36) == *(int *)player_character) goto L6263C;
     *(int *)(*(char **)((char *)l_60 + 36) + 88) = *(int *)D_00195C74;
 L6263C:;
@@ -434,7 +434,7 @@ L62DD7:;
     l_1C = object_create_child(*(int *)((char *)a1 + 67), 0, 89);
     *(signed char *)((char *)l_1C) = 9;
     *(int *)((char *)l_1C + 31) = object_new_id(100);
-    func_000A1023(l_1C + 71, *(int *)D_00195AD8 + 71, 89, (int)D_00175934, 758, 4);
+    mc_memcpy(l_1C + 71, *(int *)D_00195AD8 + 71, 89, (int)D_00175934, 758, 4);
     cast_creature_spell_at(l_1C, a1, a2);
     *(short *)((char *)l_18 + 141) -= spell_cost(l_1C + 71, l_18);
     if (*(short *)((char *)l_18 + 141) >= 0) goto L62E6C;
@@ -500,7 +500,7 @@ int monster_alloc_anim_slot(void)
 {
     int l_1C;
 
-    func_000A0040((int)text_rsc_buffer, 0, 128, (int)D_00175934, 829, 2048);
+    mc_memset((int)text_rsc_buffer, 0, 128, (int)D_00175934, 829, 2048);
     object_foreach(*(int *)(*(char **)D_00195AC4 + 63), (int)monster_mark_anim_slot_cb);
     object_foreach(*(int *)(*(char **)nonworld_root + 63), (int)monster_mark_anim_slot_cb);
     l_1C = 0;
@@ -521,7 +521,7 @@ L6308F:;
 L630B0:;
     goto L630DD;
 L630B2:;
-    func_000A0024(*(int *)(D_00190704 + (l_1C << 2)), (int)D_00175934, 836);
+    mc_free(*(int *)(D_00190704 + (l_1C << 2)), (int)D_00175934, 836);
     *(int *)(D_00190704 + (l_1C << 2)) = -1751672937;
 L630DD:;
     goto L6306A;
@@ -537,7 +537,7 @@ L630FA:;
 
 int monster_sees_invisible(int a1)
 {
-    return func_000A1079((int)dispel_monster_ids, a1, 14);
+    return memchr((int)dispel_monster_ids, a1, 14);
 }
 
 int monster_summon_near_player(int a1)
@@ -676,7 +676,7 @@ void monster_apply_gravity(void)
     l_1C = *(int *)vertical_velocity;
     l_24 = (int)(unsigned char)*(signed char *)player_on_ground;
     l_20 = *(int *)D_00195C74;
-    func_000A1023((int)l_3C, (int)D_00196D54, 12, (int)D_00175934, 1147, 4);
+    mc_memcpy((int)l_3C, (int)D_00196D54, 12, (int)D_00175934, 1147, 4);
     l_30 = 0;
 L63B94:;
     if (l_30 < *(int *)creature_count) goto L63BAC;
@@ -691,7 +691,7 @@ L63BAC:;
 L63BDC:;
     l_2C = *(int *)((char *)l_28 + 76);
     *(int *)vertical_velocity = l_2C;
-    func_000A1023((int)D_00196D54, *(int *)(D_00190504 + (l_30 << 2)) + 7, 12, (int)D_00175934, 1159, 4);
+    mc_memcpy((int)D_00196D54, *(int *)(D_00190504 + (l_30 << 2)) + 7, 12, (int)D_00175934, 1159, 4);
     *(int *)l_5C = *(int *)(*(char **)(D_00190504 + (l_30 << 2)) + 7);
     *(int *)((char *)l_5C + 4) = (int)(*(char **)(*(char **)(D_00190504 + (l_30 << 2)) + 11) + (*(int *)vertical_velocity / 256));
     *(int *)((char *)l_5C + 8) = *(int *)(*(char **)(D_00190504 + (l_30 << 2)) + 15);
@@ -731,7 +731,7 @@ L63D9C:;
     *(int *)D_00195C74 = l_20;
     *(signed char *)player_on_ground = *(signed char *)&l_24;
     *(int *)vertical_velocity = l_1C;
-    func_000A1023((int)D_00196D54, (int)l_3C, 12, (int)D_00175934, 1201, 4);
+    mc_memcpy((int)D_00196D54, (int)l_3C, 12, (int)D_00175934, 1201, 4);
 }
 
 void func_00063DDC(int a1)

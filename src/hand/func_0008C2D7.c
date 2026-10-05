@@ -12,7 +12,7 @@ extern void text_draw(char *, short, short);
 extern int inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
 extern int inpstr_text_width(char *, short);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern short func_000A0DF4(char *);
 extern void func_000CD308(void);
 extern void func_000CD31A(void);
@@ -31,7 +31,7 @@ int inpstr_edit(char *a1, short a2, short a3, short a4, short a5, short a6)
     func_0012B2EB();
     func_00142790();
     inpstr_text = a1;
-    func_000A0AD9(D_00190B44, inpstr_text, 160, D_00176E2C, 56);
+    mc_strncpy(D_00190B44, inpstr_text, 160, D_00176E2C, 56);
     inpstr_cursor = func_000A0DF4(inpstr_text);
     inpstr_max_length = a6;
     for (;;) {
@@ -54,7 +54,7 @@ int inpstr_edit(char *a1, short a2, short a3, short a4, short a5, short a6)
         }
         r = inpstr_handle_key(key);
         if (r == 32768) {
-            func_000A0AD9(inpstr_text, D_00190B44, 4, D_00176E2C, 83);
+            mc_strncpy(inpstr_text, D_00190B44, 4, D_00176E2C, 83);
             return 0;
         }
         if (r != 0x87654321)

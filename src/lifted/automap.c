@@ -100,19 +100,19 @@ extern int object_find_by_id(int, int);
 extern int object_new_id(int);
 extern int marker_find_first(int, int);
 extern int location_cell_at(int, int);
-extern int func_0009DC25();
+extern int rand();
 extern int func_0009DEA7();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A00AF();
+extern int mc_free();
+extern int mc_memset();
+extern int mc_malloc();
 extern int func_000A00CB();
-extern int func_000A0AD9();
+extern int mc_strncpy();
 extern int func_000A0DF4();
-extern int func_000A0E0D();
-extern int func_000A0E3B();
+extern int mc_memmove();
+extern int stricmp();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern int func_000C7F07();
 extern int func_000CDD81();
 extern int func_0012A254();
@@ -241,7 +241,7 @@ L26AA2:;
     l_18 = object_create_child(l_1C, 0, 62);
     *(short *)((char *)l_18 + 29) = 999;
     *(short *)((char *)l_18 + 27) = 0;
-    func_000A1023(l_18 + 1, (int)&*(signed char *)(*(char **)player_object + 1), 18, (int)D_001707AE, 130, 4);
+    mc_memcpy(l_18 + 1, (int)&*(signed char *)(*(char **)player_object + 1), 18, (int)D_001707AE, 130, 4);
     *(short *)((char *)l_18 + 3) = 2047 - *(short *)((char *)l_18 + 3);
     func_000C7F07((int)(short)*(short *)((char *)l_18 + 1), (int)(short)*(short *)((char *)l_18 + 3), (int)(short)*(short *)((char *)l_18 + 5), l_18 + 83);
     *(signed char *)((char *)l_18) = 6;
@@ -311,7 +311,7 @@ L26C8D:;
 L26CAB:;
     goto L26CCB;
 L26CAD:;
-    func_000A0024(*(int *)text_macro_fpc, (int)D_001707AE, 168);
+    mc_free(*(int *)text_macro_fpc, (int)D_001707AE, 168);
     *(int *)text_macro_fpc = -1751672937;
 L26CCB:;
     if (*(int *)D_00190E18 == 0) goto L26CE0;
@@ -319,7 +319,7 @@ L26CCB:;
 L26CE0:;
     goto L26D00;
 L26CE2:;
-    func_000A0024(*(int *)D_00190E18, (int)D_001707AE, 169);
+    mc_free(*(int *)D_00190E18, (int)D_001707AE, 169);
     *(int *)D_00190E18 = -1751672937;
 L26D00:;
     if (l_18 == 0) goto L26D0E;
@@ -344,7 +344,7 @@ void automap_draw(void)
 
     func_0014D23C(-1);
     func_0012B2EB();
-    func_000A1023(*(int *)screen_buffer, *(int *)text_macro_fpc, 64000, (int)D_001707AE, 192, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)text_macro_fpc, 64000, (int)D_001707AE, 192, 4);
     l_18 = *(int *)D_00190E18;
     if (*(signed char *)automap_top_down != 0) goto L26E0E;
     func_00144F68((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned short)*(short *)((char *)l_18 + 2), (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
@@ -369,10 +369,10 @@ int func_00026E87(void)
     return 0;
 L26EAA:;
     if (*(int *)D_00196DAC == 0) goto L26ED4;
-    func_000A0AD9((int)text_buffer, *(int *)D_00196DAC, 160, (int)D_001707AE, 213);
+    mc_strncpy((int)text_buffer, *(int *)D_00196DAC, 160, (int)D_001707AE, 213);
     goto L26EF4;
 L26ED4:;
-    func_000A0040((int)text_buffer, 0, 80, (int)D_001707AE, 215, 160);
+    mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 215, 160);
 L26EF4:;
     inpstr_edit((int)text_buffer, 2, 191, 300, 9, 50);
     if (*(int *)D_00196DAC == 0) goto L26F2B;
@@ -630,7 +630,7 @@ void func_000276B8(void)
     int l_18;
 
     l_18 = func_000A0DF4(*(int *)text_macro_fnpc + 2) + 3;
-    func_000A0E0D(*(int *)text_macro_fnpc, *(int *)text_macro_fnpc + l_18, ((int)(*(char **)D_00196DB4 + 2048) - *(int *)text_macro_fnpc) - l_18, (int)D_001707AE, 494, 4);
+    mc_memmove(*(int *)text_macro_fnpc, *(int *)text_macro_fnpc + l_18, ((int)(*(char **)D_00196DB4 + 2048) - *(int *)text_macro_fnpc) - l_18, (int)D_001707AE, 494, 4);
 }
 
 void automap_init_view(void)
@@ -712,8 +712,8 @@ L27935:;
 void func_00027947(void)
 {
     *(int *)D_00196DA8 = (((int)(unsigned char)*(signed char *)(*(char **)current_location + 32)) * ((int)(unsigned char)*(signed char *)(*(char **)current_location + 33))) << 12;
-    *(int *)D_00196DA4 = func_000A00AF(*(int *)D_00196DA8, (int)D_001707AE, 582);
-    func_000A0040(*(int *)D_00196DA4, 0, *(int *)D_00196DA8, (int)D_001707AE, 583, 4);
+    *(int *)D_00196DA4 = mc_malloc(*(int *)D_00196DA8, (int)D_001707AE, 582);
+    mc_memset(*(int *)D_00196DA4, 0, *(int *)D_00196DA8, (int)D_001707AE, 583, 4);
 }
 
 void func_000279B9(void)
@@ -724,7 +724,7 @@ void func_000279B9(void)
 L279E6:;
     return;
 L279E8:;
-    func_000A0024(*(int *)D_00196DA4, (int)D_001707AE, 598);
+    mc_free(*(int *)D_00196DA4, (int)D_001707AE, 598);
     *(int *)D_00196DA4 = -1751672937;
 }
 
@@ -751,10 +751,10 @@ void func_00028210(int a1)
 {
     *(signed char *)D_0012B508 = 146;
     if (a1 == 0) goto L2824C;
-    func_000A0AD9((int)text_buffer, a1, 160, (int)D_001707AE, 809);
+    mc_strncpy((int)text_buffer, a1, 160, (int)D_001707AE, 809);
     goto L2826C;
 L2824C:;
-    func_000A0040((int)text_buffer, 0, 80, (int)D_001707AE, 811, 160);
+    mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 811, 160);
 L2826C:;
     inpstr_edit((int)text_buffer, 2, 191, 300, 9, 50);
 }
@@ -778,7 +778,7 @@ L2833B:;
     goto L2832B;
 L2835A:;
     l_18 = (func_000A0DF4(l_1C + 4) + l_1C) + 5;
-    func_000A1023(l_1C, l_18, (*(int *)D_00195C44 + 49999) - l_18, (int)D_001707AE, 839, 4);
+    mc_memcpy(l_1C, l_18, (*(int *)D_00195C44 + 49999) - l_18, (int)D_001707AE, 839, 4);
 }
 
 int func_0002839E(int a1)
@@ -809,7 +809,7 @@ int func_000284DA(int a1)
     l_1C = *(int *)D_00195C44 + 4;
 L284F6:;
     if (*(short *)((char *)l_1C) == 0) goto L28533;
-    if (func_000A0E3B(l_1C + 4, a1) != 0) goto L2851A;
+    if (stricmp(l_1C + 4, a1) != 0) goto L2851A;
     return 1;
 L2851A:;
     l_20 = func_000A0DF4(l_1C + 4);
@@ -858,7 +858,7 @@ L2862C:;
     l_18 = l_1C;
     *(short *)D_00190D68 = *(short *)((char *)l_18);
     *(short *)D_00190D6A = *(short *)((char *)l_18 + 2);
-    func_000A0AD9((int)text_buffer, l_1C + 4, 160, (int)D_001707AE, 921);
+    mc_strncpy((int)text_buffer, l_1C + 4, 160, (int)D_001707AE, 921);
     func_0002830F(l_20 - 1);
     func_00028210((int)text_buffer);
     if (*(signed char *)text_buffer == 0) goto L286AD;
@@ -866,7 +866,7 @@ L2862C:;
 L286AD:;
     return;
 L286AF:;
-    func_000A0040((int)text_buffer, 0, 80, (int)D_001707AE, 928, 160);
+    mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 928, 160);
     func_00028210((int)text_buffer);
     if (*(signed char *)text_buffer == 0) return;
     func_0002829B((int)text_buffer);
@@ -910,13 +910,13 @@ void town_map_note_building(int a1, int a2)
     int l_14;
 
     l_14 = building_name(a2);
-    func_000A0040(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 963, 4);
+    mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 963, 4);
     func_000A0ED9(964, (int)D_001707AE);
-    func_000A0F5C((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     if (disk_file_exists((int)text_buffer) == 0) goto L28886;
     disk_read_file((int)text_buffer, *(int *)D_00195C44);
     *(int *)(*(char **)D_00195C44) = *(int *)game_minutes;
-    func_000A1023(*(int *)D_00195C44, *(int *)D_00195C44, 50000, (int)D_001707AE, 970, 4);
+    mc_memcpy(*(int *)D_00195C44, *(int *)D_00195C44, 50000, (int)D_001707AE, 970, 4);
     if (func_000284DA(l_14) != 0) return;
     goto L28893;
 L28886:;
@@ -931,7 +931,7 @@ L28893:;
     *(short *)D_00190D6A = l_18;
     func_0002829B(l_14);
     func_000A0ED9(986, (int)D_001707AE);
-    func_000A0F5C((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707B8, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, func_000281AF());
 }
 
@@ -993,9 +993,9 @@ L28BF0:;
     return;
 L28BF2:;
     *(int *)(*(char **)D_00195C44) = *(int *)game_minutes;
-    func_000A1023((int)(*(char **)D_00195C44 + 4), *(int *)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
+    mc_memcpy((int)(*(char **)D_00195C44 + 4), *(int *)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
     func_000A0ED9(1056, (int)D_001707AE);
-    func_000A0F5C((int)text_buffer, (int)D_001707E4, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707E4, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     disk_write_arena2_file((int)text_buffer, *(int *)D_00195C44, 10244);
 }
 
@@ -1004,9 +1004,9 @@ void automap_load(void)
     int l_18;
 
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) return;
-    func_000A0040(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 1066, 4);
+    mc_memset(*(int *)D_00195C44, 0, 50000, (int)D_001707AE, 1066, 4);
     func_000A0ED9(1067, (int)D_001707AE);
-    func_000A0F5C((int)text_buffer, (int)D_001707E4, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    mc_sprintf((int)text_buffer, (int)D_001707E4, ((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     l_18 = disk_open_data((int)text_buffer);
     if (l_18 == (-1)) return;
     func_000A00CB(l_18, *(int *)D_00195C44, 50000);
@@ -1325,7 +1325,7 @@ void quest_op87_respawn(int a1, int a2)
     if (*(signed char *)D_00187CA8 == 0) goto L296FB;
     world_collect_objects();
 L296FB:;
-    if ((func_0009DC25() % 100) > *(int *)((char *)a2 + 58)) return;
+    if ((rand() % 100) > *(int *)((char *)a2 + 58)) return;
     if (*(int *)((char *)a2 + 73) == (-1)) goto L29725;
     (*(int *)((char *)a2 + 73))--;
 L29725:;

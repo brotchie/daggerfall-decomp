@@ -25,10 +25,10 @@ extern int font_text_width(char *);
 extern void text_draw_shadow(char *, short, short);
 extern void text_draw_centred_shadow(char *, short, short);
 extern void func_0005F50B(void);
-extern void func_000A0024(void *, char *, int);
-extern void func_000A0040(char *, int, int, char *, int, int);
-extern char *func_000A00AF(int, char *, int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_free(void *, char *, int);
+extern void mc_memset(char *, int, int, char *, int, int);
+extern char *mc_malloc(int, char *, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern void func_0012DB50(short);
 extern void func_00144E84(int, int, int, int, char *, int);
 extern void func_00144F68(int, int, int, int, char *);
@@ -113,9 +113,9 @@ void msgbox_render(char *text, char **out)
         y += -20;
     }
     save = 0;
-    save = func_000A00AF(64000, D_00170D55, 353);
-    func_000A1023(save, screen_buffer, 64000, D_00170D55, 354, 4);
-    func_000A0040(screen_buffer, 0, 64000, D_00170D55, 355, 4);
+    save = mc_malloc(64000, D_00170D55, 353);
+    mc_memcpy(save, screen_buffer, 64000, D_00170D55, 354, 4);
+    mc_memset(screen_buffer, 0, 64000, D_00170D55, 355, 4);
     ww = D_00199668 + 10;
     cols = (ww + D_00199666 - 1) / D_00199666;
     if (cols < 2)
@@ -229,12 +229,12 @@ void msgbox_render(char *text, char **out)
         D_001940D6.b5 = 0;
         func_0005F50B();
     }
-    *out = func_000A00AF(D_0019966A * D_00199668, D_00170D55, 510);
+    *out = mc_malloc(D_0019966A * D_00199668, D_00170D55, 510);
     func_00144E84(x0, y0, D_00199668, D_0019966A, *out, 0);
     if (save != 0) {
-        func_000A1023(screen_buffer, save, 64000, D_00170D55, 515, 4);
+        mc_memcpy(screen_buffer, save, 64000, D_00170D55, 515, 4);
         if (save != 0 && save != (char *)0x97979797) {
-            func_000A0024(save, D_00170D55, 516);
+            mc_free(save, D_00170D55, 516);
             save = (char *)0x97979797;
         }
     }

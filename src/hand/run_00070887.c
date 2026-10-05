@@ -37,7 +37,7 @@ extern void func_00097A85(void);
 extern int func_00097B2A(void);
 extern int func_00097BD9(int);
 extern int travel_map_open(int);
-extern int func_000A0AD9();
+extern int mc_strncpy();
 void guild_add_membership(int, unsigned char);
 int guild_confirm_price(int);
 
@@ -58,7 +58,7 @@ L704EA:;
 L704EC:;
     *(signed char *)(*(char **)player_character + 546) = 100;
     *(int *)(*(char **)player_character + 529) = 0;
-    func_000A0AD9((int)D_001961F5, (int)D_00176089, 13, (int)D_00175EAA, 1233);
+    mc_strncpy((int)D_001961F5, (int)D_00176089, 13, (int)D_00175EAA, 1233);
 L70525:;
     if (((int)(unsigned char)*(signed char *)(*(char **)player_character + 543)) == 100) goto L70548;
     if (*(int *)(*(char **)player_character + 533) != 0) goto L7054A;
@@ -75,7 +75,7 @@ L7056B:;
 L7056D:;
     *(signed char *)(*(char **)player_character + 543) = 100;
     *(int *)(*(char **)player_character + 533) = 0;
-    func_000A0AD9((int)D_001961F5, (int)D_00176096, 13, (int)D_00175EAA, 1243);
+    mc_strncpy((int)D_001961F5, (int)D_00176096, 13, (int)D_00175EAA, 1243);
 }
 
 void guild_teleport(void)

@@ -10,8 +10,8 @@ extern int D_00195C74;
 extern unsigned char player_on_ground;
 extern short collide_flags;
 extern int collide_move_object(struct item *, int, char *, int);
-extern void func_000A0040(void *, int, int, char *, int, int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_memset(void *, int, int, char *, int, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 
 void func_0002682B(struct item *a1)
 {
@@ -28,8 +28,8 @@ void func_0002682B(struct item *a1)
 
         D_001940D7.b5 = 1;
         D_001940D7.b7 = 1;
-        func_000A1023(name, a1->name, 12, D_00170788, 477, 4);
-        func_000A0040(&d, 0, 12, D_00170788, 478, 4);
+        mc_memcpy(name, a1->name, 12, D_00170788, 477, 4);
+        mc_memset(&d, 0, 12, D_00170788, 478, 4);
         d.str = D_00187B6E;
         player_motion_flags.b3 = 1;
         collide_move_object(a1, 0, name, 0);

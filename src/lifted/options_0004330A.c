@@ -13,8 +13,8 @@ extern char options_saved_screen[];
 
 extern int disk_read_file(int, int);
 extern int key_pressed_once(unsigned char);
-extern int func_000A00AF();
-extern int func_000A1023();
+extern int mc_malloc();
+extern int mc_memcpy();
 extern void logbook_prune_quests(void);
 extern void func_0007EE38(void);
 
@@ -34,8 +34,8 @@ L4333B:;
     *(signed char *)game_mode = 7;
     *(int *)options_image = disk_read_file((int)D_00170EDB, 0);
     *(signed char *)D_00196272 = 1;
-    *(int *)options_saved_screen = func_000A00AF(64000, (int)D_00170EE8, 120);
-    func_000A1023(*(int *)options_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170EE8, 121, 4);
+    *(int *)options_saved_screen = mc_malloc(64000, (int)D_00170EE8, 120);
+    mc_memcpy(*(int *)options_saved_screen, *(int *)screen_buffer, 64000, (int)D_00170EE8, 121, 4);
     logbook_prune_quests();
 L433AB:;
     if (((int)(unsigned char)*(signed char *)game_mode) != 7) goto L433C0;

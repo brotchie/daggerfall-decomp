@@ -14,7 +14,7 @@ extern unsigned char D_001966B8;
 extern void talk_list_draw_item(char *, int, int, int, int);
 extern void func_0001839C(void);
 extern char *faction_find(short);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 
 void talk_draw_tell_list(void)
 {
@@ -29,7 +29,7 @@ void talk_draw_tell_list(void)
     if (talk_list_count >= talk_list_top && talk_list_count <= talk_list_bottom) {
         if (talk_selected_row == talk_list_count) {
             color = 244;
-            func_000A0AD9(talk_key_text[D_001966B8], D_00170431, 4, D_001703F0, 1884);
+            mc_strncpy(talk_key_text[D_001966B8], D_00170431, 4, D_001703F0, 1884);
         } else {
             color = 145;
         }
@@ -49,7 +49,7 @@ void talk_draw_tell_list(void)
         str = faction_find(talk_organisations[i]) + 3;
         if (talk_selected_row == talk_list_count) {
             color = 244;
-            func_000A0AD9(talk_key_text[D_001966B8], str, 4, D_001703F0, 1914);
+            mc_strncpy(talk_key_text[D_001966B8], str, 4, D_001703F0, 1914);
         } else {
             color = 145;
         }

@@ -9,7 +9,7 @@ extern char D_00196804[];
 extern char rmb_block[];
 extern char block_origin_x[];
 extern char block_origin_z[];
-extern int func_000A0E3B();
+extern int stricmp();
 extern int func_0014B45B();
 
 #pragma pack(1)
@@ -29,7 +29,7 @@ void func_0001E854(int a1, int a2)
     *(int *)D_001967F0 = *(int *)block_origin_z - HP->e[a2].fc;
     *(int *)D_001967F4 = func_0014B45B(*(int *)D_001967F8, *(int *)D_001967F0) - 6;
     *(int *)D_001967FC = HP->e[a2].f10;
-    if (func_000A0E3B(HP->names[a2], D_00170533) != 0) return;
+    if (stricmp(HP->names[a2], D_00170533) != 0) return;
     *(signed char *)((char *)a1 + 24) = 11;
     *(short *)((char *)a1 + 18) = 414;
 }

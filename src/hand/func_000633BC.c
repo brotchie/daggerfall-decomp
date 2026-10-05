@@ -7,7 +7,7 @@ struct mobile {
 };
 struct thing { unsigned char type; char pad[70]; struct mobile mob; };
 extern void sound_play(int, struct thing *, int);
-extern int func_0009DC25(void);
+extern int rand(void);
 
 void monster_play_sound(struct thing *a1, int a2)
 {
@@ -18,8 +18,8 @@ void monster_play_sound(struct thing *a1, int a2)
     snd = m->f506 * 10 + 10000;
     if (m->flags & 384) {
         if (a2 < 128)
-            sound_play(func_0009DC25() & 3 ? snd + 2 : snd + 1, a1, 100);
-        else if (func_0009DC25() < 32000)
+            sound_play(rand() & 3 ? snd + 2 : snd + 1, a1, 100);
+        else if (rand() < 32000)
             sound_play(snd + 1, a1, 100);
         else
             sound_play(snd, a1, 100);

@@ -85,12 +85,12 @@ extern int object_create_child(int, int, int);
 extern int object_reparent(int, int);
 extern int object_find_item(int, int, int);
 extern int object_new_id(int);
-extern int func_0009DC25();
-extern int func_0009DC49();
-extern int func_000A0024();
-extern int func_000A00AF();
+extern int rand();
+extern int srand();
+extern int mc_free();
+extern int mc_malloc();
 extern int func_000A0DD9();
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_000CD20E();
 extern int func_000CDD81();
 extern int func_000CE31C();
@@ -155,12 +155,12 @@ void guild_buy_potions(void)
 
 void guild_buy_spells(void)
 {
-    *(int *)guild_saved_screen = func_000A00AF(64000, (int)D_00175EAA, 871);
-    func_000A1023(*(int *)guild_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175EAA, 873, 4);
+    *(int *)guild_saved_screen = mc_malloc(64000, (int)D_00175EAA, 871);
+    mc_memcpy(*(int *)guild_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175EAA, 873, 4);
     spellshop_open();
 L6F5EC:;
     if (((int)(unsigned char)*(signed char *)game_mode) != 5) goto L6F634;
-    func_000A1023(*(int *)screen_buffer, *(int *)guild_saved_screen, 64000, (int)D_00175EAA, 879, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)guild_saved_screen, 64000, (int)D_00175EAA, 879, 4);
     keys_world_actions();
     spellshop_update();
     player_movement_update();
@@ -172,7 +172,7 @@ L6F634:;
 L6F649:;
     return;
 L6F64B:;
-    func_000A0024(*(int *)guild_saved_screen, (int)D_00175EAA, 886);
+    mc_free(*(int *)guild_saved_screen, (int)D_00175EAA, 886);
     *(int *)guild_saved_screen = -1751672937;
 }
 
@@ -180,9 +180,9 @@ void guild_buy_magic_items(void)
 {
     int l_18;
 
-    l_18 = func_0009DC25();
+    l_18 = rand();
     object_free_children((int)D_001960D9);
-    func_0009DC49(*(int *)(*(char **)current_building + 20));
+    srand(*(int *)(*(char **)current_building + 20));
     if (*(int *)guild_membership == 0) goto L6F6BA;
     if (((int)(unsigned char)*(signed char *)(*(char **)guild_membership)) >= 4) goto L6F6CF;
 L6F6BA:;
@@ -191,7 +191,7 @@ L6F6BA:;
 L6F6CF:;
     func_0005F1BD((int)D_001960D9, 0, 1, 1);
 L6F6E5:;
-    func_0009DC49(l_18);
+    srand(l_18);
     *(signed char *)D_001940D9 |= 2;
     if (holiday_today(*(int *)game_minutes, (int)(unsigned char)*(signed char *)current_region) != 38) goto L6F715;
     *(int *)trade_price_scale = 128;
@@ -202,8 +202,8 @@ L6F715:;
 
 void spellshop_open(void)
 {
-    *(short *)D_001A4A18 = func_0009DC25();
-    func_0009DC49((int)(short)*(short *)D_001A4A1A);
+    *(short *)D_001A4A18 = rand();
+    srand((int)(short)*(short *)D_001A4A1A);
     *(signed char *)game_mode = 5;
     *(signed char *)D_001940D8 &= 254;
     *(signed char *)D_001940D8 |= 2;
@@ -219,7 +219,7 @@ int spellshop_close(void)
     if (((struct bf8_2_1 *)&D_001940D4)->f == 0) goto L6F950;
     picklist_free((int)D_001A9AB8);
 L6F950:;
-    func_0009DC49((int)(short)*(short *)D_001A4A18);
+    srand((int)(short)*(short *)D_001A4A18);
     *(signed char *)D_001940D8 &= 253;
     *(signed char *)game_mode = 0;
     if (*(int *)window_image == 0) goto L6F97F;
@@ -227,7 +227,7 @@ L6F950:;
 L6F97F:;
     goto L6F99F;
 L6F981:;
-    func_000A0024(*(int *)window_image, (int)D_00175EAA, 963);
+    mc_free(*(int *)window_image, (int)D_00175EAA, 963);
     *(int *)window_image = -1751672937;
 L6F99F:;
     if (*(int *)spellshop_icons == 0) goto L6F9B4;
@@ -235,7 +235,7 @@ L6F99F:;
 L6F9B4:;
     goto L6F9D4;
 L6F9B6:;
-    func_000A0024(*(int *)spellshop_icons, (int)D_00175EAA, 964);
+    mc_free(*(int *)spellshop_icons, (int)D_00175EAA, 964);
     *(int *)spellshop_icons = -1751672937;
 L6F9D4:;
     *(signed char *)D_00196272 = 0;
@@ -262,7 +262,7 @@ L6FA5F:;
     l_18 = object_create_child(l_18, 0, 89);
     *(signed char *)((char *)l_18) = 9;
     *(int *)((char *)l_18 + 31) = object_new_id(100);
-    func_000A1023(l_18 + 71, *(int *)selected_spell, 89, (int)D_00175EAA, 992, 4);
+    mc_memcpy(l_18 + 71, *(int *)selected_spell, 89, (int)D_00175EAA, 992, 4);
 }
 
 void spellshop_draw_spell(int a1)
@@ -458,12 +458,12 @@ int guild_menu(int a1, int a2, int a3)
     int l_14;
 
     l_18 = -1;
-    *(int *)guild_saved_screen = func_000A00AF(64000, (int)D_00175EAA, 1581);
-    func_000A1023(*(int *)guild_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175EAA, 1582, 4);
+    *(int *)guild_saved_screen = mc_malloc(64000, (int)D_00175EAA, 1581);
+    mc_memcpy(*(int *)guild_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175EAA, 1582, 4);
     *(signed char *)D_00196272 = 1;
 L7116C:;
     if (l_18 != (-1)) goto L712D4;
-    func_000A1023(*(int *)screen_buffer, *(int *)guild_saved_screen, 64000, (int)D_00175EAA, 1587, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)guild_saved_screen, 64000, (int)D_00175EAA, 1587, 4);
     func_00144F68((int)(unsigned short)*(short *)((char *)a1), (int)(unsigned short)*(short *)((char *)a1 + 2), (int)(unsigned short)*(short *)((char *)a1 + 4), (int)(unsigned short)*(short *)((char *)a1 + 6), a1 + 12);
     text_draw_centered_colored(a3, 159, 71, 145, 141);
     keys_world_actions();
@@ -525,7 +525,7 @@ L712E4:;
 L71300:;
     goto L71320;
 L71302:;
-    func_000A0024(*(int *)guild_saved_screen, (int)D_00175EAA, 1617);
+    mc_free(*(int *)guild_saved_screen, (int)D_00175EAA, 1617);
     *(int *)guild_saved_screen = -1751672937;
 L71320:;
     return l_18;
@@ -632,7 +632,7 @@ L71592:;
     disease_remove_skill_bonuses();
     object_foreach_post(*(int *)D_00195AC4, (int)func_00071475);
     *(int *)(*(char **)player_character + 137) = 0;
-    func_000A1023((int)(*(char **)player_character + 32), (int)&*(signed char *)(*(char **)player_character + 48), 16, (int)D_00175EAA, 1708, 16);
+    mc_memcpy((int)(*(char **)player_character + 32), (int)&*(signed char *)(*(char **)player_character + 48), 16, (int)D_00175EAA, 1708, 16);
     disease_restore_skill_bonuses();
 }
 

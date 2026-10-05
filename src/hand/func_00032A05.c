@@ -53,9 +53,9 @@ extern int quest_object_in_use(int);
 extern void location_free(short *);
 extern void func_00087F76(short *, unsigned short, short, int);
 extern struct O *object_create_child(char *, int, int);
-extern int func_0009DC25();
-extern int func_000A0AD9();
-extern int func_000A1023();
+extern int rand();
+extern int mc_strncpy();
+extern int mc_memcpy();
 
 int quest_init_place(struct T *a1)
 {
@@ -133,7 +133,7 @@ retry:
     a1->cnt--;
     if (count == 0)
         return 0;
-    i = func_0009DC25() % count;
+    i = rand() % count;
     if (quest_object_in_use((l40->pos & 0xffff0000) + (list[i] & 0xffff)))
         goto retry;
     obj = object_create_child(nonworld_root, 0, 58);
@@ -158,8 +158,8 @@ retry:
     if (p->w12 == 0)
         p->w12 = *(short *)(faction_find_type_in_region(current_region, 15) + 33);
     if (a1->w4 != 1)
-        func_000A1023(p, l38->recs + (list[i] >> 16) * 26, 26, D_00170A64, 483, 4);
-    func_000A0AD9((char *)p + 26, l38, 4, D_00170A64, 485);
+        mc_memcpy(p, l38->recs + (list[i] >> 16) * 26, 26, D_00170A64, 483, 4);
+    mc_strncpy((char *)p + 26, l38, 4, D_00170A64, 485);
     location_free(&D_001970C8);
     return 1;
 }

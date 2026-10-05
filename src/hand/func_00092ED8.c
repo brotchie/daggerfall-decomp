@@ -45,7 +45,7 @@ extern int func_00097764(void);
 extern void func_000984E0(void);
 extern void inv_draw_armor_values(void);
 extern char *func_000A0DD9(int, char *, int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int func_000CE31C();
 extern int func_00144F68();
 
@@ -62,17 +62,17 @@ void inventory_draw(void)
     int val;
     int unused3;
 
-    func_000A1023(screen_buffer, inventory_images, 64000, D_0017704C, 553, 4);
+    mc_memcpy(screen_buffer, inventory_images, 64000, D_0017704C, 553, 4);
     if (trade_mode != 0)
         func_00144F68(D_001AA434->x, D_001AA434->y, D_001AA434->w, D_001AA434->h, D_001AA434->data);
     r = (struct Rect *)(((int)inv_mode_buttons + trade_mode * 84) + inventory_action * 12);
     if (trade_mode == 0) {
         for (y = r->y0; r->y1 >= y; y++)
-            func_000A1023(r->x0 + (screen_buffer + y * 320), D_001AA420 + y * 320 + r->x0, r->x1 - r->x0 + 1, D_0017704C, 566, 4);
+            mc_memcpy(r->x0 + (screen_buffer + y * 320), D_001AA420 + y * 320 + r->x0, r->x1 - r->x0 + 1, D_0017704C, 566, 4);
     } else {
         src = D_001AA438->data;
         for (y = r->y0; r->y1 >= y; y++)
-            func_000A1023(r->x0 + (screen_buffer + y * 320), (r->x0 - (unsigned short)*(short *)D_001AA438) + (src + D_001AA438->w * (y - D_001AA438->y)), r->x1 - r->x0 + 1, D_0017704C, 574, 4);
+            mc_memcpy(r->x0 + (screen_buffer + y * 320), (r->x0 - (unsigned short)*(short *)D_001AA438) + (src + D_001AA438->w * (y - D_001AA438->y)), r->x1 - r->x0 + 1, D_0017704C, 574, 4);
     }
     inv_blit_rect_from_image(inv_tab + 41, D_001AA420);
     paperdoll_draw(-147, 0);

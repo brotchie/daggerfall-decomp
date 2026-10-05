@@ -18,12 +18,12 @@ extern unsigned game_minutes;
 extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
 extern int func_000A00CB(int, void *, unsigned);
-extern int func_000A1004(char *);
+extern int unlink(char *);
 extern unsigned func_000A13DA(char *, unsigned, struct find_t *);
 extern unsigned func_000A13F7(struct find_t *);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void automap_purge_old_files(void)
 {
@@ -33,25 +33,25 @@ void automap_purge_old_files(void)
     int fh;
 
     func_000A0ED9(996, D_001707AE);
-    func_000A0F5C(text_buffer, D_001707D0, D_001917E4);
+    mc_sprintf(text_buffer, D_001707D0, D_001917E4);
     rc = func_000A13DA(text_buffer, 0, &ff);
     while (rc == 0) {
         fh = disk_open_data(ff.name);
         func_000A00CB(fh, &t, 4);
         func_0009DEA7(fh);
         if (game_minutes - t > 129600)
-            func_000A1004(text_buffer);
+            unlink(text_buffer);
         rc = func_000A13F7(&ff);
     }
     func_000A0ED9(1008, D_001707AE);
-    func_000A0F5C(text_buffer, D_001707DA, D_001917E4);
+    mc_sprintf(text_buffer, D_001707DA, D_001917E4);
     rc = func_000A13DA(text_buffer, 0, &ff);
     while (rc == 0) {
         fh = disk_open_data(ff.name);
         func_000A00CB(fh, &t, 4);
         func_0009DEA7(fh);
         if (game_minutes - t > 129600)
-            func_000A1004(text_buffer);
+            unlink(text_buffer);
         rc = func_000A13F7(&ff);
     }
 }

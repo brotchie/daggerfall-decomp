@@ -31,11 +31,11 @@ extern int monster_make_item(int, unsigned short, int, int, int, int);
 extern int rand_range(int, int);
 extern int object_create_child(int, int, int);
 extern int object_new_id(int);
-extern int func_0009DC25();
-extern int func_000A0024();
-extern int func_000A0040();
+extern int rand();
+extern int mc_free();
+extern int mc_memset();
 extern int func_000A00CB();
-extern int func_000A1023();
+extern int mc_memcpy();
 extern void character_update_armor_values(int);
 extern void item_make(int, int, int);
 extern void item_damage(int, int);
@@ -65,7 +65,7 @@ L78CA1:;
 L78CD1:;
     goto L78CFE;
 L78CD3:;
-    func_000A0024(*(int *)(D_00190704 + (l_18 << 2)), (int)D_00176844, 211);
+    mc_free(*(int *)(D_00190704 + (l_18 << 2)), (int)D_00176844, 211);
     *(int *)(D_00190704 + (l_18 << 2)) = -1751672937;
 L78CFE:;
     goto L78C99;
@@ -121,7 +121,7 @@ void monster_init_gear(int a1)
 
     l_1C = a1 + 71;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) < 43) goto L78E87;
-    monster_give_equipment(a1, l_1C, func_0009DC25() & 1);
+    monster_give_equipment(a1, l_1C, rand() & 1);
     if (((int)(unsigned short)(*(short *)(monster_table_flags + (((int)(unsigned char)*(signed char *)((char *)l_1C + 67)) * 29)) & 2)) == 0) goto L78E82;
     l_18 = ((int)(unsigned char)*(signed char *)((char *)l_1C + 129)) / 3;
     if (l_18 <= 6) goto L78E6E;
@@ -221,7 +221,7 @@ L791AD:;
     *(signed char *)((char *)l_18) = 9;
     *(short *)((char *)l_18 + 21) = 1;
     *(int *)((char *)l_18 + 31) = object_new_id(((unsigned)*(int *)((char *)a1 + 31)) >> 16);
-    func_000A1023(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_00176844, 370, 4);
+    mc_memcpy(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_00176844, 370, 4);
     l_24++;
     goto L7916D;
 }
@@ -231,7 +231,7 @@ void monster_give_equipment(int a1, int a2, int a3)
     int l_14;
     int l_10;
 
-    func_000A0040(a2 + 367, 0, 108, (int)D_00176844, 400, 108);
+    mc_memset(a2 + 367, 0, 108, (int)D_00176844, 400, 108);
     switch ((unsigned)a3) {
 case 0:
     *(int *)((char *)a2 + 443) = monster_make_item(a1, 3, 5, 7, -1, 100);

@@ -14,7 +14,7 @@ extern void text_draw(int, unsigned short, unsigned short);
 extern unsigned char inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
 extern short inpstr_text_width(int, short);
-extern void func_000A0AD9(int, char *, int, char *, int);
+extern void mc_strncpy(int, char *, int, char *, int);
 extern void func_001531F0(int, int, int, int);
 
 int inpstr_update(void)
@@ -45,7 +45,7 @@ int inpstr_update(void)
         if (r == 0x87654321)
             return 0;
         if (r == 0x8000) {
-            func_000A0AD9(inpstr_text, D_00190B44, 4, D_00176E2C, 157);
+            mc_strncpy(inpstr_text, D_00190B44, 4, D_00176E2C, 157);
             return 2;
         }
         inpstr_result = r;

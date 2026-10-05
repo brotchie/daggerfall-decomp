@@ -42,7 +42,7 @@ extern void travel_button_exit(int);
 extern void func_0009BE38(void);
 extern int travel_route(int, int, int, int, int);
 extern int travel_trip_cost(void);
-extern void func_000A0040(int, int, int, char *, int, int);
+extern void mc_memset(int, int, int, char *, int, int);
 extern int func_000C808D(int, int, int, int);
 
 void travel_begin_trip(void)
@@ -102,8 +102,8 @@ void travel_begin_trip(void)
         D_00195998 = game_minutes;
         raise_skills();
     }
-    func_000A0040(655360, 0, 64000, D_0017743D, 782, 4);
-    func_000A0040(screen_buffer, 0, 64000, D_0017743D, 783, 4);
+    mc_memset(655360, 0, 64000, D_0017743D, 782, 4);
+    mc_memset(screen_buffer, 0, 64000, D_0017743D, 783, 4);
     D_00196294 = 0;
     D_001962A8 = 0;
     D_001962A9 = 0;

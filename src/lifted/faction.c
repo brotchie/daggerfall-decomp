@@ -37,19 +37,19 @@ extern int disk_open_rw(int);
 extern int disk_create(int);
 extern int disk_file_exists(int);
 extern int rand_range(int, int);
-extern int func_0009DC25();
+extern int rand();
 extern int func_0009DEA7();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A006E();
+extern int mc_free();
+extern int mc_memset();
+extern int lseek();
 extern int func_000A00CB();
-extern int func_000A0B42();
-extern int func_000A0D13();
+extern int write();
+extern int atoi();
 extern int func_000A0DF4();
-extern int func_000A0E3B();
+extern int stricmp();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern void faction_load_file(void);
 extern void rumor_add_faction(int, int, int, unsigned char, int);
 extern void msgbox_show_string(int, int);
@@ -112,7 +112,7 @@ void faction_free(void)
 L1BBB8:;
     return;
 L1BBBA:;
-    func_000A0024(*(int *)factions, (int)D_00170464, 1082);
+    mc_free(*(int *)factions, (int)D_00170464, 1082);
     *(int *)factions = -1751672937;
 }
 
@@ -122,13 +122,13 @@ void faction_add_record(int a1, int a2, int a3)
     int l_10;
 
     *(signed char *)D_00196732 = 0;
-    func_000A0040(((int)D_001966BC) + ((a2 << 2) + 4), 0, (int)&*(signed char *)((char *)((16 - a2) << 2) - 4), (int)D_00170464, 1091, 4);
-    l_14 = func_0009DC25();
+    mc_memset(((int)D_001966BC) + ((a2 << 2) + 4), 0, (int)&*(signed char *)((char *)((16 - a2) << 2) - 4), (int)D_00170464, 1091, 4);
+    l_14 = rand();
     l_14 <<= 16;
-    l_14 |= func_0009DC25();
+    l_14 |= rand();
     *(int *)((char *)a1 + 39) = l_14;
     *(int *)((char *)a1 + 43) = rand_range(0, 50) + 20;
-    func_000A1023(a3, a1, 92, (int)D_00170464, 1097, 4);
+    mc_memcpy(a3, a1, 92, (int)D_00170464, 1097, 4);
     if (a2 != 0) goto L1BC91;
     *(int *)((char *)a3 + 88) = 0;
     goto L1BCE2;
@@ -154,7 +154,7 @@ void faction_parse_type(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(signed char *)((char *)a1) = func_000A0D13(l_C);
+    *(signed char *)((char *)a1) = atoi(l_C);
 L1BD48:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1BD74;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1BD76;
@@ -193,7 +193,7 @@ void faction_parse_rep(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(short *)((char *)a1 + 29) = func_000A0D13(l_C);
+    *(short *)((char *)a1 + 29) = atoi(l_C);
 L1BE37:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1BE63;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1BE65;
@@ -232,7 +232,7 @@ void faction_parse_region(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(signed char *)((char *)a1 + 1) = func_000A0D13(l_C);
+    *(signed char *)((char *)a1 + 1) = atoi(l_C);
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) == 255) goto L1BF45;
     (*(signed char *)((char *)a1 + 1))--;
 L1BF45:;
@@ -254,7 +254,7 @@ void faction_parse_power(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(short *)((char *)a1 + 31) = func_000A0D13(l_C);
+    *(short *)((char *)a1 + 31) = atoi(l_C);
 L1BFC9:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1BFF5;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1BFF7;
@@ -274,7 +274,7 @@ void faction_parse_flags(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(short *)((char *)a1 + 37) |= func_000A0D13(l_C);
+    *(short *)((char *)a1 + 37) |= atoi(l_C);
 L1C04D:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C079;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C07B;
@@ -297,7 +297,7 @@ void faction_parse_ally(int a1, int a2, int a3, int a4)
     fatal_error((int)D_0017048A);
 L1C0C8:;
     l_C = *(int *)((char *)a2);
-    *(int *)((char *)(((*(int *)((char *)a3))++ << 2) + a1) + 56) = func_000A0D13(l_C);
+    *(int *)((char *)(((*(int *)((char *)a3))++ << 2) + a1) + 56) = atoi(l_C);
 L1C0EF:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C11B;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C11D;
@@ -320,7 +320,7 @@ void faction_parse_enemy(int a1, int a2, int a3, int a4)
     fatal_error((int)D_001704A4);
 L1C16A:;
     l_C = *(int *)((char *)a2);
-    *(int *)((char *)(((*(int *)((char *)a4))++ << 2) + a1) + 68) = func_000A0D13(l_C);
+    *(int *)((char *)(((*(int *)((char *)a4))++ << 2) + a1) + 68) = atoi(l_C);
 L1C191:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C1BD;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C1BF;
@@ -340,7 +340,7 @@ void faction_parse_ruler(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(signed char *)((char *)a1 + 2) = func_000A0D13(l_C);
+    *(signed char *)((char *)a1 + 2) = atoi(l_C);
 L1C214:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C240;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C242;
@@ -360,7 +360,7 @@ void faction_parse_face(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(short *)((char *)a1 + 51) = func_000A0D13(l_C);
+    *(short *)((char *)a1 + 51) = atoi(l_C);
 L1C298:;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) == 13) goto L1C2AF;
     l_C++;
@@ -374,7 +374,7 @@ void faction_parse_vam(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(short *)((char *)a1 + 35) = func_000A0D13(l_C);
+    *(short *)((char *)a1 + 35) = atoi(l_C);
 L1C2EE:;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) == 13) goto L1C305;
     l_C++;
@@ -390,7 +390,7 @@ void faction_parse_flat(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_14 = *(int *)((char *)a2);
-    l_10 = func_000A0D13(l_14);
+    l_10 = atoi(l_14);
     l_C = l_10;
 L1C344:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_14) + 1))) & 32)) != 0) goto L1C370;
@@ -407,7 +407,7 @@ L1C389:;
     l_14++;
     goto L1C389;
 L1C3A0:;
-    *(short *)((char *)((((int)(unsigned char)*(signed char *)D_00196732) * 2) + a1) + 47) = (l_10 << 7) | func_000A0D13(l_14);
+    *(short *)((char *)((((int)(unsigned char)*(signed char *)D_00196732) * 2) + a1) + 47) = (l_10 << 7) | atoi(l_14);
 L1C3C0:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_14) + 1))) & 32)) != 0) goto L1C3EC;
     if (((int)(unsigned char)*(signed char *)((char *)l_14)) != 45) goto L1C3EE;
@@ -434,7 +434,7 @@ void faction_parse_race(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(signed char *)((char *)a1 + 53) = func_000A0D13(l_C);
+    *(signed char *)((char *)a1 + 53) = atoi(l_C);
 L1C48E:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C4BA;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C4BC;
@@ -454,7 +454,7 @@ void faction_parse_sgroup(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(signed char *)((char *)a1 + 54) = func_000A0D13(l_C);
+    *(signed char *)((char *)a1 + 54) = atoi(l_C);
 L1C511:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C53D;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C53F;
@@ -474,7 +474,7 @@ void faction_parse_ggroup(int a1, int a2, int a3, int a4)
     int l_C;
 
     l_C = *(int *)((char *)a2);
-    *(signed char *)((char *)a1 + 55) = func_000A0D13(l_C);
+    *(signed char *)((char *)a1 + 55) = atoi(l_C);
 L1C594:;
     if (((int)(unsigned char)(*(signed char *)(D_00178630 + ((int)(unsigned char)(*(signed char *)((char *)l_C) + 1))) & 32)) != 0) goto L1C5C0;
     if (((int)(unsigned char)*(signed char *)((char *)l_C)) != 45) goto L1C5C2;
@@ -551,7 +551,7 @@ L1C7F4:;
     if (((int)(unsigned char)*(signed char *)((char *)l_1C)) != (a1 + 45)) goto L1C8BD;
     if (a2 >= 1) goto L1C8B7;
     l_18 = l_1C + 71;
-    func_000A1023(l_18 + 157, *(int *)player_character + 157, 200, (int)D_00170464, 1352, 210);
+    mc_memcpy(l_18 + 157, *(int *)player_character + 157, 200, (int)D_00170464, 1352, 210);
     *(short *)((char *)l_18 + 124) = (*(short *)((char *)l_18 + 126) = *(short *)(*(char **)player_character + 126));
     *(short *)((char *)l_18 + 141) = (*(short *)((char *)l_18 + 143) = *(short *)(*(char **)player_character + 143));
     *(signed char *)((char *)l_18 + 129) = *(signed char *)(*(char **)player_character + 129);
@@ -593,7 +593,7 @@ void faction_save(int a1)
     int l_1C;
     int l_18;
 
-    func_000A0B42(a1, (int)faction_count, 4);
+    write(a1, (int)faction_count, 4);
     faction_save_r(a1, *(int *)factions);
     faction_link_relations(*(int *)factions);
 }
@@ -633,7 +633,7 @@ L1CA36:;
 L1CA63:;
     goto L1CA2E;
 L1CA65:;
-    func_000A0B42(a1, a2, 92);
+    write(a1, a2, 92);
     a2 = *(int *)((char *)a2 + 80);
     goto L1C9B8;
 }
@@ -665,7 +665,7 @@ L1CAEF:;
     *(short *)((char *)l_80 + 29) = 65436;
 L1CAFE:;
     l_20 = faction_find((int)(short)*(short *)((char *)l_80 + 33));
-    func_000A1023(l_20, (int)l_80, 80, (int)D_00170464, 1436, 4);
+    mc_memcpy(l_20, (int)l_80, 80, (int)D_00170464, 1436, 4);
     goto L1CAC8;
 L1CB28:;
     faction_link_relations(*(int *)factions);
@@ -834,7 +834,7 @@ void rumor_file_open(void)
     *(int *)rumor_file = disk_create((int)D_001704BB);
 L1D152:;
     if (*(int *)rumor_file < 0) return;
-    func_000A006E(*(int *)rumor_file, 0, 2);
+    lseek(*(int *)rumor_file, 0, 2);
 }
 
 void rumor_file_close(void)
@@ -851,7 +851,7 @@ int rumor_collect_local(void)
 
     l_24 = *(int *)D_00147954 + 60000;
     func_000A0ED9(1642, (int)D_00170464);
-    func_000A0F5C(l_24, (int)D_001704C5, *(int *)current_location);
+    mc_sprintf(l_24, (int)D_001704C5, *(int *)current_location);
     l_24 += func_000A0DF4(l_24);
     *(signed char *)((char *)l_24) = 0;
     *(signed char *)((char *)l_24 + 1) = 0;
@@ -867,7 +867,7 @@ L1D241:;
 L1D259:;
     if (((unsigned)l_20) >= l_1C) goto L1D2C9;
     if (func_0001D54B(l_20, 0, 1, 0) == 0) goto L1D2B6;
-    func_000A1023(l_24, l_20 + 34, *(int *)((char *)l_20 + 26), (int)D_00170464, 1658, 4);
+    mc_memcpy(l_24, l_20 + 34, *(int *)((char *)l_20 + 26), (int)D_00170464, 1658, 4);
     l_24 += *(int *)((char *)l_20 + 26) - 1;
     *(signed char *)((char *)l_24 + 1) = 252;
     *(signed char *)((char *)l_24) = *(signed char *)((char *)l_24 + 1);
@@ -916,7 +916,7 @@ L1D40E:;
     return 0;
 L1D41D:;
     *(int *)&l_20 = *(int *)((char *)((rand_range(0, *(int *)((char *)l_40 + 16) - 1) << 2) + *(int *)((char *)l_40 + 20)));
-    func_000A1023(*(int *)D_00195C44, *(int *)&l_20 + 34, *(int *)(*(char **)&l_20 + 26), (int)D_00170464, 1701, 4);
+    mc_memcpy(*(int *)D_00195C44, *(int *)&l_20 + 34, *(int *)(*(char **)&l_20 + 26), (int)D_00170464, 1701, 4);
     return *(int *)D_00195C44;
 }
 
@@ -941,7 +941,7 @@ L1D4D2:;
 L1D4F6:;
     goto L1D524;
 L1D4F8:;
-    func_000A1023(*(int *)D_00195C44, l_20 + 34, *(int *)((char *)l_20 + 26), (int)D_00170464, 1720, 4);
+    mc_memcpy(*(int *)D_00195C44, l_20 + 34, *(int *)((char *)l_20 + 26), (int)D_00170464, 1720, 4);
     return *(int *)D_00195C44;
 L1D524:;
     l_20 = (l_20 + *(int *)((char *)l_20 + 26)) + 34;
@@ -1037,7 +1037,7 @@ L1D911:;
     if (((int)(unsigned char)(*(signed char *)((char *)l_28 + 9) & 4)) == 0) goto L1D975;
     l_1C = quest_find_by_id((int)(short)((unsigned short)(unsigned char)*(signed char *)((char *)l_28 + 10)));
     if (l_1C == 0) goto L1D9F4;
-    if (func_000A0E3B(l_1C + 6, l_28 + 11) != 0) goto L1D9F4;
+    if (stricmp(l_1C + 6, l_28 + 11) != 0) goto L1D9F4;
     l_24 = rumor_copy(l_24, l_28);
     goto L1D9F4;
 L1D975:;
@@ -1061,8 +1061,8 @@ L1DA0A:;
 
 int rumor_copy(int a1, int a2)
 {
-    func_000A1023(a1, a2, 34, (int)D_00170464, 1873, 4);
-    func_000A1023(a1 + 34, a2 + 34, *(int *)((char *)a2 + 26), (int)D_00170464, 1874, 4);
+    mc_memcpy(a1, a2, 34, (int)D_00170464, 1873, 4);
+    mc_memcpy(a1 + 34, a2 + 34, *(int *)((char *)a2 + 26), (int)D_00170464, 1874, 4);
     return (a1 + 34) + *(int *)((char *)a2 + 26);
 }
 

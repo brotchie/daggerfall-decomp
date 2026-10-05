@@ -9,8 +9,8 @@ address and to resolve a named global. The matching build is the test: names cha
 
 A name is left out (and reported) when it would clash in C: a keyword, a name the sources
 already use for something else (a local, a member, a macro, a parameter: renaming the global
-would change what that code means), `main`, or a library function (those come later, with
-the C library headers in mind).
+would change what that code means), `main`, or a library function whose name is internal to
+the compiler (a leading `_` or a trailing `_`: Watcom's name decoration would mangle them).
 
 Re-running is safe: a name that changed in names.csv is renamed again, and one that dropped
 below strong goes back to its address. Tools that read the sources by address use
@@ -53,8 +53,9 @@ def wanted(rows, used):
         a = int(r["address"], 16)
         ident = ("func_%08X" if r["kind"] == "func" else "D_%08X") % a
         n = r["name"]
-        if r["kind"] == "func" and region_lib[0] <= a < region_lib[1]:
-            skipped.append((n, "a library function"))
+        if r["kind"] == "func" and region_lib[0] <= a < region_lib[1] and \
+                not re.fullmatch(r"[a-z][a-z0-9_]*[a-z0-9]", n):
+            skipped.append((n, "a library function with a compiler-internal name"))
         elif n in KEYWORDS:
             skipped.append((n, "a C keyword or main"))
         elif n in used:

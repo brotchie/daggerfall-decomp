@@ -25,7 +25,7 @@ extern void bank_draw_ship_list(void);
 extern void text_draw_colored(char *, short, short, int, unsigned char);
 extern int gold_total(void);
 extern char *func_000A0DD9(int, char *, int);
-extern void func_000A1023(char *, char *, int, char *, int, int);
+extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern int func_00144F68();
 
 void bank_draw(void)
@@ -34,7 +34,7 @@ void bank_draw(void)
     struct Img *img;
 
     img = window_image;
-    func_000A1023(screen_buffer, bank_saved_screen, 64000, D_00175CC4, 216, 4);
+    mc_memcpy(screen_buffer, bank_saved_screen, 64000, D_00175CC4, 216, 4);
     func_00144F68(img->x, img->y, img->w, img->h, img->data);
     switch (bank_screen) {
     case 0:

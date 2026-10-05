@@ -4,7 +4,7 @@
 extern char D_00170129[];
 
 extern int func_000A0DF4();
-extern int func_000A0E0D();
+extern int mc_memmove();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_set_string;
 
@@ -35,7 +35,7 @@ L12526:;
     l_14 = func_000A0DF4(a2);
     if (((unsigned)l_14) >= l_10) goto L1258F;
     l_18 = ((int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136)) - l_1C) - (l_10 - l_14);
-    func_000A0E0D(l_1C, (l_10 - l_14) + l_1C, l_18, (int)D_00170129, 870, 4);
+    mc_memmove(l_1C, (l_10 - l_14) + l_1C, l_18, (int)D_00170129, 870, 4);
     *(int *)((char *)a1 + 136) -= l_10 - l_14;
     goto L1260E;
 L1258F:;
@@ -44,7 +44,7 @@ L1258F:;
     return 0;
 L125BD:;
     l_18 = ((int)(*(char **)((char *)a1 + 132) + *(int *)((char *)a1 + 136)) - l_1C) + (l_14 - l_10);
-    func_000A0E0D((l_14 - l_10) + l_1C, l_1C, l_18, (int)D_00170129, 888, 4);
+    mc_memmove((l_14 - l_10) + l_1C, l_1C, l_18, (int)D_00170129, 888, 4);
     *(int *)((char *)a1 + 136) += l_14 - l_10;
 L1260E:;
     if (*(signed char *)((char *)a2) == 0) goto L12628;

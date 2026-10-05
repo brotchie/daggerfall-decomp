@@ -69,11 +69,11 @@ extern int func_000968F8(char *);
 extern void item_remove_equip_effects(char *, int);
 extern void inv_store_item(char *);
 extern int item_forbidden_for_class(struct item *);
-extern void func_000A0040(char *, int, int, char *, int, int);
+extern void mc_memset(char *, int, int, char *, int, int);
 extern int func_000CE44C();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 void inv_equip_item(char *obj);
 
 void inv_draw_left_list(char *a1)
@@ -81,7 +81,7 @@ void inv_draw_left_list(char *a1)
     struct node *n;
 
     inv_left_count = D_001AA586 = 0;
-    func_000A0040(inv_left_rows, 0, 20, D_0017704C, 1627, 20);
+    mc_memset(inv_left_rows, 0, 20, D_0017704C, 1627, 20);
     if (inv_left_container->type == 2 && inv_left_container != wagon_container) {
         inv_draw_item_cell(inv_left_container, 0, a1);
         D_001AA578 = inv_left_container;
@@ -103,7 +103,7 @@ void inv_draw_right_list(char *a1)
     struct node *n;
 
     inv_right_count = D_001AA588 = 0;
-    func_000A0040(inv_right_rows, 0, 20, D_0017704C, 1655, 20);
+    mc_memset(inv_right_rows, 0, 20, D_0017704C, 1655, 20);
     if (inv_right_container != D_00195B34) {
         inv_draw_item_cell(inv_right_container, 0, a1);
         D_001AA558 = inv_right_container;
@@ -131,7 +131,7 @@ void func_00095EDB(void)
     gold_add(D_001AA454);
     D_0012B508 = 144;
     func_000A0ED9(1688, D_0017704C);
-    func_000A0F5C(text_buffer, D_001832A4, D_001AA454);
+    mc_sprintf(text_buffer, D_001832A4, D_001AA454);
     msgbox_show_string(text_buffer, 1);
 }
 

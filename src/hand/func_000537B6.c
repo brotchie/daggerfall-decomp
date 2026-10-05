@@ -13,7 +13,7 @@ extern struct C *player_character;
 extern void msgbox_update(void);
 extern void text_draw_centered_colored(char *, short, short, int, unsigned char);
 extern char *func_000A0DD9(int, char *, int);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_0012B2EB();
 extern int func_0012B3ED();
 extern void func_00144D00(short, short, short, short);
@@ -28,7 +28,7 @@ void classmaker_draw_reputations(void)
     short m;
 
     func_0012B2EB();
-    func_000A1023(screen_buffer, text_macro_fae, 64000, D_00175420, 283, 4);
+    mc_memcpy(screen_buffer, text_macro_fae, 64000, D_00175420, 283, 4);
     func_00144F68(39, 5, *(unsigned short *)(text_macro_fea + 4), *(unsigned short *)(text_macro_fea + 6), text_macro_fea + 12);
     h = classmaker_reputation_buttons[0].x1 - classmaker_reputation_buttons[0].x0 + 1;
     mid = (classmaker_reputation_buttons[0].y0 + classmaker_reputation_buttons[0].y1) >> 1;

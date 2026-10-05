@@ -47,7 +47,7 @@ extern struct ent *quest_section(struct grp *, int);
 extern void fatal_error(char *);
 extern void object_foreach(int, void (*)(struct ob *));
 extern int object_find_by_id(int, int);
-extern int func_000A0040();
+extern int mc_memset();
 extern int func_000A2A2B(void);
 extern int func_000A2A76(struct msg *);
 extern int func_000CE8D5();
@@ -68,7 +68,7 @@ int mem_pool_release(char *p)
         fatal_error(D_00175B02);
     *(unsigned char *)&b->flags &= 254;
     size = b->size;
-    func_000A0040(p, 150, size, D_00175AD4, 182, 4);
+    mc_memset(p, 150, size, D_00175AD4, 182, 4);
     if (b->next != 0) {
         if (!(b->next->flags & 1)) {
             n = b->next;

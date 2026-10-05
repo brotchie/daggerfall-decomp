@@ -28,14 +28,14 @@ extern int rand_range(int, int);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
-extern int func_0009DC25(void);
-extern int func_0009DC49(int);
-extern int func_000A0040();
-extern int func_000A0AD9();
+extern int rand(void);
+extern int srand(int);
+extern int mc_memset();
+extern int mc_strncpy();
 extern char *func_000CE45E(char *, short, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, ...);
+extern int mc_sprintf(char *, ...);
 
 #define REGION(o) D_001850D4[D_00179E94[*(unsigned short *)((o) + 33)]]
 
@@ -128,8 +128,8 @@ void daedra_summon(unsigned char *a1)
         l_30 = 30;
         break;
     default:
-        l_28 = func_0009DC25();
-        func_0009DC49(game_minutes / 1440);
+        l_28 = rand();
+        srand(game_minutes / 1440);
         l_34 = 4;
         if (*(unsigned short *)(l_40 + 33) != 419) {
             while (l_34 == 4)
@@ -148,7 +148,7 @@ void daedra_summon(unsigned char *a1)
         msgbox_yes_no_rsc(481);
         if (D_00196271 == 2) return;
         l_30 = 30;
-        func_0009DC49(l_28);
+        srand(l_28);
         break;
     }
     if (D_00195D30 < 0)
@@ -163,7 +163,7 @@ void daedra_summon(unsigned char *a1)
     l_2C = 5;
     if (l_1C == 6)
         l_2C = 15;
-    if (func_0009DC25() % 101 <= l_2C) {
+    if (rand() % 101 <= l_2C) {
         l_34 = 9;
         l_3C = faction_find(l_34);
     }
@@ -177,7 +177,7 @@ void daedra_summon(unsigned char *a1)
     }
     if (*(unsigned short *)(l_3C + 37) & 64) {
         l_24 = &REGION(l_3C);
-        func_000A0040(l_70, 0, 44, D_00170634, 189, 4);
+        mc_memset(l_70, 0, 44, D_00170634, 189, 4);
         current_quest = 0;
         flc_play_with_text(D_001850E5[l_24 - D_001850D4], l_70, 482, 0);
         a1 = monster_summon_near_player(D_00179E90[rand_range(0, 4)]);
@@ -187,6 +187,6 @@ void daedra_summon(unsigned char *a1)
     }
     *(unsigned short *)(l_3C + 37) |= 64;
     func_000A0ED9(200, D_00170634);
-    func_000A0F5C(text_buffer, D_0017063D, REGION(l_3C), l_18);
-    func_000A0AD9(D_001961F5, text_buffer, 13, D_00170634, 201);
+    mc_sprintf(text_buffer, D_0017063D, REGION(l_3C), l_18);
+    mc_strncpy(D_001961F5, text_buffer, 13, D_00170634, 201);
 }

@@ -94,17 +94,17 @@ extern int object_create_child(int, int, int);
 extern int object_reparent(int, int);
 extern int object_new_id(int);
 extern int location_cell_at(int, int);
-extern int func_0009DC25();
-extern int func_0009DC49();
+extern int rand();
+extern int srand();
 extern int func_0009DEA7();
-extern int func_000A006E();
-extern int func_000A00AF();
+extern int lseek();
+extern int mc_malloc();
 extern int func_000A00CB();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
-extern int func_000A1079();
-extern int func_000A1235();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
+extern int memchr();
+extern int filelength();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
@@ -396,11 +396,11 @@ void func_0005ED19(int a1)
     if (((int)(unsigned short)*(short *)((char *)a1 + 34)) == 10) goto L5ED8D;
     if (((int)(unsigned short)*(short *)((char *)a1 + 34)) != 11) goto L5EDA3;
 L5ED8D:;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659B + (func_0009DC25() & 3));
+    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659B + (rand() & 3));
     goto L5EDC8;
 L5EDA3:;
     if (((int)(unsigned short)*(short *)((char *)a1 + 34)) != 4) goto L5EDC8;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659F + (func_0009DC25() & 3));
+    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659F + (rand() & 3));
 L5EDC8:;
     return;
 L5EDCA:;
@@ -409,7 +409,7 @@ L5EDCA:;
 L5EDEC:;
     return;
 L5EDEE:;
-    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659B + (func_0009DC25() & 3));
+    *(signed char *)((char *)a1 + 56) = *(signed char *)(D_0018659B + (rand() & 3));
 }
 
 void func_0005EE0C(int a1, int a2, int a3)
@@ -655,7 +655,7 @@ void func_0005F50B(void)
     int l_18;
 
     func_000A0ED9(625, (int)D_001758B8);
-    func_000A0F5C((int)text_buffer, (int)D_001758E2, (((int)(unsigned short)*(short *)D_00195DC4) >> 3) + 97);
+    mc_sprintf((int)text_buffer, (int)D_001758E2, (((int)(unsigned short)*(short *)D_00195DC4) >> 3) + 97);
     disk_read_file((int)text_buffer, *(int *)D_00195C44);
     l_18 = *(int *)D_00195C44;
     l_20 = 0;
@@ -674,10 +674,10 @@ void item_info_painting(int a1)
     int l_1C;
     int l_18;
 
-    l_18 = func_0009DC25();
-    *(short *)D_00195DC4 = func_0009DC25(func_0009DC49((int)(unsigned short)*(short *)((char *)a1 + 63))) % 180;
+    l_18 = rand();
+    *(short *)D_00195DC4 = rand(srand((int)(unsigned short)*(short *)((char *)a1 + 63))) % 180;
     l_1C = disk_open_data((int)D_001758EE);
-    func_000A006E(l_1C, ((int)(unsigned short)*(short *)D_00195DC4) * 40, 0);
+    lseek(l_1C, ((int)(unsigned short)*(short *)D_00195DC4) * 40, 0);
     func_000A00CB(l_1C, *(int *)D_00195C44, 40);
     func_0009DEA7(l_1C);
     *(short *)painting_subject_text = func_0005F6E9(*(int *)D_00195C44) + 6100;
@@ -686,7 +686,7 @@ void item_info_painting(int a1)
     *(short *)painting_prefix2_text = (short)func_0005F6E9((int)(*(char **)D_00195C44 + 30)) + 6400;
     *(signed char *)D_001940D6 |= 32;
     msgbox_show_rsc(250, 1);
-    func_0009DC49(l_18);
+    srand(l_18);
 }
 
 int func_0005F6E9(int a1)
@@ -718,14 +718,14 @@ void item_init_book(int a1, int a2)
     *(short *)((char *)a1 + 63) = *(short *)(D_0018E044 + (func_0005F955(a2) << 2));
     l_1C = *(int *)D_00195C44;
     func_000A0ED9(674, (int)D_001758B8);
-    func_000A0F5C((int)text_buffer, (int)D_001758F8, (int)(unsigned short)*(short *)((char *)a1 + 63));
+    mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)*(short *)((char *)a1 + 63));
     l_18 = disk_open_data((int)text_buffer);
     func_000A00CB(l_18, l_1C, 234);
     func_0009DEA7(l_18);
-    l_14 = func_0009DC25();
-    func_0009DC49(*(int *)((char *)l_1C));
+    l_14 = rand();
+    srand(*(int *)((char *)l_1C));
     *(int *)((char *)a1 + 36) = rand_range(300, 800);
-    func_0009DC49(l_14);
+    srand(l_14);
 }
 
 int func_0005F955(int a1)
@@ -751,7 +751,7 @@ L5F9A9:;
     if (l_20 != 0) goto L5F9B6;
     l_20 = 1;
 L5F9B6:;
-    l_1C = func_0009DC25() % l_20;
+    l_1C = rand() % l_20;
     l_24 = 0;
 L5F9CF:;
     if (l_1C < 0) goto L5F9FA;
@@ -782,7 +782,7 @@ L5FD67:;
     if (*(int *)(*(char **)player_character + 367 + (l_24 << 2)) == 0) goto L5FD5F;
     l_1C = *(int *)(*(char **)player_character + 367 + (l_24 << 2)) + 71;
     if (((int)(unsigned short)*(short *)((char *)l_1C + 32)) != 1) goto L5FDC4;
-    if (func_000A1079((int)D_00186583, (int)(unsigned short)*(short *)((char *)l_1C + 34), 6) != 0) goto L5FDC6;
+    if (memchr((int)D_00186583, (int)(unsigned short)*(short *)((char *)l_1C + 34), 6) != 0) goto L5FDC6;
 L5FDC4:;
     goto L5FDCC;
 L5FDC6:;
@@ -875,7 +875,7 @@ void func_0006007C(int a1)
     *(int *)((char *)l_18 + 7) = *(int *)((char *)a1 + 7);
     *(int *)((char *)l_18 + 11) = *(int *)((char *)a1 + 11);
     *(int *)((char *)l_18 + 15) = *(int *)((char *)a1 + 15);
-    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_0018661E + (func_0009DC25() % 8))), l_18 + 71);
+    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_0018661E + (rand() % 8))), l_18 + 71);
 }
 
 void func_00060100(int a1)
@@ -887,7 +887,7 @@ void func_00060100(int a1)
     *(int *)((char *)l_18 + 7) = *(int *)((char *)a1 + 7);
     *(int *)((char *)l_18 + 11) = *(int *)((char *)a1 + 11);
     *(int *)((char *)l_18 + 15) = *(int *)((char *)a1 + 15);
-    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_00186626 + (func_0009DC25() % 4))), l_18 + 71);
+    item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)(D_00186626 + (rand() % 4))), l_18 + 71);
 }
 
 void func_00060184(int a1, int a2)
@@ -941,8 +941,8 @@ void magic_def_load(void)
 
     l_18 = disk_open_data((int)D_00175927);
     func_000A00CB(l_18, (int)magic_def_count, 4);
-    *(int *)magic_def = func_000A00AF(func_000A1235(l_18) - 4, (int)D_001758B8, 1201);
-    func_000A00CB(l_18, *(int *)magic_def, (int)&*(signed char *)((char *)func_000A1235(l_18) - 4));
+    *(int *)magic_def = mc_malloc(filelength(l_18) - 4, (int)D_001758B8, 1201);
+    func_000A00CB(l_18, *(int *)magic_def, (int)&*(signed char *)((char *)filelength(l_18) - 4));
     func_0009DEA7(l_18);
 }
 
@@ -1023,7 +1023,7 @@ L61257:;
     item_make_random((int)(unsigned short)((unsigned short)(unsigned char)*(signed char *)((char *)(l_20 + l_1C))), l_C + 71);
 L61271:;
     l_14 >>= 1;
-    if ((func_0009DC25() % 100) <= l_14) goto L61293;
+    if ((rand() % 100) <= l_14) goto L61293;
     l_18 = 0;
 L61293:;
     goto L6112B;
@@ -1095,7 +1095,7 @@ L613D0:;
     *(signed char *)((char *)l_18 + 49) = *(signed char *)&l_20;
     l_1C = object_create_child(l_1C, 0, 109);
     *(signed char *)((char *)l_1C) = 31;
-    func_000A1023(l_1C + 71, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1330, 4);
+    mc_memcpy(l_1C + 71, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1330, 4);
     goto L613C8;
 }
 
@@ -1134,7 +1134,7 @@ void func_000614FB(int a1)
     *(signed char *)((char *)l_18 + 49) = *(signed char *)&l_20;
     l_1C = object_create_child(l_1C, 0, 109);
     *(signed char *)((char *)l_1C) = 31;
-    func_000A1023(l_1C + 71, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1366, 4);
+    mc_memcpy(l_1C + 71, ((int)potion_recipes) + (l_20 * 109), 109, (int)D_001758B8, 1366, 4);
 }
 
 void ai_creature_think(int a1, int a2, int a3, int a4)
@@ -1249,7 +1249,7 @@ L61911:;
     monster_set_action(a2, l_20, 0);
     goto L619BE;
 L6195B:;
-    if (func_0009DC25() >= 1000) goto L6197A;
+    if (rand() >= 1000) goto L6197A;
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 504)) != 24) goto L6197C;
 L6197A:;
     goto L6198E;
@@ -1281,7 +1281,7 @@ L619FE:;
     monster_set_action(a2, l_20, 0);
     goto L61A59;
 L61A21:;
-    if ((func_0009DC25() % 40) != 0) goto L61A47;
+    if ((rand() % 40) != 0) goto L61A47;
     if (monster_cast_spell(a2, a3) != 0) goto L61A49;
 L61A47:;
     goto L61A59;
@@ -1325,7 +1325,7 @@ L61B4F:;
     monster_set_action(a2, l_20, 32);
     goto L61C4D;
 L61B64:;
-    if ((func_0009DC25() % ((int)(short)*(short *)((char *)a1 + 44))) >= ((((int)(short)*(short *)((char *)a1 + 44)) >> 3) + 6)) goto L61B95;
+    if ((rand() % ((int)(short)*(short *)((char *)a1 + 44))) >= ((((int)(short)*(short *)((char *)a1 + 44)) >> 3) + 6)) goto L61B95;
     if (*(int *)((char *)a1 + 116) == 0) goto L61B9A;
 L61B95:;
     goto L61C16;

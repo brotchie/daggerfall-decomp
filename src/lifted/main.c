@@ -65,7 +65,7 @@ extern char ground_texture_archive[];
 extern char nature_texture_archive[];
 
 extern int object_reparent(int, int);
-extern int func_0009DC25();
+extern int rand();
 extern int func_0009DEAC();
 extern int func_000C2E05();
 extern int func_000C9C70();
@@ -449,7 +449,7 @@ void screen_shake_start(int a1)
     if (((struct bf8_0_1 *)&screen_shake)->f == 0) goto L10FCC;
     (*(int *)screen_shake)++;
 L10FCC:;
-    *(int *)D_0018DC28 = func_0009DC25();
+    *(int *)D_0018DC28 = rand();
     *(int *)D_0018DC14 = 0;
     *(int *)D_0018DC18 = 60;
 }

@@ -54,9 +54,9 @@ extern int disk_read_file(int, int);
 extern int picklist_poll(int);
 extern int inventory_open(int, int, int);
 extern int travel_map_open(int);
-extern int func_000A0024();
-extern int func_000A00AF();
-extern int func_000A1023();
+extern int mc_free();
+extern int mc_malloc();
+extern int mc_memcpy();
 extern int func_000CE44C();
 extern int func_0012B136();
 extern int func_00144F68();
@@ -274,8 +274,8 @@ L5D805:;
     *(signed char *)D_001940D4 |= 32;
     *(int *)magic_items_image = disk_read_file((int)D_001758A8, 0);
     *(signed char *)D_00196272 = 1;
-    *(int *)magic_items_saved_screen = func_000A00AF(64000, (int)D_00175898, 358);
-    func_000A1023(*(int *)magic_items_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175898, 359, 4);
+    *(int *)magic_items_saved_screen = mc_malloc(64000, (int)D_00175898, 358);
+    mc_memcpy(*(int *)magic_items_saved_screen, *(int *)screen_buffer, 64000, (int)D_00175898, 359, 4);
 }
 
 void magic_items_frame(void)
@@ -283,7 +283,7 @@ void magic_items_frame(void)
     short l_18;
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
-    func_000A1023(*(int *)screen_buffer, *(int *)magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
     func_00144F68((int)(unsigned short)*(short *)(*(char **)magic_items_image), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 2), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 4), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 6), (int)(*(char **)magic_items_image + 12));
     if (*(signed char *)key_down_esc != 0) goto L5D911;
     if (((int)(unsigned char)(*(signed char *)mouse_buttons & 2)) == 0) goto L5D931;
@@ -315,7 +315,7 @@ void magic_items_close(void)
 L5D9A6:;
     goto L5D9C6;
 L5D9A8:;
-    func_000A0024(*(int *)magic_items_image, (int)D_00175898, 396);
+    mc_free(*(int *)magic_items_image, (int)D_00175898, 396);
     *(int *)magic_items_image = -1751672937;
 L5D9C6:;
     picklist_free((int)D_001A9AB8);
@@ -326,7 +326,7 @@ L5D9C6:;
 L5D9F3:;
     return;
 L5D9F5:;
-    func_000A0024(*(int *)magic_items_saved_screen, (int)D_00175898, 400);
+    mc_free(*(int *)magic_items_saved_screen, (int)D_00175898, 400);
     *(int *)magic_items_saved_screen = -1751672937;
 }
 

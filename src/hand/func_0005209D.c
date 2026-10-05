@@ -38,9 +38,9 @@ struct info {
 #pragma pack()
 extern char D_00175404[];
 extern unsigned short disk_open_data(int);
-extern int func_000A0040();
-extern int func_000A006E(int, int, int);
-extern char *func_000A00AF(int, char *, int);
+extern int mc_memset();
+extern int lseek(int, int, int);
+extern char *mc_malloc(int, char *, int);
 extern int func_000A00CB(int, void *, int);
 
 int flc_open(int a1, struct anim *a2)
@@ -60,13 +60,13 @@ int flc_open(int a1, struct anim *a2)
     a2->a10 = l_A8.a84;
     if (a2->buf0 == 0) {
         a2->flags |= 1;
-        a2->buf0 = func_000A00AF(a2->w * a2->h, D_00175404, 225);
+        a2->buf0 = mc_malloc(a2->w * a2->h, D_00175404, 225);
     }
     if (a2->buf1 == 0) {
         a2->flags |= 2;
-        a2->buf1 = func_000A00AF(2050, D_00175404, 231);
+        a2->buf1 = mc_malloc(2050, D_00175404, 231);
     }
-    func_000A0040(a2->buf1, 0, 2050, D_00175404, 233, 4);
+    mc_memset(a2->buf1, 0, 2050, D_00175404, 233, 4);
     func_000A00CB(a2->handle, &l_28, 10);
     if ((unsigned short)l_28.x == 0xF100) {
         func_000A00CB(a2->handle, &l_28, 8);
@@ -75,11 +75,11 @@ int flc_open(int a1, struct anim *a2)
             a2->y = l_28.y - (a2->h >> 1);
         }
     }
-    func_000A006E(a2->handle, l_A8.seek, 0);
+    lseek(a2->handle, l_A8.seek, 0);
     a2->a6 = 1;
     if (a2->buf2 == 0) {
         a2->flags |= 64;
-        a2->buf2 = func_000A00AF(a2->w * a2->h, D_00175404, 255);
+        a2->buf2 = mc_malloc(a2->w * a2->h, D_00175404, 255);
     }
     return 1;
 }

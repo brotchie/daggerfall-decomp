@@ -9,7 +9,7 @@ extern int spell_cost(int, int);
 extern int cast_item_spell_at();
 extern void item_damage(int, int);
 extern int object_create_child(int, int, int);
-extern int func_000A1023();
+extern int mc_memcpy();
 
 struct S89 { char p[73]; unsigned char f; char q[15]; };
 struct E4 { short t; short v; };
@@ -42,7 +42,7 @@ L96D98:;
     l_18 = object_create_child(*(int *)D_00195AC4, 0, 89);
     *(signed char *)((char *)l_18) = 9;
     *(short *)((char *)l_18 + 21) = 3;
-    func_000A1023(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_0017704C, 2092, 4);
+    mc_memcpy(l_18 + 71, (int)(*(char **)spell_records + (l_20 * 89)), 89, (int)D_0017704C, 2092, 4);
     l_14 = l_18 + 71;
     *(signed char *)((char *)l_14 + 72) = *(signed char *)&a2 + 200;
     l_20 = 0;

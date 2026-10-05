@@ -87,15 +87,15 @@ extern void object_foreach(struct Ent *, void (*)());
 extern int object_tree_size(int);
 extern void inv_reset_left_list(void);
 extern int func_0009DEA7(int);
-extern int func_000A0040(void *, int, int, char *, int, int);
+extern int mc_memset(void *, int, int, char *, int, int);
 extern int func_000A00CB(int, void *, int);
 extern int func_000C2FF5();
 extern int func_0012A2D0();
 extern int func_0012B136();
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_0009DC59(char *, ...);
-extern int func_000A0F5C(char *, char *, ...);
+extern int open(char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 int load_game(char *name)
 {
@@ -108,10 +108,10 @@ int load_game(char *name)
     char buf[1024];
 
     func_000A0ED9(637, D_00176884);
-    func_000A0F5C(buf, D_00176909, name);
+    mc_sprintf(buf, D_00176909, name);
     func_000A0ED9(638, D_00176884);
-    func_000A0F5C(text_rsc_buffer, D_001768DF, buf, D_00176927);
-    fd = func_0009DC59(text_rsc_buffer, 512);
+    mc_sprintf(text_rsc_buffer, D_001768DF, buf, D_00176927);
+    fd = open(text_rsc_buffer, 512);
     if (fd < 0)
         return 0;
     func_000A00CB(fd, &save_version, 4);
@@ -120,7 +120,7 @@ int load_game(char *name)
     location_unload(D_00195AC4->id);
     if (save_version < 293 || save_version > 294)
         fatal_error(D_0017694A);
-    func_000A0040(inventory_containers, 0, 36, D_00176884, 655, 36);
+    mc_memset(inventory_containers, 0, 36, D_00176884, 655, 36);
     object_unlink(player_object);
     object_free_children(player_object);
     object_free_children((int)D_00195AC4);
@@ -136,8 +136,8 @@ int load_game(char *name)
     l24 = current_region;
     current_region = 255;
     func_000A0ED9(677, D_00176884);
-    func_000A0F5C(text_rsc_buffer, D_001768DF, buf, D_00176927);
-    save_file_handle = func_0009DC59(text_rsc_buffer, 512);
+    mc_sprintf(text_rsc_buffer, D_001768DF, buf, D_00176927);
+    save_file_handle = open(text_rsc_buffer, 512);
     func_000A00CB(save_file_handle, &save_version, 4);
     func_000A00CB(save_file_handle, &vec, 12);
     func_000A00CB(save_file_handle, &l18, 2);
@@ -150,8 +150,8 @@ int load_game(char *name)
         D_000C23C8 = vec.y;
         D_000C23CC = vec.z;
         func_000C2FF5();
-        func_000A0040(D_001A94B0, 0, 16, D_00176884, 696, 16);
-        func_000A0040(D_001A94A0, 0, 16, D_00176884, 697, 16);
+        mc_memset(D_001A94B0, 0, 16, D_00176884, 696, 16);
+        mc_memset(D_001A94A0, 0, 16, D_00176884, 697, 16);
     }
     object_free_single(player_object);
     sz = current_location->count * 26;

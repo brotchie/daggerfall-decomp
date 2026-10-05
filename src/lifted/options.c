@@ -77,10 +77,10 @@ extern int disk_create(int);
 extern int key_pressed_once(unsigned char);
 extern int func_0009DEA7();
 extern int func_0009DEAC();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A0B42();
-extern int func_000A1023();
+extern int mc_free();
+extern int mc_memset();
+extern int write();
+extern int mc_memcpy();
 extern int func_000CB34E();
 extern int func_000CDD81();
 extern int func_000CE87B();
@@ -170,7 +170,7 @@ L43500:;
 L4352C:;
     goto L4354C;
 L4352E:;
-    func_000A0024(*(int *)options_image, (int)D_00170EE8, 164);
+    mc_free(*(int *)options_image, (int)D_00170EE8, 164);
     *(int *)options_image = -1751672937;
 L4354C:;
     *(signed char *)D_00196272 = 0;
@@ -179,7 +179,7 @@ L4354C:;
 L43568:;
     goto L43588;
 L4356A:;
-    func_000A0024(*(int *)options_saved_screen, (int)D_00170EE8, 166);
+    mc_free(*(int *)options_saved_screen, (int)D_00170EE8, 166);
     *(int *)options_saved_screen = -1751672937;
 L43588:;
     return 1;
@@ -191,7 +191,7 @@ void options_draw(void)
     int l_1C;
     int l_18;
 
-    func_000A1023(*(int *)screen_buffer, *(int *)options_saved_screen, 64000, (int)D_00170EE8, 176, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)options_saved_screen, 64000, (int)D_00170EE8, 176, 4);
     l_20 = *(int *)options_image;
     func_00144F68((int)(unsigned short)*(short *)((char *)l_20), (int)(unsigned short)*(short *)((char *)l_20 + 2), (int)(unsigned short)*(short *)((char *)l_20 + 4), (int)(unsigned short)*(short *)((char *)l_20 + 6), l_20 + 12);
     *(signed char *)D_0012B508 = 246;
@@ -303,7 +303,7 @@ int options_controls_rebind(int a1, int a2)
     int l_18;
 
     l_1C = -1;
-    func_000A0040((int)key_down, 0, 128, (int)D_00170EE8, 276, 128);
+    mc_memset((int)key_down, 0, 128, (int)D_00170EE8, 276, 128);
 L439CA:;
     if (*(signed char *)mouse_buttons == 0) goto L439DA;
     func_0012B136();
@@ -376,7 +376,7 @@ void options_controls_draw(int a1, int a2)
     int l_18;
     int l_14;
 
-    func_000A1023(*(int *)screen_buffer, a2, 64000, (int)D_00170EE8, 355, 4);
+    mc_memcpy(*(int *)screen_buffer, a2, 64000, (int)D_00170EE8, 355, 4);
     if (((int)(unsigned char)*(signed char *)mouse_control_mode) != 1) goto L43BD3;
     func_00144F68((int)(unsigned short)*(short *)(*(char **)D_00199708), (int)(unsigned short)*(short *)(*(char **)D_00199708 + 2), (int)(unsigned short)*(short *)(*(char **)D_00199708 + 4), (int)(unsigned short)*(short *)(*(char **)D_00199708 + 6), (int)(*(char **)D_00199708 + 12));
 L43BD3:;
@@ -466,7 +466,7 @@ L43E0F:;
 L43E27:;
     goto L43E42;
 L43E29:;
-    func_000A0024(l_18, (int)D_00170EE8, 401);
+    mc_free(l_18, (int)D_00170EE8, 401);
     l_18 = -1751672937;
 L43E42:;
     if (*(int *)D_00199708 == 0) goto L43E57;
@@ -474,13 +474,13 @@ L43E42:;
 L43E57:;
     goto L43E77;
 L43E59:;
-    func_000A0024(*(int *)D_00199708, (int)D_00170EE8, 402);
+    mc_free(*(int *)D_00199708, (int)D_00170EE8, 402);
     *(int *)D_00199708 = -1751672937;
 L43E77:;
     l_1C = disk_create(*(int *)D_001788E4);
-    func_000A1023((int)D_00195E82, (int)D_00152A04, 46, (int)D_00170EE8, 405, 4);
-    func_000A0B42(l_1C, (int)mouse_control_mode, 54);
-    func_000A0B42(l_1C, (int)key_map, 38);
+    mc_memcpy((int)D_00195E82, (int)D_00152A04, 46, (int)D_00170EE8, 405, 4);
+    write(l_1C, (int)mouse_control_mode, 54);
+    write(l_1C, (int)key_map, 38);
     func_0009DEA7(l_1C);
 }
 
@@ -522,7 +522,7 @@ L43F50:;
 
 void options_controls_defaults(void)
 {
-    func_000A1023((int)key_map, (int)default_key_map, 38, (int)D_00170EE8, 432, 38);
+    mc_memcpy((int)key_map, (int)default_key_map, 38, (int)D_00170EE8, 432, 38);
 }
 
 void options_mouse_draw(int a1)
@@ -531,7 +531,7 @@ void options_mouse_draw(int a1)
     int l_18;
 
     l_18 = a1;
-    func_000A1023(*(int *)screen_buffer, *(int *)options_saved_screen, 64000, (int)D_00170EE8, 480, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)options_saved_screen, 64000, (int)D_00170EE8, 480, 4);
     func_00144F68((int)(unsigned short)*(short *)((char *)l_18), (int)(unsigned short)*(short *)((char *)l_18 + 2), (int)(unsigned short)*(short *)((char *)l_18 + 4), (int)(unsigned short)*(short *)((char *)l_18 + 6), l_18 + 12);
     *(signed char *)D_0012B508 = 246;
     func_00144D00((int)(short)((*(signed char *)mouse_control_mode == 0) ? 134 : 220), 47, 5, 5);
@@ -676,7 +676,7 @@ L446E3:;
 L446F8:;
     goto L44718;
 L446FA:;
-    func_000A0024(*(int *)D_00195B60, (int)D_00170EE8, 580);
+    mc_free(*(int *)D_00195B60, (int)D_00170EE8, 580);
     *(int *)D_00195B60 = -1751672937;
 L44718:;
     if (*(int *)D_00195B5C == 0) goto L4472D;
@@ -684,7 +684,7 @@ L44718:;
 L4472D:;
     goto L4474D;
 L4472F:;
-    func_000A0024(*(int *)D_00195B5C, (int)D_00170EE8, 581);
+    mc_free(*(int *)D_00195B5C, (int)D_00170EE8, 581);
     *(int *)D_00195B5C = -1751672937;
 L4474D:;
     if (l_1C == 0) goto L4475C;
@@ -692,7 +692,7 @@ L4474D:;
 L4475C:;
     goto L44777;
 L4475E:;
-    func_000A0024(l_1C, (int)D_00170EE8, 582);
+    mc_free(l_1C, (int)D_00170EE8, 582);
     l_1C = -1751672937;
 L44777:;
     return 0;
@@ -705,7 +705,7 @@ void options_joystick_draw(int a1, int a2)
     int l_14;
 
     l_1C = a2;
-    func_000A1023(*(int *)screen_buffer, *(int *)options_saved_screen, 64000, (int)D_00170EE8, 593, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)options_saved_screen, 64000, (int)D_00170EE8, 593, 4);
     func_00144F68((int)(unsigned short)*(short *)((char *)l_1C), (int)(unsigned short)*(short *)((char *)l_1C + 2), (int)(unsigned short)*(short *)((char *)l_1C + 4), (int)(unsigned short)*(short *)((char *)l_1C + 6), l_1C + 12);
     if (((int)(unsigned char)*(signed char *)joystick_setting) != 2) goto L44823;
     *(signed char *)D_0012B508 = 246;

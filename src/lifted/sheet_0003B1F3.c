@@ -31,7 +31,7 @@ extern int key_action_held(int);
 extern int sound_play(int, int, int);
 extern int disk_read_file(int, int);
 extern int rand_range(int, int);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern void sheet_place_spinner(int);
 
 int sheet_open(short a1)
@@ -85,7 +85,7 @@ L3B3B0:;
     *(short *)D_00190D64 = rand_range(4, 6);
 L3B3C5:;
     *(int *)D_00190BE4 = 0;
-    func_000A1023((int)D_00190D8C, (int)&*(signed char *)(*(char **)player_character + 48), 16, (int)D_00170C67, 97, 4);
+    mc_memcpy((int)D_00190D8C, (int)&*(signed char *)(*(char **)player_character + 48), 16, (int)D_00170C67, 97, 4);
     sheet_place_spinner(13);
     *(signed char *)D_0019626C = 0;
     *(signed char *)D_00187CA8 = 0;

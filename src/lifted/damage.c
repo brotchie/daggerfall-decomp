@@ -51,9 +51,9 @@ extern int rand_range(int, int);
 extern int object_create_child(int, int, int);
 extern int object_new_id(int);
 extern int travel_route(int, int, int, int, int);
-extern int func_0009DC25();
-extern int func_000A0040();
-extern int func_000A1079();
+extern int rand();
+extern int mc_memset();
+extern int memchr();
 extern int func_000C1500();
 extern int func_000C808D();
 extern int func_000C9F08();
@@ -101,7 +101,7 @@ case 6:
 L2F169:;
     return;
 case 9:
-    if (func_0009DC25() >= 400) goto L2F184;
+    if (rand() >= 400) goto L2F184;
     disease_infect_lycanthropy(a2, 0);
 L2F184:;
     return;
@@ -117,7 +117,7 @@ L2F1BA:;
 L2F1D5:;
     return;
 case 14:
-    if (func_0009DC25() >= 400) goto L2F1F3;
+    if (rand() >= 400) goto L2F1F3;
     disease_infect_lycanthropy(a2, 1);
 L2F1F3:;
     return;
@@ -133,7 +133,7 @@ L2F242:;
     return;
 case 28:
 case 30:
-    if (func_0009DC25() >= 400) goto L2F25A;
+    if (rand() >= 400) goto L2F25A;
     disease_infect_vampirism(a2);
     return;
 L2F25A:;
@@ -173,7 +173,7 @@ void damage_collapse_exhausted(int a1)
     int l_18;
 
     l_1C = func_000C9F08();
-    func_000A0040(655360, 0, ((((int)(unsigned short)(*(short *)((char *)(*(int *)game_settings)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320), (int)D_001709E4, 701, 4);
+    mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)(*(int *)game_settings)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320), (int)D_001709E4, 701, 4);
     time_pass(20160);
 L2F3E3:;
     if ((func_000C9F08() - l_1C) < 22) goto L2F3E3;
@@ -299,8 +299,8 @@ int damage_miss_sound(int a1, int a2)
 L2FA1A:;
     return (int)(short)*(short *)(weapon_swing_sounds + (((int)(unsigned short)*(short *)((char *)a1 + 34)) * 2));
 L2FA34:;
-    if (func_000A1079((int)monster_parry_ids, a2, 28) == 0) goto L2FA6A;
-    if (func_0009DC25() >= 32768) goto L2FA6A;
+    if (memchr((int)monster_parry_ids, a2, 28) == 0) goto L2FA6A;
+    if (rand() >= 32768) goto L2FA6A;
     return rand_range(291, 299);
 L2FA6A:;
     return (int)(short)*(short *)(weapon_swing_sounds + (((int)(unsigned short)*(short *)((char *)a1 + 34)) * 2));
@@ -324,8 +324,8 @@ void play_death_video(void)
     int l_18;
 
     func_0012D8BD((int)D_00196DC4, 50);
-    func_000A0040(655360, 0, 64000, (int)D_001709E4, 875, 4);
-    func_000A0040(*(int *)screen_buffer, 0, 64000, (int)D_001709E4, 876, 4);
+    mc_memset(655360, 0, 64000, (int)D_001709E4, 875, 4);
+    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_001709E4, 876, 4);
     palette_restore();
     l_18 = disk_resolve_path((int)D_001709FB);
 L2FB00:;
@@ -334,8 +334,8 @@ L2FB00:;
     goto L2FB00;
 L2FB10:;
     func_000C1500(l_18, 0, 0, 1);
-    func_000A0040(655360, 0, 64000, (int)D_001709E4, 883, 4);
-    func_000A0040(*(int *)screen_buffer, 0, 64000, (int)D_001709E4, 884, 4);
+    mc_memset(655360, 0, 64000, (int)D_001709E4, 883, 4);
+    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_001709E4, 884, 4);
     palette_restore();
     *(int *)D_00195D48 = 10000;
     *(signed char *)D_0019629B = 0;

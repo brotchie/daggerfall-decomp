@@ -24,7 +24,7 @@ extern void func_0002CAB0(struct task *);
 extern unsigned int quest_travel_minutes(struct quest *, struct actor *, struct actor *);
 extern struct task *quest_section(struct quest *, int);
 extern int rand_range(int, int);
-extern int func_000A1079(char *, int, int);
+extern int memchr(char *, int, int);
 
 void quest_timers_update(struct quest *a1)
 {
@@ -88,25 +88,25 @@ void quest_timer_update(struct quest *a1, struct task *a2, short a3)
             break;
         case 2:
             a2->delay = quest_travel_minutes(a1, 0, a2->who) * 384 >> 8;
-            if (func_000A1079(D_0017A13C, a2->who->kind, 5))
+            if (memchr(D_0017A13C, a2->who->kind, 5))
                 a2->delay += 10080;
             break;
         case 3:
             a2->delay = quest_travel_minutes(a1, a2->who, a2->whom) * 384 >> 8;
-            if (func_000A1079(D_0017A13C, a2->who->kind, 5) || func_000A1079(D_0017A13C, a2->whom->kind, 5))
+            if (memchr(D_0017A13C, a2->who->kind, 5) || memchr(D_0017A13C, a2->whom->kind, 5))
                 a2->delay += 10080;
             break;
         case 4:
             a2->delay = quest_travel_minutes(a1, 0, a2->who) * 384 >> 8;
-            if (func_000A1079(D_0017A13C, a2->who->kind, 5))
+            if (memchr(D_0017A13C, a2->who->kind, 5))
                 a2->delay += 10080;
             break;
         case 5:
             a2->delay = quest_travel_minutes(a1, 0, a2->who) * 384 >> 8;
             a2->delay += quest_travel_minutes(a1, a2->who, a2->whom) * 384 >> 8;
-            if (func_000A1079(D_0017A13C, a2->who->kind, 5))
+            if (memchr(D_0017A13C, a2->who->kind, 5))
                 a2->delay += 10080;
-            if (func_000A1079(D_0017A13C, a2->whom->kind, 5))
+            if (memchr(D_0017A13C, a2->whom->kind, 5))
                 a2->delay += 10080;
             break;
         }

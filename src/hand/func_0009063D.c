@@ -17,7 +17,7 @@ struct player {
 };
 struct career { char pad[16]; unsigned char skill[12]; };
 #define FREED ((void *)0x97979797)
-#define FREE(p, line) if ((p) != 0 && (p) != FREED) { func_000A0024((p), D_00176F41, (line)); (p) = FREED; }
+#define FREE(p, line) if ((p) != 0 && (p) != FREED) { mc_free((p), D_00176F41, (line)); (p) = FREED; }
 extern unsigned char D_0012B508;
 extern char D_00176F28[];
 extern char D_00176F34[];
@@ -62,11 +62,11 @@ extern int chargen_screen_loop(int, int);
 extern void chargen_select_skill(int);
 extern void chargen_roll_attributes(void);
 extern void chargen_select_attribute(int);
-extern void func_000A0024(void *, char *, int);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern void mc_free(void *, char *, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 int chargen_name_character(void)
 {
@@ -99,7 +99,7 @@ int chargen_name_character(void)
         FREE(window_image, 114);
     }
     func_000A0ED9(117, D_00176F41);
-    func_000A0F5C(text_buffer, D_00176F4C, player_character->f64 & 1, player_character->f67);
+    mc_sprintf(text_buffer, D_00176F4C, player_character->f64 & 1, player_character->f67);
     chargen_face_images = disk_read_file(text_buffer, 0);
     chargen_screen = 2;
     window_image = disk_read_file(D_00176F5B, 0);
@@ -136,12 +136,12 @@ int chargen_name_character(void)
     msgbox_update();
     chargen_screen = 255;
     func_000A0ED9(155, D_00176F41);
-    func_000A0F5C(text_buffer, D_00176F4C, player_character->f64 & 1, player_character->f67);
+    mc_sprintf(text_buffer, D_00176F4C, player_character->f64 & 1, player_character->f67);
     chargen_face_images = disk_read_file(text_buffer, 0);
     D_00195B60 = disk_read_file(D_00176F8F, 0);
     window_image = disk_read_file(D_00176FB6, 0);
     chargen_reflex_image = disk_read_file(D_00176FA9, 0);
-    func_000A1023(player_character->f48, player_character->f32, 16, D_00176F41, 161, 16);
+    mc_memcpy(player_character->f48, player_character->f32, 16, D_00176F41, 161, 16);
     player_character->f88 = level_skill_sum();
     if (chargen_screen_loop(0, 39)) {
         chargen_free_images();

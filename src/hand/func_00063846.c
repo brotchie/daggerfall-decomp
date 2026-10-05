@@ -34,7 +34,7 @@ extern short collide_flags;
 extern int collide_move_object(struct obj *, int, struct move *, int);
 extern void object_delete(struct obj *);
 extern int func_0009DEAC(int);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern int func_000C7FD9(int, int, int, int);
 extern void func_000CE6E2(int, int, int *, int *);
 
@@ -56,7 +56,7 @@ int monster_move_step(struct obj *o, struct obj *target, int angle)
     int saved_ab8;
 
     p = (char *)o + 71;
-    func_000A1023(&oldpos, &o->pos, 12, D_00175934, 1070, 4);
+    mc_memcpy(&oldpos, &o->pos, 12, D_00175934, 1070, 4);
     speed = D_00195AB0 * (*(short *)(p + 44) - 50 + D_00187CA9) / 1000;
     if (*(int *)(p + 76) != 0)
         dx = dz = 0;
@@ -88,13 +88,13 @@ int monster_move_step(struct obj *o, struct obj *target, int angle)
     D_001940D7 |= 128;
     mv.name = D_00187B44;
     mv.flags &= 65534;
-    func_000A1023(&saved, &D_00196D54, 12, D_00175934, 1114, 4);
+    mc_memcpy(&saved, &D_00196D54, 12, D_00175934, 1114, 4);
     D_00196D54.x = o->pos.x;
     D_00196D54.y = o->pos.y - vertical_velocity / 256;
     D_00196D54.z = o->pos.z;
     collide_move_object(o, 0, &mv, 0);
     player_on_ground = saved277;
-    func_000A1023(&D_00196D54, &saved, 12, D_00175934, 1121, 4);
+    mc_memcpy(&D_00196D54, &saved, 12, D_00175934, 1121, 4);
     if (p != player_character)
         *(int *)(p + 88) = D_00195C74;
     if ((collide_flags & (short)16) != 0 && !ai_monster_flags.b0)

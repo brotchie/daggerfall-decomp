@@ -21,10 +21,10 @@ extern int key_action_held(int);
 extern int sound_play(int, int, int);
 extern int disk_read_file(int, int);
 extern int func_0009DA1C(int, int);
-extern int func_0009DAEE(int, ...);
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A00AF();
+extern int printf(int, ...);
+extern int mc_free();
+extern int mc_memset();
+extern int mc_malloc();
 extern int func_000A2D9E();
 extern int func_00143700();
 extern void fatal_error(int);
@@ -39,8 +39,8 @@ void mem_pool_init(int a1, int a2)
 {
     int l_14;
 
-    func_000A0040(a1, 0, 4, (int)D_00175AD4, 60, 4);
-    *(int *)((char *)a1 + 4) = func_000A00AF(a2, (int)D_00175AD4, 62);
+    mc_memset(a1, 0, 4, (int)D_00175AD4, 60, 4);
+    *(int *)((char *)a1 + 4) = mc_malloc(a2, (int)D_00175AD4, 62);
     l_14 = *(int *)((char *)a1 + 4);
     if (l_14 != 0) goto L69EFC;
     fatal_error((int)D_00175ADB);
@@ -59,7 +59,7 @@ void mem_pool_free(int a1)
 L69F5F:;
     return;
 L69F61:;
-    func_000A0024(*(int *)((char *)a1 + 4), (int)D_00175AD4, 84);
+    mc_free(*(int *)((char *)a1 + 4), (int)D_00175AD4, 84);
     *(int *)((char *)a1 + 4) = -1751672937;
 }
 
@@ -122,7 +122,7 @@ void crash_screen(void)
 {
     func_00143700();
     func_0009DA1C(394, (int)D_00175AD4);
-    func_0009DAEE((int)D_00175C2D, *(int *)frame_checkpoint);
+    printf((int)D_00175C2D, *(int *)frame_checkpoint);
 L6A63A:;
     if (*(signed char *)key_down_enter == 0) goto L6A63A;
     func_00068B1B();

@@ -39,7 +39,7 @@ extern int potionmaker_in_cauldron(unsigned short, unsigned short);
 extern void potionmaker_ingredient_cb(int);
 extern int potionmaker_close(void);
 extern void potion_make(int);
-extern int func_000A0040();
+extern int mc_memset();
 extern int func_000A0DD9();
 extern int func_000CB552();
 extern int func_000CD1C5();
@@ -84,7 +84,7 @@ void potionmaker_update(void)
     text_draw_colored(func_000A0DD9(*(int *)(*(char **)player_character + 133), (int)text_buffer, 10), 235, 185, 145, 156);
     func_0012DB50(3);
     *(int *)potion_ingredient_count = 0;
-    func_000A0040((int)potion_ingredients, 0, 2048, (int)D_00176E94, 182, 2048);
+    mc_memset((int)potion_ingredients, 0, 2048, (int)D_00176E94, 182, 2048);
     object_foreach(*(int *)(*(char **)player_entity + 63), (int)potionmaker_ingredient_cb);
     for (COUNT = l_1C = 0; l_1C < 8; l_1C++) {
         if (((int *)potion_cauldron)[l_1C] != 0) {

@@ -24,23 +24,23 @@ extern char D_001A4A00[];
 extern char D_001A4A04[];
 extern char D_001A4A08[];
 
-extern int func_0009DC59(int, ...);
+extern int open(int, ...);
 extern int func_0009DEA7();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A00AF();
+extern int mc_free();
+extern int mc_memset();
+extern int mc_malloc();
 extern int func_000A00CB();
-extern int func_000A0AD9();
-extern int func_000A0B42();
+extern int mc_strncpy();
+extern int write();
 extern int func_000A0DF4();
-extern int func_000A0E3B();
-extern int func_000A0E82();
+extern int stricmp();
+extern int strnicmp();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1004();
-extern int func_000A1023();
-extern int func_000A1235();
-extern int func_000A17C1();
+extern int mc_sprintf(int, ...);
+extern int unlink();
+extern int mc_memcpy();
+extern int filelength();
+extern int strchr();
 extern void fatal_error(int);
 extern void file_index_scan(int);
 int disk_write_file(int, int, int);
@@ -60,23 +60,23 @@ int disk_read_file(int a1, int a2)
     l_20 = disk_open_data(a1);
     if (l_20 >= 0) goto L6CBAC;
     func_000A0ED9(45, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D07, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D07, a1);
     fatal_error((int)disk_path);
 L6CBAC:;
-    l_1C = (*(int *)disk_last_file_size = func_000A1235(l_20));
+    l_1C = (*(int *)disk_last_file_size = filelength(l_20));
     if (l_24 != 0) goto L6CBDC;
-    l_24 = func_000A00AF(l_1C, (int)D_00175D00, 52);
+    l_24 = mc_malloc(l_1C, (int)D_00175D00, 52);
 L6CBDC:;
     if (l_24 != 0) goto L6CC11;
     func_000A0ED9(56, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D22, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D22, a1);
     fatal_error((int)disk_path);
 L6CC11:;
-    func_000A0040(l_24, 0, l_1C, (int)D_00175D00, 60, 4);
+    mc_memset(l_24, 0, l_1C, (int)D_00175D00, 60, 4);
     l_18 = func_000A00CB(l_20, l_24, l_1C);
     if (l_18 == l_1C) goto L6CC6F;
     func_000A0ED9(65, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D44, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D44, a1);
     fatal_error((int)disk_path);
 L6CC6F:;
     func_0009DEA7(l_20);
@@ -88,12 +88,12 @@ int disk_write_file(int a1, int a2, int a3)
     int l_18;
     int l_14;
 
-    func_000A1004(a1);
-    l_18 = func_0009DC59(a1, 546, 384);
+    unlink(a1);
+    l_18 = open(a1, 546, 384);
     if (l_18 >= 1) goto L6CCCE;
     return 0;
 L6CCCE:;
-    l_14 = ((func_000A0B42(l_18, a2, a3) == a3) ? 1 : 0);
+    l_14 = ((write(l_18, a2, a3) == a3) ? 1 : 0);
     func_0009DEA7(l_18);
     return l_14;
 }
@@ -101,29 +101,29 @@ L6CCCE:;
 int disk_write_arena2_file(int a1, int a2, int a3)
 {
     func_000A0ED9(107, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
     return disk_write_file((int)disk_path, a2, a3);
 }
 
 int disk_open_data(int a1)
 {
     a1 = disk_resolve_path(a1);
-    return func_0009DC59(a1, 512);
+    return open(a1, 512);
 }
 
 int disk_open_rw(int a1)
 {
     func_000A0ED9(135, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
-    return func_0009DC59((int)disk_path, 514);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
+    return open((int)disk_path, 514);
 }
 
 int disk_create(int a1)
 {
     func_000A0ED9(149, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
-    func_000A1004((int)disk_path);
-    return func_0009DC59((int)disk_path, 546, 384);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
+    unlink((int)disk_path);
+    return open((int)disk_path, 546, 384);
 }
 
 int disk_file_exists(int a1)
@@ -132,8 +132,8 @@ int disk_file_exists(int a1)
     char l_7C[92];
 
     func_000A0ED9(159, (int)D_00175D00);
-    func_000A0F5C((int)l_7C, (int)D_00175D60, (int)D_001917E4, a1);
-    *(int *)&l_18 = func_0009DC59((int)l_7C, 512);
+    mc_sprintf((int)l_7C, (int)D_00175D60, (int)D_001917E4, a1);
+    *(int *)&l_18 = open((int)l_7C, 512);
     if (l_18 >= 0) goto L6CEDF;
     return 0;
 L6CEDF:;
@@ -148,43 +148,43 @@ void disk_copy_file(int a1, int a2, int a3)
     int l_14;
     int l_10;
 
-    l_1C = func_000A00AF(4096, (int)D_00175D00, 172);
+    l_1C = mc_malloc(4096, (int)D_00175D00, 172);
     if (((int)(unsigned char)*(signed char *)((char *)(func_000A0DF4(a2) + a2) - 1)) != 92) goto L6CF6C;
     func_000A0ED9(176, (int)D_00175D00);
-    func_000A0F5C(l_1C, (int)D_00175D60, a2, a1);
+    mc_sprintf(l_1C, (int)D_00175D60, a2, a1);
     goto L6CF96;
 L6CF6C:;
     func_000A0ED9(178, (int)D_00175D00);
-    func_000A0F5C(l_1C, (int)D_00175D65, a2, a1);
+    mc_sprintf(l_1C, (int)D_00175D65, a2, a1);
 L6CF96:;
-    l_18 = func_0009DC59(l_1C, 512);
+    l_18 = open(l_1C, 512);
     if (l_18 != (-1)) goto L6CFDF;
     if (l_1C == 0) goto L6CFBF;
     if (l_1C != (-1751672937)) goto L6CFC1;
 L6CFBF:;
     goto L6CFDA;
 L6CFC1:;
-    func_000A0024(l_1C, (int)D_00175D00, 184);
+    mc_free(l_1C, (int)D_00175D00, 184);
     l_1C = -1751672937;
 L6CFDA:;
     return;
 L6CFDF:;
     if (((int)(unsigned char)*(signed char *)((char *)(func_000A0DF4(a3) + a3) - 1)) != 92) goto L6D023;
     func_000A0ED9(189, (int)D_00175D00);
-    func_000A0F5C(l_1C, (int)D_00175D60, a3, a1);
+    mc_sprintf(l_1C, (int)D_00175D60, a3, a1);
     goto L6D04D;
 L6D023:;
     func_000A0ED9(191, (int)D_00175D00);
-    func_000A0F5C(l_1C, (int)D_00175D65, a3, a1);
+    mc_sprintf(l_1C, (int)D_00175D65, a3, a1);
 L6D04D:;
-    l_14 = func_0009DC59(l_1C, 610, 384);
+    l_14 = open(l_1C, 610, 384);
     if (l_14 != (-1)) goto L6D0A3;
     if (l_1C == 0) goto L6D07B;
     if (l_1C != (-1751672937)) goto L6D07D;
 L6D07B:;
     goto L6D096;
 L6D07D:;
-    func_000A0024(l_1C, (int)D_00175D00, 197);
+    mc_free(l_1C, (int)D_00175D00, 197);
     l_1C = -1751672937;
 L6D096:;
     func_0009DEA7(l_18);
@@ -193,11 +193,11 @@ L6D0A3:;
     l_10 = func_000A00CB(l_18, *(int *)D_00147954, 102400);
 L6D0B9:;
     if (l_10 != 102400) goto L6D0EB;
-    func_000A0B42(l_14, *(int *)D_00147954, l_10);
+    write(l_14, *(int *)D_00147954, l_10);
     l_10 = func_000A00CB(l_18, *(int *)D_00147954, 102400);
     goto L6D0B9;
 L6D0EB:;
-    func_000A0B42(l_14, *(int *)D_00147954, l_10);
+    write(l_14, *(int *)D_00147954, l_10);
     func_0009DEA7(l_14);
     func_0009DEA7(l_18);
     if (l_1C == 0) goto L6D11B;
@@ -205,7 +205,7 @@ L6D0EB:;
 L6D11B:;
     return;
 L6D11D:;
-    func_000A0024(l_1C, (int)D_00175D00, 213);
+    mc_free(l_1C, (int)D_00175D00, 213);
     l_1C = -1751672937;
 }
 
@@ -219,7 +219,7 @@ int disk_resolve_path(int a1)
     char l_8C[80];
     char l_3C[16];
 
-    if (func_000A17C1(a1, 92) == 0) goto L6D170;
+    if (strchr(a1, 92) == 0) goto L6D170;
     if (((int)(unsigned char)*(signed char *)((char *)a1 + 1)) != 58) goto L6D172;
 L6D170:;
     goto L6D1B7;
@@ -251,14 +251,14 @@ L6D1EE:;
     if (((int)(unsigned char)*(signed char *)((char *)a1)) != 92) goto L6D203;
     a1++;
 L6D203:;
-    if (func_000A0E82((func_000A0DF4(a1) - 3) + a1, (int)D_00175D6B, 3) != 0) goto L6D25E;
+    if (strnicmp((func_000A0DF4(a1) - 3) + a1, (int)D_00175D6B, 3) != 0) goto L6D25E;
     func_000A0ED9(246, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
     return (int)disk_path;
 L6D25E:;
-    if (func_000A0E82((func_000A0DF4(a1) - 3) + a1, (int)D_00175D6F, 3) != 0) goto L6D2B9;
+    if (strnicmp((func_000A0DF4(a1) - 3) + a1, (int)D_00175D6F, 3) != 0) goto L6D2B9;
     func_000A0ED9(252, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D60, (int)D_001917E4, a1);
     return (int)disk_path;
 L6D2B9:;
     l_24 = *(int *)D_001A4A00;
@@ -270,7 +270,7 @@ L6D2D8:;
     l_20++;
     goto L6D2C8;
 L6D2E0:;
-    if (func_000A0E3B(a1, l_24) != 0) goto L6D3D9;
+    if (stricmp(a1, l_24) != 0) goto L6D3D9;
     l_1C = l_24 - *(int *)D_001A4A00;
     *(signed char *)l_8C = 0;
     l_24 = *(int *)D_001A49F8;
@@ -279,15 +279,15 @@ L6D30E:;
     if (l_1C >= l_28) goto L6D3A9;
     if (*(signed char *)l_8C != 0) goto L6D36B;
     func_000A0ED9(269, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D73, (int)D_001917E4, (int)l_8C, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D73, (int)D_001917E4, (int)l_8C, a1);
     goto L6D3A0;
 L6D36B:;
     func_000A0ED9(271, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D7A, (int)D_001917E4, (int)l_8C, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D7A, (int)D_001917E4, (int)l_8C, a1);
 L6D3A0:;
     return (int)disk_path;
 L6D3A9:;
-    func_000A0AD9((int)l_8C, l_24, 80, (int)D_00175D00, 274);
+    mc_strncpy((int)l_8C, l_24, 80, (int)D_00175D00, 274);
     l_24 += func_000A0DF4(l_24) + 5;
     goto L6D30E;
 L6D3D9:;
@@ -295,14 +295,14 @@ L6D3D9:;
     goto L6D2D8;
 L6D3EA:;
     func_000A0ED9(281, (int)D_00175D00);
-    func_000A0F5C((int)disk_path, (int)D_00175D73, (int)D_00191834, (int)l_3C, a1);
+    mc_sprintf((int)disk_path, (int)D_00175D73, (int)D_00191834, (int)l_3C, a1);
     return (int)disk_path;
 }
 }
 
 void func_0006D430(int a1)
 {
-    func_000A0AD9(*(int *)D_001A49FC, a1, 4, (int)D_00175D00, 287);
+    mc_strncpy(*(int *)D_001A49FC, a1, 4, (int)D_00175D00, 287);
     *(int *)D_001A49FC += func_000A0DF4(a1) + 1;
     *(int *)(*(char **)D_001A49FC) = *(int *)D_001A49F4 - *(int *)D_001A4A00;
     *(int *)D_001A49FC += 4;
@@ -310,7 +310,7 @@ void func_0006D430(int a1)
 
 void func_0006D491(int a1)
 {
-    func_000A0AD9(*(int *)D_001A49F4, a1, 4, (int)D_00175D00, 295);
+    mc_strncpy(*(int *)D_001A49F4, a1, 4, (int)D_00175D00, 295);
     *(int *)D_001A49F4 += func_000A0DF4(a1) + 1;
     (*(int *)D_001A4A08)++;
 }
@@ -320,17 +320,17 @@ void file_index_build(void)
     int l_1C;
     int l_18;
 
-    l_18 = func_000A00AF(102400, (int)D_00175D00, 303);
+    l_18 = mc_malloc(102400, (int)D_00175D00, 303);
     *(int *)D_001A4A08 = 0;
     *(int *)D_001A49F8 = (*(int *)D_001A49FC = l_18);
     *(int *)D_001A4A00 = (*(int *)D_001A49F4 = l_18 + 1024);
     file_index_scan((int)D_001917E4);
     func_0006D430((int)D_00175D82);
-    l_1C = func_000A00AF((*(int *)D_001A49FC - *(int *)D_001A49F8) + 1, (int)D_00175D00, 311);
-    func_000A1023(l_1C, *(int *)D_001A49F8, (*(int *)D_001A49FC - *(int *)D_001A49F8) + 1, (int)D_00175D00, 312, 4);
+    l_1C = mc_malloc((*(int *)D_001A49FC - *(int *)D_001A49F8) + 1, (int)D_00175D00, 311);
+    mc_memcpy(l_1C, *(int *)D_001A49F8, (*(int *)D_001A49FC - *(int *)D_001A49F8) + 1, (int)D_00175D00, 312, 4);
     *(int *)D_001A49F8 = l_1C;
-    l_1C = func_000A00AF((*(int *)D_001A49F4 - *(int *)D_001A4A00) + 1, (int)D_00175D00, 315);
-    func_000A1023(l_1C, *(int *)D_001A4A00, (int)&*(signed char *)((char *)(*(int *)D_001A49F4 - *(int *)D_001A4A00) + 1), (int)D_00175D00, 316, 4);
+    l_1C = mc_malloc((*(int *)D_001A49F4 - *(int *)D_001A4A00) + 1, (int)D_00175D00, 315);
+    mc_memcpy(l_1C, *(int *)D_001A4A00, (int)&*(signed char *)((char *)(*(int *)D_001A49F4 - *(int *)D_001A4A00) + 1), (int)D_00175D00, 316, 4);
     *(int *)D_001A4A00 = l_1C;
     *(int *)D_001A4A04 = (int)disk_resolve_path;
     if (l_18 == 0) goto L6D5FD;
@@ -338,7 +338,7 @@ void file_index_build(void)
 L6D5FD:;
     return;
 L6D5FF:;
-    func_000A0024(l_18, (int)D_00175D00, 320);
+    mc_free(l_18, (int)D_00175D00, 320);
     l_18 = -1751672937;
 }
 
@@ -349,7 +349,7 @@ void file_index_free(void)
 L6D645:;
     goto L6D665;
 L6D647:;
-    func_000A0024(*(int *)D_001A49F8, (int)D_00175D00, 325);
+    mc_free(*(int *)D_001A49F8, (int)D_00175D00, 325);
     *(int *)D_001A49F8 = -1751672937;
 L6D665:;
     if (*(int *)D_001A4A00 == 0) goto L6D67A;
@@ -357,6 +357,6 @@ L6D665:;
 L6D67A:;
     return;
 L6D67C:;
-    func_000A0024(*(int *)D_001A4A00, (int)D_00175D00, 326);
+    mc_free(*(int *)D_001A4A00, (int)D_00175D00, 326);
     *(int *)D_001A4A00 = -1751672937;
 }

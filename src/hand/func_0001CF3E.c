@@ -34,8 +34,8 @@ extern int faction_player_related(struct npc *);
 extern unsigned char func_0001D66C(struct msg *);
 extern void parse_rsc_text(int, int, int);
 extern int rand_range(int, int);
-extern void func_000A0040(char *, int, int, char *, int, int);
-extern int func_000A0B42(int, void *, int);
+extern void mc_memset(char *, int, int, char *, int, int);
+extern int write(int, void *, int);
 extern int func_000A0DF4(char *);
 
 void rumor_add_faction(struct npc *a1, struct npc *a2, int a3, unsigned char a4, int a5)
@@ -78,12 +78,12 @@ void rumor_add_faction(struct npc *a1, struct npc *a2, int a3, unsigned char a4,
     m.sub = a4;
     m.chk = func_0001D66C(&m);
     m.zero = 0;
-    func_000A0040(m.name, 0, 9, D_00170464, 1606, 9);
+    mc_memset(m.name, 0, 9, D_00170464, 1606, 9);
     m.f20 = 0;
     m.f22 = 0;
     m.len = func_000A0DF4(text_rsc_buffer) + 1;
     m.time = game_minutes + 43140;
-    func_000A0B42(rumor_file, &m, 34);
-    func_000A0B42(rumor_file, text_rsc_buffer, m.len);
+    write(rumor_file, &m, 34);
+    write(rumor_file, text_rsc_buffer, m.len);
     D_00195B84 = saved;
 }

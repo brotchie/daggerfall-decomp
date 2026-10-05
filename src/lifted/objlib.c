@@ -72,14 +72,14 @@ extern int func_00086093(int);
 extern int object_create_child(int, int, int);
 extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
-extern int func_0009DC25();
-extern int func_0009DC49();
-extern int func_000A0024();
-extern int func_000A0040();
-extern int func_000A00AF();
+extern int rand();
+extern int srand();
+extern int mc_free();
+extern int mc_memset();
+extern int mc_malloc();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern int func_000C5280();
 extern int func_000C7FD9();
 extern int func_000CE6E2();
@@ -142,7 +142,7 @@ L84ADE:;
     *(int *)((char *)l_48 + 31) = *(int *)(*(char **)D_00195AC4 + 31) + ((int)(unsigned short)(*(short *)(*(char **)current_location + 37))++);
     *(int *)D_001A9438 = *(int *)((char *)l_48 + 31);
     l_44 = l_48 + 71;
-    func_000A1023(l_44, *(int *)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
+    mc_memcpy(l_44, *(int *)rmb_record_ptr, l_1C, (int)D_00176C20, 803, 4);
     *(int *)((char *)l_44 + 5) = l_44 + 17;
     l_40 = *(int *)((char *)l_44 + 5);
     *(int *)((char *)l_44 + 9) = l_40 + (((int)(unsigned char)*(signed char *)((char *)l_44)) * 66);
@@ -279,10 +279,10 @@ case 17:
 case 18:
 case 19:
 case 20:
-    l_1C = func_0009DC25();
-    func_0009DC49((int)(short)*(short *)((char *)l_18 + 31));
-    l_20 = func_0009DC25();
-    func_0009DC49(l_1C);
+    l_1C = rand();
+    srand((int)(short)*(short *)((char *)l_18 + 31));
+    l_20 = rand();
+    srand(l_1C);
     if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) == 42) goto L85088;
     if (((int)(unsigned short)*(short *)(*(char **)rmb_block + 661 + (a2 * 26))) != 108) goto L8508A;
 L85088:;
@@ -377,7 +377,7 @@ L8535E:;
 L85395:;
     if (archive_read_record(*(int *)arch3d_bsa, l_20, *(int *)(D_001A5C3C + (a1 * 20))) != 0) goto L853E2;
     func_000A0ED9(1104, (int)D_00176C20);
-    func_000A0F5C(*(int *)D_00195C44, (int)D_00176C4F, l_20);
+    mc_sprintf(*(int *)D_00195C44, (int)D_00176C4F, l_20);
     fatal_error(*(int *)D_00195C44);
 L853E2:;
     *(int *)model_heap_free -= (l_1C + 1) & -2;
@@ -473,10 +473,10 @@ L85564:;
     return 0;
 L855B7:;
     func_0013FE15(*(int *)(D_001A5C3C + (l_20 * 20)));
-    l_1C = func_0009DC25();
-    func_0009DC49(*(int *)(*(char **)(D_001A5C3C + (l_20 * 20)) + 12));
+    l_1C = rand();
+    srand(*(int *)(*(char **)(D_001A5C3C + (l_20 * 20)) + 12));
     arch3d_apply_climate_textures(*(int *)(D_001A5C3C + (l_20 * 20)));
-    func_0009DC49(l_1C);
+    srand(l_1C);
     return ((int)model_cache_nodes) + (l_20 * 20);
 }
 }
@@ -523,7 +523,7 @@ L856D7:;
 L856D9:;
     *(int *)((char *)a1) = 0;
     *(int *)((char *)a1 + 4) = *(int *)((char *)a1);
-    func_000A0040((int)D_001A5C40, 0, 10220, (int)D_00176C20, 1189, 4);
+    mc_memset((int)D_001A5C40, 0, 10220, (int)D_00176C20, 1189, 4);
 }
 
 void model_cache_purge_unused(int a1, int a2, int a3)
@@ -610,14 +610,14 @@ void func_0008591A(int a1, int a2)
     int l_18;
     int l_14;
 
-    l_14 = func_0009DC25();
-    func_0009DC49(*(int *)((char *)a1 + 31) & 65535);
+    l_14 = rand();
+    srand(*(int *)((char *)a1 + 31) & 65535);
     l_18 = func_0002455D(a1);
     if (l_18 == 100000) goto L85962;
     *(int *)((char *)a1 + 11) = l_18;
 L85962:;
     *(short *)((char *)a1 + 27) = func_00086041((int)(unsigned char)*(signed char *)player_environment, (int)(unsigned char)*(signed char *)(*(char **)current_building + 24));
-    func_0009DC49(l_14);
+    srand(l_14);
 }
 
 void func_00085992(int a1, int a2)
@@ -634,7 +634,7 @@ L859C2:;
     goto L85A25;
 L859F1:;
     *(signed char *)((char *)a1) = 33;
-    *(short *)((char *)a1 + 27) = ((unsigned short)(unsigned char)*(signed char *)(D_00187DAC + (func_0009DC25() % 20))) + 27648;
+    *(short *)((char *)a1 + 27) = ((unsigned short)(unsigned char)*(signed char *)(D_00187DAC + (rand() % 20))) + 27648;
     *(short *)((char *)a1 + 25) = 1;
 L85A25:;
     if (*(short *)((char *)a1 + 27) == 0) goto L85A42;
@@ -676,7 +676,7 @@ L85ADA:;
     *(int *)(sound_cache + (l_24 << 4)) = *(int *)frame_counter;
     *(int *)(D_001A8430 + (l_24 << 4)) = a1;
     *(int *)(D_001A8434 + (l_24 << 4)) = l_20;
-    *(int *)(D_001A8438 + (l_24 << 4)) = func_000A00AF(l_20, (int)D_00176C20, 1338);
+    *(int *)(D_001A8438 + (l_24 << 4)) = mc_malloc(l_20, (int)D_00176C20, 1338);
     dpmi_lock_region(*(int *)(D_001A8438 + (l_24 << 4)), l_20 + 4096);
     archive_read_record(*(int *)dagger_snd, l_1C, *(int *)(D_001A8438 + (l_24 << 4)));
     *(int *)sound_cache_bytes += l_20;
@@ -718,7 +718,7 @@ L85C40:;
 L85C8E:;
     goto L85CBB;
 L85C90:;
-    func_000A0024(*(int *)(D_001A8438 + (l_1C << 4)), (int)D_00176C20, 1375);
+    mc_free(*(int *)(D_001A8438 + (l_1C << 4)), (int)D_00176C20, 1375);
     *(int *)(D_001A8438 + (l_1C << 4)) = -1751672937;
 L85CBB:;
     *(int *)(D_001A8438 + (l_1C << 4)) = 0;
@@ -746,7 +746,7 @@ L85D27:;
 L85D7E:;
     goto L85DAB;
 L85D80:;
-    func_000A0024(*(int *)(D_001A8438 + (l_18 << 4)), (int)D_00176C20, 1392);
+    mc_free(*(int *)(D_001A8438 + (l_18 << 4)), (int)D_00176C20, 1392);
     *(int *)(D_001A8438 + (l_18 << 4)) = -1751672937;
 L85DAB:;
     *(int *)(D_001A8438 + (l_18 << 4)) = 0;
@@ -760,7 +760,7 @@ L85DD0:;
 void flat_animal_sound(int a1, int a2, int a3, int a4, int a5)
 {
     if (a4 != 201) return;
-    if (func_0009DC25() > 100) return;
+    if (rand() > 100) return;
     if (func_000C7FD9(a1, a3, *(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15)) > 768) return;
     switch ((unsigned)a5) {
     return;

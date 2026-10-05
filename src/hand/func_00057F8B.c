@@ -39,7 +39,7 @@ extern void msgbox_show_string(char *, int);
 extern void func_00057147(short, short, short, short, short, short, short);
 extern int itemmaker_free_slot(void);
 extern int itemmaker_free_slot_count(void);
-extern char *func_000A1079(char *, int, unsigned);
+extern char *memchr(char *, int, unsigned);
 
 void itemmaker_add_soul_powers(int a1)
 {
@@ -52,13 +52,13 @@ void itemmaker_add_soul_powers(int a1)
     int slot;
     char *p;
 
-    p = func_000A1079(D_00185AC4, a1, 12);
+    p = memchr(D_00185AC4, a1, 12);
     if (p == 0) return;
     idx = p - D_00185AC4;
     for (i = 0; i < 4; i += 2) {
         if (*(unsigned char *)(D_00185A94 + idx * 4 + i) == 128) {
             for (j = 0; j < 5; j++) {
-                p = func_000A1079(D_00185825, (*(unsigned char **)(D_00185AE4 + *(unsigned char *)(D_00185A95 + idx * 4 + i) * 4))[j], 39);
+                p = memchr(D_00185825, (*(unsigned char **)(D_00185AE4 + *(unsigned char *)(D_00185A95 + idx * 4 + i) * 4))[j], 39);
                 if (p == 0)
                     continue;
                 D_001998CC[j * 2] = 0;
@@ -66,7 +66,7 @@ void itemmaker_add_soul_powers(int a1)
             }
         } else if (*(unsigned char *)(D_00185A94 + idx * 4 + i) == 129) {
             for (j = 0; j < 5; j++) {
-                p = func_000A1079(D_0018584D, (*(unsigned char **)(D_00185AE4 + *(unsigned char *)(D_00185A95 + idx * 4 + i) * 4))[j], 26);
+                p = memchr(D_0018584D, (*(unsigned char **)(D_00185AE4 + *(unsigned char *)(D_00185A95 + idx * 4 + i) * 4))[j], 26);
                 if (p == 0)
                     continue;
                 D_001998D6[j * 2] = 1;

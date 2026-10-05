@@ -69,11 +69,11 @@ extern int object_free_single(int);
 extern int object_create_child(int, int, int);
 extern int inv_take_arrow(int);
 extern int door_start_swing(int, int);
-extern int func_000A0024();
-extern int func_000A0040();
+extern int mc_free();
+extern int mc_memset();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
 extern int func_000C2000();
 extern int func_000C2043();
 extern int func_000C2068();
@@ -149,11 +149,11 @@ L72A2F:;
     goto L72A58;
 L72A31:;
     func_000A0ED9(85, (int)D_0017615C);
-    func_000A0F5C((int)text_buffer, (int)D_00176166, l_14);
+    mc_sprintf((int)text_buffer, (int)D_00176166, l_14);
     goto L72A7D;
 L72A58:;
     func_000A0ED9(87, (int)D_0017615C);
-    func_000A0F5C((int)text_buffer, (int)D_00176175, l_14);
+    mc_sprintf((int)text_buffer, (int)D_00176175, l_14);
 L72A7D:;
     *(int *)(weapon_hand_cif + (a2 << 2)) = disk_read_file((int)text_buffer, 0);
 }
@@ -250,7 +250,7 @@ L739AB:;
     *(short *)(*(char **)((char *)l_24 + 12) + 27) = 0;
     item_make(3, 18, *(int *)((char *)l_24 + 12) + 71);
     *(signed char *)(*(char **)((char *)l_24 + 12) + 120) = 1;
-    func_000A0040((int)l_24, 0, 12, (int)D_0017615C, 404, 4);
+    mc_memset((int)l_24, 0, 12, (int)D_0017615C, 404, 4);
     func_000CE70D((int)(short)*(short *)(*(char **)player_object + 1), (int)(short)*(short *)(*(char **)player_object + 3), 1024, (int)l_24);
     *(int *)l_24 += *(int *)(*(char **)player_object + 7);
     *(int *)((char *)l_24 + 4) += *(int *)(*(char **)player_object + 11);
@@ -271,7 +271,7 @@ void func_00073ADF(int a1)
 {
     char l_24[12];
 
-    func_000A1023((int)l_24, a1 + 142, 12, (int)D_0017615C, 426, 12);
+    mc_memcpy((int)l_24, a1 + 142, 12, (int)D_0017615C, 426, 12);
     func_000C2068((int)l_24);
     *(short *)((char *)a1 + 23) = (short)*(int *)l_24 & 2047;
     *(short *)((char *)a1 + 5) = (short)*(int *)((char *)l_24 + 4) & 2047;
@@ -378,7 +378,7 @@ void weapon_free_sprites(void)
 L73EFE:;
     goto L73F1E;
 L73F00:;
-    func_000A0024(*(int *)weapon_hand_cif, (int)D_0017615C, 542);
+    mc_free(*(int *)weapon_hand_cif, (int)D_0017615C, 542);
     *(int *)weapon_hand_cif = -1751672937;
 L73F1E:;
     if (*(int *)D_001A4A5C == 0) goto L73F33;
@@ -386,7 +386,7 @@ L73F1E:;
 L73F33:;
     return;
 L73F35:;
-    func_000A0024(*(int *)D_001A4A5C, (int)D_0017615C, 543);
+    mc_free(*(int *)D_001A4A5C, (int)D_0017615C, 543);
     *(int *)D_001A4A5C = -1751672937;
 }
 

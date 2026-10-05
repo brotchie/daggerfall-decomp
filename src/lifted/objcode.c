@@ -69,9 +69,9 @@ extern int disk_read_file(int, int);
 extern int gold_can_afford(int);
 extern int object_find_open(int, int);
 extern int travel_trip_cost(void);
-extern int func_0009DC25();
-extern int func_000A0040();
-extern int func_000A1023();
+extern int rand();
+extern int mc_memset();
+extern int mc_memcpy();
 extern int func_000CD367();
 extern int func_0014BC00();
 extern void msgbox_show_string(int, int);
@@ -102,7 +102,7 @@ L99DEB:;
 L99DFD:;
     goto L99E29;
 L99DFF:;
-    func_000A1023((int)found_marker, a1, 55, (int)D_00177358, 191, 4);
+    mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 191, 4);
     return 1;
 L99E29:;
     *(int *)D_00195B84 += *(int *)D_001AA644;
@@ -181,7 +181,7 @@ int marker_find_first(int a1, int a2)
     *(int *)marker_kind = a2;
     *(int *)D_00195B84 = 0;
     *(int *)D_001AA644 = -1;
-    func_000A0040((int)found_marker, 0, 71, (int)D_00177358, 261, 4);
+    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 261, 4);
     object_find_open(a1, (int)marker_match_cb);
     if (*(signed char *)found_marker == 0) goto L9A08D;
     return (int)found_marker;
@@ -196,7 +196,7 @@ int marker_find_nth(int a1, int a2, int a3)
     *(int *)marker_kind = a2;
     *(int *)D_00195B84 = a3;
     *(int *)D_001AA644 = -1;
-    func_000A0040((int)found_marker, 0, 71, (int)D_00177358, 287, 4);
+    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 287, 4);
     object_find_open(a1, (int)marker_match_cb);
     l_14 = location_cell_at(*(int *)D_00195F71, *(int *)D_00195F79);
     *(short *)D_00195F81 = a3;
@@ -213,12 +213,12 @@ int marker_find_random(int a1, int a2)
     *(int *)marker_kind = a2;
     *(int *)D_00195B84 = 0;
     *(int *)D_001AA644 = 1;
-    func_000A0040((int)found_marker, 0, 71, (int)D_00177358, 317, 4);
+    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 317, 4);
     object_find_open(a1, (int)marker_match_cb);
     if (*(int *)D_00195B84 != 0) goto L9A1A4;
     return 0;
 L9A1A4:;
-    l_18 = (*(int *)D_00195B84 = func_0009DC25() % *(int *)D_00195B84);
+    l_18 = (*(int *)D_00195B84 = rand() % *(int *)D_00195B84);
     *(int *)D_001AA644 = -1;
     object_foreach_open(a1, (int)marker_match_cb);
     *(short *)D_00195F81 = l_18;
@@ -251,7 +251,7 @@ L9A2F7:;
     if (l_1C >= *(int *)D_001AA644) goto L9A330;
     *(int *)D_00195AF4 = a1;
     *(int *)D_001AA644 = l_1C;
-    func_000A1023((int)found_marker, a1, 55, (int)D_00177358, 363, 4);
+    mc_memcpy((int)found_marker, a1, 55, (int)D_00177358, 363, 4);
 L9A330:;
     return;
 case 43:
@@ -330,7 +330,7 @@ int marker_find_nearest(int a1, int a2)
 {
     *(int *)marker_kind = a2;
     *(int *)D_001AA644 = 500000;
-    func_000A0040((int)found_marker, 0, 71, (int)D_00177358, 432, 4);
+    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 432, 4);
     object_foreach_open(a1, (int)marker_nearest_cb);
     if (*(signed char *)found_marker == 0) goto L9A650;
     return (int)found_marker;
@@ -343,7 +343,7 @@ int marker_count(int a1, int a2)
     *(int *)marker_kind = a2;
     *(int *)D_00195B84 = 0;
     *(int *)D_001AA644 = 1;
-    func_000A0040((int)found_marker, 0, 71, (int)D_00177358, 456, 4);
+    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 456, 4);
     object_find_open(a1, (int)marker_match_cb);
     return *(int *)D_00195B84;
 }

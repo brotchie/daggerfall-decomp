@@ -124,16 +124,16 @@ extern int object_reparent(int, int);
 extern int object_find(int, int);
 extern int object_find_by_id(int, int);
 extern int object_new_id(int);
-extern int func_0009DC25();
-extern int func_000A0040();
-extern int func_000A0AD9();
+extern int rand();
+extern int mc_memset();
+extern int mc_strncpy();
 extern int func_000A0DF4();
-extern int func_000A0E74();
+extern int toupper();
 extern int func_000A0ED9(int, int);
-extern int func_000A0F5C(int, ...);
-extern int func_000A1023();
-extern int func_000A1079();
-extern int func_000A2EAC();
+extern int mc_sprintf(int, ...);
+extern int mc_memcpy();
+extern int memchr();
+extern int int386x();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 extern int func_000C808D();
@@ -198,7 +198,7 @@ void hud_status_set(int a1)
 {
     int l_18;
 
-    func_000A0AD9((int)hud_status_text, a1, 1440, (int)D_00176A10, 97);
+    mc_strncpy((int)hud_status_text, a1, 1440, (int)D_00176A10, 97);
     l_18 = 1132;
     *(int *)hud_status_expiry = *(int *)((char *)l_18) + 36;
     *(int *)D_00195C3C = (int)hud_status_text;
@@ -233,7 +233,7 @@ L7CBFA:;
     if (l_20 >= 0) goto L7CC09;
     return 0;
 L7CC09:;
-    func_000A0AD9(l_2C, a1, 4, (int)D_00176A10, 117);
+    mc_strncpy(l_2C, a1, 4, (int)D_00176A10, 117);
     *(int *)&l_18 = 1132;
     *(int *)(hud_message_expiry + (l_20 << 2)) = *(int *)(*(char **)&l_18) + 36;
     *(int *)(hud_message_ptrs + (l_20 << 2)) = l_2C;
@@ -303,7 +303,7 @@ L7CFDC:;
     return -1;
 L7CFE8:;
     if (a2 == 0) goto L7D02F;
-    l_14 = func_000A0E74((int)(unsigned char)l_14);
+    l_14 = toupper((int)(unsigned char)l_14);
     *(int *)&l_18 = 0;
 L7D003:;
     if ((short)(short)*(int *)&l_18 < a2) goto L7D016;
@@ -317,7 +317,7 @@ L7D016:;
 L7D02D:;
     goto L7D00E;
 L7D02F:;
-    func_000A1023(655360, *(int *)screen_buffer, 64000, (int)D_00176A10, 234, 4);
+    mc_memcpy(655360, *(int *)screen_buffer, 64000, (int)D_00176A10, 234, 4);
     goto L7CF90;
 L7D055:;
     return -2;
@@ -452,7 +452,7 @@ int picklist_update(void)
 
 int rand_range(int a1, int a2)
 {
-    return a1 + (func_0009DC25() % ((a2 - a1) + 1));
+    return a1 + (rand() % ((a2 - a1) + 1));
 }
 
 void object_free_later(int a1)
@@ -521,7 +521,7 @@ L7D8D9:;
     detect_consider(a1);
 L7D8E1:;
     if ((((int)(unsigned short)*(short *)((char *)a1 + 27)) >> 7) != 210) goto L7D91B;
-    if (func_000A1079((int)fire_flat_records, (int)(unsigned short)(*(short *)((char *)a1 + 27) & 127), 8) != 0) goto L7D91D;
+    if (memchr((int)fire_flat_records, (int)(unsigned short)(*(short *)((char *)a1 + 27) & 127), 8) != 0) goto L7D91D;
 L7D91B:;
     goto L7D973;
 L7D91D:;
@@ -574,7 +574,7 @@ case 34:
 case 13:
 case 14:
     if (*(short *)((char *)a1 + 25) != 0) goto L7DABA;
-    *(short *)((char *)a1 + 25) = func_0009DC25();
+    *(short *)((char *)a1 + 25) = rand();
 L7DABA:;
     place_spawn_from_marker(a1);
     goto L7DB53;
@@ -695,7 +695,7 @@ void msgbox_prompt_number(int a1, int a2)
     *(signed char *)D_0012B508 = 146;
     l_14 = *(int *)D_00195C44 + 55000;
     func_000A0ED9(610, (int)D_00176A10);
-    func_000A0F5C(l_14, (int)D_00176A27, a2);
+    mc_sprintf(l_14, (int)D_00176A27, a2);
     *(signed char *)((char *)(func_000A0DF4(l_14) + l_14) + 1) = 0;
     inpstr_begin_number(a1);
     msgbox_show_string(l_14, 2);
@@ -921,7 +921,7 @@ int detect_arrow_frame(void)
     if (*(int *)detect_target == 0) goto L7EDB0;
     return func_000C808D(*(int *)(*(char **)player_object + 7), *(int *)(*(char **)player_object + 15), *(int *)(*(char **)detect_target + 7), *(int *)(*(char **)detect_target + 15)) >> 6;
 L7EDB0:;
-    return func_0009DC25() % 32;
+    return rand() % 32;
 }
 
 int func_0007EDD3(void)
@@ -991,10 +991,10 @@ void func_0007EF20(void)
     char l_20[12];
 
     if (*(signed char *)D_00196281 == 0) return;
-    func_000A0040((int)l_20, 0, 12, (int)D_00176A10, 1064, 4);
+    mc_memset((int)l_20, 0, 12, (int)D_00176A10, 1064, 4);
     *(short *)l_3C = 257;
     *(short *)((char *)l_3C + 12) = *(short *)D_001A5A54;
-    func_000A2EAC(49, (int)l_3C, (int)l_3C, (int)l_20);
+    int386x(49, (int)l_3C, (int)l_3C, (int)l_20);
     *(signed char *)D_00196281 = 0;
 }
 
@@ -1274,7 +1274,7 @@ L7F93E:;
 L7F961:;
     goto L7F998;
 L7F963:;
-    func_000A1023((int)(*(char **)(*(char **)current_location + 43) + (((int)(unsigned short)*(short *)((char *)l_1C + 27)) * 26)), l_1C + 71, 26, (int)D_00176A10, 1350, 4);
+    mc_memcpy((int)(*(char **)(*(char **)current_location + 43) + (((int)(unsigned short)*(short *)((char *)l_1C + 27)) * 26)), l_1C + 71, 26, (int)D_00176A10, 1350, 4);
 L7F998:;
     l_1C = l_18;
     goto L7F902;
@@ -1342,7 +1342,7 @@ L7FB17:;
     *(signed char *)((char *)l_20) = 64;
     *(short *)((char *)l_20 + 27) = l_18;
     *(int *)((char *)l_20 + 43) = *(int *)((char *)l_1C + 20);
-    func_000A1023(l_20 + 71, l_1C, 26, (int)D_00176A10, 1392, 4);
+    mc_memcpy(l_20 + 71, l_1C, 26, (int)D_00176A10, 1392, 4);
 L7FB66:;
     goto L7FAD5;
 L7FB6B:;
@@ -1561,7 +1561,7 @@ L80129:;
     *(int *)tavern_building = l_1C;
     if (tavern_room_rented() == 0) goto L80198;
     func_000A0ED9(1570, (int)D_00176A10);
-    func_000A0F5C((int)text_buffer, (int)D_00176A42, building_name(l_1C), (((unsigned)(*(int *)((char *)l_1C + 2) - *(int *)game_minutes)) / 60) + 1);
+    mc_sprintf((int)text_buffer, (int)D_00176A42, building_name(l_1C), (((unsigned)(*(int *)((char *)l_1C + 2) - *(int *)game_minutes)) / 60) + 1);
     hud_message_add((int)text_buffer);
 L80198:;
     goto L8011A;

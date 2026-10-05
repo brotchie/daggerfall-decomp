@@ -37,9 +37,9 @@ extern void player_movement_update(void);
 extern void config_read(char *);
 extern void dpmi_lock_region(void *, int);
 extern void func_0009960A(void);
-extern void func_0009DB11(int);
+extern void exit(int);
 extern void func_0009DBF9(void);
-extern void func_0009DC49(int);
+extern void srand(int);
 extern void func_0009DEA7(int);
 extern void func_000C0520(void);
 extern void func_000C7F00(void);
@@ -54,8 +54,8 @@ extern void func_0009DA1C(int, char *);
 extern void func_0009DB3F(void (*)(void));
 #pragma aux func_0009DBFE parm routine [];
 extern void func_0009DBFE(void (*)(void));
-extern void func_0009DAEE(char *, ...);
-extern int func_0009DC59(char *, ...);
+extern void printf(char *, ...);
+extern int open(char *, ...);
 
 int func_00010010(short a1, char **a2)
 {
@@ -69,8 +69,8 @@ int func_00010010(short a1, char **a2)
 
     if (a1 != 2) {
         func_0009DA1C(54, D_00170004);
-        func_0009DAEE(D_0017000B);
-        func_0009DB11(-1);
+        printf(D_0017000B);
+        exit(-1);
     }
     func_00069E3C();
     func_0009DB3F(crash_screen);
@@ -78,14 +78,14 @@ int func_00010010(short a1, char **a2)
     func_0009960A();
     func_000C0520();
     dpmi_lock_region(func_00010010, 2048000);
-    func_0009DC49(*(int *)0x46c);
+    srand(*(int *)0x46c);
     D_0018DC1C = *(int *)0x46c;
     config_read(a2[1]);
-    l_44 = func_0009DC59(D_00170035, 546, 384);
+    l_44 = open(D_00170035, 546, 384);
     if (l_44 < 0) {
         func_0009DA1C(75, D_00170004);
-        func_0009DAEE(D_00170049);
-        func_0009DB11(-1);
+        printf(D_00170049);
+        exit(-1);
     }
     func_0009DEA7(l_44);
     mouse_set_bounds(0, 0, 319, 199);

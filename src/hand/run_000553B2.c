@@ -12,7 +12,7 @@ extern int text_macro_fpc;
 extern unsigned short *text_macro_fe;
 extern char *player_class;
 extern struct slot classmaker_specials[][7];
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern int func_0012B136();
 extern void func_000CE4A9(char *, int, int);
 extern void func_000CE4B5(char *, int, int);
@@ -35,7 +35,7 @@ void classmaker_specials_remove(void)
     else
         classmaker_set_disadvantage(D_00190D84, 1);
     if (D_00190D84 != 6)
-        func_000A1023(&classmaker_specials[classmaker_special_list][D_00190D84], &classmaker_specials[classmaker_special_list][D_00190D84 + 1], (6 - D_00190D84) * 2, D_00175420, 952, 4);
+        mc_memcpy(&classmaker_specials[classmaker_special_list][D_00190D84], &classmaker_specials[classmaker_special_list][D_00190D84 + 1], (6 - D_00190D84) * 2, D_00175420, 952, 4);
     classmaker_special_counts[classmaker_special_list]--;
     while (mouse_buttons != 0)
         func_0012B136();

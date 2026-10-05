@@ -8,7 +8,7 @@ extern unsigned char current_region;
 extern unsigned char crime_current;
 extern int court_open(unsigned char);
 extern void damage_creature_death(int);
-extern int func_0009DC25(void);
+extern int rand(void);
 
 void crime_guards_or_court(int a1)
 {
@@ -19,7 +19,7 @@ void crime_guards_or_court(int a1)
     if (v < -20 && a1 == 0) {
         damage_creature_death(player_entity);
     } else if (v >= -20 && v <= 0) {
-        if ((func_0009DC25() & 1) && a1 == 0)
+        if ((rand() & 1) && a1 == 0)
             damage_creature_death(player_entity);
         else
             court_open(crime_current);

@@ -37,7 +37,7 @@ extern short collide_flags;
 extern int collide_move_object(struct Mob *, int, struct Hit *, int);
 extern int object_delete(struct Mob *);
 extern int func_0009DEAC();
-extern int func_000A1023(void *, void *, int, char *, int, int);
+extern int mc_memcpy(void *, void *, int, char *, int, int);
 extern int func_000C7FD9();
 
 int func_00063FCF(struct Mob *m, int a2, int a3)
@@ -58,7 +58,7 @@ int func_00063FCF(struct Mob *m, int a2, int a3)
     int save14;
 
     sub = (struct Sub *)m->sub;
-    func_000A1023(&pos, &m->pos, 12, D_00175934, 1271, 4);
+    mc_memcpy(&pos, &m->pos, 12, D_00175934, 1271, 4);
     hit.a = a2;
     hit.y = m->pos.y;
     hit.b = a3;
@@ -73,13 +73,13 @@ int func_00063FCF(struct Mob *m, int a2, int a3)
     D_001940D7 |= 128;
     hit.tbl = D_00187B44;
     hit.flags &= ~1;
-    func_000A1023(&saved, &D_00196D54, 12, D_00175934, 1293, 4);
+    mc_memcpy(&saved, &D_00196D54, 12, D_00175934, 1293, 4);
     D_00196D54.x = m->pos.x;
     D_00196D58 = m->pos.y - vertical_velocity / 256;
     D_00196D5C = m->pos.z;
     collide_move_object(m, 0, &hit, 0);
     player_on_ground = save10;
-    func_000A1023(&D_00196D54, &saved, 12, D_00175934, 1300, 4);
+    mc_memcpy(&D_00196D54, &saved, 12, D_00175934, 1300, 4);
     if ((int)(short)(collide_flags & 16) != 0)
         vertical_velocity = 1;
     sub->height = vertical_velocity;

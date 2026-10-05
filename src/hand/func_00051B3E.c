@@ -17,7 +17,7 @@ extern void func_00051CF9(struct Snd *);
 extern int flc_open(int, struct Snd *);
 extern void flc_close(struct Snd *);
 extern int flc_next_frame(struct Snd *);
-extern int func_000A006E(unsigned short, int, int);
+extern int lseek(unsigned short, int, int);
 extern int func_000CE92C();
 extern int func_0012B136();
 
@@ -58,7 +58,7 @@ int pflc_play(int a1, struct Snd *s)
             if (s->loops == 0)
                 goto stop;
         }
-        func_000A006E(s->id, s->data, 0);
+        lseek(s->id, s->data, 0);
         s->count = 0;
     }
 stop:

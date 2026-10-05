@@ -22,7 +22,7 @@ extern void classmaker_draw_dagger(void);
 extern void text_draw_colored(int, int, int, int, unsigned char);
 extern void text_draw_centered_colored(int, int, int, int, unsigned char);
 extern int func_000A0DD9();
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_0012B2EB();
 extern int func_0012B3ED();
 extern int func_00144E84();
@@ -36,7 +36,7 @@ int classmaker_draw(short a1)
     short l_1C;
 
     func_0012B2EB();
-    func_000A1023(*(int *)screen_buffer, *(int *)text_macro_fae, 64000, (int)D_00175420, 235, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)text_macro_fae, 64000, (int)D_00175420, 235, 4);
     classmaker_draw_dagger();
     if (*(short *)D_00190D66 & 2) {
         func_00144ED8(44, (int)(short)*(short *)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)text_macro_fa + 4), (int)(unsigned short)*(short *)(*(char **)text_macro_fa + 6), *(int *)text_macro_fnpc, 0);

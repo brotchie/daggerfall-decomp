@@ -8,13 +8,13 @@ extern struct ent *D_00195C44;
 extern int D_00195D6C;
 extern char D_00196295;
 extern char *text_expand_wrap(unsigned short, short, unsigned char *, char *, char *);
-extern int func_0009DC25(void);
-extern int func_000A006E(int, int, int);
-extern char *func_000A00AF(int, char *, int);
+extern int rand(void);
+extern int lseek(int, int, int);
+extern char *mc_malloc(int, char *, int);
 extern int func_000A00CB(int, void *, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, ...);
+extern int mc_sprintf(char *, ...);
 
 char *text_rsc_load(short a1, unsigned short a2, short a3)
 {
@@ -26,7 +26,7 @@ char *text_rsc_load(short a1, unsigned short a2, short a3)
     char *l_2C;
     char *l_28;
 
-    func_000A006E(D_00195D6C, 0, 0);
+    lseek(D_00195D6C, 0, 0);
     func_000A00CB(D_00195D6C, &n, 2);
     func_000A00CB(D_00195D6C, D_00195C44, n);
     n /= 6;
@@ -39,16 +39,16 @@ char *text_rsc_load(short a1, unsigned short a2, short a3)
             D_00196295 = 0;
             return 0;
         }
-        l_30 = func_000A00AF(1024, D_00170D55, 65);
+        l_30 = mc_malloc(1024, D_00170D55, 65);
         func_000A0ED9(66, D_00170D55);
-        func_000A0F5C(l_30, D_00170D5C, a1);
+        mc_sprintf(l_30, D_00170D5C, a1);
         return l_30;
     }
     l_34 = D_00195C44[i + 1].off - D_00195C44[i].off;
-    func_000A006E(D_00195D6C, D_00195C44[i].off, 0);
-    l_30 = func_000A00AF(l_34 + 16, D_00170D55, 73);
-    l_2C = func_000A00AF(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 74);
-    l_28 = func_000A00AF(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 75);
+    lseek(D_00195D6C, D_00195C44[i].off, 0);
+    l_30 = mc_malloc(l_34 + 16, D_00170D55, 73);
+    l_2C = mc_malloc(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 74);
+    l_28 = mc_malloc(l_34 < 4096 ? 8192 : l_34 * 2, D_00170D55, 75);
     func_000A00CB(D_00195D6C, l_30, l_34 + 8);
     j = 0;
     i = 1;
@@ -58,7 +58,7 @@ char *text_rsc_load(short a1, unsigned short a2, short a3)
         j++;
     }
     if (i != 1)
-        i = func_0009DC25() % i;
+        i = rand() % i;
     else
         i--;
     j = 0;

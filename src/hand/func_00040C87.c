@@ -14,7 +14,7 @@ extern int is_guard_sprite(struct Obj *);
 extern void guard_spawn(struct Obj *);
 extern int ai_angle_diff(int, int, int *);
 extern int rand_range(int, int);
-extern int func_0009DC25(void);
+extern int rand(void);
 extern int func_000C808D();
 
 void guards_summon(int a1)
@@ -39,7 +39,7 @@ void guards_summon(int a1)
                 if (a < 600)
                     continue;
             }
-            if ((unsigned char)(func_0009DC25() & 3) == 0 || is_guard_sprite(people_list[i]) != 0) {
+            if ((unsigned char)(rand() & 3) == 0 || is_guard_sprite(people_list[i]) != 0) {
                 cnt++;
                 guard_spawn(people_list[i]);
                 person_place(people_list[i]);

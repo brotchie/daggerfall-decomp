@@ -10,7 +10,7 @@ extern char D_00170C28[];
 extern char D_00170C35[];
 
 extern int disk_resolve_path(int);
-extern int func_000A0040();
+extern int mc_memset();
 extern int func_000C1500();
 extern int func_0012B136();
 extern void starting_equipment_give(void);
@@ -39,14 +39,14 @@ L3A333:;
 L3A343:;
     l_18 = disk_resolve_path((int)D_00170B7B);
     func_000C1500(l_18, 0, 0, 1);
-    func_000A0040(655360, 0, 64000, (int)D_00170B88, 34, 4);
-    func_000A0040(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 35, 4);
+    mc_memset(655360, 0, 64000, (int)D_00170B88, 34, 4);
+    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 35, 4);
 L3A395:;
     if (*(signed char *)mouse_buttons == 0) goto L3A3A5;
     func_0012B136();
     goto L3A395;
 L3A3A5:;
-    func_000A0040(655360, 0, 64000, (int)D_00170B88, 39, 4);
+    mc_memset(655360, 0, 64000, (int)D_00170B88, 39, 4);
     palette_restore();
 }
 
@@ -54,7 +54,7 @@ void intro_play_movie(void)
 {
     int l_18;
 
-    func_000A0040(655360, 0, 64000, (int)D_00170B88, 358, 4);
+    mc_memset(655360, 0, 64000, (int)D_00170B88, 358, 4);
 L3AF6A:;
     if (*(signed char *)mouse_buttons == 0) goto L3AF7A;
     func_0012B136();
@@ -62,8 +62,8 @@ L3AF6A:;
 L3AF7A:;
     l_18 = disk_resolve_path((int)D_00170C1B);
     func_000C1500(l_18, 0, 0, 1);
-    func_000A0040(655360, 0, 64000, (int)D_00170B88, 363, 4);
-    func_000A0040(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 364, 4);
+    mc_memset(655360, 0, 64000, (int)D_00170B88, 363, 4);
+    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 364, 4);
 L3AFD2:;
     if (*(signed char *)mouse_buttons == 0) goto L3AFE2;
     func_0012B136();
@@ -71,8 +71,8 @@ L3AFD2:;
 L3AFE2:;
     l_18 = disk_resolve_path((int)D_00170C28);
     func_000C1500(l_18, 0, 0, 1);
-    func_000A0040(655360, 0, 64000, (int)D_00170B88, 369, 4);
-    func_000A0040(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 370, 4);
+    mc_memset(655360, 0, 64000, (int)D_00170B88, 369, 4);
+    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 370, 4);
 L3B03A:;
     if (*(signed char *)mouse_buttons == 0) goto L3B04A;
     func_0012B136();
@@ -80,8 +80,8 @@ L3B03A:;
 L3B04A:;
     l_18 = disk_resolve_path((int)D_00170C35);
     func_000C1500(l_18, 32, 0, 1);
-    func_000A0040(655360, 0, 64000, (int)D_00170B88, 375, 4);
-    func_000A0040(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 376, 4);
+    mc_memset(655360, 0, 64000, (int)D_00170B88, 375, 4);
+    mc_memset(*(int *)screen_buffer, 0, 64000, (int)D_00170B88, 376, 4);
     palette_restore();
 }
 

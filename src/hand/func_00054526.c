@@ -29,7 +29,7 @@ extern void classmaker_set_advantage(short, int);
 extern void classmaker_set_disadvantage(short, int);
 extern int classmaker_special_conflicts(short, int, short);
 extern void text_draw_colored(char *, short, short, int, unsigned char);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_0012B2EB();
 extern int func_0012B3ED();
 extern int func_0012DB50();
@@ -53,7 +53,7 @@ void classmaker_specials_screen(void)
     if ((int)(short)(classmaker_screen & 16) != 0)
         n++;
     func_0012B2EB();
-    func_000A1023(screen_buffer, text_macro_fae, 64000, D_00175420, 675, 4);
+    mc_memcpy(screen_buffer, text_macro_fae, 64000, D_00175420, 675, 4);
     func_00144F68(0, 0, *(unsigned short *)(D_00190E00 + 4), *(unsigned short *)(D_00190E00 + 6), D_00190E00 + 12);
     if (n == 2 || n == 3)
         func_00144F68(0, 0, *(unsigned short *)(text_macro_fpa + 4), *(unsigned short *)(text_macro_fpa + 6), text_macro_fpa + 12);

@@ -3,11 +3,11 @@
 
 extern char D_001700D5[];
 
-extern int func_0009DC59(int, ...);
+extern int open(int, ...);
 extern int func_0009DEA7();
-extern int func_000A0024();
-extern int func_000A006E();
-extern int func_000A00AF();
+extern int mc_free();
+extern int lseek();
+extern int mc_malloc();
 extern int func_000A00CB();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) sos_load_file;
@@ -18,13 +18,13 @@ int sos_load_file(int a1)
     int l_14;
     int l_10;
 
-    l_10 = func_0009DC59(a1, 512);
+    l_10 = open(a1, 512);
     if (l_10 != (-1)) goto L119BB;
     return 0;
 L119BB:;
-    l_14 = func_000A006E(l_10, 0, 2);
-    func_000A006E(l_10, 0, 0);
-    l_18 = func_000A00AF(l_14, (int)D_001700D5, 441);
+    l_14 = lseek(l_10, 0, 2);
+    lseek(l_10, 0, 0);
+    l_18 = mc_malloc(l_14, (int)D_001700D5, 441);
     if (l_18 != 0) goto L11A05;
     func_0009DEA7(l_10);
     return 0;
@@ -36,7 +36,7 @@ L11A05:;
 L11A2F:;
     goto L11A4A;
 L11A31:;
-    func_000A0024(l_18, (int)D_001700D5, 457);
+    mc_free(l_18, (int)D_001700D5, 457);
     l_18 = -1751672937;
 L11A4A:;
     return 0;

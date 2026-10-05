@@ -6,8 +6,8 @@ extern char D_00196A28[];
 extern char D_00196A9C[];
 
 extern int func_0008795D(int, int, int);
-extern int func_0009DC25();
-extern int func_000A0040();
+extern int rand();
+extern int mc_memset();
 extern void location_load_exterior(int, int);
 extern void location_free(int);
 
@@ -20,7 +20,7 @@ void func_00087D71(int a1, int a2, int a3)
 
     l_1C = *(int *)D_00196A9C;
     l_14 = 0;
-    func_000A0040(a1, 0, 20, (int)D_00176C94, 952, 4);
+    mc_memset(a1, 0, 20, (int)D_00176C94, 952, 4);
     l_18 = 0;
 L87DB7:;
     if (l_18 < *(int *)D_00196A28) goto L87DD3;
@@ -38,7 +38,7 @@ L87DE9:;
     return;
 L87DF9:;
     l_1C = *(int *)D_00196A9C;
-    l_10 = (func_0009DC25() % l_14) + 1;
+    l_10 = (rand() % l_14) + 1;
     l_18 = 0;
 L87E1B:;
     if (l_18 < *(int *)D_00196A28) goto L87E37;

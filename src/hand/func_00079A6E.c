@@ -18,11 +18,11 @@ extern struct thing *D_00195C44;
 extern int save_file_handle;
 extern void fatal_error(struct thing *);
 extern void save_unlink_character(struct thing *);
-extern int func_000A0B42(int, void *, int);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern int write(int, void *, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(void *, char *, ...);
+extern int mc_sprintf(void *, char *, ...);
 
 int savetree_write_record(struct thing *a1)
 {
@@ -35,11 +35,11 @@ int savetree_write_record(struct thing *a1)
     len = *(int *)((char *)a1 - 6);
     if (len == 0) {
         func_000A0ED9(84, D_00176884);
-        func_000A0F5C(D_00195C44, D_0017688F);
+        mc_sprintf(D_00195C44, D_0017688F);
         fatal_error(D_00195C44);
     }
-    func_000A0B42(save_file_handle, &len, 4);
-    func_000A1023(buf, a1, len, D_00176884, 90, 4);
+    write(save_file_handle, &len, 4);
+    mc_memcpy(buf, a1, len, D_00176884, 90, 4);
     if (buf->f51 != 0) {
         if (buf->f38 != 0)
             buf->f51 = (struct thing *)buf->f51->id;
@@ -61,5 +61,5 @@ int savetree_write_record(struct thing *a1)
         *(int *)&buf->f67 = a1->f67->type;
         buf->f39 = a1->f67->id;
     }
-    return func_000A0B42(save_file_handle, buf, len) != len ? 1 : 0;
+    return write(save_file_handle, buf, len) != len ? 1 : 0;
 }

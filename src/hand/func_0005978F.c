@@ -3,7 +3,7 @@ extern char D_0017573C[];
 extern char *player_character;
 extern unsigned char *D_00199B4C;
 extern unsigned char **D_00199B50;
-extern int func_000A0E0D();
+extern int mc_memmove();
 
 void func_0005978F(unsigned char *a1, int a2)
 {
@@ -27,8 +27,8 @@ void func_0005978F(unsigned char *a1, int a2)
     }
     while (D_00199B50[l_18] != 0 && a1[66] > D_00199B50[l_18][66])
         l_18++;
-    func_000A0E0D(&D_00199B4C[l_18 + 1], &D_00199B4C[l_18], 27, D_0017573C, 201, 4);
-    func_000A0E0D(&D_00199B50[l_18 + 1], &D_00199B50[l_18], 108, D_0017573C, 202, 4);
+    mc_memmove(&D_00199B4C[l_18 + 1], &D_00199B4C[l_18], 27, D_0017573C, 201, 4);
+    mc_memmove(&D_00199B50[l_18 + 1], &D_00199B50[l_18], 108, D_0017573C, 202, 4);
     D_00199B50[l_18] = a1;
     D_00199B4C[l_18] = a2;
 }

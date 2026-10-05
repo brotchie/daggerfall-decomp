@@ -13,8 +13,8 @@ extern void location_load_exterior(struct npc *, unsigned short);
 extern void location_free(struct npc *);
 extern void func_00087D71(struct npc *, int, short);
 extern void location_pick_random_town(struct npc *);
-extern int func_0009DC25(void);
-extern void func_000A0040(void *, int, int, char *, int, int);
+extern int rand(void);
+extern void mc_memset(void *, int, int, char *, int, int);
 
 void func_00087F76(struct npc *n, unsigned kind, int a3, int mode)
 {
@@ -27,7 +27,7 @@ void func_00087F76(struct npc *n, unsigned kind, int a3, int mode)
 
     saved = D_00196A9C;
     done = 0;
-    func_000A0040(n, 0, 20, D_00176C94, 1045, 4);
+    mc_memset(n, 0, 20, D_00176C94, 1045, 4);
     if (mode == 0) {
         location_load_exterior(n, D_00195AC4->id);
         return;
@@ -37,7 +37,7 @@ void func_00087F76(struct npc *n, unsigned kind, int a3, int mode)
         switch (kind) {
         case 0:
             while (a3 == -1 || a3 == 1)
-                a3 = func_0009DC25() % 21;
+                a3 = rand() % 21;
             if (a3 > 16) {
                 location_pick_random_town(n);
             } else {
@@ -48,12 +48,12 @@ void func_00087F76(struct npc *n, unsigned kind, int a3, int mode)
         case 1:
             if (a3 != -1) {
                 if (region_dungeon_type_counts[a3] != 0) {
-                    r = func_0009DC25() % region_dungeon_type_counts[a3];
+                    r = rand() % region_dungeon_type_counts[a3];
                     func_0001E34D(n, a3, r);
                     break;
                 }
             }
-            r = func_0009DC25() % region_dungeon_count;
+            r = rand() % region_dungeon_count;
             location_load_dungeon(n, r);
             break;
         }

@@ -39,7 +39,7 @@ extern void dungeon_load(int);
 extern void location_unload(unsigned short);
 extern void building_enter(char *);
 extern void player_to_nearest_marker(int, int);
-extern int func_000A0040();
+extern int mc_memset();
 extern int func_000C2FF5();
 extern int func_0014B45B(int, int);
 
@@ -97,8 +97,8 @@ void map_goto_location(int a1, int a2, int a3, int a4)
         D_000C23C4 = player_object->x = D_00196A9C[a3].x & 33554431;
         D_000C23CC = player_object->z = D_00196A9C[a3].z & 16777215;
         func_000C2FF5();
-        func_000A0040(D_001A94B0, 0, 16, D_00176C94, 783, 16);
-        func_000A0040(D_001A94A0, 0, 16, D_00176C94, 784, 16);
+        mc_memset(D_001A94B0, 0, 16, D_00176C94, 783, 16);
+        mc_memset(D_001A94A0, 0, 16, D_00176C94, 784, 16);
         world_update_location();
         player_object->x = D_00195AC4->x;
         player_object->z = D_00195AC4->z;
@@ -111,8 +111,8 @@ void map_goto_location(int a1, int a2, int a3, int a4)
         D_000C23C4 = player_object->x = D_00196A9C[a3].x & 33554431;
         D_000C23CC = player_object->z = D_00196A9C[a3].z & 16777215;
         func_000C2FF5();
-        func_000A0040(D_001A94B0, 0, 16, D_00176C94, 803, 16);
-        func_000A0040(D_001A94A0, 0, 16, D_00176C94, 804, 16);
+        mc_memset(D_001A94B0, 0, 16, D_00176C94, 803, 16);
+        mc_memset(D_001A94A0, 0, 16, D_00176C94, 804, 16);
         world_update_location();
         D_00196289++;
         building_enter(*(char **)(current_location + 43) + a4 * 26);

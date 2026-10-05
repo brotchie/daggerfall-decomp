@@ -15,7 +15,7 @@ struct grp {
     struct rec r[5];
 };
 extern unsigned char quest_global_states[];
-extern int func_0009DC25(void);
+extern int rand(void);
 
 void qaction_op34_pick_one_state(int a1, struct grp *a2)
 {
@@ -31,7 +31,7 @@ void qaction_op34_pick_one_state(int a1, struct grp *a2)
     }
     if (n == 0)
         return;
-    pick = func_0009DC25() % n;
+    pick = rand() % n;
     for (i = 0; i < n; i++) {
         if (i == pick) {
             if (arr[i]->global != 0)

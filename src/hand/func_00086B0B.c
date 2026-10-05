@@ -58,11 +58,11 @@ extern void object_foreach(struct who *, void (*)(int));
 extern void func_0008EAF1(int, int);
 extern void func_0008EB52(void);
 extern int player_to_nearest_marker(struct who *, int);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern int func_0014B45B(int, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern int func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void town_load(int id)
 {
@@ -73,8 +73,8 @@ void town_load(int id)
     if (D_00195AC4->id == 65535)
         func_0008EAF1(D_00195AC4->f3f, D_00195AC4->f1f);
     location_load_exterior(loaded_location, id);
-    func_000A1023(D_00195AC4, loaded_location_object, 55, D_00176C94, 365, 4);
-    func_000A1023(current_location, loaded_location_data, 48, D_00176C94, 366, 4);
+    mc_memcpy(D_00195AC4, loaded_location_object, 55, D_00176C94, 365, 4);
+    mc_memcpy(current_location, loaded_location_data, 48, D_00176C94, 366, 4);
     D_00195AC4->y = func_0014B45B(D_00195AC4->x, D_00195AC4->z);
     func_00027947();
     town_load_blocks();
@@ -103,7 +103,7 @@ void town_load(int id)
             break;
         default:
             func_000A0ED9(401, D_00176C94);
-            func_000A0F5C(text_buffer, D_00176CC9, current_location);
+            mc_sprintf(text_buffer, D_00176CC9, current_location);
             hud_message_add(text_buffer);
             break;
         }

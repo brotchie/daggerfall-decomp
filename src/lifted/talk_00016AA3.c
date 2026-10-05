@@ -9,7 +9,7 @@ extern char talk_face_image[];
 extern int disk_open_data(int);
 extern int rand_range(int, int);
 extern int func_0009DEA7();
-extern int func_000A006E();
+extern int lseek();
 extern int func_000A00CB();
 
 void talk_load_face(int a1)
@@ -22,12 +22,12 @@ void talk_load_face(int a1)
     l_18 = ((a1 == 1000) ? 0 : 6);
     l_18 += rand_range(0, 5);
     l_1C = disk_open_data((int)D_00170404);
-    func_000A006E(l_1C, l_18 << 12, 0);
+    lseek(l_1C, l_18 << 12, 0);
     goto L16B35;
 L16B11:;
     *(signed char *)D_00190D10 = 1;
     l_1C = disk_open_data((int)D_00170411);
-    func_000A006E(l_1C, a1 << 12, 0);
+    lseek(l_1C, a1 << 12, 0);
 L16B35:;
     func_000A00CB(l_1C, *(int *)talk_face_image, 4096);
     func_0009DEA7(l_1C);

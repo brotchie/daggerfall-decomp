@@ -17,7 +17,7 @@ struct stream {
 
 extern char *func_000A0DD9(int, char *, int);
 extern int func_000A0DF4(char *);
-extern int func_000A0E0D();
+extern int mc_memmove();
 extern int profile_find_item(struct stream *, ...);
 extern int profile_set_number(struct stream *, ...);
 
@@ -42,7 +42,7 @@ int profile_add_item_number(struct stream *s, char *key, int val, int width, int
     dst = s->pos;
     n = width + 4 + func_000A0DF4(buf);
     if (s->len + n > s->cap) return 0;
-    func_000A0E0D(dst + n, dst, s->start + s->len - dst, D_00170129, 1436, 4);
+    mc_memmove(dst + n, dst, s->start + s->len - dst, D_00170129, 1436, 4);
     while (*key != 0) {
         *dst++ = *key++;
         width--;

@@ -23,8 +23,8 @@ extern unsigned char D_001A9B94[];
 extern unsigned char D_001A9BAC[];
 extern short potion_cauldron_count;
 extern void func_00090261(unsigned char *, unsigned char *, unsigned char *, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
-extern void func_000A1023(void *, void *, int, char *, int, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 int potion_mix_unknown(struct spell *sp)
 {
@@ -37,18 +37,18 @@ int potion_mix_unknown(struct spell *sp)
     unsigned char z[8];
     int n;
 
-    func_000A1023(x, D_001A9B8C, potion_cauldron_count, D_00176E94, 410, 8);
-    func_000A1023(y, D_001A9BAC, potion_cauldron_count, D_00176E94, 411, 8);
-    func_000A1023(z, D_001A9B94, potion_cauldron_count, D_00176E94, 412, 8);
+    mc_memcpy(x, D_001A9B8C, potion_cauldron_count, D_00176E94, 410, 8);
+    mc_memcpy(y, D_001A9BAC, potion_cauldron_count, D_00176E94, 411, 8);
+    mc_memcpy(z, D_001A9B94, potion_cauldron_count, D_00176E94, 412, 8);
     func_00090261(x, y, z, potion_cauldron_count);
     n = potion_cauldron_count;
     for (i = 0; n - 1 > i; i++) {
         if (x[i] == x[i + 1]) {
             w[i] = D_0017B1CF[x[i]];
             y[i] += y[i + 1];
-            func_000A1023(x + i, x + (i + 1), 8 - i - 1, D_00176E94, 424, 4);
-            func_000A1023(z + i, (i + 1) + z, 8 - i - 1, D_00176E94, 425, 4);
-            func_000A1023(y + i, y + (i + 1), 8 - i - 1, D_00176E94, 426, 4);
+            mc_memcpy(x + i, x + (i + 1), 8 - i - 1, D_00176E94, 424, 4);
+            mc_memcpy(z + i, (i + 1) + z, 8 - i - 1, D_00176E94, 425, 4);
+            mc_memcpy(y + i, y + (i + 1), 8 - i - 1, D_00176E94, 426, 4);
             n--;
         }
     }
@@ -85,7 +85,7 @@ int potion_mix_unknown(struct spell *sp)
     if (n == 0) return 0;
     sp->f6 = 4;
     sp->f7 = 0;
-    func_000A0AD9(sp->name, D_00176EEC, 25, D_00176E94, 482);
+    mc_strncpy(sp->name, D_00176EEC, 25, D_00176E94, 482);
     sp->eff[0].type = sp->eff[1].type = sp->eff[2].type = 255;
     for (i = 0; i < n; i++) {
         c = spell_effect_settings[x[i]][z[i]];

@@ -47,7 +47,7 @@ extern void item_make(unsigned char, unsigned char, struct item *);
 extern void func_0005E874(struct item *);
 extern int func_000602C0(int, unsigned short);
 extern int rand_range(int, int);
-extern void func_000A0AD9(void *, char *, int, char *, int);
+extern void mc_strncpy(void *, char *, int, char *, int);
 
 void item_make_magic(struct item *a1, int a2)
 {
@@ -93,7 +93,7 @@ void item_make_magic(struct item *a1, int a2)
     do
         item_make_random(kind, a1);
     while (a1->f32 == 3 && a1->f34 == 18);
-    func_000A0AD9(a1, magic_def[i].name, 32, D_001758B8, 1039);
+    mc_strncpy(a1, magic_def[i].name, 32, D_001758B8, 1039);
     for (j = 0; j < 10; j++) {
         if (magic_def[i].pairs[j].a == 255)
             break;
@@ -143,7 +143,7 @@ void item_make_artifact(struct item *a1, int a2)
         }
     }
     item_make(magic_def[i].f33, magic_def[i].f34, a1);
-    func_000A0AD9(a1, magic_def[i].name, 32, D_001758B8, 1094);
+    mc_strncpy(a1, magic_def[i].name, 32, D_001758B8, 1094);
     for (j = 0; j < 10; j++) {
         if (magic_def[i].pairs[j].a == 255)
             break;

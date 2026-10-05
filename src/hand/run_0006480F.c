@@ -18,7 +18,7 @@ extern void link_start(struct link *);
 extern int func_000CE44C(struct link **, struct link *, int);
 extern char D_00175962[];
 extern int link_step(int);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern char screen_buffer[];
 extern char D_00147954[];
 extern char D_0017596A[];
@@ -116,7 +116,7 @@ void links_update(void)
         }
         if (sum == 0) {
             if (active_link_count - 1 > i)
-                func_000A1023(&active_links[i], &active_links[i + 1], (active_link_count - i) * 4 - 4, D_00175962, 187, 4);
+                mc_memcpy(&active_links[i], &active_links[i + 1], (active_link_count - i) * 4 - 4, D_00175962, 187, 4);
             active_link_count--;
             i--;
         }
@@ -216,7 +216,7 @@ L64C01:;
     l_2C = *(int *)(*(char **)(*(char **)((char *)a1 + 35) + 51) + 63);
     if (l_2C == 0) goto L64C5C;
     if (*(int *)((char *)l_2C + 51) == 0) goto L64C5C;
-    func_000A1023(*(int *)((char *)l_2C + 51) + 7, (int)&*(signed char *)(*(char **)((char *)a1 + 35) + 7), 12, (int)D_00175962, 264, 4);
+    mc_memcpy(*(int *)((char *)l_2C + 51) + 7, (int)&*(signed char *)(*(char **)((char *)a1 + 35) + 7), 12, (int)D_00175962, 264, 4);
 L64C5C:;
     goto L652AB;
 }
@@ -284,7 +284,7 @@ case 11:
     msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)*(signed char *)((char *)a1 + 3)) + 8600), 1);
     goto L652AB;
 case 12:
-    func_000A1023(*(int *)D_00147954, 655360, 64000, (int)D_00175962, 315, 4);
+    mc_memcpy(*(int *)D_00147954, 655360, 64000, (int)D_00175962, 315, 4);
     *(signed char *)D_001940DA |= 1;
     link_show_text(((int)(unsigned char)*(signed char *)((char *)a1 + 3)) + 5400);
     l_30 = hud_message_add((int)D_0017596A);
@@ -293,7 +293,7 @@ case 12:
     inpstr_begin_text(l_30 + 2, 16);
 L64EF5:;
     if (inpstr_update() != 0) goto L64F30;
-    func_000A1023(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00175962, 324, 4);
+    mc_memcpy(*(int *)screen_buffer, *(int *)D_00147954, 64000, (int)D_00175962, 324, 4);
     hud_messages_draw();
     func_000CDD81(1);
     goto L64EF5;

@@ -40,7 +40,7 @@ extern void func_0012DB50(int);
 extern void func_00144F68(int, int, int, int, char *);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern void func_000A0F5C(char *, char *, ...);
+extern void mc_sprintf(char *, char *, ...);
 
 void itemmaker_draw(void)
 {
@@ -56,7 +56,7 @@ void itemmaker_draw(void)
         text_draw_colored(func_000A0DD9(itemmaker_gold_cost(), text_buffer, 10), 63, 27, 145, 156);
     if (itemmaker_item != 0) {
         func_000A0ED9(161, D_001756A3);
-        func_000A0F5C(text_buffer, D_001756AE, itemmaker_points_used(), *(unsigned short *)(itemmaker_item + 61));
+        mc_sprintf(text_buffer, D_001756AE, itemmaker_points_used(), *(unsigned short *)(itemmaker_item + 61));
         text_draw_colored(text_buffer, 96, 39, 145, 156);
     }
     inv_draw_left_list(D_00185B54);
@@ -72,7 +72,7 @@ void itemmaker_draw(void)
             D_00190CEE[l_1C] = l_20;
             D_00190CEF[l_1C] = 255;
             func_000A0ED9(179, D_001756A3);
-            func_000A0F5C(text_buffer, D_001756B6, enchant_power_names[itemmaker_slots[l_20].a]);
+            mc_sprintf(text_buffer, D_001756B6, enchant_power_names[itemmaker_slots[l_20].a]);
             text_draw_colored(text_buffer, 10, l_1C * D_0012DA44 + 60, D_0012B508, 156);
             l_1C++;
             if (itemmaker_slots[l_20].b == -1) {
@@ -82,10 +82,10 @@ void itemmaker_draw(void)
                 D_00190CF0[l_1C] = 255;
                 if (itemmaker_slots[l_20].a < 3) {
                     func_000A0ED9(189, D_001756A3);
-                    func_000A0F5C(text_buffer, D_001756B9, spell_name_by_id(enchant_spell_lists[itemmaker_slots[l_20].a][itemmaker_slots[l_20].b]));
+                    mc_sprintf(text_buffer, D_001756B9, spell_name_by_id(enchant_spell_lists[itemmaker_slots[l_20].a][itemmaker_slots[l_20].b]));
                 } else {
                     func_000A0ED9(191, D_001756A3);
-                    func_000A0F5C(text_buffer, D_001756B9, enchant_power_params[itemmaker_slots[l_20].a][itemmaker_slots[l_20].b]);
+                    mc_sprintf(text_buffer, D_001756B9, enchant_power_params[itemmaker_slots[l_20].a][itemmaker_slots[l_20].b]);
                 }
                 text_draw_colored(text_buffer, 10, l_1C * D_0012DA44 + 60, D_0012B508, 156);
                 l_1C += 2;
@@ -94,7 +94,7 @@ void itemmaker_draw(void)
             D_00190D02[l_18] = l_20;
             D_00190D03[l_18] = 255;
             func_000A0ED9(200, D_001756A3);
-            func_000A0F5C(text_buffer, D_001756B6, enchant_side_effect_names[itemmaker_slots[l_20].a]);
+            mc_sprintf(text_buffer, D_001756B6, enchant_side_effect_names[itemmaker_slots[l_20].a]);
             text_draw_colored(text_buffer, 108, l_18 * D_0012DA44 + 60, D_0012B508, 156);
             l_18++;
             if (itemmaker_slots[l_20].b == -1) {
@@ -104,10 +104,10 @@ void itemmaker_draw(void)
                 D_00190D04[l_18] = 255;
                 if (itemmaker_slots[l_20].a == 0) {
                     func_000A0ED9(210, D_001756A3);
-                    func_000A0F5C(text_buffer, D_001756B9, monster_names[itemmaker_slots[l_20].b]);
+                    mc_sprintf(text_buffer, D_001756B9, monster_names[itemmaker_slots[l_20].b]);
                 } else {
                     func_000A0ED9(212, D_001756A3);
-                    func_000A0F5C(text_buffer, D_001756B9, enchant_side_effect_params[itemmaker_slots[l_20].a][itemmaker_slots[l_20].b]);
+                    mc_sprintf(text_buffer, D_001756B9, enchant_side_effect_params[itemmaker_slots[l_20].a][itemmaker_slots[l_20].b]);
                 }
                 text_draw_colored(text_buffer, 108, l_18 * D_0012DA44 + 60, D_0012B508, 156);
                 l_18 += 2;

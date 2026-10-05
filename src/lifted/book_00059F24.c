@@ -12,7 +12,7 @@ extern char D_00195C44[];
 extern char book_page_offsets[];
 extern char book_file[];
 
-extern int func_000A006E();
+extern int lseek();
 extern int func_000A00CB();
 extern int func_0012DB50();
 extern void book_flush_line(void);
@@ -25,7 +25,7 @@ void book_draw_page(int a1)
     int l_20;
 
     func_0012DB50(4);
-    func_000A006E((int)(short)*(short *)book_file, *(int *)((char *)(int)(*(char **)book_page_offsets + (((int)(short)*(short *)&a1) << 2))), 0);
+    lseek((int)(short)*(short *)book_file, *(int *)((char *)(int)(*(char **)book_page_offsets + (((int)(short)*(short *)&a1) << 2))), 0);
     func_000A00CB((int)(short)*(short *)book_file, *(int *)D_00195C44, 16000);
     l_20 = *(int *)D_00195C44;
     *(signed char *)D_0012B508 = 145;

@@ -17,15 +17,15 @@ extern void faction_add_record(struct rec *, int, struct rec *);
 extern void fatal_error(char *);
 extern int disk_open_data(char *);
 extern void func_0009DEA7(int);
-extern void func_000A0024(struct rec *, char *, int);
-extern void func_000A0040(void *, int, int, char *, int, int);
-extern struct rec *func_000A00AF(int, char *, int);
+extern void mc_free(struct rec *, char *, int);
+extern void mc_memset(void *, int, int, char *, int, int);
+extern struct rec *mc_malloc(int, char *, int);
 extern int func_000A00CB(int, char *, int);
-extern short func_000A0D13(char *);
-extern int func_000A1097(int);
+extern short atoi(char *);
+extern int tolower(int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern void func_000A0F5C(char *, char *, ...);
+extern void mc_sprintf(char *, char *, ...);
 
 void faction_load_file(void)
 {
@@ -61,13 +61,13 @@ void faction_load_file(void)
             faction_count++;
     if (factions != 0) {
         if (factions != 0 && factions != (struct rec *)0x97979797) {
-            func_000A0024(factions, D_00170464, 973);
+            mc_free(factions, D_00170464, 973);
             factions = (struct rec *)0x97979797;
         }
     }
-    cur = factions = func_000A00AF(faction_count * 92, D_00170464, 975);
-    func_000A0040(cur, 0, faction_count * 92, D_00170464, 976, 4);
-    func_000A0040(&rec, 0, 92, D_00170464, 977, 4);
+    cur = factions = mc_malloc(faction_count * 92, D_00170464, 975);
+    mc_memset(cur, 0, faction_count * 92, D_00170464, 976, 4);
+    mc_memset(&rec, 0, 92, D_00170464, 977, 4);
     p = D_00147954;
     p[len] = 0;
     while (*p != 0) {
@@ -90,12 +90,12 @@ void faction_load_file(void)
                 faction_add_record(&rec, prev, cur++);
                 prev = indent;
                 indent = 0;
-                func_000A0040(&rec, 0, 92, D_00170464, 1012, 4);
+                mc_memset(&rec, 0, 92, D_00170464, 1012, 4);
                 l_30 = l_34 = 0;
             }
             have = 1;
             p++;
-            rec.id = func_000A0D13(p);
+            rec.id = atoi(p);
             while (D_00178630[(unsigned char)(*p + 1)] & 32)
                 p++;
             break;
@@ -110,7 +110,7 @@ void faction_load_file(void)
             hash = 0;
             while (*p > ' ' && *p != ':') {
                 hash <<= 1;
-                hash += func_000A1097(*p++);
+                hash += tolower(*p++);
             }
             for (found = i = 0; i < 19; i++) {
                 if (faction_keywords[i].hash != hash) continue;
@@ -122,7 +122,7 @@ void faction_load_file(void)
             }
             if (!found) {
                 func_000A0ED9(1049, D_00170464);
-                func_000A0F5C(text_buffer, D_0017046E, line);
+                mc_sprintf(text_buffer, D_0017046E, line);
                 fatal_error(text_buffer);
             }
             break;

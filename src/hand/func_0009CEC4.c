@@ -31,9 +31,9 @@ extern int travel_pixel_time(int, int);
 extern void travel_find_transport(void);
 extern void travel_toggle_zoom(void);
 extern int func_0009DEAC();
-extern int func_000A0024(char *, char *, int);
-extern char *func_000A00AF(int, char *, int);
-extern int func_000A1023(char *, char *, int, char *, int, int);
+extern int mc_free(char *, char *, int);
+extern char *mc_malloc(int, char *, int);
+extern int mc_memcpy(char *, char *, int, char *, int, int);
 
 int travel_route(int x0, int y0, int x1, int y1, int a5)
 {
@@ -55,8 +55,8 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
 
     flag = 0;
     if (D_001AA698 != 0) {
-        D_001AA690 = func_000A00AF(64000, D_0017743D, 984);
-        func_000A1023(D_001AA690, screen_buffer, 64000, D_0017743D, 985, 4);
+        D_001AA690 = mc_malloc(64000, D_0017743D, 984);
+        mc_memcpy(D_001AA690, screen_buffer, 64000, D_0017743D, 985, 4);
     }
     save = player_character->e;
     x0 = x0 / 32768;
@@ -118,7 +118,7 @@ int travel_route(int x0, int y0, int x1, int y1, int a5)
     }
     if (D_001AA698 != 0) {
         if (!(D_001AA690 == 0 || D_001AA690 == (char *)0x97979797)) {
-            func_000A0024(D_001AA690, D_0017743D, 1058);
+            mc_free(D_001AA690, D_0017743D, 1058);
             D_001AA690 = (char *)0x97979797;
         }
     }

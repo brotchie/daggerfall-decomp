@@ -11,8 +11,8 @@ extern char *current_location;
 extern int game_minutes;
 extern int quest_find_by_id(short);
 extern void logbook_prune_quests(void);
-extern void func_000A0040(void *, int, int, char *, int, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_memset(void *, int, int, char *, int, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 
 void logbook_add_entry(unsigned char a1, int a2, int a3)
 {
@@ -31,7 +31,7 @@ void logbook_add_entry(unsigned char a1, int a2, int a3)
             r = quest_find_by_id(p->id[i]);
             if (r == 0) {
                 p->id[i] = 0;
-                func_000A0040(p->val[i], 0, 20, D_00175C86, 301, 20);
+                mc_memset(p->val[i], 0, 20, D_00175C86, 301, 20);
             }
         }
         if (p->id[i] == 0 && slot == -1) {
@@ -45,11 +45,11 @@ void logbook_add_entry(unsigned char a1, int a2, int a3)
         }
     }
     if (fresh)
-        func_000A0040(p->val[slot], 0, 20, D_00175C86, 319, 20);
+        mc_memset(p->val[slot], 0, 20, D_00175C86, 319, 20);
     p->id[slot] = a1;
     if (a3 > 9)
         a3 %= 10;
     p->val[slot][a3] = a2;
     p->time[slot][a3] = game_minutes;
-    func_000A0AD9(p->text[slot], current_location, 32, D_00175C86, 325);
+    mc_strncpy(p->text[slot], current_location, 32, D_00175C86, 325);
 }

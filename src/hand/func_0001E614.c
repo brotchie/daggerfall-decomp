@@ -16,11 +16,11 @@ extern char cfg_block_str[];
 extern char cfg_debug;
 extern int archive_find_record(int, char *, int);
 extern void archive_read_record(int, int, int);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern char *func_000A0DD9(int, char *, int);
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern void func_000A0F5C(char *, char *, ...);
+extern void mc_sprintf(char *, char *, ...);
 
 void town_block_load_rmb(int a1)
 {
@@ -48,9 +48,9 @@ void town_block_load_rmb(int a1)
     }
     if (cfg_debug == 0) {
         func_000A0ED9(476, D_001704CC);
-        func_000A0F5C(text_buffer, D_00170530, &rmb_name_templates[l_24]);
+        mc_sprintf(text_buffer, D_00170530, &rmb_name_templates[l_24]);
     } else {
-        func_000A0AD9(text_buffer, cfg_block_str, 160, D_001704CC, 478);
+        mc_strncpy(text_buffer, cfg_block_str, 160, D_001704CC, 478);
     }
     l_1C = archive_find_record(blocks_bsa, text_buffer, 8);
     archive_read_record(blocks_bsa, l_1C, rmb_block);

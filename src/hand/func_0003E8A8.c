@@ -5,7 +5,7 @@ extern int msgbox_next_page;
 extern int text_rsc_load(int, int, int);
 extern void msgbox_render(int, int);
 extern void msgbox_show_more_pages(int);
-extern void func_000A0024(int, char *, int);
+extern void mc_free(int, char *, int);
 
 int msgbox_render_rsc(short a1, int a2, short a3)
 {
@@ -21,7 +21,7 @@ int msgbox_render_rsc(short a1, int a2, short a3)
         r = 1;
     }
     if (h != 0 && h != 0x97979797) {
-        func_000A0024(h, D_00170D55, 599);
+        mc_free(h, D_00170D55, 599);
         h = 0x97979797;
     }
     return r;

@@ -6,10 +6,10 @@ int macro_bn_biography_name(void)
 {
     int l1;
     int l2;
-    l1 = func_0009DC25();
-    func_0009DC49(parse_name_seed + 0xd81);
+    l1 = rand();
+    srand(parse_name_seed + 0xd81);
     l2 = name_generate(player_character[0x43], D_00190C78 & 1);
-    func_0009DC49(l1);
+    srand(l1);
     return l2;
 }
 

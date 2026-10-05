@@ -42,11 +42,11 @@ extern int location_contains(int, int);
 extern int object_delete(int);
 extern int object_create_child(int, int, int);
 extern int object_new_id(int);
-extern int func_0009DC25();
-extern int func_0009DC49();
+extern int rand();
+extern int srand();
 extern int func_0009DEAC();
-extern int func_000A0040();
-extern int func_000A1023();
+extern int mc_memset();
+extern int mc_memcpy();
 extern int func_000C7FD9();
 extern int func_000CE6E2();
 extern int func_0014B45B();
@@ -80,8 +80,8 @@ L25A00:;
     if (*(int *)frame_counter >= 5) goto L25A15;
     return 0;
 L25A15:;
-    *(int *)((char *)l_48 + 24) = func_0009DC25();
-    func_0009DC49((int)(unsigned short)*(short *)((char *)a1 + 25));
+    *(int *)((char *)l_48 + 24) = rand();
+    srand((int)(unsigned short)*(short *)((char *)a1 + 25));
     *(int *)((char *)l_48 + 20) = a1;
     l_20 = *(int *)((char *)l_48 + 20) + 71;
     if ((((int)(unsigned short)(*(short *)(*(char **)((char *)l_48 + 20) + 27) & 31)) - 2) != 13) goto L25A5F;
@@ -106,7 +106,7 @@ L25ABB:;
     return 0;
 L25AC7:;
     if (l_1C != (-1)) goto L25AE1;
-    func_0009DC49(*(int *)((char *)l_48 + 24));
+    srand(*(int *)((char *)l_48 + 24));
     return 0;
 L25AE1:;
     *(signed char *)(*(char **)((char *)l_48 + 20)) = 18;
@@ -120,15 +120,15 @@ L25AE1:;
     *(signed char *)D_00196293 = 0;
     *(signed char *)D_001940D7 |= 32;
     *(signed char *)D_001940D7 |= 128;
-    func_000A1023((int)l_54, *(int *)((char *)l_48 + 20) + 7, 12, (int)D_00170788, 119, 4);
-    func_000A0040((int)l_48, 0, 12, (int)D_00170788, 120, 4);
+    mc_memcpy((int)l_54, *(int *)((char *)l_48 + 20) + 7, 12, (int)D_00170788, 119, 4);
+    mc_memset((int)l_48, 0, 12, (int)D_00170788, 120, 4);
     *(int *)((char *)l_48 + 12) = (int)D_00187B6E;
     *(signed char *)player_motion_flags |= 8;
     collide_move_object(*(int *)((char *)l_48 + 20), 0, (int)l_54, 0);
     *(signed char *)player_motion_flags &= 247;
     *(signed char *)player_on_ground = *(signed char *)&l_28;
     *(int *)D_00195C74 = l_24;
-    func_0009DC49(*(int *)((char *)l_48 + 24));
+    srand(*(int *)((char *)l_48 + 24));
     if (((int)(short)(*(short *)collide_flags & 1)) != 0) goto L25BC9;
     *(signed char *)((char *)a1 + 21) |= 16;
 L25BC9:;
@@ -479,8 +479,8 @@ void dungeon_roll_monster_tables(void)
     int l_1C;
     int l_18;
 
-    l_18 = func_0009DC25();
-    func_0009DC49(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
+    l_18 = rand();
+    srand(((unsigned)*(int *)(*(char **)D_00195AC4 + 31)) >> 16);
     l_1C = 0;
 L263FD:;
     if (l_1C < 256) goto L26410;
@@ -504,7 +504,7 @@ L2643E:;
     goto L26436;
 L26455:;
     object_foreach(*(int *)D_00195AC4, (int)func_0002631D);
-    func_0009DC49(l_18);
+    srand(l_18);
 }
 
 void func_00026508(void)
@@ -521,7 +521,7 @@ L26539:;
     l_18++;
     goto L2652F;
 L26541:;
-    func_000266C7((int)(unsigned char)*(signed char *)(D_0017A028 + (func_0009DC25() & 3)));
+    func_000266C7((int)(unsigned char)*(signed char *)(D_0017A028 + (rand() & 3)));
     goto L26539;
 }
 
@@ -569,7 +569,7 @@ L26676:;
     if (((int)(unsigned char)*(signed char *)player_environment) != 3) return;
     if (((int)(unsigned char)*(signed char *)game_mode) != 16) return;
     if (rand_range(0, 35) != 0) return;
-    func_000266C7((int)(unsigned char)*(signed char *)(D_001951ED + (func_0009DC25() % 6)));
+    func_000266C7((int)(unsigned char)*(signed char *)(D_001951ED + (rand() % 6)));
 }
 
 void func_000266C7(int a1)

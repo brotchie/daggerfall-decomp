@@ -13,15 +13,15 @@ extern char *quest_symbol_text(int, unsigned char, int);
 extern int func_0004A1A2(unsigned char *);
 extern void fatal_error(char *);
 extern int func_000998C8(char *);
-extern int func_0009DC25(void);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern int rand(void);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern int func_000A0DF4(char *);
-extern void func_000A1023(char *, unsigned char *, int, char *, int, int);
-extern int func_000A1720(struct macro *, char *);
+extern void mc_memcpy(char *, unsigned char *, int, char *, int, int);
+extern int strcmp(struct macro *, char *);
 extern int func_000CE3FD();
 #pragma aux func_000A0ED9 parm routine [];
 extern void func_000A0ED9(int, char *);
-extern int func_000A0F5C(char *, char *, ...);
+extern int mc_sprintf(char *, char *, ...);
 
 void parse_expand(unsigned char *a1, char *a2)
 {
@@ -38,7 +38,7 @@ void parse_expand(unsigned char *a1, char *a2)
     int k;
 
     D_00199730 = a2;
-    parse_name_seed = func_0009DC25();
+    parse_name_seed = rand();
     while (*a1 != 0) {
         c = *a1++;
         if (c == '_' || c == '=') {
@@ -85,21 +85,21 @@ void parse_expand(unsigned char *a1, char *a2)
                     cnt = macro_letter_counts[idx];
                     tab = macro_letter_tables[idx];
                     if (*a1 == 'z') {
-                        func_000A1023(buf, a1, 3, D_0017110C, 108, 1024);
+                        mc_memcpy(buf, a1, 3, D_0017110C, 108, 1024);
                         buf[3] = 0;
                         a1 += 3;
                         a1 += func_0004A1A2(a1);
                     } else
                         a1 += func_000CE3FD(buf, a1);
                     for (n = 0; n < cnt; n++) {
-                        if (func_000A1720(&tab[n], buf) == 0) {
+                        if (strcmp(&tab[n], buf) == 0) {
                             r = tab[n].fn();
                             if (r < (char *)1000) {
                                 func_000A0ED9(122, D_0017110C);
-                                func_000A0F5C(D_001911E4, D_00171114, r, buf);
+                                mc_sprintf(D_001911E4, D_00171114, r, buf);
                                 fatal_error(D_001911E4);
                             }
-                            func_000A0AD9(a2, r, 4, D_0017110C, 125);
+                            mc_strncpy(a2, r, 4, D_0017110C, 125);
                             a2 += func_000A0DF4(a2);
                             break;
                         }

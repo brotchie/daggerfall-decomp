@@ -16,7 +16,7 @@ extern void (*D_00195CD0)(int, int);
 extern char D_00195CE0[];
 extern char D_00195CE4[];
 extern unsigned char *object_building(int);
-extern int func_000A0040();
+extern int mc_memset();
 extern int func_000C7FD9();
 extern int func_000C7FF4();
 
@@ -127,7 +127,7 @@ void func_0007E5C2(void)
     l_20 = *(int *)(*(char **)D_00195AC4 + 63);
     l_1C = 10000;
     l_18 = 10000;
-    func_000A0040((int)D_001940E4, 0, 4096, (int)D_00176A10, 849, 4096);
+    mc_memset((int)D_001940E4, 0, 4096, (int)D_00176A10, 849, 4096);
 L7E609:;
     if (l_20 == 0) goto L7E675;
     if (((int)(unsigned char)*(signed char *)((char *)l_20)) != 47) goto L7E66A;
@@ -173,7 +173,7 @@ void func_0007E74E(void)
     l_20 = *(int *)(*(char **)D_00195AC4 + 63);
     l_1C = 10000;
     l_18 = 10000;
-    func_000A0040((int)D_001940E4, 0, 4096, (int)D_00176A10, 880, 4096);
+    mc_memset((int)D_001940E4, 0, 4096, (int)D_00176A10, 880, 4096);
     l_20 = *(int *)(*(char **)D_00195AC4 + 63);
 L7E7A0:;
     if (l_20 == 0) return;

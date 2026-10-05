@@ -16,7 +16,7 @@ extern char D_00195D74[];
 extern char interaction_mode[];
 extern void hud_draw_compass(void);
 extern int hud_portrait_overlay_index(void);
-extern int func_000A1023();
+extern int mc_memcpy();
 extern int func_00144ED8();
 extern int func_00144F68();
 extern int func_00144FB4();
@@ -46,7 +46,7 @@ void hud_draw(void)
     struct img *l_18;
 
     if ((**(unsigned short **)game_settings & 1) == 0) {
-        func_000A1023(*(char **)screen_buffer + ((int *)D_00142950)[IMG(hud_bar_image)->y], IMG(hud_bar_image)->data, IMG(hud_bar_image)->size, D_00175898, 124, 4);
+        mc_memcpy(*(char **)screen_buffer + ((int *)D_00142950)[IMG(hud_bar_image)->y], IMG(hud_bar_image)->data, IMG(hud_bar_image)->size, D_00175898, 124, 4);
         func_00144ED8(131, 154, 47, 22, *(char **)hud_mode_icons + ((int *)D_00185CDC)[*(unsigned char *)interaction_mode], 0);
         l_1C = hud_portrait_overlay_index();
         if (l_1C != -1) {

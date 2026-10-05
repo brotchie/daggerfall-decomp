@@ -10,9 +10,9 @@ extern char D_00170B13[];
 extern char D_00170B69[];
 extern char *D_00195C44;
 extern void disk_read_file(char *, char *);
-extern void func_000A0AD9(char *, char *, int, char *, int);
+extern void mc_strncpy(char *, char *, int, char *, int);
 extern int func_000A0DF4(char *);
-extern char *func_000A1079(char *, int, int);
+extern char *memchr(char *, int, int);
 
 char **spells_std_names_for_ids(char *keys)
 {
@@ -24,7 +24,7 @@ char **spells_std_names_for_ids(char *keys)
     short n;
     short cnt;
 
-    n = func_000A1079(keys, 255, 1000) - keys;
+    n = memchr(keys, 255, 1000) - keys;
     list = (char **)(D_00195C44 + 20000);
     str = D_00195C44 + 21000;
     tbl = (struct Ent *)D_00195C44;
@@ -36,7 +36,7 @@ char **spells_std_names_for_ids(char *keys)
                 break;
             j++;
         }
-        func_000A0AD9(str, tbl[j].name, 4, D_00170B13, 1625);
+        mc_strncpy(str, tbl[j].name, 4, D_00170B13, 1625);
         list[cnt++] = str;
         str += func_000A0DF4(str) + 1;
     }

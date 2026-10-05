@@ -7,7 +7,7 @@ struct res {
     char *pos;              /* 0xa4 */
 };
 extern int profile_hex_to_int(signed char *);
-extern int func_000A0D13(signed char *);
+extern int atoi(signed char *);
 
 int profile_get_number(struct res *r, int *out)
 {
@@ -41,7 +41,7 @@ int profile_get_number(struct res *r, int *out)
     if (buf[1] == 'x')
         val = profile_hex_to_int(buf + 2);
     else
-        val = func_000A0D13(buf);
+        val = atoi(buf);
     *out = val;
     return 1;
 }

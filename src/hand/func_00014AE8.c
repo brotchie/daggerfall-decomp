@@ -62,8 +62,8 @@ extern void guards_summon(int);
 extern void person_load_face(struct who *, int);
 extern int func_00041347(void);
 extern int disk_read_file(char *, int);
-extern int func_0009DC25(void);
-extern void *func_000A00AF(int, char *, int);
+extern int rand(void);
+extern void *mc_malloc(int, char *, int);
 extern void func_0012DB50(int);
 
 int talk_open(struct who *a1)
@@ -89,7 +89,7 @@ int talk_open(struct who *a1)
         window_image = disk_read_file(D_001703C9, 0);
         D_001965E4 = disk_read_file(D_001703D6, 0);
         D_001965F8 = disk_read_file(D_001703E3, 0);
-        talk_saved_screen = func_000A00AF(64000, D_001703F0, 225);
+        talk_saved_screen = mc_malloc(64000, D_001703F0, 225);
         D_00196272 = 1;
         D_001966BB = 0;
         talk_tone = 1;
@@ -112,7 +112,7 @@ int talk_open(struct who *a1)
         D_00187CA8 = 0;
         D_00190D0F = 0;
         talk_init_text();
-        D_001965C8 = func_0009DC25();
+        D_001965C8 = rand();
         if (D_00190D10 == 0)
             person_load_face(talk_npc_object, talk_face_image);
         err = func_0001D46A(talk_npc_object->f31);

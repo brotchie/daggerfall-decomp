@@ -18,8 +18,8 @@ extern char D_00196474[];
 extern int faction_random_of_type(unsigned char);
 extern int font_char_width(unsigned char);
 extern int rand_range(int, int);
-extern int func_000A0024();
-extern int func_000A1023();
+extern int mc_free();
+extern int mc_memcpy();
 extern void text_draw(int, int, int);
 void func_00013DB6(void);
 
@@ -34,7 +34,7 @@ void func_00013C56(void)
     if (l_18 <= 80) goto L13CA0;
     l_18 = 80;
 L13CA0:;
-    func_000A1023((int)text_buffer, *(int *)D_00196474, l_18, (int)D_001702CC, 35, 160);
+    mc_memcpy((int)text_buffer, *(int *)D_00196474, l_18, (int)D_001702CC, 35, 160);
     *(signed char *)(text_buffer + l_18) = 0;
     text_draw((int)text_buffer, *(int *)D_00196470, 140);
     *(int *)D_00196470 -= 2;
@@ -54,7 +54,7 @@ void func_00013DB6(void)
 L13DD9:;
     goto L13DF9;
 L13DDB:;
-    func_000A0024(*(int *)D_00178E54, (int)D_001702CC, 62);
+    mc_free(*(int *)D_00178E54, (int)D_001702CC, 62);
     *(int *)D_00178E54 = -1751672937;
 L13DF9:;
     *(int *)D_00178E54 = 0;
