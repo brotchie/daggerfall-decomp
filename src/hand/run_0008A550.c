@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern unsigned spell_resist_flags[];
-extern int object_delete(struct record *);
+extern struct record *object_delete(struct record *);
 void spfx_effect_end(struct spell *e, int i, struct record *target);
 
 int spfx_wall_of_frost(int spell_object, int effect, int target)

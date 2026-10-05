@@ -33,11 +33,11 @@ extern int faction_has_enemy(struct faction *, struct faction *);
 extern int faction_has_ally(struct faction *, struct faction *);
 extern int rumor_is_eligible(int, int, int, int);
 extern struct quest *quest_find_by_id(int);
-extern int disk_read_file(int, int);
-extern int disk_write_arena2_file(int, int, int);
-extern int disk_open_rw(int);
-extern int disk_create(int);
-extern int disk_file_exists(int);
+extern int disk_read_file(char *, int);
+extern int disk_write_arena2_file(char *, int, int);
+extern int disk_open_rw(char *);
+extern int disk_create(char *);
+extern int disk_file_exists(char *);
 extern int rand_range(int, int);
 extern int rand();
 extern int close();
@@ -55,8 +55,8 @@ extern int mc_memcpy();
 extern void faction_load_file(void);
 extern void rumor_add_faction(struct faction *, struct faction *, int, unsigned char, int);
 extern void msgbox_show_string(int, int);
-extern void fatal_error(int);
-extern void object_foreach(struct record *, int);
+extern void fatal_error(char *);
+extern void object_foreach(struct record *, void (*)());
 int faction_count_allies(struct faction *);
 int faction_count_enemies(struct faction *);
 int rumor_collect_local(void);
@@ -213,7 +213,7 @@ void faction_parse_ally(struct faction *faction, signed char **cursor, int *ally
 {
     signed char *text;
 
-    if ((int)ally_count == 4) fatal_error((int)D_0017048A);
+    if ((int)ally_count == 4) fatal_error(D_0017048A);
     text = *cursor;
     faction->allies[(*ally_count)++] = (struct faction *)atoi(text);
     while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*text + 1)] & 32)) != 0 || ((int)(unsigned char)*text) == 45 || ((int)(unsigned char)*text) == 43) {
@@ -226,7 +226,7 @@ void faction_parse_enemy(struct faction *faction, signed char **cursor, int *all
 {
     signed char *text;
 
-    if ((int)enemy_count == 4) fatal_error((int)D_001704A4);
+    if ((int)enemy_count == 4) fatal_error(D_001704A4);
     text = *cursor;
     faction->enemies[(*enemy_count)++] = (struct faction *)atoi(text);
     while (((int)(unsigned char)(D_00178630[(int)(unsigned char)(*text + 1)] & 32)) != 0 || ((int)(unsigned char)*text) == 45 || ((int)(unsigned char)*text) == 43) {
@@ -472,7 +472,7 @@ int faction_player_related(struct faction *faction)
     if (faction == 0) return 0;
     D_0019671C = faction;
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity->children, (int)func_0001CB3C);
+    object_foreach(player_entity->children, func_0001CB3C);
     return *(int *)D_00195B84;
 }
 
@@ -555,8 +555,8 @@ int faction_make_peace(struct faction *faction, int slot)
 void rumor_file_open(void)
 {
     D_00196708 = 0;
-    if ((rumor_file = disk_open_rw((int)D_001704BB)) < 0) {
-        rumor_file = disk_create((int)D_001704BB);
+    if ((rumor_file = disk_open_rw(D_001704BB)) < 0) {
+        rumor_file = disk_create(D_001704BB);
     }
     if (rumor_file < 0) return;
     lseek(rumor_file, 0, 2);
@@ -580,8 +580,8 @@ int rumor_collect_local(void)
     out += strlen(out);
     *out = 0;
     out[1] = 0;
-    if (disk_file_exists((int)D_001704BB) == 0) return D_00147954 + 60000;
-    disk_read_file((int)D_001704BB, D_00147954);
+    if (disk_file_exists(D_001704BB) == 0) return D_00147954 + 60000;
+    disk_read_file(D_001704BB, D_00147954);
     if (*(int *)disk_last_file_size == 0) return 0;
     end = (int)(*(char **)&D_00147954 + *(int *)disk_last_file_size);
     rumor = (struct rumor *)D_00147954;
@@ -608,8 +608,8 @@ int rumor_pick_news(short faction_id)
 
     *(int *)((char *)state + 16) = 0;
     *(int *)&index = 0;
-    if (disk_file_exists((int)D_001704BB) == 0) return 0;
-    disk_read_file((int)D_001704BB, *(int *)scratch_buffer);
+    if (disk_file_exists(D_001704BB) == 0) return 0;
+    disk_read_file(D_001704BB, *(int *)scratch_buffer);
     if (*(int *)disk_last_file_size == 0) return 0;
     *(int *)((char *)state + 24) = (int)(*(char **)scratch_buffer + *(int *)disk_last_file_size);
     *(int *)&rumor = *(int *)scratch_buffer;
@@ -636,8 +636,8 @@ int func_0001D46A(int target)
     struct rumor *rumor;
     int end;
 
-    if (disk_file_exists((int)D_001704BB) == 0) return 0;
-    disk_read_file((int)D_001704BB, *(int *)scratch_buffer);
+    if (disk_file_exists(D_001704BB) == 0) return 0;
+    disk_read_file(D_001704BB, *(int *)scratch_buffer);
     if (*(int *)disk_last_file_size == 0) return 0;
     end = (int)(*(char **)scratch_buffer + *(int *)disk_last_file_size);
     rumor = (struct rumor *)*(int *)scratch_buffer;
@@ -683,8 +683,8 @@ void rumor_file_purge(void)
     int npc_count;
 
     npc_count = 0;
-    if (disk_file_exists((int)D_001704BB) == 0) return;
-    disk_read_file((int)D_001704BB, D_00147954);
+    if (disk_file_exists(D_001704BB) == 0) return;
+    disk_read_file(D_001704BB, D_00147954);
     if (*(int *)disk_last_file_size == 0) return;
     rumor = (struct rumor *)D_00147954;
     out = *(int *)scratch_buffer;
@@ -709,7 +709,7 @@ void rumor_file_purge(void)
 L1D9F4:;
         rumor = (struct rumor *)(((int)rumor + rumor->text_length) + 34);
     }
-    disk_write_arena2_file((int)D_001704BB, *(int *)scratch_buffer, out - *(int *)scratch_buffer);
+    disk_write_arena2_file(D_001704BB, *(int *)scratch_buffer, out - *(int *)scratch_buffer);
 }
 
 int rumor_copy(int out, struct rumor *rumor)

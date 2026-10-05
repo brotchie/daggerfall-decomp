@@ -22,7 +22,7 @@ extern struct faction *D_0019671C;
 extern int current_quest;
 extern struct faction *faction_find(short);
 extern int climate_category(void);
-extern void msgbox_show_string(char *, int);
+extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern int flc_play_with_text(int, char *, int, int);
 extern struct record *monster_summon_near_player(int);

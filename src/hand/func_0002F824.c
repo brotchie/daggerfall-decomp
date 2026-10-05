@@ -9,7 +9,7 @@ extern int ceiling_height;
 extern unsigned char player_on_ground;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move *, int);
-extern void damage_apply(struct record *, int, int);
+extern int damage_apply(struct record *, int, struct record *);
 extern void xn_math_yaw_offset_xz(int, int, int *, int *);
 
 void damage_knockback_move(struct record *creature, struct character *creature_char)

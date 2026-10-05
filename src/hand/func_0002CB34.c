@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002CB34 */
 #include "records.h"
 
-extern void quest_timer_update(struct quest *, struct qbn_timer *, int);
+extern void quest_timer_update(struct quest *, struct qbn_timer *, short);
 extern void *quest_record(struct quest *, int, int);
 
 void qaction_op12_start_stop_timer(struct quest *quest, struct qbn_op *op, short run_flag)

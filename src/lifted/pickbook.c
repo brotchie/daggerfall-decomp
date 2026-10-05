@@ -52,15 +52,15 @@ extern struct picklist shared_picklist;
 
 extern int spell_effect_text_index(short);
 extern int spell_cost(struct spell *, struct character *);
-extern int sheet_open(int);
-extern int spellbook_open(int);
+extern int sheet_open(short);
+extern int spellbook_open(short);
 extern int cast_player_spell(struct record *);
 extern int sound_play(int, struct record *, int);
 extern int hud_message_add(int);
 extern int picklist_frame(struct picklist *);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern struct record *object_find_item(struct record *, int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
 extern int inventory_open(int, int, int);
 extern int mc_free();
@@ -78,11 +78,11 @@ extern void spell_add_skill_uses(struct spell *, int);
 extern void msgbox_show_rsc(int, int);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
-extern void picklist_init(struct picklist *, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void picklist_add(struct picklist *, int, int);
+extern void picklist_init(struct picklist *, short, short, short, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern void picklist_add(struct picklist *, char *, short);
 extern void picklist_free(struct picklist *);
 extern void object_swap_siblings(struct record *, struct record *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 int spellbook_close(void);
 int spellbook_build_list(void);
 int spell_cost_item_percent(void);
@@ -112,7 +112,7 @@ void spellbook_add_spell_cb(struct record *object)
         mc_set_location(68, (int)D_00170DE4);
         mc_sprintf((int)text_buffer, (int)D_00170DEF, spell_cost(spell, player_character), spell->name);
     }
-    picklist_add(&shared_picklist, (int)text_buffer, 0);
+    picklist_add(&shared_picklist, text_buffer, 0);
     *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)object;
 }
 
@@ -278,12 +278,12 @@ int spellbook_build_list(void)
     if (object == 0) return 0;
     if (object->children == 0 && ((int)(unsigned short)(player_character->flags & 4)) == 0) return 0;
     picklist_init(&shared_picklist, 27, 30, 111, 131, 144, 29, 8, 15, 144, 150, 8, 15, 144, 45, 9, 104, 146, 146, 244, 114, 0);
-    object_foreach(object->children, (int)spellbook_add_spell_cb);
+    object_foreach(object->children, spellbook_add_spell_cb);
     if (((int)(unsigned short)(player_character->flags & 4)) != 0) {
         object = player_entity->children;
         while (object != 0) {
             if (object->type == 28) {
-                object_foreach(object->children, (int)spellbook_add_spell_cb);
+                object_foreach(object->children, spellbook_add_spell_cb);
                 break;
             }
             object = object->next;

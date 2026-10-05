@@ -4,7 +4,7 @@
 extern int D_00195B84;
 extern struct faction *D_0019670C;
 extern struct faction *D_0019671C;
-extern unsigned char faction_subtree_search_r(struct faction *);
+extern int faction_subtree_search_r(struct faction *);
 
 int faction_tree_relation(struct faction *faction, struct faction *other)
 {

@@ -57,8 +57,8 @@ extern int D_001985CC;
 extern int D_001985D0;
 
 extern int climate_category(void);
-extern int disk_read_file(int, int);
-extern int disk_open_data(int);
+extern int disk_read_file(char *, int);
+extern int disk_open_data(char *);
 extern int rand_range(int, int);
 extern int rand();
 extern int srand();
@@ -96,8 +96,8 @@ void sky_init(void)
 
     night_sky_loaded = 0;
     sky_loaded_frame = 10000;
-    moon0_image = (struct cfa_header *)disk_read_file((int)D_00170A6C, 0);
-    moon1_image = (struct cfa_header *)disk_read_file((int)D_00170A79, 0);
+    moon0_image = (struct cfa_header *)disk_read_file(D_00170A6C, 0);
+    moon1_image = (struct cfa_header *)disk_read_file(D_00170A79, 0);
     sky_image_a = mc_malloc(112640, (int)D_00170A86, 93);
     sky_image_b = mc_malloc(112640, (int)D_00170A86, 94);
     D_00196286 = 13;
@@ -235,7 +235,7 @@ void sky_load_day(int minutes)
     sky_loaded_frame = frame;
     mc_set_location(558, (int)D_00170A86);
     mc_sprintf((int)text_buffer, (int)D_00170A8C, frame >> 5);
-    fd = disk_open_data((int)text_buffer);
+    fd = disk_open_data(text_buffer);
     frame &= 31;
     lseek(fd, (int)&*(signed char *)((char *)(frame * 776) + 11), 0);
     read(fd, *(int *)scratch_buffer, 93);
@@ -330,12 +330,12 @@ void sky_stub(int unused)
 
 void sky_load_night(void)
 {
-    disk_read_file((int)D_00170A98, *(int *)scratch_buffer);
+    disk_read_file(D_00170A98, *(int *)scratch_buffer);
     xn_pal_set_range_8bit(*(int *)scratch_buffer + 11, 1, 31);
     mc_memcpy((int)xn_pal_current + 3, (int)&*(signed char *)(*(char **)scratch_buffer + 11), 93, (int)D_00170A86, 671, 4);
     mc_set_location(673, (int)D_00170A86);
     mc_sprintf((int)text_buffer, (int)D_00170AA5, (int)(unsigned char)D_0017A3E5[climate_category()]);
-    disk_read_file((int)text_buffer, sky_image_a);
+    disk_read_file(text_buffer, sky_image_a);
     sky_add_stars((unsigned char *)sky_image_a);
     night_sky_loaded = 1;
 }

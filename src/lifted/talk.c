@@ -144,7 +144,7 @@ extern struct faction *factions;
 extern struct quest *current_quest;
 extern struct quest *quest_tick_data;
 
-extern int talk_open(int);
+extern int talk_open(struct record *);
 extern int talk_hint_text_id(int);
 extern int town_has_building(short, int);
 extern int building_distance(struct building *);
@@ -153,23 +153,23 @@ extern struct faction *faction_find(short);
 extern int rumor_pick_news(short);
 extern int quest_symbol_text(int, int, int);
 extern int quest_section(int, int);
-extern int quest_find_site_for_building(struct building *);
+extern struct record *quest_find_site_for_building(struct building *);
 extern int parse_bio_answer_text(int);
 extern int quest_find_by_id(int);
 extern int quest_find_potential_questor(void);
 extern struct character *npc_talk_record_build(struct record *);
 extern int font_char_width(unsigned char);
 extern int font_text_width(int);
-extern int player_reaction_mod(unsigned char);
+extern int player_reaction_mod(int);
 extern int item_artifact_equipped(int);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int guild_local_temple_rank(void);
-extern int hud_message_add(int);
+extern int hud_message_add(char *);
 extern int key_pressed_once(unsigned char);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
-extern int npc_display_name(int);
+extern int npc_display_name(struct record *);
 extern int building_name(int);
 extern int rand();
 extern int srand();
@@ -187,14 +187,14 @@ extern int xn_mouse_poll_clamped();
 extern int xn_draw_fill_rect();
 extern int xn_draw_image();
 extern void func_000164EF(void);
-extern void talk_load_face(unsigned short);
-extern void talk_draw_answer(short, int, int, int);
-extern void talk_draw_question(short, int, int, int);
+extern void talk_load_face(int);
+extern void talk_draw_answer(int, int, int, int);
+extern void talk_draw_question(int, int, int, int);
 extern void talk_draw_tell_list(void);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void parse_rsc_text(int, int, int);
-extern void quest_load_text(int, int, int, int);
+extern void quest_load_text(struct quest *, int, short, int);
 extern void time_pass(int);
 extern void logbook_copy_text(int);
 extern void text_draw_coloured();
@@ -281,7 +281,7 @@ void talk_update(void)
     if (D_001966BA != 0) {
         for (button = 10; button < 17; button++) {
             if (mouse_x > talk_buttons[button].x0 && mouse_x < talk_buttons[button].x1 && mouse_y > talk_buttons[button].y0 && mouse_y < talk_buttons[button].y1) {
-                sound_play(203, (int)player_object, 110);
+                sound_play(203, player_object, 110);
                 talk_buttons[button].handler(button);
             }
         }
@@ -290,7 +290,7 @@ void talk_update(void)
     for (button = 0; button < 19; button++) {
         if (mouse_x > talk_buttons[button].x0 && mouse_x < talk_buttons[button].x1 && mouse_y > talk_buttons[button].y0 && mouse_y < talk_buttons[button].y1) {
             if (mouse_buttons != 0 || button == 15) {
-                sound_play(203, (int)player_object, 110);
+                sound_play(203, player_object, 110);
                 talk_buttons[button].handler(button);
             }
         }
@@ -310,7 +310,7 @@ void talk_draw(void)
     if (talk_npc_own_faction->type == 4) {
         text_draw_centred_coloured((int)((char *)talk_npc_own_faction + 3), 213, 53, 145, 156);
     } else {
-        text_draw_centred_coloured(npc_display_name((int)talk_npc_object), 213, 53, 145, 156);
+        text_draw_centred_coloured(npc_display_name(talk_npc_object), 213, 53, 145, 156);
     }
     talk_draw_face();
     talk_draw_answer(190, 66, 302, 184);
@@ -387,7 +387,7 @@ void talk_start(struct record *npc)
         return;
     }
     if (npc->type == 53 && ((int)(unsigned short)(npc->image2 & 1)) != 0) {
-        hud_message_add((int)D_001703F7);
+        hud_message_add(D_001703F7);
         return;
     }
     *(short *)talk_flags = 0;
@@ -444,7 +444,7 @@ void talk_start(struct record *npc)
             return;
         }
     }
-    talk_open((int)talk_npc_object);
+    talk_open(talk_npc_object);
 }
 
 int talk_prostitute_update(void)
@@ -458,7 +458,7 @@ int talk_prostitute_update(void)
             break;
         case 1:
             if (((int)D_00196271) == 2) {
-                talk_open((int)talk_npc_object);
+                talk_open(talk_npc_object);
             } else if ((talk_prostitute_price = rand_range(50, 75) - talk_disposition) > 0) {
                 msgbox_yes_no_rsc(7202);
                 talk_prostitute_state = 3;
@@ -478,11 +478,11 @@ int talk_prostitute_update(void)
         case 2:
 L15B7E:;
             if (((int)D_00196271) == 2) {
-                talk_open((int)talk_npc_object);
+                talk_open(talk_npc_object);
             } else {
                 func_000164EF();
                 time_pass(player_character->attributes[4]);
-                talk_open((int)talk_npc_object);
+                talk_open(talk_npc_object);
             }
         }
     }
@@ -772,7 +772,7 @@ int talk_macro_hint(int variant)
     text_id = talk_hint_text_id(variant);
     if ((text_id & 32768) != 0) {
         *(int *)&current_quest = (*(int *)&quest_tick_data = quest_find_by_id((int)(short)(short)D_00190D11));
-        quest_load_text((int)current_quest, text_id & 32767, 0, 0);
+        quest_load_text(current_quest, text_id & 32767, 0, 0);
     } else {
         parse_rsc_text(text_id, 0, 0);
     }

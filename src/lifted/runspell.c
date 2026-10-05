@@ -71,11 +71,11 @@ extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int spfx_resist_roll(int, int, struct character *, struct career *, int, int);
 extern int spell_extend_duration(struct record *, struct spell *, int);
-extern int object_delete(struct record *);
+extern struct record *object_delete(struct record *);
 extern struct record *object_clone(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
-extern struct record *object_find_item(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
+extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
 extern int mc_memset();
 extern int mc_strncpy();
@@ -96,7 +96,7 @@ extern void damage_knockback(struct record *, int, int, int);
 extern void spell_add_skill_uses(struct spell *, int);
 extern void spell_cast_queue(struct record *, struct record *);
 extern void spell_end(struct record *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 int spell_resist_check(struct record *, struct record **);
 struct spell *spell_find_active_effect(struct record *, int, int *, int *);
 int spell_apply_effect(struct record *, int, struct record *);
@@ -224,7 +224,7 @@ int cast_recast_last(void)
         return 0;
     }
     scratch_object = 0;
-    object_foreach(found->children, (int)spellbook_find_last_cast_cb);
+    object_foreach(found->children, spellbook_find_last_cast_cb);
     found = scratch_object;
     spell_data = &found->data.spell;
     cost = (int)(short)spell_ready_cost;
@@ -625,7 +625,7 @@ void spell_lookup_name(struct spell *spell)
     if (i >= 128) {
         spellbook = object_find_item(player_entity->children, 27, 0);
         D_00199D64 = spell;
-        object_foreach(spellbook->children, (int)func_0005CA28);
+        object_foreach(spellbook->children, func_0005CA28);
         return;
     }
     mc_strncpy(spell->name, (int)(signed char *)&spell_records[i].name[0], 25, (int)D_001757F4, 974);

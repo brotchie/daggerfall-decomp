@@ -7,7 +7,7 @@ extern struct record *player_entity;
 extern struct character *player_character;
 extern unsigned char current_region;
 extern unsigned char crime_current;
-extern int court_open(unsigned char);
+extern int court_open(int);
 extern void damage_creature_death(struct record *);
 extern int rand(void);
 

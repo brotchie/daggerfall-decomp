@@ -6,7 +6,7 @@ extern char D_00176198[];
 extern char D_0017627D[];
 extern signed char text_buffer[];
 
-extern int disk_open_data(int);
+extern int disk_open_data(char *);
 extern int close();
 extern int read();
 extern int mc_set_location(int, int);
@@ -19,7 +19,7 @@ void book_read_header(char *header, int book_id)
 
     mc_set_location(586, (int)D_00176198);
     mc_sprintf((int)text_buffer, (int)D_0017627D, book_id);
-    handle = disk_open_data((int)text_buffer);
+    handle = disk_open_data(text_buffer);
     read(handle, header, 234);
     close(handle);
 }

@@ -34,10 +34,10 @@ extern void msgbox_show_rsc(int, int);
 extern int sound_play(int, struct record *, int);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern int potionmaker_open(int);
 extern void potionmaker_add_ingredient(int);
-extern int potionmaker_in_cauldron(unsigned short, unsigned short);
+extern int potionmaker_in_cauldron(int, int);
 extern void potionmaker_ingredient_cb(struct record *);
 extern int potionmaker_close(void);
 extern void potion_make(struct item *);
@@ -70,7 +70,7 @@ void potionmaker_update(void)
     xn_font_select(3);
     *(int *)potion_ingredient_count = 0;
     mc_memset((int)potion_ingredients, 0, 2048, (int)D_00176E94, 182, 2048);
-    object_foreach(player_entity->children, (int)potionmaker_ingredient_cb);
+    object_foreach(player_entity->children, potionmaker_ingredient_cb);
     for (COUNT = i = 0; i < 8; i++) {
         if (((int *)potion_cauldron)[i] != 0) {
             item = &((struct record **)potion_cauldron)[i]->data.item;

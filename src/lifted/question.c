@@ -29,10 +29,10 @@ extern signed char class_answer_counts;
 extern signed char D_0019981A;
 extern signed char D_0019981B;
 
-extern int text_rsc_load(int, int, int);
+extern char *text_rsc_load(short, unsigned short, short);
 extern int pflc_play(int, int);
 extern int sound_play_ui(int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int rand();
 extern int mc_free();
 extern int mc_memset();
@@ -46,8 +46,8 @@ extern int func_000A1944();
 extern int xn_draw_cel_frame();
 extern int xn_str_copy_until();
 extern int xn_str_append_char();
-extern void fatal_error(int);
-extern void class_question_scroll(int *, int);
+extern void fatal_error(char *);
+extern void class_question_scroll(int *, short);
 extern void text_draw(int, int, int);
 int class_question_answer_span(short, short, short *, short *);
 
@@ -174,7 +174,7 @@ int class_question_pick_class(void)
     int answers;
     short i;
 
-    disk_read_file((int)D_001753DB, *(int *)scratch_buffer);
+    disk_read_file(D_001753DB, *(int *)scratch_buffer);
     *(int *)&entry = *(int *)scratch_buffer + 18;
     answers = ((((int)(unsigned char)D_0019981B) << 16) | (((int)(unsigned char)D_0019981A) << 8)) | ((int)(unsigned char)class_answer_counts);
     *(int *)&i = 0;
@@ -187,6 +187,6 @@ int class_question_pick_class(void)
         if ((*(int *)(*(char **)&entry) & 16777215) == answers) return (((int)(short)i) >> 2) + 12;
         *(int *)&entry += 3;
     }
-    fatal_error((int)D_001753E7);
+    fatal_error(D_001753E7);
     return 0;
 }

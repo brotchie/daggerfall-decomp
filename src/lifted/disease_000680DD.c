@@ -16,14 +16,14 @@ extern char nearest_creature[];
 extern char extra_spell_points[];
 extern int D_001A3AA8;
 
-extern int damage_apply(struct record *, int, int);
+extern int damage_apply(struct record *, int, struct record *);
 extern int player_in_daylight(void);
 extern int player_in_temple(void);
 extern int rand();
 extern void item_damage(struct record *, int);
 extern void enchant_extra_spell_points(struct item *, int);
-extern void object_foreach(struct record *, int);
-extern void item_repair_cb(int);
+extern void object_foreach(struct record *, void (*)());
+extern void item_repair_cb(struct record *);
 extern void item_break(struct record *);
 
 void item_enchantment_tick(struct item *item, int enchant_type, int enchant_param)
@@ -95,7 +95,7 @@ L68256:;
         break;
     case 8:
         *(int *)D_00195B84 = *(int *)D_00195B08;
-        object_foreach(player_entity->children, (int)item_repair_cb);
+        object_foreach(player_entity->children, item_repair_cb);
         if ((rand() % 10) == 0) item_damage(scratch_current_object, 1);
         break;
     case 1:

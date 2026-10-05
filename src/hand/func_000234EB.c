@@ -21,7 +21,7 @@ extern struct collide_hits *D_00196D50;
 extern char collide_flags[];
 extern int collide_step_player(struct record *, int, struct move_request *);
 extern void collide_for_each_nearby(struct record *, int);
-extern void collide_gather_cb(int);
+extern void collide_gather_cb(struct record *);
 extern void automap_mark_seen(int);
 extern int links_object_motion(int);
 extern int abs();

@@ -31,7 +31,7 @@ extern int D_001A5AD0;
 
 extern int sos_load_song(int, ...);
 extern int climate_category(void);
-extern int ai_angle_diff(int, int, int);
+extern int ai_angle_diff(int, int, int *);
 extern int sound_play_sample(int, int, struct record *, int);
 extern int sound_cache_load(int);
 extern int dpmi_lock_region(int, int);
@@ -93,7 +93,7 @@ void sound_volume_pan(int *listener, int *source, int *volume, int *pan, struct 
     }
     if (*volume > 32767) *volume = 32767;
     angle = xn_math_angle_to_point(listener[0], listener[2], source[0], source[2]);
-    offset = ai_angle_diff(player_object->yaw, angle, (int)&distance);
+    offset = ai_angle_diff(player_object->yaw, angle, &distance);
     if (offset > 512) offset = 512 - (offset - 512);
     offset = (offset << 15) / 512;
     if (cfg_stereo != 0) offset = -offset;

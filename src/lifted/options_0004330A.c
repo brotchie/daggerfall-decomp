@@ -12,7 +12,7 @@ extern signed char game_mode;
 extern int options_image;
 extern int options_saved_screen;
 
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int key_pressed_once(unsigned char);
 extern int mc_malloc();
 extern int mc_memcpy();
@@ -28,7 +28,7 @@ int options_open(short force)
         save_thumbnail_capture();
         D_00187CA8 = 0;
         game_mode = 7;
-        options_image = disk_read_file((int)D_00170EDB, 0);
+        options_image = disk_read_file(D_00170EDB, 0);
         D_00196272 = 1;
         options_saved_screen = mc_malloc(64000, (int)D_00170EE8, 120);
         mc_memcpy(options_saved_screen, screen_buffer, 64000, (int)D_00170EE8, 121, 4);

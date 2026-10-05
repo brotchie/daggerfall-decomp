@@ -71,18 +71,18 @@ extern signed char cfg_gender;
 
 extern struct faction *faction_find(short);
 extern int list_popup_poll(void);
-extern int sheet_open(int);
-extern struct record *kludge_add_random_item(struct record *, unsigned short);
+extern int sheet_open(short);
+extern struct record *kludge_add_random_item(struct record *, int);
 extern int item_add_random_to_container(struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
-extern int hud_message_add(int);
+extern int hud_message_add(char *);
 extern int rand_range(int, int);
-extern int object_free_single(struct record *);
+extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
-extern struct record *object_find_item(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
+extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
 extern int func_0009DA1C(int, int);
 extern int printf(int, ...);
@@ -111,11 +111,11 @@ extern void guild_join_dark_brotherhood(void);
 extern void monster_init(struct record *, int);
 extern void list_popup_open(int);
 extern void object_free_children(struct record *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern void inv_equip_item(struct record *);
 extern void inv_store_item(struct record *);
 extern void inv_create_wagon(void);
-extern void inv_add_arrows(struct record *, unsigned char);
+extern void inv_add_arrows(struct record *, int);
 struct record *item_add_to_container(struct record *, int, int, int);
 int class_has_magic_skill(struct career *);
 void kludge_make_test_character(int);
@@ -240,7 +240,7 @@ void kludge_make_test_character(int full)
     player_character->gold = 5000;
     player_character->level = 2;
     if (full != 0) {
-        disk_read_file((int)D_00171077, (int)player_class);
+        disk_read_file(D_00171077, (int)player_class);
         player_class->forbidden_equipment = 0;
         player_class->forbidden_materials = 0;
         mc_strncpy(player_character->name, (int)D_00171083, 32, (int)D_00171044, 197);
@@ -436,7 +436,7 @@ void kludge_pick_pockets(void)
     scratch_190ce4[0] = 3;
     mc_set_location(448, (int)D_00171044);
     mc_sprintf((int)text_buffer, (int)D_00171096, *(int *)(monster_names + (monster_id << 2)));
-    hud_message_add((int)text_buffer);
+    hud_message_add(text_buffer);
     scratch_190ce4[0] = 4;
     pickpocket_attempt(creature);
     scratch_190ce4[0] = 5;
@@ -450,7 +450,7 @@ void kludge_toggle_quest_debug(void)
 {
     D_001940DA ^= 2;
     if (((struct bf8_1_1 *)&D_001940DA)->f == 0) return;
-    hud_message_add((int)D_001710A7);
+    hud_message_add(D_001710A7);
 }
 
 void kludge_remove_all_items(void)
@@ -521,7 +521,7 @@ void cheat_raise_reputation(void)
     int i;
 
     faction = factions;
-    hud_message_add((int)D_001710D6);
+    hud_message_add(D_001710D6);
     for (i = 0; i < faction_count; i++, faction++) {
         if (faction->reputation <= 90) faction->reputation += 10;
     }
@@ -532,7 +532,7 @@ void cheat_raise_skills(void)
 {
     int i;
 
-    hud_message_add((int)D_001710EB);
+    hud_message_add(D_001710EB);
     for (i = 0; i < 35; i++) {
         if (player_character->skills[i].value != 100) player_character->skills[i].value++;
     }
@@ -583,6 +583,6 @@ struct record *kludge_find_door(void)
 {
     D_00199718 = 50000;
     D_00199714 = 0;
-    object_foreach(location_object, (int)kludge_find_door_cb);
+    object_foreach(location_object, kludge_find_door_cb);
     return D_00199714;
 }

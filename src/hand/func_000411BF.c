@@ -7,7 +7,7 @@ extern short D_0017B66D[];
 extern short D_0017B69D[];
 extern struct character *text_macro_npc;
 extern int climate_category(void);
-extern struct flat_cfg *flats_cfg_find(unsigned short);
+extern struct flat_cfg *flats_cfg_find(int);
 extern int disk_open_data(char *);
 extern int rand(void);
 extern void srand(int);

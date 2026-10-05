@@ -76,15 +76,15 @@ extern short inv_left_count;
 
 extern int spells_std_names_for_ids(int);
 extern int spell_cost(struct spell *, struct character *);
-extern int itemmaker_row_slot(int);
-extern int enchant_slot_cost(int, unsigned char, unsigned char, short);
-extern int enchant_value_slot_cost(int, unsigned char, unsigned char, short);
-extern int itemmaker_power_excluded(short);
-extern int sound_play(int, int, int);
-extern int disk_create(int);
+extern int itemmaker_row_slot(short);
+extern int enchant_slot_cost(int, unsigned char, unsigned char, int);
+extern int enchant_value_slot_cost(int, unsigned char, unsigned char, int);
+extern int itemmaker_power_excluded(int);
+extern int sound_play(int, struct record *, int);
+extern int disk_create(char *);
 extern int gold_can_afford(int);
-extern int object_free_single(struct record *);
-extern int object_delete(int);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_delete(struct record *);
 extern int inv_draw_item_cell(struct record *, int, int);
 extern int close();
 extern int mc_free();
@@ -95,19 +95,19 @@ extern int strlen();
 extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int func_000A1054();
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void player_refresh_paperdoll(void);
-extern void itemmaker_add_power_cb(short);
-extern void itemmaker_add_side_effect_cb(short);
+extern void itemmaker_add_power_cb(int);
+extern void itemmaker_add_side_effect_cb(int);
 extern void func_00057147(short, short, short, short, short, short, short);
 extern void itemmaker_show_param_list(int, short);
-extern void itemmaker_add_soul_powers(short);
+extern void itemmaker_add_soul_powers(int);
 extern void list_popup_open(int);
 extern void gold_spend(int);
 extern void inpstr_begin_text(int, short);
-extern void object_foreach(struct record *, int);
-extern void inv_store_item(int);
+extern void object_foreach(struct record *, void (*)());
+extern void inv_store_item(struct record *);
 int spell_name_by_id(unsigned char);
 int itemmaker_points_used(void);
 int itemmaker_gold_cost(void);
@@ -143,7 +143,7 @@ int itemmaker_close(void)
 {
     while (key_down_esc != 0);
     D_00187CA8 = 1;
-    if ((int)itemmaker_item != 0) inv_store_item((int)itemmaker_item_object);
+    if ((int)itemmaker_item != 0) inv_store_item(itemmaker_item_object);
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
         mc_free(window_image, (int)D_001756A3, 141);
@@ -172,7 +172,7 @@ void itemmaker_enter_name(void)
     mc_sprintf((int)prompt, (int)D_001756BE, D_0017D1EA);
     *(strlen(prompt) + prompt + 1) = 0;
     inpstr_begin_text((int)itemmaker_item, 23);
-    msgbox_show_string((int)prompt, 2);
+    msgbox_show_string(prompt, 2);
 }
 
 void itemmaker_powers_click(void)
@@ -235,7 +235,7 @@ void itemmaker_return_item(void)
     int unused;
     int unused2;
 
-    if ((int)itemmaker_item != 0) inv_store_item((int)itemmaker_item_object);
+    if ((int)itemmaker_item != 0) inv_store_item(itemmaker_item_object);
     itemmaker_item_object = 0;
     itemmaker_item = 0;
     *(int *)scratch_190be4 = 0;
@@ -283,13 +283,13 @@ void itemmaker_enchant(void)
     itemmaker_write_item_file();
     itemmaker_consume_soul();
     itemmaker_store_item();
-    sound_play(207, (int)player_object, 100);
+    sound_play(207, player_object, 100);
     itemmaker_reset();
 }
 
 void itemmaker_store_item(void)
 {
-    inv_store_item((int)itemmaker_item_object);
+    inv_store_item(itemmaker_item_object);
     itemmaker_item = 0;
     itemmaker_item_object = 0;
 }
@@ -331,9 +331,9 @@ int itemmaker_pick_param_list(int list_kind)
         *(int *)scratch_190ee4 = *(int *)scratch_buffer + 20000;
         D_00190EDC = *(int *)scratch_buffer + 21000;
         *(int *)D_00195B84 = 0;
-        object_foreach(player_entity->children, (int)itemmaker_soul_list_cb);
+        object_foreach(player_entity->children, itemmaker_soul_list_cb);
         if (*(int *)D_00195B84 == 0 && ((int)(short)scratch_190d68) != 2) {
-            msgbox_show_string((int)D_001756EC, 1);
+            msgbox_show_string(D_001756EC, 1);
             return 0;
         }
         *(int *)(scratch_190ee4 + (*(int *)D_00195B84 << 2)) = 0;
@@ -498,9 +498,9 @@ void itemmaker_consume_soul(void)
 L57E13:;
     D_00190D63 = (signed char)itemmaker_slots[slot].param;
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity->children, (int)itemmaker_soul_list_cb);
+    object_foreach(player_entity->children, itemmaker_soul_list_cb);
     gem = scratch_object->parent;
-    object_delete((int)scratch_object);
+    object_delete(scratch_object);
     if (gem->data.item.enchantments[0].type == 26) return;
     object_free_single(gem);
 }
@@ -534,7 +534,7 @@ void itemmaker_write_item_file(void)
     int fd;
 
     if (*(signed char *)cfg_item_file == 0) return;
-    fd = disk_create((int)cfg_item_file);
+    fd = disk_create(cfg_item_file);
     write(fd, (int)itemmaker_item, 107);
     close(fd);
 }

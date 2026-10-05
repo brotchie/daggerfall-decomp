@@ -129,9 +129,9 @@ extern signed char D_0019982F[];
 extern struct rect *classmaker_current_buttons;
 
 extern int classmaker_draw(short);
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
-extern int disk_create(int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
+extern int disk_create(char *);
 extern int list_popup_update(void);
 extern int close();
 extern int mc_free();
@@ -152,11 +152,11 @@ extern int xn_draw_get_rect();
 extern void msgbox_show_rsc(int, int);
 extern void keys_world_actions(void);
 extern void classmaker_draw_reputations(void);
-extern void classmaker_input_text(int, short, int);
-extern void classmaker_select_attribute(int);
+extern void classmaker_input_text(int, int, int);
+extern void classmaker_select_attribute(short);
 extern void classmaker_specials_screen(void);
 extern void itemmaker_reset(void);
-extern void itemmaker_select_tab(unsigned char);
+extern void itemmaker_select_tab(int);
 extern void list_popup_open(int);
 int classmaker_pick_from_list(int, int);
 int classmaker_update_advancement(void);
@@ -190,19 +190,19 @@ void classmaker_run(void)
     D_00190D86 = 0;
     D_001940D8 |= 1;
     if (*(signed char *)classmaker_file != 0) {
-        disk_read_file((int)classmaker_file, (int)player_class);
+        disk_read_file(classmaker_file, (int)player_class);
     }
-    disk_read_file((int)D_00175429, screen_buffer);
+    disk_read_file(D_00175429, screen_buffer);
     scratch_190df4 = mc_malloc(64000, (int)D_00175420, 105);
     mc_memcpy(scratch_190df4, screen_buffer, 64000, (int)D_00175420, 106, 4);
-    scratch_190dec = disk_read_file((int)D_00175436, 0);
+    scratch_190dec = disk_read_file(D_00175436, 0);
     *(int *)scratch_190de4 = mc_malloc(5520, (int)D_00175420, 109);
     xn_draw_get_rect(219, 46, 40, 138, *(int *)scratch_190de4, 0);
-    *(int *)scratch_190df0 = disk_read_file((int)D_00175443, 0);
+    *(int *)scratch_190df0 = disk_read_file(D_00175443, 0);
     scratch_190de8 = mc_malloc(((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4)) * ((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6)), (int)D_00175420, 113);
-    scratch_190df8 = disk_read_file((int)D_00175450, 0);
-    D_00190E00 = disk_read_file((int)D_0017545D, 0);
-    scratch_190dfc = disk_read_file((int)D_0017546A, 0);
+    scratch_190df8 = disk_read_file(D_00175450, 0);
+    D_00190E00 = disk_read_file(D_0017545D, 0);
+    scratch_190dfc = disk_read_file(D_0017546A, 0);
     bios_ticks = (int *)1132;
     *(int *)scratch_190be4 = *bios_ticks;
     while (classmaker_done == 0) {
@@ -216,11 +216,11 @@ void classmaker_run(void)
             D_00190D74 = 16;
         } else if (*(short *)classmaker_screen == 0) {
             if (mouse_x > classmaker_attribute_down_box && mouse_x < D_00185654 && mouse_y > D_00185652 && mouse_y < D_00185656) {
-                sound_play(203, (int)player_object, 100);
+                sound_play(203, player_object, 100);
                 ((int (*)())(D_00185658))();
             }
             if (mouse_x > classmaker_attribute_up_box && mouse_x < D_00185648 && mouse_y > D_00185646 && mouse_y < D_0018564A) {
-                sound_play(203, (int)player_object, 100);
+                sound_play(203, player_object, 100);
                 ((int (*)())(D_0018564C))();
             }
         }
@@ -245,7 +245,7 @@ void classmaker_run(void)
                 *(int *)&button = 0;
                 for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
                     if (mouse_x > classmaker_current_buttons[(short)button].x0 && mouse_x < classmaker_current_buttons[(short)button].x1 && mouse_y > classmaker_current_buttons[(short)button].y0 && mouse_y < classmaker_current_buttons[(short)button].y1) {
-                        sound_play(203, (int)player_object, 100);
+                        sound_play(203, player_object, 100);
                         classmaker_current_buttons[(short)button].handler();
                         break;
                     }
@@ -254,7 +254,7 @@ void classmaker_run(void)
                 *(int *)&button = 0;
                 for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
                     if (mouse_x > classmaker_current_buttons[(short)button].x0 && mouse_x < classmaker_current_buttons[(short)button].x1 && mouse_y > classmaker_current_buttons[(short)button].y0 && mouse_y < classmaker_current_buttons[(short)button].y1) {
-                        sound_play(203, (int)player_object, 100);
+                        sound_play(203, player_object, 100);
                         classmaker_current_buttons[(short)button].handler();
                         break;
                     }
@@ -701,7 +701,7 @@ void classmaker_save_file(void)
     int file;
 
     if (*(signed char *)classmaker_file == 0) return;
-    file = disk_create((int)classmaker_file);
+    file = disk_create(classmaker_file);
     write(file, (int)player_class, 74);
     close(file);
 }
@@ -871,9 +871,9 @@ int itemmaker_open(int opening)
         D_00187CA8 = 0;
         D_001940D8 |= 4;
         game_mode = 10;
-        window_image = disk_read_file((int)D_0017567E, 0);
-        magic_window_image = disk_read_file((int)D_0017568B, 0);
-        D_00190EE0 = disk_read_file((int)D_00175698, 0);
+        window_image = disk_read_file(D_0017567E, 0);
+        magic_window_image = disk_read_file(D_0017568B, 0);
+        D_00190EE0 = disk_read_file(D_00175698, 0);
         D_00196272 = 1;
         D_001940D8 &= 254;
         itemmaker_select_tab(15);

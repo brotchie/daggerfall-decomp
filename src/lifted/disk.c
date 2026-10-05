@@ -42,7 +42,7 @@ extern int unlink();
 extern int mc_memcpy();
 extern int filelength();
 extern int strchr();
-extern void fatal_error(int);
+extern void fatal_error(char *);
 extern void file_index_scan(char *);
 int disk_write_file(char *, int, int);
 int disk_open_data(char *);
@@ -62,21 +62,21 @@ int disk_read_file(char *name, int buffer)
     if (handle < 0) {
         mc_set_location(45, (int)D_00175D00);
         mc_sprintf((int)disk_path, (int)D_00175D07, name);
-        fatal_error((int)disk_path);
+        fatal_error(disk_path);
     }
     size = (*(int *)disk_last_file_size = filelength(handle));
     if (data == 0) data = mc_malloc(size, (int)D_00175D00, 52);
     if (data == 0) {
         mc_set_location(56, (int)D_00175D00);
         mc_sprintf((int)disk_path, (int)D_00175D22, name);
-        fatal_error((int)disk_path);
+        fatal_error(disk_path);
     }
     mc_memset(data, 0, size, (int)D_00175D00, 60, 4);
     bytes_read = read(handle, data, size);
     if (bytes_read != size) {
         mc_set_location(65, (int)D_00175D00);
         mc_sprintf((int)disk_path, (int)D_00175D44, name);
-        fatal_error((int)disk_path);
+        fatal_error(disk_path);
     }
     close(handle);
     return data;

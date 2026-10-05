@@ -35,7 +35,7 @@ extern void town_grid_build(void);
 extern void location_restore_stored(void);
 extern void town_door_roll_unlock(struct record *);
 extern void location_set_discovered(int, int);
-extern void object_foreach(struct record *, void (*)(struct record *));
+extern void object_foreach(struct record *, void (*)());
 extern void object_delete_block(int, int);
 extern void func_0008EB52(void);
 extern int player_to_nearest_marker(struct record *, int);

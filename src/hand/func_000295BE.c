@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern int game_minutes;
-extern void qaction_place_foe(struct qbn_op *, int);
+extern void qaction_place_foe(struct qbn_op *, struct qbn_place *);
 extern int rand(void);
 
 void qaction_op09_spawn_repeat(struct quest *unused, struct qbn_op *o)

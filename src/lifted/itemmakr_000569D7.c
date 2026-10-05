@@ -14,7 +14,7 @@ extern struct enchantment itemmaker_slots[];
 extern int itemmaker_pick_param_list(int);
 extern int itemmaker_free_slot(void);
 extern void msgbox_show_rsc(int, int);
-extern void itemmaker_set_power_param_cb(short);
+extern void itemmaker_set_power_param_cb(int);
 extern void func_00057147(short, short, short, short, short, short, short);
 extern void itemmaker_show_param_list(int, short);
 

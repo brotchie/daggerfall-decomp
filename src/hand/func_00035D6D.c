@@ -29,7 +29,7 @@ extern int archive_find_record(int, char *, int);
 extern int archive_read_record(int, int, char *);
 extern void rdb_create_objects(struct record *, char *, int);
 extern void rdb_link_actions(struct record *, char *, int);
-extern struct record *object_create_in_block(struct record *, unsigned char, int, int, int);
+extern struct record *object_create_in_block(struct record *, int, int, int, int);
 extern int xn_tex_cache_begin_frame();
 #pragma aux mc_set_location parm routine [];
 extern int mc_set_location(int, char *);

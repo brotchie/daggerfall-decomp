@@ -20,8 +20,8 @@ extern int active_links[];
 extern int link_count;
 extern int active_link_count;
 
-extern int func_000658CA(unsigned short, unsigned short);
-extern int hud_message_add(int);
+extern int func_000658CA(int, int);
+extern int hud_message_add(char *);
 extern int spfx_damage(struct record *, int, struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
@@ -94,7 +94,7 @@ void link_show_text(int text_id)
             end++;
         }
         *end = 0;
-        hud_message_add((int)line);
+        hud_message_add(line);
         line = end + 1;
     }
 }

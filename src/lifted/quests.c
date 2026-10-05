@@ -48,8 +48,8 @@ extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned
 extern int disk_read_file(char *, int);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_find(int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern int object_find(struct record *, int (*)());
 extern struct record *object_find_by_id(struct record *, int);
 extern int rand();
 extern int srand();
@@ -72,10 +72,10 @@ extern void rumor_add_quest(struct quest *, int, int, int);
 extern void quest_timers_start_all(void);
 extern void msgbox_show_rsc(int, int);
 extern void quest_end(struct quest *);
-extern void fatal_error(int);
+extern void fatal_error(char *);
 extern void logbook_prune_quests(void);
-extern void object_foreach(struct record *, int);
-extern void object_foreach_open(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
+extern void object_foreach_open(struct record *, void (*)());
 int quest_start(char *);
 int quest_match_person_cb(struct record *);
 int quest_free_id(void);
@@ -188,12 +188,12 @@ void func_0004C588(struct record *object)
     if (object->type == 41 && (((unsigned)object->id) >> 16) == 800) {
         *(int *)scratch_190be4 = object->data.building.faction_id;
         found_object = 0;
-        object_find((int)location_object, (int)quest_match_person_cb);
+        object_find(location_object, quest_match_person_cb);
         if (found_object == 0) return;
         if (found_object->twin != 0) {
             mc_set_location(422, (int)D_00174F47);
             mc_sprintf((int)text_buffer, (int)D_00174F71, (int)(unsigned short)(short)found_object->image);
-            fatal_error((int)text_buffer);
+            fatal_error(text_buffer);
         }
         object->id = found_object->id;
         mc_memcpy(&object->x, &found_object->x, 12, (int)D_00174F47, 427, 4);
@@ -220,7 +220,7 @@ void func_0004C588(struct record *object)
 void func_0004C759(void)
 {
     D_00196282 = 0;
-    object_foreach_open(nonworld_root, (int)func_0004C588);
+    object_foreach_open(nonworld_root, func_0004C588);
 }
 
 int quest_free_id(void)
@@ -241,7 +241,7 @@ int quest_free_id(void)
     for (id = 1; id < 256; id++) {
         if (id_used[id] == 0) return id;
     }
-    fatal_error((int)D_00174F8F);
+    fatal_error(D_00174F8F);
     return 0;
 }
 
@@ -313,7 +313,7 @@ void quest_mark_givers(void)
         }
     }
     srand(((unsigned)game_minutes) / 1440);
-    object_foreach(location_object, (int)quest_mark_giver_cb);
+    object_foreach(location_object, quest_mark_giver_cb);
     srand(saved_seed);
 }
 
@@ -352,11 +352,11 @@ void quest_count_givers_cb(struct record *object)
 int quest_find_potential_questor(void)
 {
     *(int *)D_00195B84 = 32768;
-    object_foreach(location_object, (int)quest_count_givers_cb);
+    object_foreach(location_object, quest_count_givers_cb);
     if (*(int *)D_00195B84 == 32768) return 0;
     *(int *)D_00195B84 = rand_range(0, (*(int *)D_00195B84 & 32767) - 1) + 1;
     found_object = 0;
-    object_foreach(location_object, (int)quest_count_givers_cb);
+    object_foreach(location_object, quest_count_givers_cb);
     quest_potential_questor = (int)found_object;
     return (int)found_object;
 }

@@ -10,8 +10,8 @@ extern int inventory_action;
 extern short picked_model_index;
 extern struct record D_00196120;   /* furniture_container_3 (candidate) */
 extern struct record *inv_selected_item;
-extern void quest_raise_event(int, struct record *, int);
-extern int object_reparent(struct record *, struct record *);
+extern void quest_raise_event(short, struct record *, struct record *);
+extern struct record *object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
 extern int inv_take_item(struct record *);
 extern void inv_use_item(void);

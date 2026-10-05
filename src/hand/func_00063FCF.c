@@ -28,7 +28,7 @@ extern int D_00196D58;
 extern int D_00196D5C;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct Hit *, int);
-extern int object_delete(struct record *);
+extern struct record *object_delete(struct record *);
 extern int abs();
 extern int mc_memcpy(void *, void *, int, char *, int, int);
 extern int xn_math_approx_dist2d();

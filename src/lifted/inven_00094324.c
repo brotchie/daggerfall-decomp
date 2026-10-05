@@ -18,13 +18,13 @@ extern char picked_model_index[];
 extern char D_00196120[];
 extern struct record *inv_selected_item;
 
-extern int object_reparent(struct record *, struct record *);
+extern struct record *object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
 extern int inv_take_item(struct record *);
-extern int inv_paperdoll_slot_at(short, short, int);
+extern int inv_paperdoll_slot_at(int, int, int);
 extern int trade_can_repair_item(struct item *);
 extern void msgbox_show_rsc(int, int);
-extern void quest_raise_event(int, int, int);
+extern void quest_raise_event(short, struct record *, struct record *);
 extern void inv_use_item(void);
 extern void inv_item_info(struct record *, struct item *);
 extern void item_remove_equip_effects(struct record *, int);
@@ -85,7 +85,7 @@ void inv_click_paperdoll(void)
         if (object->quest_id == 0 && trade_mode == 0) {
             object->id = object_new_id(((unsigned)location_object->id) >> 16);
         }
-        quest_raise_event(5, (int)object, 0);
+        quest_raise_event(5, object, 0);
         trade_schedule_repair();
         return;
     case 3:

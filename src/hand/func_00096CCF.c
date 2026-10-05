@@ -10,7 +10,7 @@ extern int game_minutes;
 extern int spell_cost(struct spell *, struct character *);
 extern int cast_item_spell_at();
 extern void item_damage(struct record *, int);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int mc_memcpy();
 
 

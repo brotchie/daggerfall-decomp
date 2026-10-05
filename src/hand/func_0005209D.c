@@ -22,7 +22,7 @@ struct info {
 };
 #pragma pack()
 extern char D_00175404[];
-extern unsigned short disk_open_data(char *);
+extern int disk_open_data(char *);
 extern int mc_memset();
 extern int lseek(int, int, int);
 extern char *mc_malloc(int, char *, int);

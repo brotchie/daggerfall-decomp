@@ -16,7 +16,7 @@ extern char crime_current;
 extern char D_001962B2;
 extern struct record *people_list[];
 extern int people_count;
-extern void engine_pick_object(int, int, struct pick_result *);
+extern int engine_pick_object(int, int, struct pick_result *);
 extern int collide_line_of_sight(struct record *, struct record *);
 extern void town_map_note_building(struct record *, struct building *);
 extern void damage_resolve_attack(struct record *, struct record *, int);

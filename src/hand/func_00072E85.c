@@ -34,7 +34,7 @@ extern void fatigue_add(int);
 extern int weapon_start_swing(int);
 extern void weapon_bow_update(void);
 extern void weapon_melee_strike(struct record *);
-extern void hud_status_set(int);
+extern void hud_status_set(char *);
 extern int inv_take_arrow(int);
 extern int xn_img_cif_group();
 extern int xn_draw_cif_rle_frame();
@@ -56,7 +56,7 @@ void weapon_player_update(void)
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
     if (((int)D_001875B7) == *(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2))) {
         if (inv_take_arrow(0) == 0) {
-            hud_status_set((int)D_00176184);
+            hud_status_set(D_00176184);
             D_001940D6 &= 191;
             return;
         }

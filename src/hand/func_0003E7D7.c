@@ -5,7 +5,7 @@ extern signed char text_buffer[];
 extern char qrc_name[];
 extern char D_001910EC[];
 extern int text_rsc_file;
-extern char *text_rsc_load(int, int, int);
+extern char *text_rsc_load(short, unsigned short, short);
 extern int disk_open_data(char *);
 extern void close(int);
 extern void mc_memcpy(char *, char *, int, char *, int, int);

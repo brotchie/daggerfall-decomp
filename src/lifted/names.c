@@ -38,12 +38,12 @@ extern signed char input_digits_only;
 
 extern int faction_find(short);
 extern struct record *quest_find_site_for_building(struct building *);
-extern int disk_open_data(int);
-extern int guild_find_membership_by_kind(unsigned char);
+extern int disk_open_data(char *);
+extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
 extern int name_generate_seeded(unsigned char, unsigned char, int);
-extern int name_generate_surname(unsigned char, unsigned char);
-extern int inpstr_edit(int, short, short, short, short, short);
+extern char *name_generate_surname(unsigned char, unsigned char);
+extern int inpstr_edit(char *, short, short, short, short, short);
 extern int rand();
 extern int srand();
 extern int close();
@@ -57,7 +57,7 @@ extern int strchr();
 extern int xn_kbd_flush();
 extern void parse_expand(int, int);
 extern void parse_rsc_text(int, int, int);
-extern void namegen_read_part(short, int);
+extern void namegen_read_part(short, short);
 int name_generate_first(unsigned char, unsigned char);
 int str_list_random(char **);
 #pragma aux mc_set_location parm routine [];
@@ -67,7 +67,7 @@ int name_generate(unsigned char bank, unsigned char female)
     char *surname;
 
     *(signed char *)namegen_name = 0;
-    namegen_file = disk_open_data((int)D_00176D8C);
+    namegen_file = disk_open_data(D_00176D8C);
     lseek((int)(short)namegen_file, ((int)(unsigned char)bank) * 48, 0);
     read((int)(short)namegen_file, (int)namegen_part_offsets, 48);
     mc_strncpy((int)namegen_name, name_generate_first((int)(unsigned char)bank, (int)(unsigned char)female), 40, (int)D_00176D98, 90);
@@ -286,6 +286,6 @@ void input_edit_number_box(char *text, short x, int y, short width, short height
 {
     xn_kbd_flush();
     input_digits_only = 1;
-    inpstr_edit((int)text, (int)(short)x, (int)(short)*(short *)&y, (int)(short)width, (int)(short)height, (int)(short)max_length);
+    inpstr_edit(text, (int)(short)x, (int)(short)*(short *)&y, (int)(short)width, (int)(short)height, (int)(short)max_length);
     input_digits_only = 0;
 }

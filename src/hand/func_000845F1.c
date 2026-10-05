@@ -7,7 +7,7 @@ extern struct location *current_location;
 extern struct settings *game_settings;
 extern signed char current_region;
 extern struct flat_cfg *flats_cfg_find(int);
-extern struct record *rmb_make_light(struct record *, int, short);
+extern struct record *rmb_make_light(struct record *, int, int);
 extern struct record *rmb_make_marker(struct record *, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 

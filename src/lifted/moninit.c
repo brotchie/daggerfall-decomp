@@ -29,9 +29,9 @@ extern struct spell *spell_records;
 extern struct character *player_character;
 extern int save_file_handle;
 
-extern struct record *monster_make_item(struct record *, unsigned short, int, int, int, int);
+extern struct record *monster_make_item(struct record *, int, int, int, int, int);
 extern int rand_range(int, int);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int rand();
 extern int mc_free();
@@ -44,7 +44,7 @@ extern void item_damage(struct record *, int);
 extern void poison_init_record(struct disease *, int);
 extern void monster_init(struct record *, int);
 extern void monster_reload_anim_cb(struct record *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 void monster_give_spells(struct record *, char *);
 void monster_give_equipment(struct record *, struct character *, int);
 void monster_poison_weapon(struct record *);
@@ -61,8 +61,8 @@ void monster_reload_anims(void)
             }
         }
     }
-    object_foreach(location_object, (int)monster_reload_anim_cb);
-    object_foreach(nonworld_root, (int)monster_reload_anim_cb);
+    object_foreach(location_object, monster_reload_anim_cb);
+    object_foreach(nonworld_root, monster_reload_anim_cb);
 }
 
 int monster_roll_d8_health(int dice_count, int bonus)
@@ -297,7 +297,7 @@ void monster_maybe_give_map(struct record *monster, int mobile_id)
     item_make(27, 8, item_data);
 }
 
-int savetree_read_chunk(char *buffer)
+int savetree_read_chunk(struct record *buffer)
 {
     int size;
 

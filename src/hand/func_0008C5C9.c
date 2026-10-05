@@ -11,7 +11,7 @@ extern short text_cursor_x;
 extern short text_cursor_y;
 extern short inpstr_cursor;
 extern void text_draw(int, unsigned short, unsigned short);
-extern unsigned char inpstr_read_key(void);
+extern int inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
 extern short inpstr_text_width(int, short);
 extern void mc_strncpy(int, char *, int, char *, int);

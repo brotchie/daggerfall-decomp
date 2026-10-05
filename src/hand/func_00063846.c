@@ -20,7 +20,7 @@ extern unsigned char player_on_ground;
 extern struct vec3 D_00196D54;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move_request *, int);
-extern void object_delete(struct record *);
+extern struct record *object_delete(struct record *);
 extern int abs(int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern int xn_math_approx_dist2d(int, int, int, int);

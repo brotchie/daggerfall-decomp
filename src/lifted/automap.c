@@ -79,21 +79,21 @@ extern struct record *quest_event_object;
 extern signed char cfg_show_markers;
 
 extern int engine_pick_object(int, int, struct pick_result *);
-extern int town_note_at(short, short);
+extern int town_note_at(int, int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
-extern int disk_write_arena2_file(int, int, int);
-extern int disk_open_data(int);
-extern int disk_file_exists(int);
-extern int guild_find_membership_by_kind(unsigned char);
+extern int disk_read_file(char *, int);
+extern int disk_write_arena2_file(char *, int, int);
+extern int disk_open_data(char *);
+extern int disk_file_exists(char *);
+extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern struct building *object_building(struct record *);
-extern int automap_draw_object_cb(int);
+extern int automap_draw_object_cb(struct record *);
 extern int location_contains(int, int);
 extern char *building_name(struct building *);
-extern int inpstr_edit(int, short, short, short, short, short);
-extern int object_free_single(struct record *);
+extern int inpstr_edit(char *, short, short, short, short, short);
+extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_find_by_id(struct record *, int);
 extern int object_new_id(int);
 extern struct record *marker_find_first(struct record *, int);
@@ -136,15 +136,15 @@ extern void automap_add_note(struct record *, char *);
 extern void town_map_open(void);
 extern void town_map_scroll(int);
 extern void town_note_add(char *);
-extern void quest_set_state(struct quest *, struct qbn_op *, int);
+extern void quest_set_state(struct quest *, struct qbn_op *, short);
 extern void quest_set_arg_state(struct quest *, struct qbn_op *, int, int);
-extern void qaction_place_foe(struct qbn_op *, int);
+extern void qaction_place_foe(struct qbn_op *, struct qbn_place *);
 extern void text_draw(char *, int, int);
 extern void hud_draw_heading_strip(int);
 extern void text_draw_coloured(char *, int, int, int, unsigned char);
 extern void world_collect_objects(void);
 extern void building_grant_access(struct building *, unsigned char, int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 int automap_move_forward(int);
 int automap_move_back(int);
 int automap_move_left(int);
@@ -197,8 +197,8 @@ void automap_open(void)
     D_0019629F = 1;
     saved_screen_active = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
-    *(int *)scratch_190de4 = disk_read_file((int)D_00170794, 0);
-    D_00190E18 = disk_read_file((int)D_001707A1, 0);
+    *(int *)scratch_190de4 = disk_read_file(D_00170794, 0);
+    D_00190E18 = disk_read_file(D_001707A1, 0);
     *(int *)scratch_190be4 = player_object->x;
     scratch_190be8 = player_object->y;
     scratch_190bec = player_object->z;
@@ -266,7 +266,7 @@ void automap_open(void)
     } else {
         xn_cam_set_view_window(160, 77, 160, 77);
     }
-    object_foreach(location_object, (int)func_00028F8B);
+    object_foreach(location_object, func_00028F8B);
     func_00028DFD();
     D_00196272 = *(signed char *)&saved_screen_active;
     cfg_show_markers = *(signed char *)&saved_show_markers;
@@ -304,7 +304,7 @@ int automap_button_note_line(void)
     } else {
         mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 215, 160);
     }
-    inpstr_edit((int)text_buffer, 2, 191, 300, 9, 50);
+    inpstr_edit(text_buffer, 2, 191, 300, 9, 50);
     if (D_00196DAC != 0 && scratch_190de8 != 0) automap_delete_note();
     if (text_buffer[0] != 0) automap_add_note(D_00196DB0, (char *)text_buffer);
     D_00196DAC = automap_find_note(D_00196DB0);
@@ -365,9 +365,9 @@ void automap_render(void)
     xn_mat_transform_transposed_ptr((int)&light_x, (int)&light_y, (int)&light_z, (int)xn_cam_rotation);
     xn_light_add(light_x, light_y, light_z, 28, 0, 8);
     if (((int)player_environment) == 3) {
-        object_foreach(location_object, (int)automap_draw_object_cb);
+        object_foreach(location_object, automap_draw_object_cb);
     } else {
-        object_foreach(player_object->parent->children, (int)automap_draw_object_cb);
+        object_foreach(player_object->parent->children, automap_draw_object_cb);
     }
     player_motion_flags &= 254;
     overflow = xn_render_frame(2);
@@ -497,7 +497,7 @@ void automap_find_record(void)
 
     found_object = (struct record *)((*(int *)&D_00196DA0 = 0));
     if (player_entity == 0) return;
-    object_foreach(player_entity->children, (int)automap_match_record);
+    object_foreach(player_entity->children, automap_match_record);
     if (found_object == 0) {
         object = object_create_child(player_entity, 0, 10240);
         object->type = 51;
@@ -652,7 +652,7 @@ void func_00028210(char *text)
     } else {
         mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 811, 160);
     }
-    inpstr_edit((int)text_buffer, 2, 191, 300, 9, 50);
+    inpstr_edit(text_buffer, 2, 191, 300, 9, 50);
 }
 
 void town_note_delete(int index)
@@ -775,8 +775,8 @@ void town_map_note_building(struct record *object, struct building *building)
     mc_memset((int)scratch_buffer, 0, 50000, (int)D_001707AE, 963, 4);
     mc_set_location(964, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    if (disk_file_exists((int)text_buffer) != 0) {
-        disk_read_file((int)text_buffer, (int)scratch_buffer);
+    if (disk_file_exists(text_buffer) != 0) {
+        disk_read_file(text_buffer, (int)scratch_buffer);
         *(int *)scratch_buffer = game_minutes;
         mc_memcpy((int)scratch_buffer, (int)scratch_buffer, 50000, (int)D_001707AE, 970, 4);
         if (town_note_exists(name) != 0) return;
@@ -793,7 +793,7 @@ void town_map_note_building(struct record *object, struct building *building)
     town_note_add(name);
     mc_set_location(986, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    disk_write_arena2_file((int)text_buffer, (int)scratch_buffer, town_notes_size());
+    disk_write_arena2_file(text_buffer, (int)scratch_buffer, town_notes_size());
 }
 
 void automap_draw_block_overview(void)
@@ -835,7 +835,7 @@ void automap_save(void)
     mc_memcpy((int)(scratch_buffer + 4), (int)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
     mc_set_location(1056, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707E4, location_object->id >> 16);
-    disk_write_arena2_file((int)text_buffer, (int)scratch_buffer, 10244);
+    disk_write_arena2_file(text_buffer, (int)scratch_buffer, 10244);
 }
 
 void automap_load(void)
@@ -846,7 +846,7 @@ void automap_load(void)
     mc_memset((int)scratch_buffer, 0, 50000, (int)D_001707AE, 1066, 4);
     mc_set_location(1067, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707E4, location_object->id >> 16);
-    handle = disk_open_data((int)text_buffer);
+    handle = disk_open_data(text_buffer);
     if (handle == (-1)) return;
     read(handle, (int)scratch_buffer, 50000);
     close(handle);
@@ -879,7 +879,7 @@ void func_00028DDB(struct record *object)
 
 void func_00028DFD(void)
 {
-    object_foreach(location_object, (int)func_00028DDB);
+    object_foreach(location_object, func_00028DDB);
 }
 
 void func_00028EAA(void)
@@ -902,7 +902,7 @@ void func_00028ED1(struct record *object)
 void automap_restore_seen(void)
 {
     if ((int)D_00196DA0 == 0) automap_find_record();
-    object_foreach(location_object, (int)func_00028ED1);
+    object_foreach(location_object, func_00028ED1);
 }
 
 void func_00028F8B(struct record *object)

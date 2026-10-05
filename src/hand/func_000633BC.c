@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000633BC */
 #include "records.h"
 
-extern void sound_play(int, struct record *, int);
+extern int sound_play(int, struct record *, int);
 extern int rand(void);
 
 void monster_play_sound(struct record *monster, int dist)

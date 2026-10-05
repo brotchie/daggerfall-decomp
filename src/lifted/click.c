@@ -123,29 +123,29 @@ extern int D_001A4FD4;
 
 extern int lockpick_action_door(struct building *, int, struct record *);
 extern int furniture_is_container(int);
-extern struct faction *faction_find_type_in_region(int, short);
+extern struct faction *faction_find_type_in_region(short, short);
 extern struct faction *faction_find(short);
-extern int tavern_open(int);
+extern int tavern_open(short);
 extern int climate_category(void);
 extern int collide_line_of_sight(struct record *, struct record *);
 extern int quest_event_clicked_faction(unsigned short);
-extern int func_00031843(int, struct record *, struct record *);
+extern int func_00031843(short, struct record *, struct record *);
 extern int list_popup_poll(void);
 extern int pedestrian_spawn_spot_ok(struct record *, int, int);
 extern struct record *item_add_to_container(struct record *, int, int, int);
 extern int building_is_open(struct building *);
 extern int quest_raise_event();
 extern int quest_pick_file();
-extern int func_0004CD80(int);
+extern int func_0004CD80(struct person *);
 extern int npc_talk_record_build(struct record *);
 extern int func_000612A1(void);
-extern int ai_angle_diff(int, int, int);
+extern int ai_angle_diff(int, int, int *);
 extern int sound_play(int, struct record *, int);
 extern int sound_play_at_point(int, int, int, int, int);
 extern int bank_open(int);
-extern int disk_read_file(int, int);
-extern int guild_find_membership_by_kind(unsigned char);
-extern int guild_find_membership_by_bits(unsigned char);
+extern int disk_read_file(char *, int);
+extern struct membership *guild_find_membership_by_kind(unsigned char);
+extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int spawn_point_fits(struct record *);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
@@ -153,10 +153,10 @@ extern struct building *object_building(struct record *);
 extern int location_contains(int, int);
 extern int npc_display_name(struct record *);
 extern int building_name(struct building *);
-extern int object_delete(int);
-extern int object_detach(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_detach(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
 extern struct record *object_find_type(struct record *, int);
 extern int object_new_id(int);
 extern int inventory_open(int, int, int);
@@ -182,33 +182,33 @@ extern int xn_terrain_height_at();
 extern void pickpocket_attempt(struct record *);
 extern void talk_start(struct record *);
 extern void rumor_show_local(void);
-extern void daedra_summon(int);
+extern void daedra_summon(struct record *);
 extern void town_map_note_building(struct record *, struct building *);
 extern void automap_save(void);
 extern void automap_load(void);
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern void guards_summon(int);
 extern void quest_pick_for_npc(struct record *);
 extern void book_open(short);
-extern void cast_spell_on(int, struct record *, int);
+extern void cast_spell_on(struct record *, struct record *, int);
 extern void item_make(int, int, struct item *);
 extern void shelf_stock_items(struct record *, int, int);
-extern void loot_generate(int, struct record *, int, unsigned short);
+extern void loot_generate(int, struct record *, int, int);
 extern void loot_fill_container(struct record *);
 extern void guild_service_dispatch(struct record *);
 extern void door_try_open(struct record *, int);
-extern void book_read_header(char *, unsigned short);
+extern void book_read_header(char *, int);
 extern void pick_up_item(struct record *);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void hud_status_set(int);
 extern void list_popup_open_strings(char *);
 extern void msgbox_yes_no_rsc(int);
 extern void dungeon_load(int);
-extern void location_unload(unsigned short);
+extern void location_unload(int);
 extern void building_enter(struct building *);
 extern void building_exit(void);
 extern void object_free_children(struct record *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern void inventory_open_container(struct record *, int, int);
 extern void ladder_climb(void);
 int shelf_collect_items(struct record *, int, int);
@@ -368,14 +368,14 @@ void shelf_open(struct record *shelf, struct building *shelf_building, int model
         return;
     case 11:
         if (guild_find_membership_by_kind(1) == 0) {
-            msgbox_show_string((int)D_0017622D, 1);
+            msgbox_show_string(D_0017622D, 1);
             return;
         }
         shelf_open_books(shelf, shelf_building, model_index);
         return;
     case 14:
         if (guild_find_membership_by_bits(128) == 0) {
-            msgbox_show_string((int)D_00176255, 1);
+            msgbox_show_string(D_00176255, 1);
             return;
         }
         shelf_open_books(shelf, shelf_building, model_index);
@@ -607,7 +607,7 @@ void npc_click_service(struct record *npc)
             }
         }
     }
-    if (npc->quest_id == 0 && func_0004CD80((int)person) != 0) return;
+    if (npc->quest_id == 0 && func_0004CD80(person) != 0) return;
     if (person->faction_id != 0 && person->faction_id != 65535 && faction_find((int)(short)person->faction_id)->type == 8) {
         coven_menu_open(1);
         return;
@@ -733,7 +733,7 @@ void count_items_cb(struct record *object)
 int object_count_items(struct record *container)
 {
     *(int *)scratch_190be4 = 0;
-    object_foreach(container->children, (int)count_items_cb);
+    object_foreach(container->children, count_items_cb);
     return *(int *)scratch_190be4;
 }
 
@@ -742,7 +742,7 @@ int repair_menu_open(int opening)
     if (((int)(unsigned char)game_mode) == 26) return 1;
     if (opening != 0) {
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        window_image = disk_read_file((int)D_001762DD, 0);
+        window_image = disk_read_file(D_001762DD, 0);
         game_mode = 26;
         D_00196272 = 1;
         return 1;
@@ -805,7 +805,7 @@ int coven_menu_open(int opening)
     if (((int)(unsigned char)game_mode) == 27) return 1;
     if (opening != 0) {
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        window_image = disk_read_file((int)D_001762EA, 0);
+        window_image = disk_read_file(D_001762EA, 0);
         game_mode = 27;
         D_00196272 = 1;
         return 1;
@@ -853,7 +853,7 @@ void coven_menu_talk(void)
 void coven_menu_summon(void)
 {
     coven_menu_close();
-    daedra_summon((int)coven_menu_npc);
+    daedra_summon(coven_menu_npc);
 }
 
 void click_item(struct pick_result *unused, struct record *object)
@@ -913,8 +913,8 @@ void click_creature(struct pick_result *unused, struct record *monster)
     character = &monster->data.character;
     creature_class = &character->career;
     if ((int)spell_ready_touch != 0 && pick_distance < 160) {
-        cast_spell_on((int)spell_ready_touch, monster, 0);
-        object_delete((int)spell_ready_touch);
+        cast_spell_on(spell_ready_touch, monster, 0);
+        object_delete(spell_ready_touch);
         spell_ready_touch = 0;
     }
     switch (interaction_mode) {
@@ -1153,7 +1153,7 @@ int service_menu_open(int label)
     if (label != 0) {
         service_menu_label = label;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        window_image = disk_read_file((int)D_00176322, 0);
+        window_image = disk_read_file(D_00176322, 0);
         game_mode = 28;
         D_00196272 = 1;
         return 1;
@@ -1320,7 +1320,7 @@ int spawn_point_visible(struct record *object)
     if (D_0019629D != 0) return 0;
     if (collide_line_of_sight(player_object, object) == 0) return 0;
     bearing = xn_math_angle_to_point(player_object->x, player_object->z, object->x, object->z);
-    angle_diff = ai_angle_diff(object->yaw, bearing, (int)&direction);
+    angle_diff = ai_angle_diff(object->yaw, bearing, &direction);
     return ((angle_diff < 400) ? 1 : 0);
 }
 
@@ -1400,7 +1400,7 @@ void spawn_point_occupied_cb(struct record *object)
 int spawn_point_occupied(struct record *object)
 {
     scratch_object = object;
-    object_foreach(location_object, (int)spawn_point_occupied_cb);
+    object_foreach(location_object, spawn_point_occupied_cb);
     return (((int)scratch_object == 0) ? 1 : 0);
 }
 

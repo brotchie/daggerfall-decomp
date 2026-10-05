@@ -66,13 +66,13 @@ extern void *quest_section(struct quest *, int);
 extern int guards_are_present(void);
 extern struct flat_cfg *flats_cfg_find(int);
 extern int sound_play(int, struct record *, int);
-extern int disk_open_data(int);
+extern int disk_open_data(char *);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int spfx_resist_roll(int, int, struct character *, struct career *, int, int);
 extern int name_generate_seeded(unsigned char, unsigned char, int);
 extern int building_name(struct building *);
-extern int object_free_single(struct record *);
+extern struct record *object_free_single(struct record *);
 extern int rand();
 extern int close();
 extern int read();
@@ -91,8 +91,8 @@ extern void monster_wake_all(void);
 extern void damage_namira_reflect(struct record *, struct record *, int);
 extern void skill_add_uses(int, int);
 extern void crime_guards_or_court(int);
-extern void parse_expand(int, int);
-extern void quest_raise_event(int, struct record *, struct record *);
+extern void parse_expand(unsigned char *, char *);
+extern void quest_raise_event(short, struct record *, struct record *);
 extern void spell_break_concealment(struct record *);
 extern void item_wear_from_hit(struct record *, int);
 extern void item_damage(struct record *, int);
@@ -141,13 +141,13 @@ int quest_symbol_text(int symbol, int form, int second_symbol)
                         book_header = *(char **)&D_00147954 + 90000;
                         mc_set_location(115, (int)D_001708F0);
                         mc_sprintf((int)text_buffer, (int)D_001708F7, (int)(unsigned short)(short)text_macro_item->message);
-                        book_file = disk_open_data((int)text_buffer);
+                        book_file = disk_open_data(text_buffer);
                         read(book_file, book_header, 234);
                         close(book_file);
                         mc_strncpy((int)text_rsc_buffer, book_header, 2048, (int)D_001708F0, 119);
                         return (int)text_rsc_buffer;
                     }
-                    parse_expand((int)D_00170909, (int)D_00190B44);
+                    parse_expand(D_00170909, D_00190B44);
                     return (int)D_00190B44;
                 }
             }

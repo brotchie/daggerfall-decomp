@@ -13,7 +13,7 @@ extern void msgbox_show_quest_text(struct quest *, short, int);
 extern void msgbox_show_rsc(int, int);
 extern void msgbox_yes_no_quest(short);
 
-void quest_show_message(struct quest *quest, short message)
+void quest_show_message(struct quest *quest, int message)
 {
     D_0012B508 = 144;
     D_001940D5 &= 254;

@@ -4,8 +4,8 @@
 #include "records.h"
 
 
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
 extern void item_make_random(unsigned short, struct item *);
 extern void item_make(int, int, struct item *);
 

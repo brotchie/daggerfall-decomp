@@ -34,7 +34,7 @@ extern int sound_play(int, struct record *, int);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
-extern void location_place_player_at_edge(int);
+extern void location_place_player_at_edge(unsigned int);
 extern void map_goto_location(int, int, int, int);
 extern void travel_button_exit(int);
 extern void func_0009BE38(void);

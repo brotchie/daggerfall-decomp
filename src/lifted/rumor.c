@@ -1,3 +1,4 @@
+#include "records.h"
 /* rumor.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
@@ -16,7 +17,7 @@ extern signed char text_buffer[];
 extern int marquee_x;
 extern int marquee_text;
 
-extern int faction_random_of_type(unsigned char);
+extern struct faction *faction_random_of_type(unsigned char);
 extern int font_char_width(unsigned char);
 extern int rand_range(int, int);
 extern int mc_free();

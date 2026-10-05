@@ -5,7 +5,7 @@ extern char D_00170D5C[];
 extern struct text_rsc_entry *scratch_buffer;
 extern int text_rsc_file;
 extern char text_missing_ok;
-extern char *text_expand_wrap(unsigned short, short, unsigned char *, char *, char *);
+extern char *text_expand_wrap(unsigned short, short, char *, char *, char *);
 extern int rand(void);
 extern int lseek(int, int, int);
 extern char *mc_malloc(int, char *, int);

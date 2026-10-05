@@ -52,7 +52,7 @@ extern char model_heap[];
 extern signed char D_001A949C;
 extern signed char model_cache_flush_count;
 
-extern int archive_find_record(int, int, int);
+extern int archive_find_record(int, char *, int);
 extern int archive_record_size(int, int);
 extern int archive_read_record(int, int, int);
 extern int collide_floor_height(struct record *);
@@ -61,7 +61,7 @@ extern int sound_play_at_point(int, int, int, int, int);
 extern int mem_pool_alloc(int, int);
 extern int mem_pool_release(int);
 extern int rand_range(int, int);
-extern int model_get(unsigned short, int, int);
+extern int model_get(int, int, int);
 extern int flat_table_pick(int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int dpmi_lock_region(int, int);
@@ -89,7 +89,7 @@ extern void rotate_xz(int *, int *, int);
 extern void rmb_add_doors(struct record *, int);
 extern void rmb_add_people(struct record *, int);
 extern void rmb_add_editor_marker(struct record *, struct block_flat *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 struct record *rmb_add_subrecord(struct record *);
 int model_load(int, int);
 int model_cache_add(int);
@@ -301,7 +301,7 @@ int model_load(int slot, int key)
     int model_id;
 
     model_id = key & 131071;
-    record = archive_find_record(arch3d_bsa, (int)text_buffer, model_id);
+    record = archive_find_record(arch3d_bsa, text_buffer, model_id);
     size = archive_record_size(arch3d_bsa, record);
     if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((int)model_heap, size)) == 0) {
         if (model_cache_flush_count == 0) {
@@ -522,7 +522,7 @@ int sound_cache_load(int id)
     }
     slot = 0;
     while (sound_cache[slot].data != 0) slot++;
-    record = archive_find_record(dagger_snd, (int)D_001910AC, id);
+    record = archive_find_record(dagger_snd, D_001910AC, id);
     size = archive_record_size(dagger_snd, record);
     sound_cache[slot].last_frame = *(int *)frame_counter;
     sound_cache[slot].id = id;
@@ -647,7 +647,7 @@ void model_unlink_object_cb(struct record *object)
 void model_unlink_objects(int model)
 {
     *(int *)scratch_190de4 = model;
-    object_foreach(location_object, (int)model_unlink_object_cb);
+    object_foreach(location_object, model_unlink_object_cb);
 }
 
 int flat_random_clutter(int environment, int building_type)

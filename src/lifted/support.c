@@ -112,18 +112,18 @@ extern short D_001A5A54;
 extern int tavern_room_rented(void);
 extern int monster_despawn_to_marker(struct record *);
 extern int place_spawn_from_marker(struct record *);
-extern struct record *item_add_to_container(int, int, int, int);
+extern struct record *item_add_to_container(struct record *, int, int, int);
 extern int object_weight(struct record *);
 extern int spell_missile_update(struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int location_contains(int, int);
 extern int building_name(struct building *);
 extern int picklist_poll(struct picklist *);
-extern int object_free_single(struct record *);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
-extern int object_find(struct record *, int);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
+extern int object_find(struct record *, int (*)());
 extern struct record *object_find_by_id(struct record *, int);
 extern int object_new_id(int);
 extern int rand();
@@ -146,17 +146,17 @@ extern int xn_tex_cache_lookup_image();
 extern int xn_tex_cache_flush();
 extern int xn_kbd_read_key();
 extern int xn_draw_image();
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern void msgbox_show_quest_text(struct quest *, short, int);
 extern void msgbox_show_rsc(int, int);
 extern void holiday_announce(void);
 extern void cast_spell_on(int, int, int);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
-extern void detect_consider_creature(struct record *, unsigned short);
+extern void detect_consider_creature(struct record *, int);
 extern void func_0007E815(struct record *, void (*)());
-extern void func_0007F0F3(short);
-extern void marker_make_clutter(struct record *, int);
+extern void func_0007F0F3(int);
+extern void marker_make_clutter(struct record *, struct building *);
 extern void marker_make_loot_pile(struct record *, int);
 extern void inpstr_begin_number(int);
 extern void picklist_init(int, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
@@ -164,10 +164,10 @@ extern void picklist_add(int, int, int);
 extern void picklist_free(struct picklist *);
 extern void picklist_draw(struct picklist *, int);
 extern void object_free_children(struct record *);
-extern void object_foreach_pre(struct record *, int);
-extern void object_foreach(struct record *, int);
-extern void object_foreach_skip_player(struct record *, int);
-extern void object_foreach_open(struct record *, int);
+extern void object_foreach_pre(struct record *, void (*)());
+extern void object_foreach(struct record *, void (*)());
+extern void object_foreach_skip_player(struct record *, void (*)());
+extern void object_foreach_open(struct record *, void (*)());
 int hud_message_add(char *);
 int picklist_frame(struct picklist *);
 struct building *object_building(struct record *);
@@ -342,7 +342,7 @@ void size_fit(short *width, short *height, short max_width, short max_height)
 
 void list_popup_open_strings(char *strings)
 {
-    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file((int)D_00176A1A, 0);
+    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file(D_00176A1A, 0);
     D_00195F40 = 160 - (list_popup_image->width >> 1);
     D_00195F3E = 100 - (list_popup_image->height >> 1);
     D_00195F42 = list_popup_image->width;
@@ -357,7 +357,7 @@ void list_popup_open_strings(char *strings)
 
 void list_popup_open(char **strings)
 {
-    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file((int)D_00176A1A, 0);
+    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file(D_00176A1A, 0);
     D_00195F40 = 160 - (list_popup_image->width >> 1);
     D_00195F3E = 100 - (list_popup_image->height >> 1);
     D_00195F42 = list_popup_image->width;
@@ -479,7 +479,7 @@ void world_collect_object(struct record *object)
             if (((int)player_environment) == 3) {
                 marker_make_clutter(object, 0);
             } else if (((int)player_environment) == 2 && current_building->type >= 17 && current_building->type <= 20) {
-                marker_make_clutter(object, (int)current_building);
+                marker_make_clutter(object, current_building);
             }
             break;
         case 17:
@@ -519,7 +519,7 @@ void world_collect_objects(void)
     grid_visit_func = object_foreach_pre;
     if (((int)player_environment) < 3) {
         if (player_object->parent->type != 1) {
-            object_foreach_pre(player_object->parent->children, (int)world_collect_object);
+            object_foreach_pre(player_object->parent->children, world_collect_object);
         } else {
             grid_visit_func = object_foreach_open;
             town_grid_visit_near(player_object, world_collect_object);
@@ -529,7 +529,7 @@ void world_collect_objects(void)
             next_object = object->next;
             if (object->type != 38) {
                 if (object->children != 0) {
-                    object_foreach_open(object->children, (int)world_collect_object);
+                    object_foreach_open(object->children, world_collect_object);
                 }
                 world_collect_object(object);
             }
@@ -541,7 +541,7 @@ void world_collect_objects(void)
         while (object != 0) {
             next_object = object->next;
             if (object->type != 47) {
-                object_foreach_open(object->children, (int)world_collect_object);
+                object_foreach_open(object->children, world_collect_object);
                 world_collect_object(object);
             }
             object = next_object;
@@ -574,7 +574,7 @@ void msgbox_prompt_number(int number, char *prompt)
     mc_sprintf((int)text, (int)D_00176A27, prompt);
     text[strlen(text) + 1] = 0;
     inpstr_begin_number(number);
-    msgbox_show_string((int)text, 2);
+    msgbox_show_string(text, 2);
 }
 
 void msgbox_prompt_number_rsc(int number, int text_id)
@@ -794,7 +794,7 @@ void func_0007F093(struct record *object)
 
 void func_0007F0C9(void)
 {
-    object_foreach(player_entity->children, (int)func_0007F093);
+    object_foreach(player_entity->children, func_0007F093);
 }
 
 void gold_add(int amount)
@@ -822,7 +822,7 @@ void gold_spend(int amount)
     }
     free_later_count = 0;
     *(int *)D_00195B84 = amount;
-    object_find(player_entity->children, (int)gold_spend_credit_cb);
+    object_find(player_entity->children, gold_spend_credit_cb);
     object_free_pending();
     if (*(int *)D_00195B84 == 0) return;
     player_character->gold -= *(int *)D_00195B84;
@@ -848,7 +848,7 @@ void gold_sum_credit_cb(struct record *object)
 int gold_total(void)
 {
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity->children, (int)gold_sum_credit_cb);
+    object_foreach(player_entity->children, gold_sum_credit_cb);
     return *(int *)D_00195B84 + player_character->gold;
 }
 
@@ -887,7 +887,7 @@ int gold_spend_credit_cb(struct record *object)
 struct record *gold_find_credit(int amount)
 {
     *(int *)D_00195B84 = amount;
-    object_find(player_entity->children, (int)gold_find_credit_cb);
+    object_find(player_entity->children, gold_find_credit_cb);
     return found_object;
 }
 
@@ -895,7 +895,7 @@ void gold_make_credit_letter(int amount)
 {
     struct record *letter;
 
-    letter = item_add_to_container((int)D_001959E0, 27, 2, 0);
+    letter = item_add_to_container(D_001959E0, 27, 2, 0);
     letter->data.item.value = amount;
 }
 
@@ -924,7 +924,7 @@ void gold_delete_credit_cb(struct record *object)
 void gold_remove_all(void)
 {
     player_character->gold = 0;
-    object_foreach(player_entity->children, (int)gold_delete_credit_cb);
+    object_foreach(player_entity->children, gold_delete_credit_cb);
 }
 
 void func_0007F671(void)
@@ -984,7 +984,7 @@ void location_restore_stored(void)
     struct record *next_stored;
 
     if (((int)player_environment) == 3) return;
-    object_foreach_skip_player(repair_container->children, (int)restore_repair_item_cb);
+    object_foreach_skip_player(repair_container->children, restore_repair_item_cb);
     if (room_storage_container != 0 && room_storage_container->children != 0) {
         stored = room_storage_container->children;
         while (stored != 0) {
@@ -996,12 +996,12 @@ void location_restore_stored(void)
             }
             stored = next_stored;
         }
-        object_foreach_skip_player(room_storage_container->children, (int)func_0007FD7E);
+        object_foreach_skip_player(room_storage_container->children, func_0007FD7E);
     }
     if (house_container != 0 && player_character->house != 0 && (((unsigned)player_character->house) >> 16) == (((unsigned)location_object->id) >> 16)) {
-        object_foreach_skip_player(house_container->children, (int)func_0007FEB9);
+        object_foreach_skip_player(house_container->children, func_0007FEB9);
     } else if (ship_container != 0 && player_character->ship_owned != 0 && ((unsigned)(((unsigned)location_object->id) >> 16)) < 1000) {
-        object_foreach_skip_player(ship_container->children, (int)func_0007FEB9);
+        object_foreach_skip_player(ship_container->children, func_0007FEB9);
     }
     D_001A59D4 = 10;
 }
@@ -1014,10 +1014,10 @@ void location_store_objects(void)
 
     if (((int)player_environment) == 3) return;
     free_later_count = 0;
-    object_foreach_skip_player(location_object->children, (int)store_repair_item_cb);
+    object_foreach_skip_player(location_object->children, store_repair_item_cb);
     if (room_storage_container != 0) {
         scratch_object = room_storage_container;
-        object_foreach_skip_player(location_object, (int)func_0007FCBF);
+        object_foreach_skip_player(location_object, func_0007FCBF);
         building = current_location->buildings;
         for (building_index = 0; current_location->building_count > building_index; building_index++, building++) {
             if (building->type == 15 && ((int)(unsigned char)(building->flags & 2)) != 0 && ((unsigned)building->rent_expires) > game_minutes) {
@@ -1037,7 +1037,7 @@ void location_store_objects(void)
             house_container->flags = 3;
             house_container->container_index = 5;
         }
-        object_foreach_skip_player(object_find_by_id(location_object, player_character->house)->children, (int)func_0007FDEA);
+        object_foreach_skip_player(object_find_by_id(location_object, player_character->house)->children, func_0007FDEA);
     } else if (player_character->ship_owned != 0 && ((unsigned)(((unsigned)location_object->id) >> 16)) < 1000) {
         object_free_children(ship_container);
         if ((*(int *)&scratch_object = (int)ship_container) == 0) {
@@ -1046,7 +1046,7 @@ void location_store_objects(void)
             ship_container->flags = 3;
             ship_container->container_index = 6;
         }
-        object_foreach_skip_player(object_find_by_id(location_object, location_object->id)->children, (int)func_0007FDEA);
+        object_foreach_skip_player(object_find_by_id(location_object, location_object->id)->children, func_0007FDEA);
     }
     object_free_pending();
 }

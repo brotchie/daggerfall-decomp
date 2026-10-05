@@ -32,7 +32,7 @@ extern struct image *D_00199638;
 
 extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int rand_range(int, int);
 extern int mc_memcpy();
 extern void sheet_place_spinner(int);
@@ -48,9 +48,9 @@ int sheet_open(short opening)
     }
     if (opening != 0 || (game_mode == 0 && key_action_held(36) != 0 && player_death_timer == 0)) {
         game_mode = 3;
-        window_image = disk_read_file((int)D_00170C40, 0);
-        D_00199638 = (struct image *)disk_read_file((int)D_00170C4D, 0);
-        D_00195B5C = (struct image *)disk_read_file((int)D_00170C5A, 0);
+        window_image = disk_read_file(D_00170C40, 0);
+        D_00199638 = (struct image *)disk_read_file(D_00170C4D, 0);
+        D_00195B5C = (struct image *)disk_read_file(D_00170C5A, 0);
         D_00196272 = 1;
         D_00195F40 = 160 - (D_00199638->width >> 1);
         D_00195F3E = 100 - (D_00199638->height >> 1);

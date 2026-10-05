@@ -10,7 +10,7 @@ extern char arena2_cd_path[];
 extern struct settings *game_settings;
 extern char *scratch_buffer;
 extern char D_001961F5[];
-extern int quest_file_list_add(unsigned char *, int);
+extern int quest_file_list_add(char *, int);
 extern int rand_range(int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
 extern int strlen(char *);

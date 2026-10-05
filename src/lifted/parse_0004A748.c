@@ -8,7 +8,7 @@ extern char D_001711A4[];
 extern signed char text_rsc_buffer[];
 extern struct quest *current_quest;
 
-extern int text_qrc_load(int, short, short, short);
+extern char *text_qrc_load(char *, short, short, short);
 extern int mc_free();
 extern int mc_strncpy();
 extern int mc_set_location(int, int);
@@ -29,7 +29,7 @@ void quest_load_text(struct quest *quest, int message_id, short flags, int width
         mc_memcpy((int)file_name, quest->name, 8, (int)D_0017110C, 2018, 13);
     }
     file_name[8] = 0;
-    text = (char *)text_qrc_load((int)file_name, (int)(short)*(short *)&message_id, (int)(short)flags, (int)(short)*(short *)&width);
+    text = (char *)text_qrc_load(file_name, (int)(short)*(short *)&message_id, (int)(short)flags, (int)(short)*(short *)&width);
     if (text == 0) return;
     mc_strncpy((int)text_rsc_buffer, text, 2048, (int)D_0017110C, 2022);
     if (text == 0 || text == (char *)0x97979797) return;

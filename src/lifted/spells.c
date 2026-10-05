@@ -56,14 +56,14 @@ extern signed char D_00199630;
 
 extern int func_00037AB7(void);
 extern int spell_effect_text_index(short);
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
-extern int disk_write_arena2_file(int, int, int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
+extern int disk_write_arena2_file(char *, int, int);
 extern int list_popup_update(void);
 extern int gold_can_afford(int);
 extern int picklist_poll(int);
-extern struct record *object_create_child(struct record *, int, int);
-extern struct record *object_find_item(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_find_item(struct record *, short, short);
 extern int object_count_type(struct record *, short);
 extern int object_new_id(int);
 extern int mc_free();
@@ -85,12 +85,12 @@ extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void keys_world_actions(void);
 extern void list_popup_open(int);
-extern void msgbox_choice_rsc(short, unsigned char, unsigned char, int, unsigned char, unsigned char, unsigned char);
+extern void msgbox_choice_rsc(short, short, short, short, unsigned char, unsigned char, unsigned char);
 extern void gold_spend(int);
 extern void inpstr_begin_text(int, short);
 extern void picklist_free(int);
 extern void picklist_draw(int, int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 int spellmaker_allowed_targets(void);
 int spellmaker_new(void);
 int spellbook_has_spell_id(unsigned char);
@@ -318,7 +318,7 @@ int spellmaker_buy(void)
     object->type = 9;
     object->id = object_new_id(100);
     mc_memcpy(&object->data.spell, (int)selected_spell, 89, (int)D_00170B13, 981, 4);
-    sound_play(206, (int)player_object, 110);
+    sound_play(206, player_object, 110);
     spellmaker_new();
     msgbox_show_rsc(1705, 1);
     return 0;
@@ -540,7 +540,7 @@ int spellbook_has_spell_id(unsigned char id)
     *(int *)scratch_object = 0;
     D_00199630 = id;
     spellbook = object_find_item(player_entity->children, 27, 0);
-    object_foreach(spellbook->children, (int)spellbook_find_id_cb);
+    object_foreach(spellbook->children, spellbook_find_id_cb);
     if (*(int *)scratch_object != 0) {
         found = 1;
     } else {
@@ -596,7 +596,7 @@ int spells_std_name_list(int ids)
     names = *(int *)scratch_buffer + 20000;
     text = *(int *)scratch_buffer + 21000;
     spells = *(struct spell **)scratch_buffer;
-    disk_read_file((int)D_00170B69, *(int *)scratch_buffer);
+    disk_read_file(D_00170B69, *(int *)scratch_buffer);
     *(int *)&i = 0;
     *(int *)&count = *(int *)&i;
     for (; ((int)(short)i) < 128; (*(int *)&i)++) {
@@ -618,7 +618,7 @@ void spells_std_delete(void)
     spell = spells_pick_list();
     if (spell == 0) return;
     spell->name[0] = 0;
-    disk_write_arena2_file((int)D_00170B69, *(int *)scratch_buffer, 11392);
+    disk_write_arena2_file(D_00170B69, *(int *)scratch_buffer, 11392);
 }
 
 void spells_std_edit(void)
@@ -629,7 +629,7 @@ void spells_std_edit(void)
     if (spell == 0) return;
     mc_memcpy((int)selected_spell, spell, 89, (int)D_00170B13, 1654, 4);
     spell->name[0] = 0;
-    disk_write_arena2_file((int)D_00170B69, *(int *)scratch_buffer, 11392);
+    disk_write_arena2_file(D_00170B69, *(int *)scratch_buffer, 11392);
 }
 
 void spells_std_append(void)
@@ -638,10 +638,10 @@ void spells_std_append(void)
 
     spell_assign_new_id();
     spell = *(struct spell **)scratch_buffer;
-    disk_read_file((int)D_00170B69, *(int *)scratch_buffer);
+    disk_read_file(D_00170B69, *(int *)scratch_buffer);
     while (spell->name[0] != 0) spell++;
     mc_memcpy(spell, (int)selected_spell, 89, (int)D_00170B13, 1667, 4);
-    disk_write_arena2_file((int)D_00170B69, *(int *)scratch_buffer, 11392);
+    disk_write_arena2_file(D_00170B69, *(int *)scratch_buffer, 11392);
     msgbox_show_rsc(1706, 1);
 }
 

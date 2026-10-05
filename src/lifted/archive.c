@@ -36,7 +36,7 @@ extern int mc_sprintf(int, ...);
 extern void skill_add_uses(int, int);
 extern void fatal_error(int);
 extern void links_trigger(struct record *, int);
-extern void guild_count_crime(int, unsigned char);
+extern void guild_count_crime(int, int);
 int lockpick_door(struct record *);
 #pragma aux mc_set_location parm routine [];
 

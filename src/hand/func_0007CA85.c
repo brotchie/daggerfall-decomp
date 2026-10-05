@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007CA85 */
 extern unsigned char text_shadow_colour;
 extern unsigned char D_0012B508;
-extern void text_draw_centred_shadow(char *, short, short);
+extern void text_draw_centred_shadow(char *, int, int);
 
 void text_draw_centred_coloured(char *text, short x, short y, short colour, int shadow)
 {

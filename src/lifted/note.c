@@ -51,11 +51,11 @@ extern signed char D_001997EB;
 extern signed char note_action;
 extern signed char note_silent;
 
-extern int sheet_open(int);
+extern int sheet_open(short);
 extern int note_text_hit_cb(int);
 extern char *note_page_walk(int, int, int);
 extern int font_text_width(char *);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int close();
 extern int mc_free();
 extern int mc_memset();
@@ -73,15 +73,15 @@ extern int strstr();
 extern int xn_mouse_set_position();
 extern int xn_font_select();
 extern int xn_draw_line_to();
-extern void msgbox_show_string(char *, int);
+extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void note_add_line(short, short, short, short);
-extern void text_draw(char *, int, int);
-extern void text_draw_centred(char *, int, int);
+extern void text_draw(char *, short, short);
+extern void text_draw_centred(char *, int, short);
 extern void text_draw_coloured(char *, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(char *, int, int, int, unsigned char);
 extern void inpstr_begin_number(int);
-extern void inpstr_begin_text(char *, short);
+extern void inpstr_begin_text(char *, int);
 int note_find_match_cb(struct note_text *);
 int note_select_text_cb(struct note_text *);
 int note_select_line_cb(struct note_line *);
@@ -304,7 +304,7 @@ void note_goto_page(int page_index)
     note_page_index = page_index;
     note_load_page();
     if (note_silent != 0) return;
-    sound_play(205, (int)player_object, 100);
+    sound_play(205, player_object, 100);
 }
 }
 
@@ -315,7 +315,7 @@ void note_prev_page(void)
     note_page_index--;
     note_reload_page();
     if (note_silent != 0) return;
-    sound_play(205, (int)player_object, 100);
+    sound_play(205, player_object, 100);
 }
 
 void note_next_page(void)
@@ -327,7 +327,7 @@ void note_next_page(void)
     if (((int)(short)note_page_index) < (((int)(short)page_count) - 1)) {
         note_page_index++;
         note_reload_page();
-        if (note_silent == 0) sound_play(205, (int)player_object, 100);
+        if (note_silent == 0) sound_play(205, player_object, 100);
         return;
     }
     if (*(signed char *)(*(char **)note_page) == 0) return;
@@ -337,7 +337,7 @@ void note_next_page(void)
     note_file_size = filelength((int)(short)note_file);
     note_page_index++;
     if (note_silent != 0) return;
-    sound_play(205, (int)player_object, 100);
+    sound_play(205, player_object, 100);
 }
 
 void note_cycle_tool(void)

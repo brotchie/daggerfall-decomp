@@ -5,7 +5,7 @@
 extern unsigned char player_environment;
 extern signed char D_00196297;
 extern char doors_moving[];
-extern void func_00063DDC(int);
+extern void func_00063DDC(struct record *);
 extern void links_trigger(struct record *, int);
 extern int sound_play(int, struct record *, int);
 

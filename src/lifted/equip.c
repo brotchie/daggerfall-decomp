@@ -76,22 +76,22 @@ extern signed char forced_material;
 extern int D_00199D74;
 
 extern int collide_line_of_sight(struct record *, struct record *);
-extern int item_add_to_container(struct record *, int, int, int);
-extern int armor_image_for_type(int, unsigned short);
+extern struct record *item_add_to_container(struct record *, int, int, int);
+extern int armor_image_for_type(int, int);
 extern int monster_set_action(struct record *, int, int);
 extern int ai_pick_ranged_spell(int);
 extern int ai_pick_touch_spell(int);
 extern int monster_cast_spell(struct record *, struct record *);
-extern int ai_angle_diff(int, int, int);
+extern int ai_angle_diff(int, int, int *);
 extern int ai_sees_through_illusion(int);
-extern int ai_stealth_check(int, unsigned short, int, unsigned short);
-extern int disk_read_file(int, int);
-extern int disk_open_data(int);
+extern int ai_stealth_check(int, int, int, int);
+extern int disk_read_file(char *, int);
+extern int disk_open_data(char *);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
 extern struct record *location_cell_at(int, int);
 extern int rand();
@@ -114,7 +114,7 @@ extern void damage_knockback_move(struct record *, struct character *);
 extern void msgbox_show_rsc(int, int);
 extern void item_init_from_template(unsigned short, short, short, struct item *);
 extern void item_make_random(unsigned short, struct item *);
-extern void loot_generate(int, struct record *, int, unsigned short);
+extern void loot_generate(int, struct record *, int, int);
 extern void item_make_magic(struct item *, int);
 extern void item_make_artifact(struct item *, int);
 extern void monster_shoot_arrow(struct record *, struct record *);
@@ -533,7 +533,7 @@ void painting_draw(void)
 
     mc_set_location(625, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758E2, (((int)(unsigned short)D_00195DC4) >> 3) + 97);
-    disk_read_file((int)text_buffer, *(int *)scratch_buffer);
+    disk_read_file(text_buffer, *(int *)scratch_buffer);
     image = *(struct image **)scratch_buffer;
     i = 0;
     frame = (int)(unsigned short)(D_00195DC4 & 7);
@@ -551,7 +551,7 @@ void item_info_painting(struct item *item)
 
     saved_seed = rand();
     D_00195DC4 = rand(srand((int)(unsigned short)(short)item->message)) % 180;
-    fd = disk_open_data((int)D_001758EE);
+    fd = disk_open_data(D_001758EE);
     lseek(fd, ((int)(unsigned short)D_00195DC4) * 40, 0);
     read(fd, *(int *)scratch_buffer, 40);
     close(fd);
@@ -584,7 +584,7 @@ void item_init_book(struct item *item, int level)
     header = *(int **)scratch_buffer;
     mc_set_location(674, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758F8, (int)(unsigned short)(short)item->message);
-    fd = disk_open_data((int)text_buffer);
+    fd = disk_open_data(text_buffer);
     read(fd, header, 234);
     close(fd);
     saved_seed = rand();
@@ -753,7 +753,7 @@ void magic_def_load(void)
 {
     int fd;
 
-    fd = disk_open_data((int)D_00175927);
+    fd = disk_open_data(D_00175927);
     read(fd, (int)magic_def_count, 4);
     magic_def = mc_malloc(filelength(fd) - 4, (int)D_001758B8, 1201);
     read(fd, magic_def, (int)&*(signed char *)((char *)filelength(fd) - 4));
@@ -949,7 +949,7 @@ void ai_creature_think(struct character *monster_char, struct record *monster, s
             monster_char->flags &= ~0x80;
         }
     }
-    angle_delta = ai_angle_diff(monster->yaw, target_angle, (int)&turn_dir);
+    angle_delta = ai_angle_diff(monster->yaw, target_angle, &turn_dir);
     distance = xn_math_approx_hypot(monster->y - target->y, xn_math_approx_dist2d(monster->x, monster->z, target->x, target->z));
     if (monster->wait_state != 0 && trespassing == 0) {
         monster_set_action(monster, target_angle, 48);
@@ -1128,7 +1128,7 @@ int ai_turn_toward(struct record *monster, int angle)
     int angle_delta;
     int turn_dir;
 
-    angle_delta = ai_angle_diff(monster->yaw, angle, (int)&turn_dir);
+    angle_delta = ai_angle_diff(monster->yaw, angle, &turn_dir);
     if (angle_delta < 64) {
         monster->yaw = angle;
         return 0;
@@ -1143,7 +1143,7 @@ void func_0006228A(struct record *monster, int unused, int angle)
     int turn_dir;
 
     angle = (angle + 1024) & 2047;
-    angle_delta = ai_angle_diff(monster->yaw, angle, (int)&turn_dir);
+    angle_delta = ai_angle_diff(monster->yaw, angle, &turn_dir);
     if (angle_delta < 32) {
         monster->yaw = angle;
         return;

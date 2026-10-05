@@ -52,7 +52,7 @@ extern char extra_spell_points[];
 extern int D_001A3AA8;
 extern double trade_haggle_asking;
 
-extern int damage_apply(struct record *, int, int);
+extern int damage_apply(struct record *, int, struct record *);
 extern int player_in_daylight(void);
 extern int player_in_temple(void);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
@@ -60,27 +60,27 @@ extern int trade_haggle_counter(int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int spfx_resist_roll(int, int, struct character *, struct career *, int, int);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern struct record *object_find_item(struct record *, int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
 extern int mc_strncpy();
 extern int strlen();
 extern int mc_memcpy();
 extern int xn_math_approx_dist2d();
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void paperdoll_draw(int, int);
 extern void item_damage(struct record *, int);
-extern void disease_toggle_memberships_cb(int);
+extern void disease_toggle_memberships_cb(struct record *);
 extern void disease_become_vampire(void);
-extern void item_enchantment_tick(struct item *, short, int);
+extern void item_enchantment_tick(struct item *, int, int);
 extern void trade_haggle_show_offer(void);
 extern void trade_counter_offer(void);
 extern void fatigue_add(int);
 extern void weapon_reload_hand_sprites(void);
 extern void mode_pop(void);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern void inv_unequip_all_saved(void);
 extern void inv_reequip_saved(void);
 int disease_is_lycanthrope(void);
@@ -363,7 +363,7 @@ void disease_cure_vampirism(void)
     player_character->skills[18].value -= 30;
     player_character->skills[30].value -= 30;
     mc_memcpy(player_class, &saved_class->data.career, 74, (int)D_00175970, 590, 4);
-    object_foreach(player_entity->children, (int)disease_toggle_memberships_cb);
+    object_foreach(player_entity->children, disease_toggle_memberships_cb);
     player_character->race = player_character->original_race;
     player_character->min_metal_to_hit = 0;
     child = object_find_item(player_entity->children, 27, 0);
@@ -507,7 +507,7 @@ void disease_lycanthrope_shapechange(int forced)
     disease = 0;
     if (forced == 0 && player_character->race < 8 && ((unsigned)(game_minutes - player_character->last_shapechange_time)) < 1200) {
         if (item_artifact_equipped(3) == 0) {
-            msgbox_show_string((int)D_0017597A, 1);
+            msgbox_show_string(D_0017597A, 1);
             return;
         }
     }

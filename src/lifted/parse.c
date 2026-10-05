@@ -167,15 +167,15 @@ extern struct membership *guild_membership;
 
 extern int talk_macro_hint(int);
 extern int talk_macro_1com(void);
-extern struct faction *faction_find_type_in_region(int, short);
+extern struct faction *faction_find_type_in_region(short, short);
 extern int faction_find(short);
 extern int text_rsc_load(int, int, int);
-extern int parse_regional_name(int, signed char);
+extern int parse_regional_name(int, int);
 extern int parse_town_building_name(short);
 extern int calendar_format_date(int, int);
-extern int item_armor_value(int);
+extern int item_armor_value(struct item *);
 extern struct flat_cfg *flats_cfg_find(int);
-extern int enchant_powers_text(int);
+extern int enchant_powers_text(struct item *);
 extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int rand_range(int, int);
 extern int object_building(int);
@@ -199,7 +199,7 @@ extern int xn_math_angle_to_point();
 extern int xn_str_copy_word();
 extern int xn_str_find_u32();
 extern void parse_expand(int, int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 int macro_dat_date(void);
 int macro_fl1_faction1_leader(void);
 int macro_pcn_player_name(void);
@@ -299,7 +299,7 @@ int macro_mod_armor_modifier(void)
     if (text_macro_item->index >= 7) {
         return parse_signed_itoa(text_macro_item->index - 6, (char *)text_rsc_buffer, 10);
     }
-    return parse_signed_itoa(item_armor_value((int)text_macro_item) / 10, (char *)text_rsc_buffer, 10);
+    return parse_signed_itoa(item_armor_value(text_macro_item) / 10, (char *)text_rsc_buffer, 10);
 }
 
 int macro_brd_regional_name(void)
@@ -1037,7 +1037,7 @@ int macro_mpw_magic_powers(void)
         parse_rsc_text(text_macro_item->enchantments[9].param + 8700, 0, 0);
         return (int)text_rsc_buffer;
     }
-    return enchant_powers_text((int)text_macro_item);
+    return enchant_powers_text(text_macro_item);
 }
 
 int macro_nh_holiday_name(void)
@@ -1821,7 +1821,7 @@ int object_weight(struct record *object)
     struct character *creature;
 
     weight_total = 0;
-    object_foreach(object->children, (int)object_weight_add);
+    object_foreach(object->children, object_weight_add);
     if (object == player_entity) {
         return (int)(((char *)weight_total) + (((unsigned)object->data.character.gold) / 100));
     }

@@ -10,7 +10,7 @@ extern void item_init_from_template(unsigned short, short, short, struct item *)
 extern void item_make_magic(struct item *, int);
 extern void item_make_artifact(struct item *, int);
 
-void item_make_in_range(short group, int min_index, int max_index, struct item *item)
+void item_make_in_range(unsigned short group, int min_index, int max_index, struct item *item)
 {
     int index;
 

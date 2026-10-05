@@ -57,12 +57,12 @@ extern short book_page;
 extern short D_00199D5E;
 extern short book_page_count;
 
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
-extern int disk_open_data(int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
+extern int disk_open_data(char *);
 extern int key_pressed_once(unsigned char);
-extern int object_free_single(struct record *);
-extern int object_delete(struct record *);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_delete(struct record *);
 extern int inventory_open(int, int, int);
 extern int close();
 extern int mc_free();
@@ -74,8 +74,8 @@ extern int mc_sprintf(char *, ...);
 extern int mc_memcpy();
 extern int xn_font_draw_string();
 extern int xn_draw_image_transparent();
-extern void msgbox_show_string(char *, int);
-extern void book_draw_page(short);
+extern void msgbox_show_string(char *, short);
+extern void book_draw_page(int);
 extern void text_draw_centred(char *, int, int);
 extern void text_draw_coloured(char *, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(char *, int, int, int, unsigned char);
@@ -93,19 +93,19 @@ void book_open(short book_id)
 {
     mc_set_location(37, (int)D_001757A8);
     mc_sprintf((char *)text_buffer, (int)D_001757AF, (int)(short)book_id);
-    book_file = disk_open_data((int)text_buffer);
+    book_file = disk_open_data(text_buffer);
     read((int)(short)book_file, (int)book_header, 234);
     read((int)(short)book_file, (int)&book_page_count, 2);
     book_page_offsets = mc_malloc(((int)(short)book_page_count) << 2, (int)D_001757A8, 43);
     read((int)(short)book_file, book_page_offsets, ((int)(short)book_page_count) << 2);
-    window_image = disk_read_file((int)D_001757C1, 0);
+    window_image = disk_read_file(D_001757C1, 0);
     func_0005A230();
     book_page = 0;
     scratch_190d68 = 0;
     game_mode = 11;
     D_00196272 = 1;
     D_00187CA8 = 0;
-    sound_play(237, (int)player_object, 100);
+    sound_play(237, player_object, 100);
 }
 
 void book_update(void)
@@ -119,7 +119,7 @@ void book_update(void)
     if (scratch_190d68 != 0 && ((int)(unsigned char)game_mode) != 8) {
         scratch_190d68 = 0;
         if (((int)(short)book_page_count) >= *(int *)inpstr_result) {
-            sound_play(205, (int)player_object, 100);
+            sound_play(205, player_object, 100);
             book_page = *(short *)inpstr_result - 1;
         }
     }
@@ -132,7 +132,7 @@ void book_update(void)
     *(int *)&i = 0;
     for (; ((int)(short)i) < 4; (*(int *)&i)++) {
         if (mouse_x > book_buttons[(int)(short)i].x0 && mouse_x < book_buttons[(int)(short)i].x1 && mouse_y > book_buttons[(int)(short)i].y0 && mouse_y < book_buttons[(int)(short)i].y1) {
-            sound_play(203, (int)player_object, 100);
+            sound_play(203, player_object, 100);
             book_buttons[(int)(short)i].handler();
         }
     }
@@ -178,7 +178,7 @@ void func_0005A1C8(char *name)
 {
     mc_set_location(218, (int)D_001757A8);
     mc_sprintf((char *)text_buffer, (int)D_001757CE, name);
-    D_00199C2C[((int)(short)(D_00199D5E)++)] = disk_read_file((int)text_buffer, 0);
+    D_00199C2C[((int)(short)(D_00199D5E)++)] = disk_read_file(text_buffer, 0);
 }
 
 void func_0005A230(void)
@@ -209,14 +209,14 @@ void func_0005A2BE(void)
 void book_prev_page(void)
 {
     if (book_page == 0) return;
-    sound_play(205, (int)player_object, 100);
+    sound_play(205, player_object, 100);
     book_page--;
 }
 
 void book_next_page(void)
 {
     if (((int)(short)book_page) == (((int)(short)book_page_count) - 1)) return;
-    sound_play(205, (int)player_object, 100);
+    sound_play(205, player_object, 100);
     book_page++;
 }
 

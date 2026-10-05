@@ -16,7 +16,7 @@ extern void item_set_race_image(struct item *, int);
 extern void func_0005E636(struct item *);
 extern void item_roll_material(struct item *);
 extern void item_roll_armor_type(struct item *);
-extern void item_init_book(struct item *, short);
+extern void item_init_book(struct item *, int);
 extern void item_make_magic(struct item *, int);
 extern int rand_range(int, int);
 extern int rand(void);

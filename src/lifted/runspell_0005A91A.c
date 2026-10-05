@@ -11,8 +11,8 @@ extern struct character *player_character;
 
 extern int spell_cost(struct spell *, struct character *);
 extern int cast_player_spell(struct record *);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int mc_memcpy();
 

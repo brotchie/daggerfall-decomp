@@ -104,7 +104,7 @@ extern int weapon_arrow_update(struct record *);
 extern int object_draw_cb(struct record *);
 extern struct record *rmb_make_door(struct record *, short, short, int);
 extern struct record *rmb_make_flat(struct record *, short, short, int);
-extern int model_get(unsigned short, int, int);
+extern int model_get(int, int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int func_0009DA1C(int, int);
 extern int printf(int, ...);
@@ -132,10 +132,10 @@ extern void sky_apply_sunlight(void);
 extern void weapon_missile_orient(struct record *);
 extern void object_free_pending(void);
 extern void spell_cast_queued_run(void);
-extern void func_0007E815(struct record *, int);
-extern void town_grid_visit_near(struct record *, int);
+extern void func_0007E815(struct record *, void (*)());
+extern void town_grid_visit_near(struct record *, void (*)());
 extern void player_light_draw(void);
-extern void object_foreach_open(struct record *, int);
+extern void object_foreach_open(struct record *, void (*)());
 void rotate_xz(int *, int *, int);
 #pragma aux func_0009DA1C parm routine [];
 #pragma aux mc_set_location parm routine [];
@@ -274,9 +274,9 @@ void world_draw_objects(void)
             }
         }
         if (player_object->parent->type != 1) {
-            object_foreach_open(player_object->parent->children, (int)object_draw_cb);
+            object_foreach_open(player_object->parent->children, object_draw_cb);
         } else {
-            town_grid_visit_near(player_object, (int)object_draw_cb);
+            town_grid_visit_near(player_object, object_draw_cb);
         }
         block = location_object->children;
         while (block != 0) {
@@ -286,7 +286,7 @@ void world_draw_objects(void)
             if (block->type != 38) {
                 object_draw_cb(block);
                 if (((int)(unsigned short)(*(int *)&flags & 1)) == 0) {
-                    object_foreach_open(children, (int)object_draw_cb);
+                    object_foreach_open(children, object_draw_cb);
                 }
             }
             block = next;
@@ -300,7 +300,7 @@ void world_draw_objects(void)
                 xn_light_add(player_object->x, player_object->y - 60, player_object->z, 16, 128, 0);
             }
         }
-        func_0007E815(player_object, (int)object_draw_cb);
+        func_0007E815(player_object, object_draw_cb);
         block = location_object->children;
         while (block != 0) {
             next = block->next;
@@ -309,7 +309,7 @@ void world_draw_objects(void)
             if (block->type != 47) {
                 object_draw_cb(block);
                 if (((int)(unsigned short)(*(int *)&flags & 1)) == 0) {
-                    object_foreach_open(children, (int)object_draw_cb);
+                    object_foreach_open(children, object_draw_cb);
                 }
             }
             block = next;

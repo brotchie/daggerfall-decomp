@@ -33,11 +33,11 @@ extern short note_cursor_x;
 extern signed char note_tool;
 extern signed char D_001997EB;
 extern signed char note_action;
-extern int note_open_notebook(int);
+extern int note_open_notebook(short);
 extern int note_close(void);
 extern void note_click_page(void);
 extern void note_draw_page(void);
-extern void note_add_text(int);
+extern void note_add_text(char *);
 extern void note_goto_page(int);
 extern void note_prev_page(void);
 extern void note_next_page(void);
@@ -46,7 +46,7 @@ extern void note_delete_in_box(void);
 extern void note_delete_selected(void);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern int key_pressed_once(unsigned char);
-extern void inpstr_begin_text(int, short);
+extern void inpstr_begin_text(char *, int);
 extern int inpstr_update(void);
 extern int mc_memset();
 extern int itoa();
@@ -77,7 +77,7 @@ void note_update(void)
         xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(short)*(short *)note_font]));
         if (inpstr_update() != 0) {
             if (text_rsc_buffer[0] != 0 && ((int)(short)(*(short *)note_text_flags & 32)) == 0) {
-                note_add_text((int)text_rsc_buffer);
+                note_add_text(text_rsc_buffer);
             }
             if (text_rsc_buffer[0] == 0 && ((int)(short)(*(short *)note_text_flags & 32)) != 0) {
                 note_selected->text.flags |= 64;
@@ -88,7 +88,7 @@ void note_update(void)
                 note_cursor_y += font_height;
                 text_cursor_y = note_cursor_y;
                 mc_memset((int)text_rsc_buffer, 0, 81, (int)D_00174FAC, 137, 2048);
-                inpstr_begin_text((int)text_rsc_buffer, 79);
+                inpstr_begin_text(text_rsc_buffer, 79);
             } else {
                 D_001940D5 &= 251;
                 note_action = 0;

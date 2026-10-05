@@ -12,7 +12,7 @@ extern signed char D_0019995F;
 extern short D_001999AD[];
 extern short D_00199B43;
 
-extern struct faction *faction_find_type_in_region(int, short);
+extern struct faction *faction_find_type_in_region(short, short);
 extern int faction_find(short);
 extern int flats_cfg_find(int);
 extern int npc_display_name(struct record *);

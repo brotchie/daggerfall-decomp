@@ -159,35 +159,35 @@ extern short D_001AA586;
 extern signed char trade_offer_pending;
 extern signed char D_001AA5F8;
 
-extern int damage_apply(struct record *, int, int);
-extern int sheet_open(int);
-extern int spellbook_open(int);
+extern int damage_apply(struct record *, int, struct record *);
+extern int sheet_open(short);
+extern int spellbook_open(short);
 extern int key_action_held(int);
 extern int macro_kg_weight(void);
 extern int object_weight(struct record *);
 extern int holiday_today(int, int);
-extern int quest_find_by_id(int);
-extern int enchant_item_value(int);
-extern int cast_item_used_spell(short);
+extern struct quest *quest_find_by_id(int);
+extern int enchant_item_value(struct item *);
+extern int cast_item_used_spell(int);
 extern int spell_find_on_entity(int, short, int);
 extern int equip_hiding_capacity(int);
 extern struct record *monster_summon_near_player(int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
-extern int hud_message_add(int);
+extern int disk_read_file(char *, int);
+extern int hud_message_add(char *);
 extern int rand_range(int, int);
 extern int gold_can_afford(int);
 extern int carry_capacity(void);
-extern int object_free_single(struct record *);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
-extern int object_find(struct record *, int);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
+extern int object_find(struct record *, int (*)());
 extern int object_new_id(int);
-extern int inv_match_arrows(int);
+extern int inv_match_arrows(struct record *);
 extern int inv_draw_item_cell(struct record *, int, int);
-extern int trade_shop_takes_group(unsigned short);
-extern int player_to_nearest_marker(int, int);
+extern int trade_shop_takes_group(int);
+extern int player_to_nearest_marker(struct record *, int);
 extern int rand();
 extern int mc_free();
 extern int mc_memset();
@@ -209,11 +209,11 @@ extern void quest_items_release_on_close(void);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_quest_text(struct quest *, short, int);
-extern void msgbox_show_qrc_text(char *, unsigned short, int);
+extern void msgbox_show_qrc_text(char *, unsigned short, short);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
-extern void parse_expand(int, int);
-extern void quest_raise_event(int, int, int);
+extern void parse_expand(unsigned char *, char *);
+extern void quest_raise_event(short, struct record *, struct record *);
 extern void player_refresh_paperdoll(void);
 extern void book_open(short);
 extern void item_make(int, int, struct item *);
@@ -224,7 +224,7 @@ extern void poison_apply(struct record *, int, int);
 extern void weapon_reload_hand_sprites(void);
 extern void book_read_header(int, unsigned short);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
-extern void size_fit(int, int, short, short);
+extern void size_fit(short *, short *, short, short);
 extern void object_free_pending(void);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_add(int);
@@ -236,18 +236,18 @@ extern void location_set_discovered(int, int);
 extern void spell_end(int);
 extern void inpstr_begin_number(int);
 extern void object_free_children(struct record *);
-extern void object_foreach_pre(struct record *, int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach_pre(struct record *, void (*)());
+extern void object_foreach(struct record *, void (*)());
 extern void potion_drink(struct record *);
-extern void inv_sum_hidden_weight(int);
-extern void trade_add_buy_price(int);
-extern void trade_add_repair_cost(int);
-extern void inv_return_unpaid_item(int);
-extern void inv_store_cb(int);
+extern void inv_sum_hidden_weight(struct record *);
+extern void trade_add_buy_price(struct record *);
+extern void trade_add_repair_cost(struct record *);
+extern void inv_return_unpaid_item(struct record *);
+extern void inv_store_cb(struct record *);
 extern void inv_claim_item(int);
-extern void inv_assign_item_id(int);
+extern void inv_assign_item_id(struct record *);
 extern void inventory_draw(void);
-extern void inv_select_tab(unsigned char);
+extern void inv_select_tab(int);
 extern void inv_click_right_item(int);
 extern void inv_click_left_item(int);
 extern void inv_equip_item(int);
@@ -287,21 +287,21 @@ void trade_mark_in_repair(void);
 
 void inventory_load_images(void)
 {
-    inventory_images = disk_read_file((int)D_00176FE4, 0);
-    D_001AA420 = disk_read_file((int)D_00176FF1, 0);
-    D_001AA424 = disk_read_file((int)D_00176FFE, 0);
-    D_001AA428 = disk_read_file((int)D_0017700B, 0);
-    D_001AA42C = disk_read_file((int)D_00177018, 0);
-    D_001AA430 = disk_read_file((int)D_00177025, 0);
-    D_001AA43C = disk_read_file((int)D_00177032, 0);
-    D_001AA440 = disk_read_file((int)D_0017703F, 0);
+    inventory_images = disk_read_file(D_00176FE4, 0);
+    D_001AA420 = disk_read_file(D_00176FF1, 0);
+    D_001AA424 = disk_read_file(D_00176FFE, 0);
+    D_001AA428 = disk_read_file(D_0017700B, 0);
+    D_001AA42C = disk_read_file(D_00177018, 0);
+    D_001AA430 = disk_read_file(D_00177025, 0);
+    D_001AA43C = disk_read_file(D_00177032, 0);
+    D_001AA440 = disk_read_file(D_0017703F, 0);
     if (trade_mode == 0) return;
     mc_set_location(313, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_00177054, (trade_mode * 2) + 6);
-    D_001AA434 = disk_read_file((int)text_buffer, 0);
+    D_001AA434 = disk_read_file(text_buffer, 0);
     mc_set_location(315, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_00177054, (trade_mode * 2) + 7);
-    D_001AA438 = disk_read_file((int)text_buffer, 0);
+    D_001AA438 = disk_read_file(text_buffer, 0);
 }
 
 void inventory_free_images(void)
@@ -507,13 +507,13 @@ void inventory_close(void)
     inv_track_hand_weapons(1);
     if (D_0019597C[0] > 0 && player_character->equipped[19] != 0) {
         text_macro_item = &player_character->equipped[19]->data.item;
-        parse_expand((int)D_00177099, (int)D_001913E4);
-        hud_message_add((int)D_001913E4);
+        parse_expand(D_00177099, D_001913E4);
+        hud_message_add(D_001913E4);
     }
     if (left_hand_ready_delay > 0 && player_character->equipped[21] != 0) {
         text_macro_item = &player_character->equipped[21]->data.item;
-        parse_expand((int)D_00177099, (int)D_001913E4);
-        hud_message_add((int)D_001913E4);
+        parse_expand(D_00177099, D_001913E4);
+        hud_message_add(D_001913E4);
     }
     if (((struct bf8_5_1 *)&D_001940D8)->f != 0) {
         D_001940D8 &= 223;
@@ -567,7 +567,7 @@ void func_00093BD9(int unused, struct rect *buttons, int button)
     }
     width = image->width;
     height = image->height;
-    size_fit((int)&width, (int)&height, (int)(short)((buttons[button].x1 - buttons[button].x0) - 4), (int)(short)((buttons[button].y1 - buttons[button].y0) - 4));
+    size_fit(&width, &height, (int)(short)((buttons[button].x1 - buttons[button].x0) - 4), (int)(short)((buttons[button].y1 - buttons[button].y0) - 4));
     for (button = 0; image->height > button; button++) {
         mc_memcpy((int)(*(char **)scratch_buffer + (button << 8)), image->pixels + (image->width * button), image->width, (int)D_0017704C, 787, 4);
     }
@@ -699,7 +699,7 @@ int inv_take_item(struct record *object)
         object_free_single(object);
     } else {
         object->caster = 0;
-        quest_raise_event(3, (int)object, 0);
+        quest_raise_event(3, object, 0);
         object->x = player_object->x;
         object->y = player_object->y;
         object->z = player_object->z;
@@ -728,7 +728,7 @@ void inv_update_hidden_load(void)
 
     capacity = equip_hiding_capacity(1);
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity, (int)inv_sum_hidden_weight);
+    object_foreach(player_entity, inv_sum_hidden_weight);
     player_character->hidden_load_percent = (*(int *)D_00195B84 * 100) / capacity;
 }
 
@@ -806,14 +806,14 @@ void inv_use_item(void)
     }
     if (item->enchantments[0].type == 26 && item->enchantments[0].param == 4) {
         if (creature_count == 0) {
-            hud_message_add((int)D_00177129);
+            hud_message_add(D_00177129);
             return;
         }
         D_0019629D = 1;
         monster = monster_summon_near_player(27);
         D_0019629D = 0;
         if (monster == 0) {
-            hud_message_add((int)D_00177147);
+            hud_message_add(D_00177147);
             return;
         }
         monster->data.character.flags |= 2;
@@ -822,14 +822,14 @@ void inv_use_item(void)
     }
     if (item->enchantments[0].type == 26 && item->enchantments[0].param == 8) {
         if (creature_count == 0) {
-            hud_message_add((int)D_0017716F);
+            hud_message_add(D_0017716F);
             return;
         }
         D_0019629D = 1;
         monster = monster_summon_near_player(creature_list[0]->data.character.mobile_id);
         D_0019629D = 0;
         if (monster == 0) {
-            hud_message_add((int)D_0017718D);
+            hud_message_add(D_0017718D);
             return;
         }
         monster->data.character.flags |= 2;
@@ -1040,12 +1040,12 @@ void inv_equip_in_slot(struct record *object, int slot)
     if (player_character->equipped[slot] != 0) {
         item_remove_equip_effects(player_character->equipped[slot], slot);
         player_character->equipped[slot] = object;
-        quest_raise_event(3, (int)object, 0);
+        quest_raise_event(3, object, 0);
         item_apply_equip_effects(object, slot);
         return;
     }
     player_character->equipped[slot] = object;
-    quest_raise_event(3, (int)object, 0);
+    quest_raise_event(3, object, 0);
     item_apply_equip_effects(object, slot);
 }
 
@@ -1064,7 +1064,7 @@ void trade_total_buy(void)
 
     D_00190CA8 = 0;
     trade_total = 0;
-    object_foreach(player_entity->children, (int)trade_add_buy_price);
+    object_foreach(player_entity->children, trade_add_buy_price);
     trade_total = trade_base_price(trade_total);
     trade_price = ((trade_price = trade_adjust_price(trade_total, 0)) * trade_price_scale) / 256;
 }
@@ -1075,7 +1075,7 @@ int trade_total_repair(void)
     int unused;
 
     trade_total = 0;
-    object_foreach(inv_right_container->children, (int)trade_add_repair_cost);
+    object_foreach(inv_right_container->children, trade_add_repair_cost);
     if (trade_total > 0) {
         total = trade_total;
     } else {
@@ -1091,9 +1091,9 @@ void inv_close_return_unpaid(void)
     int slot;
 
     free_later_count = 0;
-    object_foreach_pre(player_entity->children, (int)inv_return_unpaid_item);
+    object_foreach_pre(player_entity->children, inv_return_unpaid_item);
     if (D_0019628A != 0) {
-        object_foreach_pre(player_entity->children, (int)inv_store_cb);
+        object_foreach_pre(player_entity->children, inv_store_cb);
     }
     for (slot = 0; slot < 27; slot++) {
         if (player_character->equipped[slot] != 0 && ((int)(unsigned short)(player_character->equipped[slot]->flags & 32)) != 0) {
@@ -1162,8 +1162,8 @@ void item_break(struct record *object)
     inv_store_item(object);
     mc_set_location(2157, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_001771C5, item->name);
-    parse_expand((int)text_buffer, (int)D_00190B44);
-    hud_message_add((int)D_00190B44);
+    parse_expand(text_buffer, D_00190B44);
+    hud_message_add(D_00190B44);
     for (i = 0; i < 27; i++) {
         if (player_character->equipped[i] == object) slot = i;
     }
@@ -1172,7 +1172,7 @@ void item_break(struct record *object)
         i = 0;
         while (i < 10 && item->enchantments[i].type != (-1)) {
             if (item->enchantments[i].type == 15) {
-                hud_message_add((int)D_001771D3);
+                hud_message_add(D_001771D3);
                 monster_summon_near_player(item->enchantments[i].param)->data.character.team = 1;
             }
             i++;
@@ -1223,7 +1223,7 @@ void inv_create_wagon(void)
 void inv_drop_wagon_if_no_cart(void)
 {
     scratch_190ce4[0] = 0;
-    object_foreach(player_entity, (int)inv_count_cart_cb);
+    object_foreach(player_entity, inv_count_cart_cb);
     if (scratch_190ce4[0] != 0 || wagon_container == 0) return;
     object_delete(wagon_container);
     wagon_container = 0;
@@ -1235,7 +1235,7 @@ void inv_merge_arrows(struct record *owner, struct record *arrows, int delete_so
     int count;
 
     found_object = 0;
-    object_find(owner->children, (int)inv_match_arrows);
+    object_find(owner->children, inv_match_arrows);
     if (found_object == 0) {
         stack = object_create_child(owner, 0, 107);
         found_object = stack;
@@ -1430,11 +1430,11 @@ void trade_steal_button(void)
         inventory_close();
         crime_current = 13;
         guards_summon(1);
-        hud_message_add((int)D_001771FF);
+        hud_message_add(D_001771FF);
         return;
     }
-    hud_message_add((int)D_00177217);
-    object_foreach(player_entity->children, (int)inv_claim_item);
+    hud_message_add(D_00177217);
+    object_foreach(player_entity->children, inv_claim_item);
     for (chance = 0; chance < 27; chance++) {
         if (player_character->equipped[chance] != 0) {
             inv_claim_item((int)player_character->equipped[chance]);
@@ -1448,7 +1448,7 @@ void inv_claim_items(void)
 {
     int slot;
 
-    object_foreach(player_entity->children, (int)inv_claim_item);
+    object_foreach(player_entity->children, inv_claim_item);
     for (slot = 0; slot < 27; slot++) {
         if (player_character->equipped[slot] != 0) {
             inv_claim_item((int)player_character->equipped[slot]);
@@ -1470,7 +1470,7 @@ void trade_clear_button(void)
     switch (trade_mode) {
         return;
     case 1:
-        object_foreach(player_entity->children, (int)inv_return_unpaid_item);
+        object_foreach(player_entity->children, inv_return_unpaid_item);
         return;
     case 2:
     case 3:
@@ -1556,7 +1556,7 @@ void inv_toggle_hidden(void)
     }
     capacity = equip_hiding_capacity(1);
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity, (int)inv_sum_hidden_weight);
+    object_foreach(player_entity, inv_sum_hidden_weight);
     if ((object_weight(object) + *(int *)D_00195B84) > capacity) {
         msgbox_show_string((int)D_0017727F, 1);
         return;
@@ -1606,7 +1606,7 @@ void func_00098A15(void)
         location = 2;
     }
     map_goto_location(31, 1, location, 0);
-    player_to_nearest_marker((int)location_object, 8);
+    player_to_nearest_marker(location_object, 8);
 }
 
 int func_00098B20(void)
@@ -1693,7 +1693,7 @@ void func_00098F1D(struct record *object)
 
 void inv_close_assign_ids(void)
 {
-    object_foreach(player_entity->children, (int)inv_assign_item_id);
+    object_foreach(player_entity->children, inv_assign_item_id);
 }
 
 void inv_track_hand_weapons(int closing)
@@ -1744,12 +1744,12 @@ void item_refresh_magic_value_cb(struct record *object)
     if (parent->container_index > 4) return;
     item = &object->data.item;
     if (item->enchantments[0].type == (-1)) return;
-    item->value = enchant_item_value((int)item);
+    item->value = enchant_item_value(item);
 }
 
 void inv_refresh_magic_values(void)
 {
-    object_foreach(player_entity->children, (int)item_refresh_magic_value_cb);
+    object_foreach(player_entity->children, item_refresh_magic_value_cb);
 }
 
 int trade_can_repair_item(struct item *item)

@@ -70,17 +70,17 @@ extern char shared_picklist[];
 extern struct faction *faction_find(short);
 extern int spell_cost(struct spell *, struct character *);
 extern int holiday_today(int, int);
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
 extern int spellshop_build_list(void);
 extern int guild_confirm_price(int);
 extern int rand_range(int, int);
 extern int gold_can_afford(int);
-extern int object_free_single(struct record *);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
-extern struct record *object_find_item(struct record *, int, int);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
+extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
 extern int rand();
 extern int srand();
@@ -101,8 +101,8 @@ extern void shop_stock_potions(int);
 extern void disease_remove_skill_bonuses(void);
 extern void disease_restore_skill_bonuses(void);
 extern void spellshop_update(void);
-extern void spellshop_show_effect(int);
-extern void blessing_remove(int);
+extern void spellshop_show_effect(short);
+extern void blessing_remove(struct blessing *);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void msgbox_yes_no_rsc(int);
@@ -110,8 +110,8 @@ extern void gold_spend(int);
 extern void player_movement_update(void);
 extern void picklist_free(int);
 extern void object_free_children(int);
-extern void object_foreach_post(struct record *, int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach_post(struct record *, void (*)());
+extern void object_foreach(struct record *, void (*)());
 extern void inventory_open_container(int, int, int);
 int spellshop_close(void);
 int guild_best_skill(int *, unsigned char *, int);
@@ -191,8 +191,8 @@ void spellshop_open(void)
     game_mode = 5;
     D_001940D8 &= 254;
     D_001940D8 |= 2;
-    window_image = disk_read_file((int)D_0017606F, 0);
-    magic_window_image = disk_read_file((int)D_0017607C, 0);
+    window_image = disk_read_file(D_0017606F, 0);
+    magic_window_image = disk_read_file(D_0017607C, 0);
     D_00196272 = 1;
     if (spellshop_build_list() != 0) return;
     spellshop_close();
@@ -343,7 +343,7 @@ struct membership *guild_find_membership_by_kind(unsigned char kind)
     found_object = 0;
     guild_search_faction = 0;
     scratch_190d20 = kind;
-    object_foreach(player_entity->children, (int)guild_match_membership);
+    object_foreach(player_entity->children, guild_match_membership);
     if (found_object == 0) return 0;
     return &found_object->data.membership;
 }
@@ -353,7 +353,7 @@ struct membership *guild_find_membership_by_bits(unsigned char bits)
     found_object = 0;
     guild_search_faction = 0;
     scratch_190d20 = bits;
-    object_foreach(player_entity->children, (int)guild_match_membership_bits);
+    object_foreach(player_entity->children, guild_match_membership_bits);
     if (found_object == 0) return 0;
     return &found_object->data.membership;
 }
@@ -368,7 +368,7 @@ void guild_expire_blessings(void)
         if (object->type == 30) {
             blessing = &object->data.blessing;
             if (blessing->end_time < game_minutes) {
-                blessing_remove((int)blessing);
+                blessing_remove(blessing);
                 object_free_single(object);
                 return;
             }
@@ -414,7 +414,7 @@ int guild_menu(struct image *image, int is_member, int label)
             for (button = 0; button < 4; button++) {
                 if (mouse_x > guild_menu_buttons[button].x0 && mouse_x < guild_menu_buttons[button].x1 && mouse_y > guild_menu_buttons[button].y0 && mouse_y < guild_menu_buttons[button].y1) {
                     if (button == 0 && is_member != 0) continue;
-                    sound_play(203, (int)player_object, 100);
+                    sound_play(203, player_object, 100);
                     choice = button;
                 }
             }
@@ -509,7 +509,7 @@ void guild_heal(void)
     msgbox_yes_no_rsc(403);
     if (((int)D_00196271) == 2) return;
     disease_remove_skill_bonuses();
-    object_foreach_post(location_object, (int)guild_heal_cleanup);
+    object_foreach_post(location_object, guild_heal_cleanup);
     player_character->conditions = 0;
     mc_memcpy((int)player_character->attributes, (int)player_character->base_attributes, 16, (int)D_00175EAA, 1708, 16);
     disease_restore_skill_bonuses();
@@ -542,7 +542,7 @@ void rest_open(void)
         msgbox_show_rsc(355, 1);
         return;
     }
-    *(int *)rest_image = disk_read_file((int)D_001760A4, 0);
+    *(int *)rest_image = disk_read_file(D_001760A4, 0);
     game_mode = 16;
     D_00196272 = 1;
     D_00190D1A = 0;

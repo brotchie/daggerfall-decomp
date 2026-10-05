@@ -7,7 +7,7 @@ extern char D_00170411[];
 extern signed char D_00190D10;
 extern int talk_face_image;
 
-extern int disk_open_data(int);
+extern int disk_open_data(char *);
 extern int rand_range(int, int);
 extern int close();
 extern int lseek();
@@ -22,11 +22,11 @@ void talk_load_face(int face)
     if (face >= 1000) {
         index = ((face == 1000) ? 0 : 6);
         index += rand_range(0, 5);
-        file = disk_open_data((int)D_00170404);
+        file = disk_open_data(D_00170404);
         lseek(file, index << 12, 0);
     } else {
         D_00190D10 = 1;
-        file = disk_open_data((int)D_00170411);
+        file = disk_open_data(D_00170411);
         lseek(file, face << 12, 0);
     }
     read(file, talk_face_image, 4096);

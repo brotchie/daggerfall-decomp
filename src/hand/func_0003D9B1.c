@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003D9B1 */
 extern char D_00170D55[];       /* __FILE__ */
 extern short text_format_flags;
-extern void parse_expand(char *, char *);
+extern void parse_expand(unsigned char *, char *);
 extern int font_char_width(unsigned char);
 extern void mc_free(void *, char *, int);
 extern void mc_strncpy(char *, char *, int, char *, int);

@@ -44,21 +44,21 @@ extern struct map_location *region_locations;
 extern struct record *quest_reward_container;
 
 extern struct faction *faction_find(short);
-extern int tavern_open(int);
-extern int quest_arg_state(struct qbn_op *, int);
+extern int tavern_open(short);
+extern int quest_arg_state(struct qbn_op *, short);
 extern void *quest_section(struct quest *, int);
 extern void *quest_record(struct quest *, int, int);
 extern struct location_door *location_find_door(int);
 extern struct flat_cfg *flats_cfg_find(int);
-extern int hud_message_add(int);
+extern int hud_message_add(char *);
 extern int rand_range(int, int);
 extern int location_contains(int, int);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_reparent(struct record *, struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern struct record *object_reparent(struct record *, struct record *);
 extern struct record *object_find_by_id(struct record *, int);
 extern int object_new_id(int);
-extern int object_find_quest(struct record *, unsigned char);
+extern struct record *object_find_quest(struct record *, unsigned char);
 extern int strnicmp();
 extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
@@ -67,9 +67,9 @@ extern int func_000A148C(int, ...);
 extern int xn_draw_image_transparent();
 extern void maploads_load_region(int);
 extern void tavern_close(void);
-extern void func_0002FE02(int);
-extern void func_0002FE4B(int);
-extern void quest_cast_spell_on_foe_cb(int);
+extern void func_0002FE02(struct record *);
+extern void func_0002FE4B(struct record *);
+extern void quest_cast_spell_on_foe_cb(struct record *);
 extern void quest_show_message(struct quest *, int);
 extern void quest_reward_faction(struct quest *);
 extern void guild_join_dark_brotherhood(void);
@@ -77,7 +77,7 @@ extern void guild_join_thieves_guild(void);
 extern void dungeon_load(int);
 extern void map_goto_location(int, int, int, int);
 extern void object_free_children(int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern void inv_store_item(struct record *);
 struct record *func_000310E1(struct record *, struct record *);
 void quest_give_item_to_player(struct record *);
@@ -128,7 +128,7 @@ void qaction_op04_give_reward(struct quest *quest, struct qbn_op *op)
             } else {
                 mc_set_location(332, (int)D_00170A1A);
                 mc_sprintf((int)text_buffer, (int)D_00170A22, (int)quest->name, qbn_item->symbol);
-                hud_message_add((int)text_buffer);
+                hud_message_add(text_buffer);
             }
         }
     }
@@ -307,7 +307,7 @@ int qcond_op57_item_used(struct quest *quest, struct qbn_op *op)
 
 void quest_items_release_on_close(void)
 {
-    object_foreach(player_entity->children, (int)func_0002FE02);
+    object_foreach(player_entity->children, func_0002FE02);
 }
 
 void func_00030F63(struct quest *quest, struct qbn_op *op)
@@ -326,7 +326,7 @@ void func_00030F63(struct quest *quest, struct qbn_op *op)
     } else {
         foe_object->data.character.flags &= ~0x8000;
     }
-    object_foreach(location_object, (int)func_0002FE4B);
+    object_foreach(location_object, func_0002FE4B);
 }
 
 void qaction_op69_cast_spell_on_foe(struct quest *quest, struct qbn_op *op)
@@ -346,7 +346,7 @@ void qaction_op69_cast_spell_on_foe(struct quest *quest, struct qbn_op *op)
     spell_object->caster = player_entity;
     spell_object->id = object_new_id(((unsigned)location_object->id) >> 16);
     mc_memcpy(&spell_object->data.spell, &spell_records[spell_index], 89, (int)D_00170A1A, 679, 4);
-    object_foreach(location_object, (int)quest_cast_spell_on_foe_cb);
+    object_foreach(location_object, quest_cast_spell_on_foe_cb);
     object_delete(spell_object);
 }
 

@@ -76,17 +76,17 @@ extern struct membership *guild_membership;
 
 extern struct faction *faction_find(short);
 extern int list_popup_poll(void);
-extern int sheet_open(int);
+extern int sheet_open(short);
 extern int level_skill_sum(void);
-extern int skill_ready_to_advance(short, short, int, int);
+extern int skill_ready_to_advance(int, int, int, int);
 extern int text_rsc_load(int, int, int);
-extern int spellbook_open(int);
+extern int spellbook_open(short);
 extern int career_specials_text(void);
 extern int sound_play(int, struct record *, int);
 extern int logbook_open(int);
-extern int disk_read_file(int, int);
-extern int disk_open_data(int);
-extern int hud_message_add(int);
+extern int disk_read_file(char *, int);
+extern int disk_open_data(char *);
+extern int hud_message_add(char *);
 extern int rand_range(int, int);
 extern int gold_can_afford(int);
 extern int inventory_open(int, int, int);
@@ -106,8 +106,8 @@ extern int xn_font_select();
 extern int xn_draw_image_transparent();
 extern void career_show_biography(void);
 extern void sheet_draw(void);
-extern void sheet_show_career_skills(int, int);
-extern void health_status_add(int);
+extern void sheet_show_career_skills(short, short);
+extern void health_status_add(struct record *);
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void time_pass(int);
@@ -118,8 +118,8 @@ extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void list_popup_open_strings(int);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_spend(int);
-extern void inpstr_begin_text(char *, short);
-extern void object_foreach(struct record *, int);
+extern void inpstr_begin_text(char *, int);
+extern void object_foreach(struct record *, void (*)());
 int sheet_close(void);
 int skill_raised_recently(int);
 int health_status_text(void);
@@ -230,7 +230,7 @@ void sheet_show_affiliations(void)
     D_0019963C = *(int *)scratch_buffer + 55000;
     mc_set_location(264, (int)D_00170C67);
     mc_sprintf(D_0019963C, (int)D_00170CB1, D_00182682);
-    object_foreach(player_entity->children, (int)sheet_affiliation_line);
+    object_foreach(player_entity->children, sheet_affiliation_line);
     if (text_cursor_x == 0) {
         msgbox_show_rsc(19, 1);
         return;
@@ -362,7 +362,7 @@ void sheet_button_history(void)
         window_image = -1751672937;
     }
     career_show_biography();
-    window_image = disk_read_file((int)D_00170C40, 0);
+    window_image = disk_read_file(D_00170C40, 0);
 }
 
 void sheet_button_log(void)
@@ -410,7 +410,7 @@ int health_status_text(void)
 
     D_001962A7 = (D_001962A2 = 0);
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity->children, (int)health_status_add);
+    object_foreach(player_entity->children, health_status_add);
     if (*(int *)D_00195B84 == 0) return 0;
     text = *(char **)scratch_buffer + 55000;
     i = 0;
@@ -555,7 +555,7 @@ void raise_skills(void)
             if (player_character->skills[skill].value < 100) {
                 mc_set_location(674, (int)D_00170C67);
                 mc_sprintf((int)text_buffer, D_00185073, *(int *)(skill_names + (skill << 2)));
-                hud_message_add((int)text_buffer);
+                hud_message_add(text_buffer);
                 player_character->skills[skill].value++;
                 if (skill < 32) {
                     player_character->skills_raised_lo |= 1 << skill;
@@ -631,7 +631,7 @@ int text_rsc_open(void)
 {
     int ok;
 
-    text_rsc_main_file = (*(int *)text_rsc_file = disk_open_data((int)D_00170D4C));
+    text_rsc_main_file = (*(int *)text_rsc_file = disk_open_data(D_00170D4C));
     if (*(int *)text_rsc_file > 0) {
         ok = 1;
     } else {

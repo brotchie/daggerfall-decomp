@@ -46,9 +46,9 @@ extern int career_answer_effect(int);
 extern int career_nearest_class(void);
 extern int place_marker_in_range(struct record *, int);
 extern int text_rsc_load(int, int, int);
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
-extern int disk_write_arena2_file(int, int, int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
+extern int disk_write_arena2_file(char *, int, int);
 extern int rand_range(int, int);
 extern int rand();
 extern int mc_free();
@@ -96,9 +96,9 @@ void career_background_summary(int class_id, int ask)
     mc_set_location(59, (int)D_00170738);
     mc_sprintf((int)text_buffer, (int)D_00170741, class_id);
     mc_memset(*(int *)scratch_buffer, 0, 64000, (int)D_00170738, 60, 4);
-    disk_read_file((int)text_buffer, *(int *)scratch_buffer + 1);
+    disk_read_file(text_buffer, *(int *)scratch_buffer + 1);
     *(signed char *)(*(char **)scratch_buffer) = 10;
-    if (ask != 0) disk_read_file((int)D_00170750, D_00147954);
+    if (ask != 0) disk_read_file(D_00170750, D_00147954);
     for (question = 0; question < 12; question++) {
         if (ask != 0) {
             mc_memcpy(screen_buffer, D_00147954, 64000, (int)D_00170738, 69, 4);
@@ -123,7 +123,7 @@ void career_background_summary(int class_id, int ask)
         }
         cursor++;
     }
-    disk_write_arena2_file((int)D_0017075D, start, (int)cursor - start + 1);
+    disk_write_arena2_file(D_0017075D, start, (int)cursor - start + 1);
     if (start != 0 && start != (-1751672937)) {
         mc_free(start, (int)D_00170738, 94);
         start = -1751672937;
@@ -209,7 +209,7 @@ void career_wait_answer(void)
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         for (answer = 0; ((int)(short)*(short *)scratch_190d64) > answer; answer++) {
             if (mouse_x > career_answer_boxes[answer + 1].x0 && mouse_x < career_answer_boxes[answer + 1].x1 && mouse_y > career_answer_boxes[answer + 1].y0 && mouse_y < career_answer_boxes[answer + 1].y1) {
-                sound_play(203, (int)player_object, 100);
+                sound_play(203, player_object, 100);
                 *(short *)scratch_190d66 = answer;
             }
         }
@@ -276,9 +276,9 @@ void career_show_biography(void)
     int done;
 
     done = 0;
-    window_image = disk_read_file((int)D_0017077B, 0);
-    career_bio_page = (career_bio_text = disk_read_file((int)D_0017075D, 0));
-    sound_play(237, (int)player_object, 100);
+    window_image = disk_read_file(D_0017077B, 0);
+    career_bio_page = (career_bio_text = disk_read_file(D_0017075D, 0));
+    sound_play(237, player_object, 100);
     D_00196D70 = (int)(*(char **)&career_bio_text + *(int *)disk_last_file_size);
     career_bio_lines = career_bio_count_lines();
     D_00196D68 = 0;

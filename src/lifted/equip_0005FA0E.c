@@ -9,9 +9,9 @@ extern struct record *player_object;
 extern struct record *location_object;
 extern struct character *player_character;
 
-extern int item_add_to_container(struct record *, int, int, int);
+extern struct record *item_add_to_container(struct record *, int, int, int);
 extern int rand_range(int, int);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int rand();
 extern void item_make_random(unsigned short, struct item *);

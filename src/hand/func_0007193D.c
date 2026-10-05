@@ -38,7 +38,7 @@ extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void time_pass_minutes(int);
 extern void hud_draw(void);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern void rest_recover(struct record *);
 extern void rest_close(void);
 extern int rest_allowed(void);
@@ -101,7 +101,7 @@ void rest_update(void)
                 mc_free((int)rest_image, (int)D_001760D6, 165);
                 rest_image = (struct image *)-1751672937;
             }
-            rest_image = (struct image *)disk_read_file((int)D_001760DD, 0);
+            rest_image = (struct image *)disk_read_file(D_001760DD, 0);
             prompt = (int)(*(char **)scratch_buffer + 55000);
             mc_set_location(168, (int)D_001760D6);
             mc_sprintf(prompt, (int)D_001760EA, D_0017D1FA);
@@ -121,7 +121,7 @@ void rest_update(void)
                 mc_free((int)rest_image, (int)D_001760D6, 184);
                 rest_image = (struct image *)-1751672937;
             }
-            rest_image = (struct image *)disk_read_file((int)D_0017610F, 0);
+            rest_image = (struct image *)disk_read_file(D_0017610F, 0);
             D_00190CBC = *(int *)1132;
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 185, 63, 232, 86) != 0) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -131,7 +131,7 @@ void rest_update(void)
                 mc_free((int)rest_image, (int)D_001760D6, 193);
                 rest_image = (struct image *)-1751672937;
             }
-            rest_image = (struct image *)disk_read_file((int)D_001760DD, 0);
+            rest_image = (struct image *)disk_read_file(D_001760DD, 0);
             prompt = (int)(*(char **)scratch_buffer + 55000);
             mc_set_location(196, (int)D_001760D6);
             mc_sprintf(prompt, (int)D_0017611C, D_0017D1FE);

@@ -5,7 +5,7 @@
 
 extern char monster_category[];
 
-extern int damage_apply(struct record *, int, int);
+extern int damage_apply(struct record *, int, struct record *);
 extern void item_damage(struct record *, int);
 
 void damage_namira_reflect(struct record *attacker, struct record *target, int damage)

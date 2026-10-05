@@ -8,9 +8,9 @@ extern char D_001762B5[];
 extern struct record *player_entity;
 
 extern int object_weight(struct record *);
-extern int hud_message_add(int);
+extern int hud_message_add(char *);
 extern int carry_capacity(void);
-extern void quest_raise_event(int, struct record *, int);
+extern void quest_raise_event(short, struct record *, struct record *);
 extern void inventory_open_container(struct record *, int, int);
 extern void inv_store_item(struct record *);
 
@@ -30,11 +30,11 @@ void pick_up_item(struct record *object)
     carried_weight = object_weight(player_entity);
     capacity = carry_capacity() << 2;
     if (weight > capacity) {
-        hud_message_add((int)D_0017629C);
+        hud_message_add(D_0017629C);
         return;
     }
     if ((weight + carried_weight) > capacity) {
-        hud_message_add((int)D_001762B5);
+        hud_message_add(D_001762B5);
         return;
     }
     quest_raise_event(3, object, 0);

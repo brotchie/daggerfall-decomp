@@ -38,16 +38,16 @@ extern int court_open(int);
 extern int rand_range(int, int);
 extern int gold_can_afford(int);
 extern int gold_total_alias(void);
-extern int object_delete(int);
-extern int player_to_random_marker(int, int);
+extern struct record *object_delete(struct record *);
+extern int player_to_random_marker(struct record *, int);
 extern int mc_free();
 extern int mc_memcpy();
 extern void faction_change_reputation(int, int);
-extern void prison_serve_sentence(short);
+extern void prison_serve_sentence(int);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void time_pass(int);
-extern void msgbox_choice_rsc(short, unsigned char, unsigned char, int, unsigned char, unsigned char, unsigned char);
+extern void msgbox_choice_rsc(short, short, short, short, unsigned char, unsigned char, unsigned char);
 extern void gold_spend(int);
 extern void gold_remove_all(void);
 void court_reputation_restore(void);
@@ -86,7 +86,7 @@ void court_frame(void)
                 if (court_prison_days != 0) {
                     court_state = 3;
                 } else {
-                    player_to_random_marker((int)location_object, 8);
+                    player_to_random_marker(location_object, 8);
                     court_close();
                 }
             } else {
@@ -106,7 +106,7 @@ void court_frame(void)
         court_state = 3;
         return;
     case 3:
-        player_to_random_marker((int)location_object, 8);
+        player_to_random_marker(location_object, 8);
         prison_serve_sentence((int)(short)court_prison_days);
         court_restore_vitals();
         court_reputation_restore();
@@ -115,7 +115,7 @@ void court_frame(void)
     case 5:
         msgbox_show_rsc(8063, 1);
         region_punishment_flags[((int)(unsigned char)current_region) * 80] |= 1;
-        player_to_random_marker((int)location_object, 8);
+        player_to_random_marker(location_object, 8);
         court_state = 100;
         return;
     case 6:
@@ -124,7 +124,7 @@ void court_frame(void)
         court_state = 7;
         return;
     case 7:
-        player_to_random_marker((int)location_object, 4);
+        player_to_random_marker(location_object, 4);
         court_state = 100;
         return;
     case 8:
@@ -163,7 +163,7 @@ void court_frame(void)
         court_state = 2;
         return;
     case 9:
-        player_to_random_marker((int)location_object, 12);
+        player_to_random_marker(location_object, 12);
         court_state = 100;
         return;
     case 100:
@@ -216,7 +216,7 @@ void court_remove_creatures(void)
 
     for (i = 0; i < creature_count; i++) {
         if ((int)creature_list[i] == (int)player_entity) continue;
-        object_delete((int)creature_list[i]);
+        object_delete(creature_list[i]);
     }
 }
 

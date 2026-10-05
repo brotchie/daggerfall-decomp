@@ -43,9 +43,9 @@ extern int automap_move_right(int);
 extern void town_map_draw(void);
 extern int town_notes_size(void);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
-extern int disk_write_arena2_file(int, int, int);
-extern int disk_open_rw(int);
+extern int disk_read_file(char *, int);
+extern int disk_write_arena2_file(char *, int, int);
+extern int disk_open_rw(char *);
 extern int hud_message_add(int);
 extern int location_contains(int, int);
 extern int close();
@@ -96,7 +96,7 @@ void town_map_open(void)
     mc_memset(*(int *)scratch_buffer, 0, 50000, (int)D_001707AE, 624, 4);
     mc_set_location(625, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    handle = disk_open_rw((int)text_buffer);
+    handle = disk_open_rw(text_buffer);
     if (handle != (-1)) {
         read(handle, *(int *)scratch_buffer, 50000);
         *(int *)(*(char **)scratch_buffer) = game_minutes;
@@ -107,8 +107,8 @@ void town_map_open(void)
     mouse_buttons = (mouse_buttons_prev = 0);
     saved_screen_active = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
-    *(int *)scratch_190de4 = disk_read_file((int)D_00170794, 0);
-    D_00196D9C = (struct image *)disk_read_file((int)D_001707C3, 0);
+    *(int *)scratch_190de4 = disk_read_file(D_00170794, 0);
+    D_00196D9C = (struct image *)disk_read_file(D_001707C3, 0);
     while (done == 0) {
         xn_mouse_cursor_erase();
         town_map_draw();
@@ -153,7 +153,7 @@ void town_map_open(void)
     if (scratch_190ce5 == 0) return;
     mc_set_location(686, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    disk_write_arena2_file((int)text_buffer, *(int *)scratch_buffer, town_notes_size());
+    disk_write_arena2_file(text_buffer, *(int *)scratch_buffer, town_notes_size());
 }
 
 void town_map_draw(void)

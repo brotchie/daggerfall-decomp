@@ -5,7 +5,7 @@ extern unsigned char D_00196272;
 extern unsigned char D_00196275;
 extern unsigned char mouse_buttons_prev;
 extern char *info_popup_text;
-extern short font_text_width(char *);
+extern int font_text_width(char *);
 extern void text_draw(char *, short, short);
 extern void xn_draw_darken_rect(int, int, int, int);
 extern char *xn_str_copy_line(char *, char *);

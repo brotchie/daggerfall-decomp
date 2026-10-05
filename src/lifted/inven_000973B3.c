@@ -6,9 +6,9 @@
 extern struct record *player_entity;
 extern struct record *found_object;
 
-extern struct record *object_create_child(struct record *, int, int);
-extern int object_find(struct record *, int);
-extern int inv_match_arrows(int);
+extern struct record *object_create_child(struct record *, struct record *, int);
+extern int object_find(struct record *, int (*)());
+extern int inv_match_arrows(struct record *);
 extern void item_make(int, int, struct item *);
 extern void inv_store_item(struct record *);
 
@@ -18,7 +18,7 @@ void inv_add_arrows(struct record *owner, int count)
     int total;
 
     found_object = 0;
-    object_find(owner->children, (int)inv_match_arrows);
+    object_find(owner->children, inv_match_arrows);
     if (found_object == 0) {
         stack = object_create_child(owner, 0, 107);
         found_object = stack;

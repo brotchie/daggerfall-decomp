@@ -57,17 +57,17 @@ extern short swing_damage;
 
 extern int lockpick_door(struct record *);
 extern struct record *door_find_key(struct record *, int, unsigned short);
-extern int collide_move_missile(struct record *, int, int);
+extern int collide_move_missile(struct record *, int *, int *);
 extern int people_check_witnesses(void);
 extern int key_action_held(int);
-extern int building_is_open(int);
+extern int building_is_open(struct building *);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int click_world_face(struct pick_result *);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
-extern int object_free_single(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int inv_take_arrow(int);
 extern int door_start_swing(struct record *, int);
 extern int mc_free();
@@ -86,8 +86,8 @@ extern int xn_math_advance_pitch_yaw();
 extern void lock_show_difficulty(int);
 extern void damage_resolve_attack(struct record *, struct record *, int);
 extern void guards_summon(int);
-extern void cast_fire_missile(int);
-extern void spell_area_effect(int);
+extern void cast_fire_missile(struct record *);
+extern void spell_area_effect(struct record *);
 extern void item_make(int, int, struct item *);
 extern void links_trigger(struct record *, int);
 extern void mem_check_crt_heap(int);
@@ -140,7 +140,7 @@ L72941:;
         mc_set_location(87, (int)D_0017615C);
         mc_sprintf((int)text_buffer, (int)D_00176175, cif_index);
     }
-    weapon_hand_cif[hand] = disk_read_file((int)text_buffer, 0);
+    weapon_hand_cif[hand] = disk_read_file(text_buffer, 0);
 }
 
 void weapon_reload_sprites(void)
@@ -273,7 +273,7 @@ int weapon_arrow_update(struct record *arrow)
         angles[1] = arrow->yaw;
         angles[2] = 0;
         *(signed char *)collide_flags |= 4;
-        hit_flags = collide_move_missile(arrow, (int)dest, (int)angles);
+        hit_flags = collide_move_missile(arrow, dest, angles);
         if (arrow->from_player == 0) {
             dist = xn_math_approx_hypot(player_object->y - arrow->y, xn_math_approx_dist2d(player_object->x, player_object->z, arrow->x, arrow->z));
             if (dist < 125) {
@@ -380,10 +380,10 @@ void click_world_object(struct pick_result *pick, struct record *object)
             spell_ready_missile->x = player_object->x;
             spell_ready_missile->y = player_object->y;
             spell_ready_missile->z = player_object->z;
-            spell_area_effect((int)spell_ready_missile);
+            spell_area_effect(spell_ready_missile);
             spell_cast_queued_run();
         } else {
-            cast_fire_missile((int)spell_ready_missile);
+            cast_fire_missile(spell_ready_missile);
         }
         spell_ready_missile = 0;
         return;
@@ -454,7 +454,7 @@ void door_try_open(struct record *door, int lockpick)
         }
         return;
     }
-    if (((int)current_building->id == player_character->house || (((int)player_environment) == 2 && building_is_open((int)current_building) != 0)) && door_start_swing(door, 0) != 0) {
+    if (((int)current_building->id == player_character->house || (((int)player_environment) == 2 && building_is_open(current_building) != 0)) && door_start_swing(door, 0) != 0) {
         door->flags |= 0x100;
         return;
     }

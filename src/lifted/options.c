@@ -56,9 +56,9 @@ extern struct image *controls_view_image;
 extern int options_image;
 extern int options_saved_screen;
 
-extern int options_open(int);
+extern int options_open(short);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int disk_create(int);
 extern int key_pressed_once(unsigned char);
 extern int close();
@@ -80,10 +80,10 @@ extern int xn_draw_image();
 extern int xn_draw_image_transparent();
 extern int xn_joy_calibrate();
 extern int xn_joy_poll();
-extern void msgbox_show_string(int, int);
-extern void game_exit(int);
+extern void msgbox_show_string(char *, short);
+extern void game_exit(char *);
 extern void text_draw_centred(int, int, int);
-extern void sound_set_volume(short);
+extern void sound_set_volume(int);
 extern void saveload_menu(int);
 extern void msgbox_yes_no_rsc(int);
 extern void cursor_draw_arrow(void);
@@ -316,8 +316,8 @@ void options_controls_screen(void)
     int background;
 
     done = 0;
-    background = disk_read_file((int)D_00170EF2, 0);
-    controls_view_image = (struct image *)disk_read_file((int)D_00170EFF, 0);
+    background = disk_read_file(D_00170EF2, 0);
+    controls_view_image = (struct image *)disk_read_file(D_00170EFF, 0);
     while (done == 0) {
         if (key_down_esc != 0 && options_controls_check() != 0) break;
         mouse_buttons_prev = mouse_buttons;
@@ -358,7 +358,7 @@ int options_controls_check(void)
     for (i = 0; i < 38; i++) {
         for (j = 0; j < 38; j++) {
             if (i != j && *(signed char *)(key_map + i) == *(signed char *)(key_map + j)) {
-                msgbox_show_string((int)D_00170F0C, 1);
+                msgbox_show_string(D_00170F0C, 1);
                 return 0;
             }
         }
@@ -450,9 +450,9 @@ int options_joystick_screen(void)
     int background;
 
     done = 0;
-    background = disk_read_file((int)D_00170F54, 0);
-    D_00195B5C = (struct image *)disk_read_file((int)D_00170F61, 0);
-    D_00195B60 = (struct image *)disk_read_file((int)D_00170F6E, 0);
+    background = disk_read_file(D_00170F54, 0);
+    D_00195B5C = (struct image *)disk_read_file(D_00170F61, 0);
+    D_00195B60 = (struct image *)disk_read_file(D_00170F6E, 0);
     while (done == 0) {
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();

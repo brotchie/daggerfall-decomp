@@ -21,7 +21,7 @@ extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern void xn_mouse_poll_clamped(void);
 extern void xn_font_select(int);
 
-void msgbox_show_qrc_text(char *name, short message_id, short kind)
+void msgbox_show_qrc_text(char *name, unsigned short message_id, short kind)
 {
     struct quest stub;
     int single_page;

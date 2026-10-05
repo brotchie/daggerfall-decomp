@@ -13,7 +13,7 @@ extern unsigned char *scratch_buffer;
 extern unsigned char mouse_buttons_prev;
 extern char shared_picklist[];
 extern unsigned short D_001A9AE1;
-extern void spellshop_close(void);
+extern int spellshop_close(void);
 extern void spellshop_buy(void);
 extern void spellshop_draw_spell(struct spell *);
 extern short picklist_frame(char *);

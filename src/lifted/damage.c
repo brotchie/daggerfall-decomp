@@ -47,10 +47,10 @@ extern short D_001997AA;
 
 extern int object_weight(struct record *);
 extern int cast_creature_spell(struct record *, struct record *, int);
-extern struct record *spell_find_on_entity(struct record *, short, int);
+extern struct record *spell_find_on_entity(struct record *, int, int);
 extern int disk_resolve_path(int);
 extern int rand_range(int, int);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int travel_route(int, int, int, int, int);
 extern int rand();
@@ -69,9 +69,9 @@ extern void quest_op_done(struct quest *, struct qbn_op *);
 extern void time_pass(int);
 extern void palette_restore(void);
 extern void cast_spell_on(struct record *, struct record *, int);
-extern void disease_infect(struct record *, int, int, int);
+extern void disease_infect(struct record *, unsigned char *, int, int);
 extern void flat_anim_restart(struct record *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 void disease_infect_lycanthropy(struct record *, int);
 void disease_infect_vampirism(struct record *);
 void damage_collapse_exhausted(struct record *);
@@ -88,10 +88,10 @@ void damage_monster_hit_effects(struct record *attacker, struct record *target)
     target_char = &target->data.character;
     switch (attacker_char->race) {
     case 0:
-        if (rand_range(0, 100) <= 5) disease_infect(target, (int)monster_diseases_plague, 0, 0);
+        if (rand_range(0, 100) <= 5) disease_infect(target, monster_diseases_plague, 0, 0);
         return;
     case 3:
-        if (rand_range(0, 100) <= 2) disease_infect(target, (int)monster_diseases_bat, 0, 0);
+        if (rand_range(0, 100) <= 2) disease_infect(target, monster_diseases_bat, 0, 0);
         return;
     case 6:
         if (spell_find_on_entity(target, 66, 0) == 0) cast_creature_spell(attacker, target, 66);
@@ -110,7 +110,7 @@ void damage_monster_hit_effects(struct record *attacker, struct record *target)
         if (rand() < 400) disease_infect_lycanthropy(target, 1);
         return;
     case 19:
-        if (rand_range(1, 100) <= 5) disease_infect(target, (int)monster_diseases_mummy, 0, 0);
+        if (rand_range(1, 100) <= 5) disease_infect(target, monster_diseases_mummy, 0, 0);
         return;
     case 20:
         if (spell_find_on_entity(target, 66, 0) == 0) cast_creature_spell(attacker, target, 66);
@@ -122,7 +122,7 @@ void damage_monster_hit_effects(struct record *attacker, struct record *target)
             return;
         }
         if (rand_range(1, 100) > 2) return;
-        disease_infect(target, (int)monster_diseases_plague, 0, 0);
+        disease_infect(target, monster_diseases_plague, 0, 0);
     default:;
     }
 }
@@ -276,7 +276,7 @@ void monster_wake_all(void)
 {
     if (monsters_woken != 0) return;
     monsters_woken = 1;
-    object_foreach(location_object, (int)monster_wake_cb);
+    object_foreach(location_object, monster_wake_cb);
 }
 
 void func_0002FD75(struct record *object)
@@ -331,7 +331,7 @@ void quest_cast_spell_on_foe_cb(struct record *object)
     D_00196291 = 0;
 }
 
-int quest_travel_minutes(int quest, struct record *from, struct record *to)
+unsigned int quest_travel_minutes(struct quest *quest, struct record *from, struct record *to)
 {
     if (from == 0) return travel_route(player_object->x, player_object->y, to->x, to->y, 0) + 2880;
     return travel_route(from->x, from->y, to->x, to->y, 0) + 2880;

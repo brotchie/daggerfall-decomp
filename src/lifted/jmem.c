@@ -20,8 +20,8 @@ extern int logbook_first_entry;
 extern char logbook_show_notes[];
 
 extern int key_action_held(int);
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
 extern int func_0009DA1C(int, int);
 extern int printf(int, ...);
 extern int mc_free();
@@ -29,7 +29,7 @@ extern int mc_memset();
 extern int mc_malloc();
 extern int func_000A2D9E();
 extern int xn_gfx_restore_mode();
-extern void fatal_error(int);
+extern void fatal_error(char *);
 extern void sound_shutdown_music(void);
 extern void mem_check_heap(int);
 extern void logbook_build_entries(void);
@@ -44,7 +44,7 @@ void mem_pool_init(struct mem_pool *pool, int size)
     mc_memset((int)pool, 0, 4, (int)D_00175AD4, 60, 4);
     pool->first = (struct mem_block *)mc_malloc(size, (int)D_00175AD4, 62);
     block = pool->first;
-    if (block == 0) fatal_error((int)D_00175ADB);
+    if (block == 0) fatal_error(D_00175ADB);
     pool->size = size;
     block->size = size - 18;
     block->prev = 0;
@@ -129,11 +129,11 @@ int logbook_open(int force)
     if (force != 0 || (game_mode == 0 && key_action_held(24) != 0)) {
         game_mode = 14;
         D_00196272 = 1;
-        window_image = disk_read_file((int)D_00175C79, 0);
+        window_image = disk_read_file(D_00175C79, 0);
         *(int *)logbook_show_notes = (logbook_first_entry = 0);
         D_00187CA8 = 0;
         logbook_build_entries();
-        sound_play(237, (int)player_object, 100);
+        sound_play(237, player_object, 100);
     }
     return ((((int)(unsigned char)game_mode) == 14) ? 1 : 0);
 }

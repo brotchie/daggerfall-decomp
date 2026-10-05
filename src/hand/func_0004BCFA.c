@@ -6,7 +6,7 @@ extern char D_00174F57[];
 extern signed char text_buffer[];
 extern char arena2_path[];
 extern char arena2_cd_path[];
-extern void quest_start(char *);
+extern int quest_start(char *);
 #pragma aux mc_set_location parm routine [];
 extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);

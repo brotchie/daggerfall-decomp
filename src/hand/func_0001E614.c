@@ -14,7 +14,7 @@ extern int blocks_bsa;
 extern char cfg_block_str[];
 extern char cfg_debug;
 extern int archive_find_record(int, char *, int);
-extern void archive_read_record(int, int, int);
+extern int archive_read_record(int, int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
 extern char *itoa(int, char *, int);
 #pragma aux mc_set_location parm routine [];

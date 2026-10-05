@@ -43,11 +43,11 @@ extern short steer_key_region;
 extern struct picklist shared_picklist;
 extern struct record *inv_selected_item;
 
-extern int sheet_open(int);
-extern int spellbook_open(int);
-extern int options_open(int);
+extern int sheet_open(short);
+extern int spellbook_open(short);
+extern int options_open(short);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int picklist_poll(struct picklist *);
 extern int inventory_open(int, int, int);
 extern int travel_map_open(int);
@@ -58,16 +58,16 @@ extern int xn_str_find_u32();
 extern int xn_mouse_poll_clamped();
 extern int xn_draw_image();
 extern void automap_open(void);
-extern void status_show(int);
+extern void status_show(short);
 extern void interaction_mode_cycle(int);
-extern void parse_expand(int, int);
+extern void parse_expand(unsigned char *, char *);
 extern void rest_open(void);
 extern void cursor_draw_arrow(void);
-extern void picklist_init(struct picklist *, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void picklist_add(struct picklist *, int, int);
+extern void picklist_init(struct picklist *, short, short, short, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern void picklist_add(struct picklist *, char *, short);
 extern void picklist_free(struct picklist *);
 extern void picklist_draw(struct picklist *, int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern void inv_use_item(void);
 extern void transport_menu(void);
 void hud_buttons_click(int);
@@ -191,11 +191,11 @@ void magic_items_add_cb(struct record *object)
     text_macro_item = item;
     if (kind == 2) {
         D_00195ACC = (int)&object->children->data.potion_recipe;
-        parse_expand((int)D_001758A0, (int)D_00190B44);
+        parse_expand(D_001758A0, D_00190B44);
     } else {
-        parse_expand((int)D_001758A4, (int)D_00190B44);
+        parse_expand(D_001758A4, D_00190B44);
     }
-    picklist_add(&shared_picklist, (int)D_00190B44, 0);
+    picklist_add(&shared_picklist, D_00190B44, 0);
     *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)object;
 }
 
@@ -205,7 +205,7 @@ void magic_items_open(void)
 
     *(short *)scratch_190d64 = 0;
     picklist_init(&shared_picklist, 100, 159, 166, 34, 88, 159, 8, 15, 88, 179, 8, 59, 0, 0, 1, 1, 146, 146, 244, 114, 0);
-    object_foreach(player_entity->children, (int)magic_items_add_cb);
+    object_foreach(player_entity->children, magic_items_add_cb);
     if (*(short *)scratch_190d64 == 0) {
         picklist_free(&shared_picklist);
         return;
@@ -213,7 +213,7 @@ void magic_items_open(void)
     D_00187CA8 = 0;
     D_001940D8 &= 254;
     D_001940D4 |= 32;
-    magic_items_image = (struct image *)disk_read_file((int)D_001758A8, 0);
+    magic_items_image = (struct image *)disk_read_file(D_001758A8, 0);
     D_00196272 = 1;
     magic_items_saved_screen = mc_malloc(64000, (int)D_00175898, 358);
     mc_memcpy(magic_items_saved_screen, screen_buffer, 64000, (int)D_00175898, 359, 4);

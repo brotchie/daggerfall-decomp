@@ -5,7 +5,7 @@
 
 
 extern int rand_range(int, int);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern void item_make_in_range(unsigned short, int, int, struct item *);
 

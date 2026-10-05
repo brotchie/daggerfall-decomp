@@ -2,7 +2,7 @@
 #include "structs.h"
 extern struct magic_enchantment D_00199868[][5];   /* itemmaker_slot_exclusions */
 
-void func_00057147(short slot, short type, short param, short type2, char param2, char type3, char param3)
+void func_00057147(short slot, short type, short param, short type2, short param2, short type3, short param3)
 {
     D_00199868[slot][0].type = type;
     D_00199868[slot][0].param = param;

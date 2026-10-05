@@ -144,7 +144,7 @@ extern int dagger_snd;
 extern int D_001AA5FC;
 
 extern int climate_category(void);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int rand_range(int, int);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
@@ -208,10 +208,10 @@ extern void msgbox_free_borders(void);
 extern void kludge_print_build(int);
 extern void calendar_update(void);
 extern void paperdoll_draw(int, int);
-extern void text_draw(int, int, int);
+extern void text_draw(char *, short, short);
 extern void sound_shutdown_music(void);
 extern void mem_check_crt_heap(int);
-extern void disk_copy_file(int, int, int);
+extern void disk_copy_file(char *, char *, char *);
 extern void file_index_build(void);
 extern void file_index_free(void);
 extern void weapon_reload_hand_sprites(void);
@@ -223,7 +223,7 @@ extern void model_heap_free_all(void);
 extern void sound_cache_free_all(void);
 extern void region_unload(void);
 extern void dungeon_load(int);
-extern void location_unload(unsigned short);
+extern void location_unload(int);
 extern void map_goto_location(int, int, int, int);
 extern void object_heap_init(void);
 extern void object_heap_shutdown(void);
@@ -257,14 +257,14 @@ void debug_show_mem_used(void)
     mc_set_location(47, (int)D_00175040);
     mc_sprintf((int)text_buffer, (int)D_00175047, D_001A3F9C);
     D_0012B508 = 146;
-    text_draw((int)text_buffer, 246, 23);
+    text_draw(text_buffer, 246, 23);
 }
 
 void player_refresh_paperdoll(void)
 {
     D_001940D8 |= 8;
     mem_check_crt_heap(0);
-    xn_draw_fullscreen_overlay_shaded((window_image = disk_read_file((int)D_00175207, 0)));
+    xn_draw_fullscreen_overlay_shaded((window_image = disk_read_file(D_00175207, 0)));
     paperdoll_draw(0, 0);
     xn_gfx_clear(0);
     if (window_image == 0 || window_image == (-1751672937)) return;
@@ -503,7 +503,7 @@ void init_video(void)
     xn_shade_load(0, 0);
     xn_shade_keep_colours_0_255();
     player_underwater = 0;
-    disk_read_file((int)D_00175214, (D_001997F4 = mc_malloc(768, (int)D_00175040, 410)));
+    disk_read_file(D_00175214, (D_001997F4 = mc_malloc(768, (int)D_00175040, 410)));
     xn_world_init();
     xn_world_open((int)D_0017521C);
 }
@@ -602,7 +602,7 @@ void newgame_init_player(void)
     player_compute_jump_velocity();
     mc_set_location(514, (int)D_00175040);
     mc_sprintf((int)text_buffer, (int)D_00175313, (int)arena2_path);
-    disk_copy_file((int)cfg_mapsave_file, (int)text_buffer, (int)arena2_path);
+    disk_copy_file(cfg_mapsave_file, text_buffer, arena2_path);
     character = player_character;
     career = player_class;
     character->fatigue = (character->attributes[ATTR_STR] + character->attributes[ATTR_END]) << 6;
@@ -753,11 +753,11 @@ void update_underwater(void)
 void spell_cast_anims_load(void)
 {
     spell_cast_anims_free();
-    spell_cast_anim_fire[0] = disk_read_file((int)D_00175324, 0);
-    spell_cast_anim_frost = disk_read_file((int)D_00175331, 0);
-    spell_cast_anim_magic = disk_read_file((int)D_0017533E, 0);
-    spell_cast_anim_poison = disk_read_file((int)D_0017534B, 0);
-    spell_cast_anim_shock = disk_read_file((int)D_00175358, 0);
+    spell_cast_anim_fire[0] = disk_read_file(D_00175324, 0);
+    spell_cast_anim_frost = disk_read_file(D_00175331, 0);
+    spell_cast_anim_magic = disk_read_file(D_0017533E, 0);
+    spell_cast_anim_poison = disk_read_file(D_0017534B, 0);
+    spell_cast_anim_shock = disk_read_file(D_00175358, 0);
 }
 
 void spell_cast_anims_free(void)

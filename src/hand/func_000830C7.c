@@ -20,7 +20,7 @@ extern int weapon_arrow_update(struct record *);
 extern void object_free_later(struct record *);
 extern int flat_anim_finished(struct record *);
 extern void flat_anim_step(struct record *);
-extern int model_get(unsigned short, int, int);
+extern int model_get(int, int, int);
 extern void flat_animal_sound(int, int, int, int, int);
 extern int xn_anim_update();
 extern int xn_rand_noise_2d();

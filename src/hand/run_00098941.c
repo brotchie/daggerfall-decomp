@@ -24,7 +24,7 @@ extern int game_minutes;
 extern unsigned char current_region;
 extern char mouse_buttons_prev;
 extern unsigned char *inv_selected_item;
-extern void msgbox_show_string(char *, int);
+extern void msgbox_show_string(char *, short);
 extern int holiday_today(int, int);
 extern char *disk_read_file(char *, int);
 extern int hud_message_add(char *);

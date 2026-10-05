@@ -9,8 +9,8 @@ extern struct record *player_entity;
 extern char D_00195B84[];
 extern struct character *player_character;
 
-extern void reaction_mod_item_cb(int);
-extern void object_foreach(struct record *, int);
+extern void reaction_mod_item_cb(struct record *);
+extern void object_foreach(struct record *, void (*)());
 
 int player_reaction_mod(int social_group)
 {
@@ -18,7 +18,7 @@ int player_reaction_mod(int social_group)
 
     scratch_190ce4[0] = *(signed char *)&social_group;
     *(int *)D_00195B84 = 0;
-    object_foreach(player_entity->children, (int)reaction_mod_item_cb);
+    object_foreach(player_entity->children, reaction_mod_item_cb);
     bio_mod = player_character->reputation_mod;
     *(int *)D_00195B84 += (int)(signed char)bio_mod;
     return *(int *)D_00195B84;

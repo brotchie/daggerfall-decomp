@@ -38,20 +38,20 @@ extern char D_00199D9B[];
 extern int link_count;
 
 extern int collide_move_object(struct record *, int, struct move_request *, int);
-extern int damage_apply(struct record *, int, int);
+extern int damage_apply(struct record *, int, struct record *);
 extern int spell_cost(struct spell *, struct character *);
 extern int cast_creature_spell_at(struct record *, struct record *, struct record *);
 extern int spell_player_has_spell(unsigned char);
 extern int ai_turn_toward(struct record *, int);
-extern int ai_stealth_check(int, unsigned short, int, unsigned short);
-extern int monster_move_step(struct record *, struct record *, short);
+extern int ai_stealth_check(int, int, int, int);
+extern int monster_move_step(struct record *, struct record *, int);
 extern int func_00063FCF(struct record *, int, int);
 extern int sound_play(int, int, int);
 extern int spawn_find_point(struct record *, int, int);
 extern int rand_range(int, int);
-extern int object_free_single(struct record *);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_free_single(struct record *);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_random_child_of_type(struct record *, int);
 extern int object_new_id(int);
 extern int abs();
@@ -66,7 +66,7 @@ extern int xn_math_yaw_offset_xz();
 extern void weapon_monster_arrow(int, int);
 extern void monster_init(struct record *, int);
 extern void object_apply_gravity(struct record *, struct character *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 int monster_set_action_seducer(struct record *, int, int);
 struct record *monster_spell_list(struct record *);
 int func_0006379A(struct record *, struct record *);
@@ -415,8 +415,8 @@ int monster_alloc_anim_slot(void)
     int slot;
 
     mc_memset((int)text_rsc_buffer, 0, 128, (int)D_00175934, 829, 2048);
-    object_foreach(location_object->children, (int)monster_mark_anim_slot_cb);
-    object_foreach(nonworld_root->children, (int)monster_mark_anim_slot_cb);
+    object_foreach(location_object->children, monster_mark_anim_slot_cb);
+    object_foreach(nonworld_root->children, monster_mark_anim_slot_cb);
     for (slot = 0; slot < 128; slot++) {
         if (text_rsc_buffer[slot] == 0 && *(int *)(D_00190704 + (slot << 2)) != 0) {
             if (*(int *)(D_00190704 + (slot << 2)) != 0 && *(int *)(D_00190704 + (slot << 2)) != (-1751672937)) {

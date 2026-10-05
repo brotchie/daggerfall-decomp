@@ -37,21 +37,21 @@ extern unsigned char D_00196271;
 extern signed char D_00196273;
 extern signed char mouse_buttons_prev;
 extern int D_00199634;
-extern void career_background_summary(int, short);
+extern void career_background_summary(int, int);
 extern void intro_play_movie(void);
-extern int chargen_popup_choice(int, unsigned char, unsigned char, int, unsigned char, unsigned char);
+extern int chargen_popup_choice(short, short, short, char *, unsigned char, unsigned char);
 extern void chargen_give_starting_equipment(void);
 extern void msgbox_show_rsc(int, int);
 extern void keys_world_actions(void);
 extern void quests_start_initial(void);
 extern void newgame_place_player(void);
 extern void palette_restore(void);
-extern void game_exit(int);
+extern void game_exit(char *);
 extern void newgame_init_player(void);
 extern int class_questions_run(void);
 extern void classmaker_run(void);
 extern int sound_play_ui(int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern void automap_delete_files(void);
 extern void saveload_menu(int);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
@@ -92,7 +92,7 @@ L3A3EC:;
         xn_mouse_poll_clamped();
         goto L3A3EC;
     }
-    disk_read_file((int)D_00170B90, *(int *)scratch_buffer);
+    disk_read_file(D_00170B90, *(int *)scratch_buffer);
     mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 55, 4);
     mc_memcpy(655360, screen_buffer, 64000, (int)D_00170B88, 56, 4);
     for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
@@ -144,16 +144,16 @@ L3A496:;
         player_character->reflexes = 2;
         player_character->mobile_id = 200;
         mc_memset((int)player_class, 0, 74, (int)D_00170B88, 152, 4);
-        disk_read_file((int)D_00170BAD, *(int *)scratch_buffer);
+        disk_read_file(D_00170BAD, *(int *)scratch_buffer);
         for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
             *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&choice))) <<= 2;
         }
         xn_pal_set_all_8bit(*(int *)scratch_buffer);
         while (((int)D_00196271) != 1) {
-            disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
+            disk_read_file(D_00170BB5, *(int *)scratch_buffer);
             mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 161, 4);
             text_draw_centred_coloured((int)D_00170BC2, 160, 16, 145, 156);
-            disk_read_file((int)D_00170BE6, *(int *)scratch_buffer);
+            disk_read_file(D_00170BE6, *(int *)scratch_buffer);
             xn_mouse_cursor_drawn &= 254;
             D_001940D4 |= 1;
             pick = 255;
@@ -171,7 +171,7 @@ L3A496:;
                     D_00196090 = 5;
                     msgbox_button_keys = 21;
                     D_00196034 = 49;
-                    disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
+                    disk_read_file(D_00170BB5, *(int *)scratch_buffer);
                     mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 186, 4);
                     mouse_buttons = (mouse_buttons_prev = 0);
                     xn_mouse_poll_clamped();
@@ -183,14 +183,14 @@ L3A496:;
             }
             player_character->race = pick - 1;
         }
-        if (chargen_popup_choice(2200, 7, 8, (int)D_00170BB5, 50, 33) == 0) {
+        if (chargen_popup_choice(2200, 7, 8, D_00170BB5, 50, 33) == 0) {
             player_character->flags &= ~0x1;
         } else {
             player_character->flags |= 1;
         }
-        disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
+        disk_read_file(D_00170BB5, *(int *)scratch_buffer);
         mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 213, 4);
-        image = (struct image *)disk_read_file((int)D_00170BF3, 0);
+        image = (struct image *)disk_read_file(D_00170BF3, 0);
         xn_draw_image(68, 28, 184, 144, image);
         if (image != 0 && (int)image != (-1751672937)) {
             mc_free(image, (int)D_00170B88, 217);
@@ -216,12 +216,12 @@ L3A496:;
         }
         if (((int)(short)*(short *)&choice) == 2) {
 L3AABE:;
-            disk_read_file((int)D_00170BAD, *(int *)scratch_buffer);
+            disk_read_file(D_00170BAD, *(int *)scratch_buffer);
             for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
                 *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&choice))) <<= 2;
             }
             xn_pal_set_all_8bit(*(int *)scratch_buffer);
-            disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
+            disk_read_file(D_00170BB5, *(int *)scratch_buffer);
             mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 251, 4);
             list_popup_open((int)D_0017CCFA);
             for (;;) {
@@ -236,13 +236,13 @@ L3AABE:;
                         break;
                     }
                     sound_play_ui(217);
-                    if (chargen_popup_choice((int)(short)(choice + 2100), 4, 5, (int)D_00170BB5, 21, 49) == 0) {
+                    if (chargen_popup_choice((int)(short)(choice + 2100), 4, 5, D_00170BB5, 21, 49) == 0) {
                         mc_set_location(272, (int)D_00170B88);
                         mc_sprintf((int)text_buffer, (int)D_00170C00, (int)(short)*(short *)&choice);
-                        disk_read_file((int)text_buffer, (int)player_class);
+                        disk_read_file(text_buffer, (int)player_class);
                         break;
                     }
-                    disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
+                    disk_read_file(D_00170BB5, *(int *)scratch_buffer);
                     mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 278, 4);
                     list_popup_open((int)D_0017CCFA);
                 }
@@ -252,15 +252,15 @@ L3AABE:;
             }
         } else {
             if ((D_00199634 = class_questions_run()) < 0) goto L3AABE;
-            disk_read_file((int)D_00170BAD, *(int *)scratch_buffer);
+            disk_read_file(D_00170BAD, *(int *)scratch_buffer);
             for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
                 *(signed char *)((char *)(int)(*(char **)scratch_buffer + ((int)(short)*(short *)&choice))) <<= 2;
             }
             xn_pal_set_all_8bit(*(int *)scratch_buffer);
         }
-        disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
+        disk_read_file(D_00170BB5, *(int *)scratch_buffer);
         mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 299, 4);
-        image = (struct image *)disk_read_file((int)D_00170C0E, 0);
+        image = (struct image *)disk_read_file(D_00170C0E, 0);
         xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
         if (image != 0 && (int)image != (-1751672937)) {
             mc_free(image, (int)D_00170B88, 303);

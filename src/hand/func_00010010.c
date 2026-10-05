@@ -35,7 +35,7 @@ extern void dpmi_memory_stats(void);
 extern void crash_screen(void);
 extern void player_movement_update(void);
 extern void config_read(char *);
-extern void dpmi_lock_region(void *, int);
+extern int dpmi_lock_region(void *, int);
 extern void causeway_disable_error_dump(void);
 extern void exit(int);
 extern void func_0009DBF9(void);

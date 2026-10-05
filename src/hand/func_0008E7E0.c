@@ -4,7 +4,7 @@
 extern short object_count_result;
 extern short D_001A9B42;
 extern void object_foreach(struct record *, void (*)());
-extern void object_count_type_cb();
+extern void object_count_type_cb(struct record *);
 
 int object_count_type(struct record *root, short type)
 {

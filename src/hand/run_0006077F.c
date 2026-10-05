@@ -9,9 +9,9 @@ extern int magic_def_count;
 extern struct magic_template *magic_def;
 extern int enchant_item_value(struct item *);
 extern void item_make_random(unsigned short, struct item *);
-extern void item_make(unsigned char, unsigned char, struct item *);
+extern void item_make(int, int, struct item *);
 extern void item_roll_material(struct item *);
-extern int armor_image_for_type(int, unsigned short);
+extern int armor_image_for_type(int, int);
 extern int rand_range(int, int);
 extern void mc_strncpy(void *, char *, int, char *, int);
 

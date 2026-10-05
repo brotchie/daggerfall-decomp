@@ -14,7 +14,7 @@ extern signed char D_001962A4;
 extern signed char D_001962A5;
 extern signed char D_001962B0;
 
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int mc_free();
 extern int mc_memset();
 extern int mc_set_location(int, int);
@@ -38,7 +38,7 @@ void prison_serve_sentence(int days)
     D_001962A4 = 1;
     D_001962A5 = 0;
     D_00196294 = 1;
-    image = disk_read_file((int)D_001706E9, 0);
+    image = disk_read_file(D_001706E9, 0);
     mc_memset(655360, 0, 64000, (int)D_001706E1, 384, 4);
     for (day = 0; day < 768; day++) {
         *(signed char *)((char *)(image + day) + 64000) <<= 2;

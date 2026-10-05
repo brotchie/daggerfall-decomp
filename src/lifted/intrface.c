@@ -103,7 +103,7 @@ extern signed char D_001A5B34;
 
 extern int engine_pick_object(int, int, struct pick_result *);
 extern int collide_move_player(struct record *, int, struct move_request *, int);
-extern int damage_apply(struct record *, int, int);
+extern int damage_apply(struct record *, int, struct record *);
 extern int key_action_held(int);
 extern int key_action_pressed(int);
 extern int object_weight(struct record *);
@@ -112,13 +112,13 @@ extern int links_object_motion(int);
 extern int sound_channel_done(int);
 extern int sound_play(int, struct record *, int);
 extern int sound_play_loop(int, struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
-extern int intrface_region_at(short, short, int *, int *);
+extern int intrface_region_at(int, int, int *, int *);
 extern int player_try_move(int);
 extern int player_try_move_vertical(int);
-extern int climb_angle_ok(unsigned short);
+extern int climb_angle_ok(int);
 extern int hex_digit_value(char *);
 extern int rand();
 extern int mc_free();
@@ -134,15 +134,15 @@ extern int xn_draw_image_transparent();
 extern int xn_math_isqrt();
 extern int xn_joy_poll();
 extern void skill_add_uses(int, int);
-extern void cast_fire_missile(int);
-extern void links_trigger(int, int);
+extern void cast_fire_missile(struct record *);
+extern void links_trigger(struct record *, int);
 extern void sound_stop_channel(int);
 extern void fatigue_add(int);
 extern void click_world_object(struct pick_result *, struct record *);
 extern void func_0007EED8(void);
 extern void cursor_draw(short);
 extern void player_mouse_look(void);
-extern void intrface_steer(short, int, int, int);
+extern void intrface_steer(int, int, int, int);
 int intrface_key_region(void);
 int player_climb_probe(void);
 char *string_last_char(char *);
@@ -159,8 +159,8 @@ void intrface_init(void)
 {
     short i;
 
-    cursor_region_images = disk_read_file((int)D_00176A68, 0);
-    cursor_arrow_image = disk_read_file((int)D_00176A72, 0);
+    cursor_region_images = disk_read_file(D_00176A68, 0);
+    cursor_arrow_image = disk_read_file(D_00176A72, 0);
     mc_memset(*(int *)scratch_buffer, 0, 256, (int)D_00176A7C, 44, 4);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 10; (*(int *)&i)++) {
@@ -329,7 +329,7 @@ void click_activate(int at_view_centre)
             return;
         }
         if ((int)spell_ready_missile == 0) return;
-        cast_fire_missile((int)spell_ready_missile);
+        cast_fire_missile(spell_ready_missile);
         spell_ready_missile = 0;
     }
 }
@@ -547,9 +547,9 @@ void player_movement_update(void)
         }
         blocked = player_try_move(step);
         if (((int)(short)(*(short *)collide_flags & 16)) == 0 && ((int)(short)(*(short *)collide_flags & 1)) != 0) {
-            links_trigger((int)D_00195CB8, 1);
+            links_trigger(D_00195CB8, 1);
         }
-        if (((int)(short)(*(short *)collide_flags & 2)) != 0) links_trigger((int)D_00195C70, 3);
+        if (((int)(short)(*(short *)collide_flags & 2)) != 0) links_trigger(D_00195C70, 3);
     }
     if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
     if (distance == 0 && (int)D_00195CB8 != 0 && links_object_motion((int)D_00195CB8) != 0) {

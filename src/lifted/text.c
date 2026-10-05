@@ -74,24 +74,24 @@ extern int people_count;
 extern struct quest *current_quest;
 extern int daylight;
 
-extern struct faction *faction_find_type_in_region(int, short);
+extern struct faction *faction_find_type_in_region(short, short);
 extern int climate_category(void);
 extern int collide_creature_near(int, int);
-extern char *text_rsc_load(int, int, int);
-extern char *text_qrc_load_for_quest(struct quest *, short, int, short);
+extern char *text_rsc_load(short, unsigned short, short);
+extern char *text_qrc_load_for_quest(struct quest *, short, short, short);
 extern int msgbox_render_rsc(short, int, int);
 extern int msgbox_render_quest_text(struct quest *, short, int, int);
 extern int town_map_area_clear(int, int);
 extern int ai_angle_diff(int, int, int *);
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
 extern int spawn_find_point(struct record *, int, int);
 extern int key_pressed_once(unsigned char);
 extern int rand_range(int, int);
 extern int location_contains(int, int);
 extern int inpstr_update(void);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int rand();
 extern int abs();
@@ -110,11 +110,11 @@ extern int xn_terrain_height_at();
 extern unsigned char ground_tile_at(int, int);
 extern void marquee_start(char *);
 extern void msgbox_render(char *, char **);
-extern void msgbox_set_border_style(int);
+extern void msgbox_set_border_style(short);
 extern void guards_summon(int);
 extern void pedestrian_pick_sprite(struct record *);
 extern void keys_world_actions(void);
-extern void game_exit(int);
+extern void game_exit(char *);
 extern void func_0006987B(void);
 extern void monster_init(struct record *, int);
 extern void mode_push(void);
@@ -357,7 +357,7 @@ L3F47F:;
     }
     button = msgbox_button_at((int)(short)mouse_x, (int)(short)mouse_y);
     if ((short)button == 0) return;
-    sound_play(203, (int)player_object, 110);
+    sound_play(203, player_object, 110);
     D_00196271 = button;
     msgbox_close();
 }
@@ -379,8 +379,8 @@ void msgbox_close(void)
 
 void msgbox_load_borders(void)
 {
-    msgbox_spop_tiles[0] = disk_read_file((int)D_00170DAE, 0);
-    msgbox_mpop_tiles = disk_read_file((int)D_00170DB7, 0);
+    msgbox_spop_tiles[0] = disk_read_file(D_00170DAE, 0);
+    msgbox_mpop_tiles = disk_read_file(D_00170DB7, 0);
     msgbox_set_border_style(0);
 }
 

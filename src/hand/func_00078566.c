@@ -13,12 +13,12 @@ extern char D_00190704[];
 extern int monster_bsa_handle;
 extern struct character *player_character;
 extern signed char D_00196293;
-extern int archive_find_record(int, int, int);
+extern int archive_find_record(int, char *, int);
 extern int archive_read_record(int, int, int);
-extern void loot_generate(int, struct record *, int, unsigned short);
+extern void loot_generate(int, struct record *, int, int);
 extern int monster_set_action(struct record *, int, int);
 extern int monster_alloc_anim_slot(void);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int monster_roll_d8_health(int, int);
 extern int monster_roll_class_health(int, int, int);
 extern void monster_init_gear(struct record *);
@@ -102,7 +102,7 @@ void monster_init(struct record *monster, int monster_type)
         }
         mc_set_location(91, (int)D_00176844);
         mc_sprintf((int)text_buffer, (int)D_0017685B, monster_char->ascr_record);
-        record_index = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
+        record_index = archive_find_record(monster_bsa_handle, text_buffer, 8);
         *(int *)(D_00190704 + (monster_char->anim_slot << 2)) = (int)(anim->anim_script = (char *)archive_read_record(monster_bsa_handle, record_index, 0));
         anim->anim_request = 0;
         do {
@@ -116,11 +116,11 @@ void monster_init(struct record *monster, int monster_type)
         if (monster_type >= 43) {
             mc_set_location(112, (int)D_00176844);
             mc_sprintf((int)text_buffer, (int)D_00176868, class_index);
-            disk_read_file((int)text_buffer, (int)career);
+            disk_read_file(text_buffer, (int)career);
         } else {
             mc_set_location(117, (int)D_00176844);
             mc_sprintf((int)text_buffer, (int)D_00176876, monster_type);
-            record_index = archive_find_record(monster_bsa_handle, (int)text_buffer, 8);
+            record_index = archive_find_record(monster_bsa_handle, text_buffer, 8);
             archive_read_record(monster_bsa_handle, record_index, (int)career);
         }
         if (type_147 != 0) {

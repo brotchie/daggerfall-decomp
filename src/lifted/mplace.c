@@ -41,8 +41,8 @@ extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern int location_here_contains(int, int);
 extern int location_contains(int, int);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int rand();
 extern int srand();
@@ -54,7 +54,7 @@ extern int xn_math_yaw_offset_xz();
 extern int xn_terrain_height_at();
 extern void monster_init(struct record *, int);
 extern void monster_pacify_check(struct record *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 int encounter_pick_monster(int);
 int place_marker_in_range(struct record *, int);
 void place_assign_marker_monster(struct record *);
@@ -366,7 +366,7 @@ void dungeon_roll_monster_tables(void)
     for (i = 0; i < 256; i++) {
         dungeon_water_monster_table[i] = encounter_pick_monster(1);
     }
-    object_foreach(location_object, (int)place_assign_marker_monster);
+    object_foreach(location_object, place_assign_marker_monster);
     srand(saved_seed);
 }
 

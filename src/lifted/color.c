@@ -25,7 +25,7 @@ extern int mc_memcpy();
 extern int xn_str_fill_ascending();
 extern int xn_mem_align_up();
 extern int xn_collide_spheres_model();
-extern void object_foreach_post(struct record *, int);
+extern void object_foreach_post(struct record *, void (*)());
 int door_blocked_by_player(struct record *);
 void building_disable_monster_marker_cb(struct record *);
 
@@ -158,5 +158,5 @@ void building_disable_monster_markers(struct record *building)
 
     minute_of_day = ((unsigned)game_minutes) % 1440;
     *(int *)scratch_190be4 = (((minute_of_day > 360) && (minute_of_day < 1080)) ? 1 : 0);
-    object_foreach_post(building->children, (int)building_disable_monster_marker_cb);
+    object_foreach_post(building->children, building_disable_monster_marker_cb);
 }

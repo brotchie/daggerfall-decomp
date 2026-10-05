@@ -4,11 +4,11 @@
 extern char D_00170464[];       /* __FILE__ */
 extern struct record *player_entity;
 extern int D_001966FC[];
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 /* a biography person: a type 45+kind record holding a character record and its class */
-unsigned short bio_person_add(struct character *person, struct career *career, int kind)
+unsigned short bio_person_add(struct character *person, char *career, int kind)
 {
     struct record *object;
 

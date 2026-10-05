@@ -60,7 +60,7 @@ extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
 extern void time_pass_minutes(int);
 extern void palette_restore(void);
-extern void rest_recover(int);
+extern void rest_recover(struct record *);
 extern void weapon_load_hand_sprite(struct record *, int);
 extern void weapon_free_sprites(void);
 void fatigue_add(int);
@@ -147,7 +147,7 @@ void fatigue_add(int amount)
     msgbox_show_rsc(1071, 1);
     D_001962A4 = 1;
     time_pass_minutes(60);
-    rest_recover((int)player_entity);
+    rest_recover(player_entity);
     D_001962A4 = 0;
 }
 

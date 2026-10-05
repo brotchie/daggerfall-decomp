@@ -14,7 +14,7 @@ extern int D_00196708;
 extern struct faction *D_0019670C;
 extern struct faction *D_0019671C;
 extern int faction_player_related(struct faction *);
-extern unsigned char func_0001D66C(struct rumor *);
+extern int func_0001D66C(struct rumor *);
 extern void parse_rsc_text(int, int, int);
 extern int rand_range(int, int);
 extern void mc_memset(char *, int, int, char *, int, int);

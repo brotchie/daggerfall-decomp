@@ -35,7 +35,7 @@ extern char D_001998D6[];
 extern char D_001998D7[];
 extern struct enchantment itemmaker_slots[];
 extern signed char D_00199910[];
-extern void msgbox_show_string(char *, int);
+extern void msgbox_show_string(char *, short);
 extern void func_00057147(short, short, short, short, short, short, short);
 extern int itemmaker_free_slot(void);
 extern int itemmaker_free_slot_count(void);

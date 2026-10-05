@@ -19,9 +19,9 @@ extern void shop_stock_soul_traps(int);
 extern int blessing_apply(struct blessing *, int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
-extern void spfx_cure_disease(int, int);
+extern void spfx_cure_disease(struct record *, struct character *);
 extern void object_free_children(int);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern void inventory_open_container(int, int, int);
 extern int trade_adjust_price(int, int);
 extern void trade_make_offer(void);
@@ -128,7 +128,7 @@ void guild_cure_diseases(void)
         return;
     }
     gold_spend(price);
-    spfx_cure_disease((int)player_entity, (int)player_character);
+    spfx_cure_disease(player_entity, player_character);
 }
 
 void guild_buy_blessing(void)

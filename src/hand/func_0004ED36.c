@@ -130,7 +130,7 @@ extern int func_0007EEAF(void);
 extern void intrface_init(void);
 extern void intrface_set_regions(void);
 extern void model_heap_init(int);
-extern void object_foreach_open();
+extern void object_foreach_open(struct record *, void (*)());
 extern void color_init_remap_tables(void);
 extern int srand(int);
 extern int close(int);

@@ -78,13 +78,13 @@ extern unsigned char bank_screen;
 extern signed char bank_selected;
 extern signed char bank_house_count;
 
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
 extern int gold_can_carry(int);
-extern int model_get(unsigned short, int, int);
+extern int model_get(int, int, int);
 extern int inpstr_update(void);
-extern int object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern int mc_free();
 extern int mc_memset();
 extern int mc_malloc();
@@ -108,7 +108,7 @@ extern int xn_model_submit();
 extern int xn_kbd_flush();
 extern int xn_draw_image_transparent();
 extern int xn_shade_set_fog();
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void msgbox_update(void);
 extern void item_make(int, int, struct item *);
@@ -116,8 +116,8 @@ extern void bank_draw(void);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void msgbox_yes_no_rsc(int);
 extern void cursor_draw_arrow(void);
-extern void inpstr_begin_text(int, short);
-extern void object_foreach(struct record *, int);
+extern void inpstr_begin_text(char *, int);
+extern void object_foreach(struct record *, void (*)());
 int bank_open(int);
 int bank_confirm(int);
 int bank_input_amount(void);
@@ -136,10 +136,10 @@ int bank_open(int opening)
     if (opening != 0) {
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         D_001A41E4 = 0;
-        window_image = disk_read_file((int)D_00175C90, 0);
-        *(int *)D_00195B5C = disk_read_file((int)D_00175C9D, 0);
-        D_001A41E8 = disk_read_file((int)D_00175CAA, 0);
-        D_001A4140 = disk_read_file((int)D_00175CB7, 0);
+        window_image = disk_read_file(D_00175C90, 0);
+        *(int *)D_00195B5C = disk_read_file(D_00175C9D, 0);
+        D_001A41E8 = disk_read_file(D_00175CAA, 0);
+        D_001A4140 = disk_read_file(D_00175CB7, 0);
         xn_cam_set_view_window(51, 45, 216, 72);
         D_00196272 = 1;
         game_mode = 15;
@@ -150,7 +150,7 @@ int bank_open(int opening)
         bank_saved_screen = mc_malloc(64000, (int)D_00175CC4, 89);
         mc_memcpy(bank_saved_screen, screen_buffer, 64000, (int)D_00175CC4, 90, 4);
         bank_account = &bank_accounts->data.bank_accounts[(int)(unsigned char)current_region];
-        object_foreach(location_object, (int)bank_add_house_for_sale);
+        object_foreach(location_object, bank_add_house_for_sale);
         bank_init_ships();
     }
     return ((((int)(unsigned char)game_mode) == 15) ? 1 : 0);
@@ -216,7 +216,7 @@ void bank_frame(void)
     }
     for (i = first; i < last; i++) {
         if (mouse_x > bank_buttons[i].x0 && mouse_x < bank_buttons[i].x1 && mouse_y > bank_buttons[i].y0 && mouse_y < bank_buttons[i].y1) {
-            sound_play(203, (int)player_object, 100);
+            sound_play(203, player_object, 100);
             bank_buttons[i].handler();
         }
     }
@@ -294,7 +294,7 @@ void bank_withdraw_gold(void)
         player_character->gold += amount;
         return;
     }
-    msgbox_show_string((int)D_00175CD0, 1);
+    msgbox_show_string(D_00175CD0, 1);
 }
 
 void bank_deposit_letter(struct record *object)
@@ -311,7 +311,7 @@ void bank_deposit_letter(struct record *object)
 void bank_deposit_letters_of_credit(void)
 {
     if (bank_confirm(291) == 0) return;
-    object_foreach(player_entity->children, (int)bank_deposit_letter);
+    object_foreach(player_entity->children, bank_deposit_letter);
 }
 
 void bank_withdraw_letter_of_credit(void)
@@ -623,7 +623,7 @@ int bank_input_amount(void)
     *(signed char *)D_00191020 = 0;
     text_cursor_x = 157;
     text_cursor_y = 152;
-    inpstr_begin_text((int)D_00191020, 10);
+    inpstr_begin_text(D_00191020, 10);
     xn_kbd_flush();
     mouse_buttons = (mouse_buttons_prev = 0);
     while (done == 0) {

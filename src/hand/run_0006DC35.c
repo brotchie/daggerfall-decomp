@@ -19,15 +19,15 @@ extern unsigned char D_00196271;
 extern struct faction *D_0019671C;
 extern struct membership *guild_membership;
 extern unsigned char D_001A4A1D;
-extern void msgbox_show_rsc(short, int);
+extern void msgbox_show_rsc(int, int);
 extern int guild_join_check(int);
 extern int guild_rank_for_skills(int);
 extern struct membership *guild_find_membership_by_faction(short);
-extern int guild_find_membership_by_bits(unsigned char);
+extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern void guild_give_map(int);
-extern void msgbox_yes_no_rsc(short);
-extern void object_delete(struct record *);
-extern struct record *object_create_child(struct record *, int, int);
+extern void msgbox_yes_no_rsc(int);
+extern struct record *object_delete(struct record *);
+extern struct record *object_create_child(struct record *, struct record *, int);
 extern void xn_mouse_poll_clamped(void);
 extern char D_00175EAA[];
 extern char D_00175EB3[];
@@ -78,12 +78,12 @@ extern struct faction *faction_find(short);
 extern void daedra_summon(struct record *);
 extern int spellmaker_open(int);
 extern void training_offer(int);
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern int itemmaker_open(int);
 extern void item_make_in_range(unsigned short, int, int, struct item *);
 extern void bank_add_house_for_sale(struct record *);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern void guild_buy_potions(void);
 extern void guild_buy_spells(void);
 extern void guild_buy_magic_items(void);
@@ -93,7 +93,7 @@ extern void guild_cure_diseases(void);
 extern void guild_buy_blessing(void);
 extern void guild_donate(void);
 extern void guild_temple_quest(void);
-extern int guild_kind_of_faction(int);
+extern int guild_kind_of_faction(struct faction *);
 extern int guild_service_label(short);
 extern int guild_menu(int, int, int);
 extern void guild_heal(void);
@@ -102,7 +102,7 @@ extern void npc_talk(struct record *);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern void object_free_children(int);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern int potionmaker_open(int);
 extern void inventory_open_container(int, int, int);
 extern void inv_store_item(struct record *);
@@ -209,7 +209,7 @@ void guild_service_dispatch(struct record *npc)
     object_free_children((int)D_001960D9);
     D_0019671C = faction_find(current_building->faction_id);
     guild_membership = guild_find_membership_by_faction(current_building->faction_id);
-    guild = guild_kind_of_faction((int)D_0019671C);
+    guild = guild_kind_of_faction(D_0019671C);
     scratch_object = npc;
     guild_join_or_promote(guild, 0);
     D_001A4A1A = ((unsigned)npc->id) >> 16;
@@ -221,7 +221,7 @@ void guild_service_dispatch(struct record *npc)
     is_member = ((guild_membership != 0) ? 1 : 0);
     mc_set_location(163, (int)D_00175EAA);
     mc_sprintf((int)text_buffer, (int)D_00175EB3, is_member + 48);
-    image = disk_read_file((int)text_buffer, 0);
+    image = disk_read_file(text_buffer, 0);
     choice = guild_menu(image, is_member, label);
     switch (choice) {
     case 0:
@@ -372,7 +372,7 @@ void guild_service_dispatch(struct record *npc)
                 inventory_open_container((int)D_001960D9, 4, 8);
                 break;
             default:
-                msgbox_show_string((int)D_00175EC1, 1);
+                msgbox_show_string(D_00175EC1, 1);
             }
         }
         break;
@@ -487,7 +487,7 @@ void guild_service_dispatch(struct record *npc)
                     msgbox_show_rsc(460, 1);
                     break;
                 }
-                object_foreach(location_object, (int)bank_add_house_for_sale);
+                object_foreach(location_object, bank_add_house_for_sale);
                 if (bank_house_count == 0) break;
                 choice = rand_range(0, (unsigned char)bank_house_count - 1);
                 player_character->house = bank_houses_for_sale[choice].id;
@@ -515,7 +515,7 @@ void guild_service_dispatch(struct record *npc)
                 }
                 break;
             default:
-                msgbox_show_string((int)D_00175EEC, 1);
+                msgbox_show_string(D_00175EEC, 1);
             }
         }
         break;
@@ -574,7 +574,7 @@ L6E949:;
                 guild_cure_diseases();
                 break;
             default:
-                msgbox_show_string((int)D_00175F17, 1);
+                msgbox_show_string(D_00175F17, 1);
             }
         }
         break;
@@ -627,7 +627,7 @@ L6E949:;
                 guild_temple_quest();
                 break;
             default:
-                msgbox_show_string((int)D_00175F42, 1);
+                msgbox_show_string(D_00175F42, 1);
             }
         }
         break;
@@ -680,7 +680,7 @@ L6E949:;
                 guild_temple_quest();
                 break;
             default:
-                msgbox_show_string((int)D_00175F6D, 1);
+                msgbox_show_string(D_00175F6D, 1);
             }
         }
         break;
@@ -733,7 +733,7 @@ L6E949:;
                 guild_temple_quest();
                 break;
             default:
-                msgbox_show_string((int)D_00175F98, 1);
+                msgbox_show_string(D_00175F98, 1);
             }
         }
         break;
@@ -786,7 +786,7 @@ L6E949:;
                 guild_temple_quest();
                 break;
             default:
-                msgbox_show_string((int)D_00175FC3, 1);
+                msgbox_show_string(D_00175FC3, 1);
             }
         }
         break;
@@ -839,7 +839,7 @@ L6E949:;
                 guild_temple_quest();
                 break;
             default:
-                msgbox_show_string((int)D_00175FEE, 1);
+                msgbox_show_string(D_00175FEE, 1);
             }
         }
         break;
@@ -892,7 +892,7 @@ L6E949:;
                 guild_temple_quest();
                 break;
             default:
-                msgbox_show_string((int)D_00176019, 1);
+                msgbox_show_string(D_00176019, 1);
             }
         }
         break;
@@ -945,7 +945,7 @@ L6E949:;
                 guild_temple_quest();
                 break;
             default:
-                msgbox_show_string((int)D_00176044, 1);
+                msgbox_show_string(D_00176044, 1);
             }
         }
     }

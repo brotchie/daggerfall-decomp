@@ -40,10 +40,10 @@ extern int logbook_first_entry;
 extern char logbook_show_notes[];
 extern int logbook_entry_count;
 
-extern int sheet_open(int);
+extern int sheet_open(short);
 extern struct quest *quest_find_by_id(int);
 extern int font_char_width(unsigned char);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int logbook_open(int);
 extern char *str_list_skip(char *, int);
 extern int disk_read_file(int, int);
@@ -60,7 +60,7 @@ extern int write();
 extern int strlen();
 extern int mc_memcpy();
 extern int xn_font_select();
-extern void quest_load_text(struct quest *, int, int, int);
+extern void quest_load_text(struct quest *, int, short, int);
 extern void book_flush_line(void);
 extern void func_0005A1C8(char *);
 int logbook_close(void);
@@ -181,14 +181,14 @@ L6AB05:;
 void logbook_prev_page(void)
 {
     if (logbook_first_entry == 0) return;
-    sound_play(205, (int)player_object, 100);
+    sound_play(205, player_object, 100);
     logbook_first_entry--;
 }
 
 void logbook_next_page(void)
 {
     if ((logbook_entry_count - 1) <= logbook_first_entry) return;
-    sound_play(205, (int)player_object, 100);
+    sound_play(205, player_object, 100);
     logbook_first_entry++;
 }
 
@@ -275,7 +275,7 @@ void logbook_toggle_notes(void)
     *(signed char *)logbook_show_notes ^= 1;
     logbook_first_entry = 0;
     logbook_build_entries();
-    sound_play(237, (int)player_object, 100);
+    sound_play(237, player_object, 100);
 }
 
 void logbook_copy_text(char *text)

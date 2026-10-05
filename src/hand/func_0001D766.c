@@ -7,7 +7,7 @@ extern signed char text_rsc_buffer[];
 extern char *game_minutes;
 extern char text_missing_ok;
 extern int rumor_file;
-extern void quest_load_text(struct quest *, int, int, int);
+extern void quest_load_text(struct quest *, int, short, int);
 extern int disk_open_rw(char *);
 extern int disk_file_exists(char *);
 extern int close(int);

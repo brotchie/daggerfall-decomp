@@ -17,11 +17,11 @@ extern signed char D_001962AE;
 extern struct record *inv_selected_item;
 
 extern int object_weight(struct record *);
-extern int object_reparent(struct record *, struct record *);
+extern struct record *object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
 extern int trade_can_repair_item(struct item *);
 extern void msgbox_show_rsc(int, int);
-extern void quest_raise_event(int, int, int);
+extern void quest_raise_event(short, struct record *, struct record *);
 extern void inv_use_item(void);
 extern void inv_item_info(struct record *, struct item *);
 extern void inv_equip_item(struct record *);
@@ -90,7 +90,7 @@ L94793:;
             if (((int)D_00196120) == (int)object->parent) object->owner = *(short *)picked_model_index;
             object->id = object_new_id(((unsigned)location_object->id) >> 16);
             if (object->twin != 0) object->twin->id = object->id;
-            quest_raise_event(5, (int)object, 0);
+            quest_raise_event(5, object, 0);
             trade_schedule_repair();
             return;
         case 3:

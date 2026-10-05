@@ -100,9 +100,9 @@ extern signed char D_001AA6A5;
 extern signed char D_001AA6A6;
 
 extern int climate_at(int, int);
-extern int sound_play(int, int, int);
-extern int disk_read_file(int, int);
-extern int guild_find_membership_by_bits(unsigned char);
+extern int sound_play(int, struct record *, int);
+extern int disk_read_file(char *, int);
+extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int key_pressed_once(unsigned char);
 extern int gold_can_afford(int);
 extern int travel_map_open(int);
@@ -134,7 +134,7 @@ extern void palette_restore(void);
 extern void text_draw_coloured(int, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
 extern void msgbox_yes_no_rsc(int);
-extern void inpstr_begin_text(int, short);
+extern void inpstr_begin_text(char *, int);
 extern void object_foreach(int, int);
 extern void travel_draw_trip_popup(void);
 int travel_location_at_cursor(void);
@@ -312,7 +312,7 @@ void travel_button_exit(int button)
         func_0009BE38();
         return;
     }
-    sound_play(203, (int)player_object, 110);
+    sound_play(203, player_object, 110);
     mc_memset(screen_buffer, 0, 64000, (int)D_0017743D, 367, 4);
     xn_gfx_present_inclusive(1);
     palette_restore();
@@ -429,7 +429,7 @@ void travel_open_region(int region)
         }
         mc_set_location(461, (int)D_0017743D);
         mc_sprintf((int)text_buffer, (int)D_00177446, region);
-        D_001AA668 = (struct image *)disk_read_file((int)text_buffer, 0);
+        D_001AA668 = (struct image *)disk_read_file(text_buffer, 0);
         maploads_load_region(region);
         region_load_location_names(region);
         saved_screen = screen_buffer;
@@ -543,7 +543,7 @@ void travel_button_map(void)
         return;
     }
     D_00190CE8 = 0;
-    sound_play(203, (int)player_object, 110);
+    sound_play(203, player_object, 110);
     pixel = (int)(unsigned char)*(signed char *)((char *)(int)(*(char **)&D_001AA66C + ((((int)(short)mouse_y) * 320) + ((int)(short)mouse_x))));
     if (pixel < 128 || pixel == 255) return;
     D_001889BC = *(signed char *)&pixel - 128;
@@ -569,7 +569,7 @@ void travel_toggle_option(int button)
     if (((int)(unsigned char)(mouse_buttons & 1)) == 0 || ((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
         return;
     }
-    sound_play(203, (int)player_object, 110);
+    sound_play(203, player_object, 110);
     if (button < 2) {
         *(signed char *)travel_options ^= 3;
     } else if (button < 4) {
@@ -597,7 +597,7 @@ void travel_popup_exit(void)
     if (((int)(unsigned char)(mouse_buttons & 1)) == 0 || ((int)(unsigned char)(mouse_buttons_prev & 1)) != 0) {
         return;
     }
-    sound_play(203, (int)player_object, 110);
+    sound_play(203, player_object, 110);
     scratch_190ce5 = 0;
 }
 
@@ -615,7 +615,7 @@ void travel_button_find(void)
     }
     if (scratch_190ce4[0] == 0) return;
     D_00190CE8 = 0;
-    sound_play(203, (int)player_object, 110);
+    sound_play(203, player_object, 110);
     D_0012B508 = 145;
     xn_kbd_flush();
     prompt = *(int *)scratch_buffer + 55000;
@@ -623,7 +623,7 @@ void travel_button_find(void)
     mc_sprintf(prompt, (int)D_00177460, D_001846F4);
     *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
     text_rsc_buffer[0] = 0;
-    inpstr_begin_text((int)text_rsc_buffer, 32);
+    inpstr_begin_text(text_rsc_buffer, 32);
     msgbox_show_string(prompt, 2);
     if (strnicmp((int)D_0017748E, (int)text_rsc_buffer, 4) == 0) {
         mc_memcpy((int)text_rsc_buffer, (int)D_00190FE8, (int)&*(signed char *)((char *)strlen((int)text_rsc_buffer) + 1), (int)D_0017743D, 812, 2048);
@@ -827,7 +827,7 @@ void travel_load_region_part(void)
     }
     mc_set_location(1121, (int)D_0017743D);
     mc_sprintf((int)text_buffer, (int)D_00177493, ((int)(unsigned char)D_001AA6A5) + 97, ((int)(signed char)scratch_190ce4[0]) - 1);
-    D_001AA668 = (struct image *)disk_read_file((int)text_buffer, 0);
+    D_001AA668 = (struct image *)disk_read_file(text_buffer, 0);
     saved_screen = screen_buffer;
     screen_buffer = (int)D_001AA668;
     travel_draw_locations();
@@ -846,7 +846,7 @@ void travel_button_arrows(int button)
     } else {
         D_001AA6A5 ^= 1;
     }
-    sound_play(203, (int)player_object, 110);
+    sound_play(203, player_object, 110);
     travel_load_region_part();
 }
 

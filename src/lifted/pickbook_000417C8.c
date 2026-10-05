@@ -24,7 +24,7 @@ extern int spellbook_saved_screen;
 extern int spellbook_build_list(void);
 extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int mc_malloc();
 extern int mc_memcpy();
 extern int xn_font_select();
@@ -52,8 +52,8 @@ int spellbook_open(short force)
         spellbook_saved_screen = mc_malloc(64000, (int)D_00170DE4, 101);
         mc_memcpy(spellbook_saved_screen, screen_buffer, 64000, (int)D_00170DE4, 102, 4);
         game_mode = 5;
-        window_image = disk_read_file((int)D_00170DF7, 0);
-        magic_window_image = disk_read_file((int)D_00170E04, 0);
+        window_image = disk_read_file(D_00170DF7, 0);
+        magic_window_image = disk_read_file(D_00170E04, 0);
         D_00196272 = 1;
         sound_play(237, player_object, 100);
     }

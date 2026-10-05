@@ -54,7 +54,7 @@ extern int mc_memcpy();
 extern int func_000A148C(int, ...);
 extern int xn_math_approx_dist2d();
 extern void unequip_object(struct record *);
-extern void fatal_error(int);
+extern void fatal_error(char *);
 extern void mem_pool_init(int, int);
 extern void mem_pool_free(int);
 extern void object_follow_move_cb(struct record *);
@@ -164,7 +164,7 @@ struct record *object_alloc(struct record *after, struct record *source, int dat
     size = data_size + 71;
     object_heap_free -= size + 18;
     object = (struct record *)mem_pool_alloc((int)object_heap, size);
-    if (object == 0) fatal_error((int)D_00176E70);
+    if (object == 0) fatal_error(D_00176E70);
     if (source != 0) {
         mc_memcpy(object, source, 55, (int)D_00176E44, 163, 4);
         mc_memcpy(&object->data, &source->data, size - 71, (int)D_00176E44, 164, 4);

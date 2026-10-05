@@ -30,11 +30,11 @@ extern int xn_pal_get();
 extern int xn_draw_image();
 extern int xn_draw_image_transparent();
 extern void parse_rsc_text(int, int, int);
-extern void quest_load_text(struct quest *, int, int, int);
-extern void fatal_error(int);
-extern void flc_decode_palette(char *, char *, unsigned char);
-extern void flc_decode_lc(char *, struct flc_player *);
-extern void flc_decode_ss2(char *, struct flc_player *);
+extern void quest_load_text(struct quest *, int, short, int);
+extern void fatal_error(char *);
+extern void flc_decode_palette(unsigned char *, unsigned char *, unsigned char);
+extern void flc_decode_lc(unsigned char *, struct flc_player *);
+extern void flc_decode_ss2(unsigned char *, struct flc_player *);
 extern void text_draw_centred_coloured(char *, int, int, int, unsigned char);
 int flc_next_frame(struct flc_player *);
 char *flc_draw_text_page(char *);
@@ -72,7 +72,7 @@ int flc_play_with_text(int name, struct flc_player *anim, int text_id, int ask_y
     if (flc_open(name, anim) == 0) {
         mc_set_location(131, (int)D_00175404);
         mc_sprintf((int)text_buffer, (int)D_0017540B, name);
-        fatal_error((int)text_buffer);
+        fatal_error(text_buffer);
     }
     mc_memset(screen_buffer, 0, 64000, (int)D_00175404, 135, 4);
     anim->loops = 255;

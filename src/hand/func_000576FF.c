@@ -5,7 +5,7 @@ extern int scratch_190ee4[];
 extern char *scratch_buffer;
 extern struct magic_enchantment D_00199868[][5];   /* itemmaker_slot_exclusions */
 extern struct enchantment itemmaker_slots[];
-extern int itemmaker_param_excluded(short, short);
+extern int itemmaker_param_excluded(int, int);
 extern void list_popup_open(int *);
 
 void itemmaker_show_param_list(int *names, short type)

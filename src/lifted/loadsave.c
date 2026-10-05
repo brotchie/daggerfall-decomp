@@ -143,9 +143,9 @@ extern struct record *inv_left_container;
 extern int D_001AA580;
 
 extern int func_000641CD(struct record *);
-extern int sound_play(int, int, int);
+extern int sound_play(int, struct record *, int);
 extern int mem_block_size(int);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int savetree_read_chunk(struct record *);
 extern int savetree_write_record(struct record *);
 extern int load_game(int);
@@ -180,23 +180,23 @@ extern void faction_save(int);
 extern void faction_load(int);
 extern void region_locations_save_discovered(int);
 extern void automap_save(void);
-extern void quests_unlink_all(int);
-extern void quests_relink_all(int);
+extern void quests_unlink_all(struct record *);
+extern void quests_relink_all(struct record *);
 extern void msgbox_show_string(int, int);
-extern void fatal_error(int);
+extern void fatal_error(char *);
 extern void text_draw(int, int, int);
 extern void text_draw_centred(int, int, int);
 extern void links_save(int);
 extern void mem_check_now(int);
-extern void disk_copy_file(int, int, int);
-extern void disk_delete_matching(int, int);
+extern void disk_copy_file(char *, char *, char *);
+extern void disk_delete_matching(char *, char *);
 extern void save_copy_automap_files(int);
 extern void saveload_draw(int, int, int);
 extern void text_draw_centred_coloured();
-extern void inpstr_begin_text(int, short);
-extern void object_foreach_pre(struct record *, int);
-extern void object_foreach_post(struct record *, int);
-extern void object_foreach(struct record *, int);
+extern void inpstr_begin_text(char *, int);
+extern void object_foreach_pre(struct record *, void (*)());
+extern void object_foreach_post(struct record *, void (*)());
+extern void object_foreach(struct record *, void (*)());
 struct record *savetree_attach_record(struct record *, struct record *, int);
 int savetree_should_save(struct record *);
 int save_write_name(char *);
@@ -243,7 +243,7 @@ void savetree_write_subtree(struct record *object)
 
     next = object->next;
     object->next = 0;
-    object_foreach_pre(object, (int)savetree_write_record);
+    object_foreach_pre(object, savetree_write_record);
     object->next = next;
 }
 
@@ -289,7 +289,7 @@ struct record *savetree_attach_record(struct record *root, struct record *record
         object->parent_id = 0;
         return object;
     }
-    fatal_error((int)D_001768A8);
+    fatal_error(D_001768A8);
     return 0;
 }
 
@@ -387,8 +387,8 @@ default:;
 
 void load_relink_all(void)
 {
-    object_foreach(location_object, (int)load_relink_object_cb);
-    object_foreach(nonworld_root, (int)load_relink_object_cb);
+    object_foreach(location_object, load_relink_object_cb);
+    object_foreach(nonworld_root, load_relink_object_cb);
     inv_left_container = inventory_containers[0];
 }
 
@@ -409,7 +409,7 @@ void load_relink_character(struct record *object)
     }
     if (character->target != 0) {
         character->target = object_find_by_id(location_object, (int)character->target);
-        if (character->target == 0) fatal_error((int)D_001768BD);
+        if (character->target == 0) fatal_error(D_001768BD);
     }
     if (object->type != 18) if (object->type != 44) return;
     xn_anim_reset(anim);
@@ -464,8 +464,8 @@ void load_drop_spawned_marker_cb(struct record *object)
 void load_drop_spawned_markers(void)
 {
     *(int *)D_00195B84 = 0;
-    object_foreach(location_object->children, (int)load_collect_spawned_ids_cb);
-    object_foreach_post(location_object->children, (int)load_drop_spawned_marker_cb);
+    object_foreach(location_object->children, load_collect_spawned_ids_cb);
+    object_foreach_post(location_object->children, load_drop_spawned_marker_cb);
 }
 
 void save_write_image(void)
@@ -474,7 +474,7 @@ void save_write_image(void)
     mc_sprintf((int)D_001913E4, (int)D_001768DF, (int)text_buffer, (int)D_001768D5);
     unlink((int)D_001913E4);
     if ((save_file_handle = open((int)D_001913E4, 546, 384)) < 0) {
-        fatal_error((int)D_001768E4);
+        fatal_error(D_001768E4);
     }
     write(save_file_handle, D_00147954 + 24000, 4000);
     close(save_file_handle);
@@ -498,7 +498,7 @@ int save_game(int slot, char *name)
     mem_check_now(1000);
     mc_set_location(540, (int)D_00176884);
     mc_sprintf((int)text_buffer, (int)D_00176909, slot);
-    disk_delete_matching((int)text_buffer, (int)D_00176911);
+    disk_delete_matching(text_buffer, D_00176911);
     save_write_image();
     save_write_name(name);
     savevars_write(slot);
@@ -506,9 +506,9 @@ int save_game(int slot, char *name)
     automap_save();
     mc_set_location(550, (int)D_00176884);
     mc_sprintf((int)text_buffer, (int)D_00176909, slot);
-    disk_copy_file((int)D_00176915, (int)arena2_path, (int)text_buffer);
-    disk_copy_file((int)D_0017691F, (int)arena2_path, (int)text_buffer);
-    disk_copy_file((int)cfg_mapsave_file, (int)arena2_path, (int)text_buffer);
+    disk_copy_file(D_00176915, arena2_path, text_buffer);
+    disk_copy_file(D_0017691F, arena2_path, text_buffer);
+    disk_copy_file(cfg_mapsave_file, arena2_path, text_buffer);
     save_copy_automap_files(slot);
     mc_set_location(558, (int)D_00176884);
     mc_sprintf((int)text_rsc_buffer, (int)D_001768DF, (int)text_buffer, (int)D_00176927);
@@ -522,12 +522,12 @@ int save_game(int slot, char *name)
     write(save_file_handle, (int)&size, 4);
     write(save_file_handle, (int)current_location->buildings, size);
     size = 0;
-    quests_unlink_all((int)quest_root);
+    quests_unlink_all(quest_root);
     savetree_write_saved(location_object->children);
     write(save_file_handle, (int)&size, 4);
-    object_foreach_pre(nonworld_root->children, (int)savetree_write_record);
+    object_foreach_pre(nonworld_root->children, savetree_write_record);
     write(save_file_handle, (int)&size, 4);
-    quests_relink_all((int)quest_root);
+    quests_relink_all(quest_root);
     links_save(save_file_handle);
     close(save_file_handle);
     mouse_buttons = (mouse_buttons_prev = 0);
@@ -572,8 +572,8 @@ void saveload_menu(int saving)
     done = 0;
     used_slots = 0;
     slot = 0;
-    window = (window_image = disk_read_file((int)D_0017697F, 0));
-    *(int *)D_00195B5C = disk_read_file((int)D_0017698C, 0);
+    window = (window_image = disk_read_file(D_0017697F, 0));
+    *(int *)D_00195B5C = disk_read_file(D_0017698C, 0);
     mc_memset(*(int *)scratch_buffer, 0, 256, (int)D_00176884, 862, 4);
     mc_strncpy((int)text_buffer, (int)D_00176999, 160, (int)D_00176884, 864);
     for (i = 0; i < 6; i++) {
@@ -610,7 +610,7 @@ void saveload_menu(int saving)
         } else if (mouse_double_click != 0 || (mouse_buttons != 0 && mouse_buttons_prev == 0)) {
             for (i = 0; i < 14; i++) {
                 if (mouse_x > saveload_buttons[i].x0 && mouse_x < saveload_buttons[i].x1 && mouse_y > saveload_buttons[i].y0 && mouse_y < saveload_buttons[i].y1) {
-                    sound_play(203, (int)player_object, 100);
+                    sound_play(203, player_object, 100);
                     slot = saveload_buttons[i].handler(i, saving, slot, used_slots);
                 }
                 if (slot == (-1)) break;
@@ -650,7 +650,7 @@ int saveload_confirm(int button, int saving, int slot, int used_slots)
         mc_sprintf(prompt, (int)D_001769BC, D_001846F8);
         *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
         xn_kbd_flush();
-        inpstr_begin_text((int)text_rsc_buffer, 31);
+        inpstr_begin_text(text_rsc_buffer, 31);
         mouse_buttons = (mouse_buttons_prev = 0);
         msgbox_show_string(prompt, 2);
         if (((int)(unsigned char)D_0019966C) == 2) return 0;
@@ -861,7 +861,7 @@ void load_fix_object_cb(struct record *object)
                 twin = object_find_by_id(load_relink_root, (int)object->twin);
                 object->twin = twin;
                 if ((int)load_relink_root == (int)location_object) {
-                    if (object->twin == 0) fatal_error((int)D_001769F7);
+                    if (object->twin == 0) fatal_error(D_001769F7);
                     if (object->twin->twin == 0) object->twin->twin = (struct record *)object;
                 }
             } else {
@@ -940,10 +940,10 @@ void load_fix_ids_cb(struct record *object)
 void load_fix_objects(void)
 {
     load_relink_root = nonworld_root;
-    object_foreach(location_object, (int)load_fix_object_cb);
+    object_foreach(location_object, load_fix_object_cb);
     load_relink_root = location_object;
-    object_foreach(nonworld_root, (int)load_fix_object_cb);
-    object_foreach_post(location_object, (int)load_fix_ids_cb);
+    object_foreach(nonworld_root, load_fix_object_cb);
+    object_foreach_post(location_object, load_fix_ids_cb);
 }
 
 void text_draw_centred_black_shadow(int text, int x, int y)

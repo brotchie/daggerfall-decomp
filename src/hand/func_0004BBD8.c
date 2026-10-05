@@ -3,8 +3,8 @@
 extern struct record *quest_event_object2;
 extern struct record *quest_event_object;
 extern short quest_event_code;
-extern void quest_dispatch_event(struct quest *);
-extern struct quest *quest_find_by_id(unsigned char);
+extern int quest_dispatch_event(struct quest *);
+extern struct quest *quest_find_by_id(int);
 
 void quest_raise_event(short event, struct record *object, struct record *object2)
 {

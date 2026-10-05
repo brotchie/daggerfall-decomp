@@ -436,7 +436,7 @@ struct record *quest_find_site_for_building(struct building *building)
     return 0;
 }
 
-int pick_random_of_three(int *choices)
+struct faction *pick_random_of_three(struct faction **choices)
 {
     int i;
     int choice_count;

@@ -52,13 +52,13 @@ extern int qcond_op21_foe_hurt(struct quest *, struct qbn_op *);
 extern int qcond_op02_foe_killed(struct quest *, struct qbn_op *);
 extern int qcond_op28_npc_clicked(struct quest *, struct qbn_op *);
 extern int qcond_op70_player_has_items(struct quest *, struct qbn_op *);
-extern int quest_arg_state(struct qbn_op *, int);
+extern int quest_arg_state(struct qbn_op *, short);
 extern void *quest_section(struct quest *, int);
 extern void *quest_record(struct quest *, int, int);
 extern int qcond_op57_item_used(struct quest *, struct qbn_op *);
 extern int quest_deliveries_done(struct quest *);
-extern int quest_start(int);
-extern int sound_play(int, int, int);
+extern int quest_start(char *);
+extern int sound_play(int, struct record *, int);
 extern int disk_resolve_path(int);
 extern int rand_range(int, int);
 extern int location_contains(int, int);
@@ -78,25 +78,25 @@ extern void qaction_op09_spawn_repeat(struct quest *, struct qbn_op *);
 extern void qaction_op87_respawn(struct quest *, struct qbn_op *);
 extern void quest_unlink_for_save(struct quest *);
 extern void quest_timers_update(struct quest *);
-extern void quest_timer_update(struct quest *, struct qbn_timer *, int);
-extern void qaction_op12_start_stop_timer(struct quest *, struct qbn_op *, int);
+extern void quest_timer_update(struct quest *, struct qbn_timer *, short);
+extern void qaction_op12_start_stop_timer(struct quest *, struct qbn_op *, short);
 extern void qaction_op35_cycle_state(struct quest *, struct qbn_op *);
 extern void qaction_op34_pick_one_state(struct quest *, struct qbn_op *);
 extern void qaction_op29_prompt(struct quest *, struct qbn_op *);
-extern void quest_set_state(struct quest *, struct qbn_op *, int);
+extern void quest_set_state(struct quest *, struct qbn_op *, short);
 extern void quest_set_arg_state(struct quest *, struct qbn_op *, int, int);
 extern void qaction_op04_give_reward(struct quest *, struct qbn_op *);
 extern void qaction_op19_reveal_location(struct quest *, struct qbn_op *, int);
 extern void func_0003077F(struct record *, int);
 extern void quest_give_item_to_player(struct record *);
 extern void qaction_op37_repute_exceeds(struct quest *, struct qbn_op *);
-extern void quest_face_add(struct record *, unsigned char, int, int);
+extern void quest_face_add(struct record *, int, int, int);
 extern void quest_face_remove(int);
 extern void func_00030F63(struct quest *, struct qbn_op *);
 extern void qaction_op69_cast_spell_on_foe(struct quest *, struct qbn_op *);
 extern void func_00031658(struct quest *, struct qbn_op *, int);
 extern void qaction_op83_teleport_pc(struct qbn_op *);
-extern void quest_show_message(struct quest *, short);
+extern void quest_show_message(struct quest *, int);
 extern void quest_op_done(struct quest *, struct qbn_op *);
 extern void qaction_place_foe(struct qbn_op *, int);
 extern void qaction_place_item(struct quest *, struct qbn_op *);
@@ -110,16 +110,16 @@ extern void qaction_op48_restore_npc(struct quest *, struct qbn_op *);
 extern void func_0004C8CF(struct quest *, struct qbn_op *);
 extern void quest_add_questor_rumor(struct quest *, int);
 extern void palette_restore(void);
-extern void fatal_error(int);
-extern void disease_infect(int, int, int, int);
+extern void fatal_error(char *);
+extern void disease_infect(struct record *, unsigned char *, int, int);
 extern void disease_cure_vampirism(void);
 extern void disease_cure_lycanthropy(void);
 extern void logbook_add_entry(unsigned char, int, int);
 extern void logbook_remove_entry(unsigned char, int);
 extern void rest_close(void);
 extern void location_reveal(int, int);
-extern void spfx_cure_disease(int, int);
-extern void inventory_open_container(int, int, int);
+extern void spfx_cure_disease(struct record *, struct character *);
+extern void inventory_open_container(struct record *, int, int);
 extern void travel_button_exit(int);
 int qaction_op25_countdown(struct quest *, struct qbn_op *);
 void quest_relink_after_load(struct quest *);
@@ -177,7 +177,7 @@ void quest_run_opcodes(struct quest *quest)
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0 && ((int)(unsigned char)current_region) != 31) {
                     mc_set_location(64, (int)D_001707F0);
                     mc_sprintf((int)D_001911E4, (int)D_001707F7, rand_range(op->args[1].value, op->args[2].value));
-                    quest_start((int)D_001911E4);
+                    quest_start(D_001911E4);
                     quest_op_done(quest, op);
                 }
                 break;
@@ -423,7 +423,7 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 49:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
-                    spfx_cure_disease((int)player_entity, (int)player_character);
+                    spfx_cure_disease(player_entity, player_character);
                     quest_op_done(quest, op);
                 }
                 break;
@@ -509,7 +509,7 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 60:
                 if (quest_arg_state(op, 0) != 0) {
-                    sound_play(op->args[1].value, (int)player_object, 110);
+                    sound_play(op->args[1].value, player_object, 110);
                     quest_op_done(quest, op);
                 }
                 break;
@@ -625,7 +625,7 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 72:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
-                    disease_infect((int)player_entity, 0, op->args[1].value, 1);
+                    disease_infect(player_entity, 0, op->args[1].value, 1);
                     quest_op_done(quest, op);
                 }
                 break;
@@ -706,7 +706,7 @@ void quest_run_opcodes(struct quest *quest)
                 if (quest_arg_state(op, 0) != 0) {
                     if (game_minutes != op->last_minutes && (((unsigned)game_minutes) % op->args[2].value) == 0 && rand_range(1, 100) <= op->args[3].value) {
                         op->last_minutes = game_minutes;
-                        sound_play(op->args[1].value, (int)player_object, 110);
+                        sound_play(op->args[1].value, player_object, 110);
                         quest_op_done(quest, op);
                     }
                 }
@@ -733,7 +733,7 @@ void quest_run_opcodes(struct quest *quest)
         if (quest_reward_container == 0 || quest_reward_container->children == 0 || ((int)(unsigned char)game_mode) == 4) {
             return;
         }
-        inventory_open_container((int)quest_reward_container, 0, 6);
+        inventory_open_container(quest_reward_container, 0, 6);
     }
 }
 
@@ -907,7 +907,7 @@ void quest_relink_after_load(struct quest *quest)
     for (i = 0; quest->section_counts[4] > i; i++, qbn_place++) {
         if (qbn_place->object != 0) {
             qbn_place->object = (struct record *)object_find_by_id(nonworld_root, (int)qbn_place->object);
-            if (qbn_place->object == 0) fatal_error((int)D_001708ED);
+            if (qbn_place->object == 0) fatal_error(D_001708ED);
         }
     }
     qbn_item = (struct qbn_item *)((int)quest + quest->section_offsets[0]);

@@ -23,7 +23,7 @@ extern char terrain_cell_ids[];
 extern char terrain_cell_dirty[];
 extern int terrain_cell_at_player;
 
-extern int object_reparent(struct record *, struct record *);
+extern struct record *object_reparent(struct record *, struct record *);
 extern int mc_memset();
 extern int mc_memcpy();
 extern int xn_world_reload();
@@ -34,10 +34,10 @@ extern void func_00064301(void);
 extern void sound_stop_ambient(void);
 extern void location_store_objects(void);
 extern void location_free(struct loaded_location *);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern void object_delete_block(int, int);
 extern void func_0008EB52(void);
-extern void inv_assign_item_id(int);
+extern void inv_assign_item_id(struct record *);
 
 void location_unload(int image)
 {
@@ -53,7 +53,7 @@ void location_unload(int image)
             location_object->twin = 0;
         }
         object_reparent(location_object, player_object);
-        object_foreach(player_entity->children, (int)inv_assign_item_id);
+        object_foreach(player_entity->children, inv_assign_item_id);
         people_clear();
         creature_count = 0;
         mc_memset((int)((char *)creature_list), 0, 512, (int)D_00176C94, 450, 512);

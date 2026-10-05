@@ -11,7 +11,7 @@ extern int game_minutes;
 extern char D_00196291;
 extern char D_00196292;
 extern int damage_heal(struct character *, int);
-extern int cast_item_strike_spell(short, struct record *);
+extern int cast_item_strike_spell(int, struct record *);
 extern int cast_creature_spell(struct record *, struct record *, int);
 extern void item_damage(struct record *, int);
 extern int rand_range(int, int);

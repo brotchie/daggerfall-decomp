@@ -70,17 +70,17 @@ extern short D_0019979A;
 extern short quest_event_code;
 extern int D_001AA698;
 
-extern struct faction *faction_find_type_in_region(int, short);
+extern struct faction *faction_find_type_in_region(short, short);
 extern struct faction *faction_find(short);
 extern int quest_dispatch_event(struct quest *);
 extern int holiday_today(int, int);
-extern int poison_tick(int);
+extern int poison_tick(struct disease *);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern int location_here_contains(int, int);
-extern int spfx_disease_daily(int);
-extern int spfx_disease_recover(int);
+extern int spfx_disease_daily(struct disease *);
+extern int spfx_disease_recover(struct disease *);
 extern struct record *object_find_by_id(struct record *, int);
 extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
@@ -90,7 +90,7 @@ extern void faction_politics_update(int);
 extern void encounter_tick(int, int);
 extern void automap_expire_records(void);
 extern void automap_purge_old_files(void);
-extern void quest_run_opcodes(int);
+extern void quest_run_opcodes(struct quest *);
 extern void quest_remove_objects(unsigned char);
 extern void quest_faces_remove_quest(unsigned char);
 extern void sky_update_moons(void);
@@ -104,9 +104,9 @@ extern void disease_special_infection_tick(void);
 extern void disease_start_cure_quest(int);
 extern void guild_expire_blessings(void);
 extern void fatigue_update(void);
-extern void spfx_walk_effect_records(struct record *, int);
+extern void spfx_walk_effect_records(struct record *, int (*)());
 extern void spfx_expire_created_items(void);
-extern void object_foreach(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
 extern void travel_show_days_left(int);
 int building_is_open(struct building *);
 void time_pass_minutes(int);
@@ -188,7 +188,7 @@ void time_pass_minutes(int minutes)
         frame_checkpoint = 2000;
         for (i = 0; i < days; i++) {
             if (D_001962A4 == 0) {
-                spfx_walk_effect_records(player_entity->children, (int)spfx_disease_daily);
+                spfx_walk_effect_records(player_entity->children, spfx_disease_daily);
             }
             frame_checkpoint = 2001;
             if (player_death_timer < 0) return;
@@ -227,9 +227,9 @@ void time_pass_minutes(int minutes)
             if (D_001962A4 == 0) {
                 frame_checkpoint = 2017;
                 spell_tick(player_entity);
-                spfx_walk_effect_records(player_entity, (int)spfx_disease_recover);
+                spfx_walk_effect_records(player_entity, spfx_disease_recover);
                 scratch_current_object = player_entity;
-                spfx_walk_effect_records(player_entity->children, (int)poison_tick);
+                spfx_walk_effect_records(player_entity->children, poison_tick);
                 fatigue_update();
                 frame_checkpoint = 2018;
             }
@@ -245,7 +245,7 @@ void time_pass_minutes(int minutes)
                 if ((int)creature_list[n] == (-1768515946)) continue;
                 spell_tick(creature_list[n]);
                 scratch_current_object = creature_list[n];
-                spfx_walk_effect_records(scratch_current_object->children, (int)poison_tick);
+                spfx_walk_effect_records(scratch_current_object->children, poison_tick);
             }
             if (player_death_timer < 0) return;
         }
@@ -394,10 +394,10 @@ void building_update_open_state(void)
     }
     goto L4B64F;
 L4B638:;
-    object_foreach(player_object->parent->children, (int)interior_person_show_cb);
+    object_foreach(player_object->parent->children, interior_person_show_cb);
     return;
 L4B64F:;
-    object_foreach(player_object->parent->children, (int)interior_person_hide_cb);
+    object_foreach(player_object->parent->children, interior_person_hide_cb);
 }
 
 void reputation_decay(void)
@@ -518,7 +518,7 @@ void quests_run_all(void)
             quest_tick_object = object;
             quest_tick_data = (struct quest *)((int)&object->data.quest);
             if (quest_debug_data == 0) quest_debug_data = (int)quest_tick_data;
-            quest_run_opcodes((int)quest_tick_data);
+            quest_run_opcodes(quest_tick_data);
         }
         object = next;
     }

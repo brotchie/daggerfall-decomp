@@ -1,3 +1,4 @@
+#include "records.h"
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000934F6 */
 #include "structs.h"
 extern int screen_buffer;
@@ -20,8 +21,8 @@ extern char color_remap_tables[];
 
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern void inv_draw_item_image(char *, struct rect *, short);
-extern void func_00093BD9(char *, struct rect *, short);
-extern void inv_draw_cell_mark(int, int, struct rect *, short);
+extern void func_00093BD9(char *, struct rect *, int);
+extern void inv_draw_cell_mark(int, int, struct rect *, int);
 extern int mc_strncpy();
 extern int mc_memcpy();
 #pragma aux mc_set_location parm routine [];

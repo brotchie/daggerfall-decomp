@@ -12,7 +12,7 @@ extern unsigned char D_00196271;
 
 extern void msgbox_show_rsc(int, int);
 
-void msgbox_yes_no_rsc(short text_id)
+void msgbox_yes_no_rsc(int text_id)
 {
     D_00196271 = 0;
     msgbox_button_ids = 4;

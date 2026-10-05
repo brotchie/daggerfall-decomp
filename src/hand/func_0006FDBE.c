@@ -12,7 +12,7 @@ extern int spell_cost(struct spell *, struct character *);
 extern int rand_range(int, int);
 extern void picklist_init(char *, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void picklist_add(char *, char *, int);
-extern struct record *object_find_item(struct record *, int, int);
+extern struct record *object_find_item(struct record *, short, short);
 
 int spellshop_build_list(void)
 {

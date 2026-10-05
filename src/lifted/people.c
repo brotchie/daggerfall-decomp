@@ -21,7 +21,7 @@ extern int people_count;
 
 extern int collide_line_of_sight(struct record *, struct record *);
 extern int is_guard_sprite(struct record *);
-extern int object_delete(struct record *);
+extern struct record *object_delete(struct record *);
 extern int mc_memset();
 extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
@@ -30,7 +30,7 @@ extern int xn_draw_image_masked_at_origin();
 extern void pedestrian_place(struct record *);
 extern void guards_summon(int);
 extern void text_draw(int, int, int);
-extern void guild_count_crime(int, unsigned char);
+extern void guild_count_crime(int, int);
 int people_check_witnesses(void);
 #pragma aux mc_set_location parm routine [];
 

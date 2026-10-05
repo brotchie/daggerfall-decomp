@@ -15,7 +15,7 @@ extern struct map_location *region_locations;
 extern int D_001AA678;
 extern int D_001AA67C;
 extern int sound_play(int, struct record *, int);
-extern void location_place_player_at_edge(int);
+extern void location_place_player_at_edge(unsigned int);
 extern void map_goto_location(int, int, int, int);
 extern void travel_button_exit(int);
 extern void func_0009BE38(void);

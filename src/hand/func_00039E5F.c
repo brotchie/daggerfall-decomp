@@ -4,7 +4,7 @@
 extern char D_00170B13[];
 extern char D_00170B69[];
 extern char *scratch_buffer;
-extern void disk_read_file(char *, char *);
+extern int disk_read_file(char *, char *);
 extern void mc_strncpy(char *, char *, int, char *, int);
 extern int strlen(char *);
 extern char *memchr(char *, int, int);

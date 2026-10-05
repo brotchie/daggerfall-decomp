@@ -25,10 +25,10 @@ extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern void monster_wake_all(void);
 extern void skill_add_uses(int, int);
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
-extern void guild_count_crime(int, unsigned char);
+extern void guild_count_crime(int, int);
 extern void hud_status_set(int);
 #pragma aux mc_set_location parm routine [];
 
@@ -67,7 +67,7 @@ void pickpocket_attempt(struct record *target)
     player_character->gold += gold;
     mc_set_location(155, (int)D_0017018C);
     mc_sprintf((int)text_buffer, D_00183340, gold);
-    msgbox_show_string((int)text_buffer, 1);
+    msgbox_show_string(text_buffer, 1);
     guild_count_crime(5, 1);
 }
 

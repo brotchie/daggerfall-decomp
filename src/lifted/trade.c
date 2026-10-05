@@ -43,7 +43,7 @@ extern signed char sound_enabled;
 extern int sos_init(int, ...);
 extern int sos_shutdown(void);
 extern int sos_read_settings(int, ...);
-extern int archive_open(int, int, int);
+extern int archive_open(char *, int, int);
 extern int sound_timer_add(int, int);
 extern int dpmi_lock_region(int, int);
 extern int dpmi_unlock_region(int, int);
@@ -52,7 +52,7 @@ extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int func_000A1D3C();
 extern void archive_close(int);
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(char *, short);
 extern void sound_stop_channel(int);
 extern void music_stop(void);
 extern void sound_timer_remove(int);
@@ -72,7 +72,7 @@ void trade_haggle_show_offer(void)
     D_00196035 = 46;
     mc_set_location(131, (int)D_00175A30);
     mc_sprintf((int)text_buffer, (int)D_00175A38, (int)trade_haggle_asking);
-    msgbox_show_string((int)text_buffer, 5);
+    msgbox_show_string(text_buffer, 5);
 }
 
 void trade_counter_offer(void)
@@ -84,7 +84,7 @@ void trade_counter_offer(void)
     mc_set_location(141, (int)D_00175A30);
     mc_sprintf((int)text, (int)D_00175A6A);
     *(strlen(text) + text + 1) = 0;
-    msgbox_show_string((int)text, 2);
+    msgbox_show_string(text, 2);
     inpstr_begin_number((int)trade_haggle_asking);
 }
 
@@ -120,7 +120,7 @@ int sound_init_music(void)
     if (sos_init(D_0018DD5C, D_0018DD54) != 0) return 0;
     D_0018DC64 = 2048;
     func_000A1D3C(127);
-    midi_bsa = archive_open((int)D_00175AC3, 0, 0);
+    midi_bsa = archive_open(D_00175AC3, 0, 0);
     for (i = 0; i < 4; i++) {
         sound_channels[i].handle = 305419896;
     }

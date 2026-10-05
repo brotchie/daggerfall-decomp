@@ -30,7 +30,7 @@ extern char links[];
 extern int link_count;
 
 extern int spellmaker_new(void);
-extern int disk_read_file(int, int);
+extern int disk_read_file(char *, int);
 extern int mc_memset();
 short rdb_object_id_by_offset(int);
 void func_000361B7(int);
@@ -201,9 +201,9 @@ int spellmaker_open(int opening)
     if (((int)D_0019626F) == 2) return 1;
     if (opening != 0) {
         game_mode = 2;
-        window_image = disk_read_file((int)D_00170AEC, 0);
-        magic_window_image = disk_read_file((int)D_00170AF9, 0);
-        spellmaker_settings_image = disk_read_file((int)D_00170B06, 0);
+        window_image = disk_read_file(D_00170AEC, 0);
+        magic_window_image = disk_read_file(D_00170AF9, 0);
+        spellmaker_settings_image = disk_read_file(D_00170B06, 0);
         D_00196272 = 1;
         D_001940D8 |= 1;
         spellmaker_new();

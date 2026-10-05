@@ -62,7 +62,7 @@ extern int D_00196D5C;
 extern int collide_height;
 extern char collide_flags[];
 
-extern int object_find_open(int, int);
+extern int object_find_open(struct record *, int (*)());
 extern int door_start_swing(struct record *, int);
 extern int mc_memcpy();
 extern int memcmp();
@@ -74,11 +74,11 @@ extern int xn_collide_segment_flat_stk();
 extern int xn_terrain_height_at();
 extern unsigned char ground_tile_at(int, int);
 extern void collide_for_each_nearby(struct record *, int);
-extern void fatal_error(int);
+extern void fatal_error(char *);
 extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern void object_move_by(struct record *, int, int, int, int, int, int);
-extern void object_foreach(struct record *, int);
-extern void object_foreach_open(struct record *, int);
+extern void object_foreach(struct record *, void (*)());
+extern void object_foreach_open(struct record *, void (*)());
 int collide_line_of_sight_cb(struct record *);
 int collide_creature_near(struct record *, struct move_request *);
 int collide_creature_within(struct record *, int *, int);
@@ -500,7 +500,7 @@ void collide_gather_cb(struct record *object)
             if (*model != 0) {
                 if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 2)) == 0 && (int)D_00196D48 != (-1)) {
                     collide_candidates[collide_candidate_count++] = object;
-                    if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
+                    if (collide_candidate_count > 128) fatal_error(D_0017071B);
                 }
             }
         }
@@ -512,7 +512,7 @@ void collide_gather_cb(struct record *object)
             if (*model != 0) {
                 if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 2)) == 0 && (int)D_00196D48 != (-1)) {
                     collide_candidates[collide_candidate_count++] = object;
-                    if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
+                    if (collide_candidate_count > 128) fatal_error(D_0017071B);
                 }
             }
         }
@@ -527,7 +527,7 @@ void collide_gather_cb(struct record *object)
         }
         collide_candidates[collide_candidate_count++] = object;
         if (collide_candidate_count <= 128) return;
-        fatal_error((int)D_0017071B);
+        fatal_error(D_0017071B);
     default:;
     }
 }
@@ -779,6 +779,6 @@ int collide_floor_height(struct record *object)
     D_00196B14 -= 20;
     D_00196B20 += 40;
     collide_height = 100000;
-    object_foreach(location_object->children, (int)collide_vertical_cb);
+    object_foreach(location_object->children, collide_vertical_cb);
     return collide_height;
 }
