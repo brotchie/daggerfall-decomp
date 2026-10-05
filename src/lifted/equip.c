@@ -65,7 +65,7 @@ extern int trespassing;
 extern int ai_los_index;
 extern char magic_def_count[];
 extern int magic_def;
-extern char D_00195D54[];
+extern char picked_model_index[];
 extern int ai_monster_flags;
 extern short D_00195DC4;
 extern short painting_subject_text;
@@ -828,7 +828,7 @@ int func_000612A1(void)
     l_1C = 0;
     l_20 = D_0019615F;
     while (l_20 != 0) {
-        if (l_20->owner == *(int *)D_00195D54) l_1C++;
+        if (l_20->owner == *(int *)picked_model_index) l_1C++;
         l_20->x = player_object->x;
         l_20->y = player_object->y;
         l_20->z = player_object->z;

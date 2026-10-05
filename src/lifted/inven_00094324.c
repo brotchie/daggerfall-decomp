@@ -8,13 +8,13 @@ extern short mouse_y;
 extern signed char D_001940D8;
 extern struct item *text_macro_item;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct record *location_object;
 extern struct record *inv_right_container;
 extern struct character *player_character;
 extern int trade_mode;
 extern int inventory_action;
-extern char D_00195D54[];
+extern char picked_model_index[];
 extern char D_00196120[];
 extern struct record *inv_selected_item;
 
@@ -44,7 +44,7 @@ void inv_click_paperdoll(void)
     D_001940D8 |= 8;
     l_1C += -64;
     l_18 = (inv_selected_item = player_character->equipped[l_1C]);
-    D_00195AA8 = inv_selected_item;
+    scratch_current_object = inv_selected_item;
     l_28 = &inv_selected_item->data.item;
     text_macro_item = l_28;
     l_2C = inventory_action - 1;
@@ -81,7 +81,7 @@ void inv_click_paperdoll(void)
         l_18->caster = 0;
         if (l_18->image == 0) l_18->image = l_28->dropped_image;
         object_reparent(inv_right_container, l_18);
-        if (((int)D_00196120) == (int)l_18->parent) l_18->owner = *(short *)D_00195D54;
+        if (((int)D_00196120) == (int)l_18->parent) l_18->owner = *(short *)picked_model_index;
         if (l_18->quest_id == 0 && trade_mode == 0) {
             l_18->id = object_new_id(((unsigned)location_object->id) >> 16);
         }

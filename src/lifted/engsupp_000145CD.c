@@ -8,7 +8,7 @@ extern short D_00179966[];
 extern char D_00179970[];
 extern char D_0017998E[];
 extern signed char scratch_190ce4[];
-extern signed char D_00190CE5;
+extern signed char scratch_190ce5;
 extern signed char climate_weathers[];
 
 extern int xn_str_find_u16();
@@ -24,7 +24,7 @@ short texture_archive_for_climate(int a1, int a2)
         if (xn_str_find_u16((int)D_00179970, (int)(short)*(short *)&l_18, 15) != 0) {
             if (l_18 == 74 && a2 > 2) return a1;
             a1 = l_18 + (((int)(signed char)scratch_190ce4[0]) * 100);
-            if (((int)(unsigned char)climate_weathers[(int)(signed char)D_00190CE5]) == 5 && l_18 != 74) {
+            if (((int)(unsigned char)climate_weathers[(int)(signed char)scratch_190ce5]) == 5 && l_18 != 74) {
                 a1++;
             }
         }

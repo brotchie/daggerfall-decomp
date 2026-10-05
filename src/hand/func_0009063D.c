@@ -18,8 +18,8 @@ extern char D_00176FA9[];
 extern char D_00176FB6[];
 extern unsigned char chargen_career_skill_bonus[];
 extern signed char text_buffer[];
-extern int D_00190BE8;
-extern unsigned char D_00190CEE[];
+extern int scratch_190be8;
+extern unsigned char scratch_190cee[];
 extern short scratch_190d64;
 extern short chargen_selected_attribute;
 extern short D_00190DEA;
@@ -65,12 +65,12 @@ int chargen_name_character(void)
             player_character->skills[i].value = rand_range(3, 6);
     }
     for (i = 0; i < 12; i++) {
-        D_00190CEE[i] = player_character->skills[player_class->skills[i]].value += chargen_career_skill_bonus[i];
+        scratch_190cee[i] = player_character->skills[player_class->skills[i]].value += chargen_career_skill_bonus[i];
     }
     player_character->level = 1;
     disk_read_file(D_00176F28, scratch_buffer);
     D_00190DEA = scratch_190dec = D_00190DEE = scratch_190d64 = chargen_selected_attribute = 0;
-    D_00190BE8 = 0;
+    scratch_190be8 = 0;
     player_character->name[0] = 0;
     D_0012B508 = 146;
     for (i = 0; i < 8; i++) {
@@ -103,7 +103,7 @@ int chargen_name_character(void)
     D_00195B60 = disk_read_file(D_00176F8F, 0);
     D_00190DEA = scratch_190dec = D_00190DEE = 6;
     for (i = 0; i < 12; i++) {
-        D_00190CEE[i] = player_character->skills[player_class->skills[i]].value;
+        scratch_190cee[i] = player_character->skills[player_class->skills[i]].value;
     }
     chargen_select_skill(2);
     chargen_select_skill(5);

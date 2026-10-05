@@ -25,7 +25,7 @@ extern char quest_faces_image[];
 extern struct record *camera_object;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct record *location_object;
 extern struct spell *spell_records;
 extern int creature_count;
@@ -344,7 +344,7 @@ void qaction_op69_cast_spell_on_foe(struct quest *a1, struct qbn_op *a2)
     l_18 = 0;
     while (spell_records[l_18].name[0] == 0 || spell_records[l_18].id != a2->args[2].value) l_18++;
     l_14 = object_create_child(player_object->parent, 0, 89);
-    D_00195AA8 = l_14;
+    scratch_current_object = l_14;
     l_14->type = 9;
     l_14->caster = player_entity;
     l_14->id = object_new_id(((unsigned)location_object->id) >> 16);

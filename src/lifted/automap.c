@@ -39,17 +39,17 @@ extern char D_0017A034[];
 extern signed char D_0017A11D;
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
-extern char D_00190BE4[];
-extern int D_00190BE8;
-extern int D_00190BEC;
+extern char scratch_190be4[];
+extern int scratch_190be8;
+extern int scratch_190bec;
 extern int automap_pitch;
 extern int automap_yaw;
 extern int D_00190BFC;
 extern int D_00190C00;
 extern int D_00190C04;
-extern signed char D_00190CE5;
+extern signed char scratch_190ce5;
 extern short scratch_190d68;
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern char scratch_190de4[];
 extern int scratch_190de8;
 extern int D_00190E18;
@@ -203,9 +203,9 @@ void automap_open(void)
     D_00196272 = 1;
     *(int *)scratch_190de4 = disk_read_file((int)D_00170794, 0);
     D_00190E18 = disk_read_file((int)D_001707A1, 0);
-    *(int *)D_00190BE4 = player_object->x;
-    D_00190BE8 = player_object->y;
-    D_00190BEC = player_object->z;
+    *(int *)scratch_190be4 = player_object->x;
+    scratch_190be8 = player_object->y;
+    scratch_190bec = player_object->z;
     xn_gfx_clip_bottom = 199;
     xn_cam_set_view_window(160, 84, 160, 85);
     automap_find_record();
@@ -350,9 +350,9 @@ void automap_render(void)
     xn_cam_y = D_00190C00;
     xn_cam_z = D_00190C04;
     xn_mat_transform_ptr((int)&xn_cam_x, (int)&xn_cam_y, (int)&xn_cam_z, (int)xn_cam_rotation);
-    xn_cam_x += *(int *)D_00190BE4;
-    xn_cam_y += D_00190BE8;
-    xn_cam_z += D_00190BEC;
+    xn_cam_x += *(int *)scratch_190be4;
+    xn_cam_y += scratch_190be8;
+    xn_cam_z += scratch_190bec;
     xn_cam_pitch = automap_pitch;
     xn_cam_yaw = (-automap_yaw) & 2047;
     xn_cam_roll = 0;
@@ -397,8 +397,8 @@ int automap_move_forward(int a1)
     l_24 = 0;
     l_20 = l_24;
     xn_mat_transform_ptr((int)&l_24, (int)&l_20, (int)&l_1C, (int)xn_cam_rotation);
-    *(int *)D_00190BE4 += l_24;
-    D_00190BEC += l_1C;
+    *(int *)scratch_190be4 += l_24;
+    scratch_190bec += l_1C;
     return 0;
 }
 
@@ -417,8 +417,8 @@ int automap_move_back(int a1)
     l_24 = 0;
     l_20 = l_24;
     xn_mat_transform_ptr((int)&l_24, (int)&l_20, (int)&l_1C, (int)xn_cam_rotation);
-    *(int *)D_00190BE4 += l_24;
-    D_00190BEC += l_1C;
+    *(int *)scratch_190be4 += l_24;
+    scratch_190bec += l_1C;
     return 0;
 }
 
@@ -437,8 +437,8 @@ int automap_move_left(int a1)
     l_1C = 0;
     l_20 = l_1C;
     xn_mat_transform_ptr((int)&l_24, (int)&l_20, (int)&l_1C, (int)xn_cam_rotation);
-    *(int *)D_00190BE4 += l_24;
-    D_00190BEC += l_1C;
+    *(int *)scratch_190be4 += l_24;
+    scratch_190bec += l_1C;
     return 0;
 }
 
@@ -457,20 +457,20 @@ int automap_move_right(int a1)
     l_1C = 0;
     l_20 = l_1C;
     xn_mat_transform_ptr((int)&l_24, (int)&l_20, (int)&l_1C, (int)xn_cam_rotation);
-    *(int *)D_00190BE4 += l_24;
-    D_00190BEC += l_1C;
+    *(int *)scratch_190be4 += l_24;
+    scratch_190bec += l_1C;
     return 0;
 }
 
 int automap_button_upstairs(void)
 {
-    if (D_00190BE8 > (-3072)) D_00190BE8 -= 16;
+    if (scratch_190be8 > (-3072)) scratch_190be8 -= 16;
     return 0;
 }
 
 int automap_button_downstairs(void)
 {
-    if (D_00190BE8 < 3072) D_00190BE8 += 16;
+    if (scratch_190be8 < 3072) scratch_190be8 += 16;
     return 0;
 }
 
@@ -710,14 +710,14 @@ void func_00028547(void)
     int l_18;
 
     scratch_190d68 = ((((int)(short)mouse_x) - 10) / 2) + town_map_view_x;
-    D_00190D6A = ((((int)(short)mouse_y) - 10) / 2) + town_map_view_y;
+    scratch_190d6a = ((((int)(short)mouse_y) - 10) / 2) + town_map_view_y;
     l_20 = town_note_at((int)(short)mouse_x, (int)(short)mouse_y);
     if (D_00196D94 != 0 && l_20 == 0 && ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
-        D_00190CE5 = 1;
+        scratch_190ce5 = 1;
         l_1C = town_note_get(D_00196D94 - 1);
         l_18 = l_1C;
         *(short *)((char *)l_18) = scratch_190d68;
-        *(short *)((char *)l_18 + 2) = D_00190D6A;
+        *(short *)((char *)l_18 + 2) = scratch_190d6a;
         return;
     }
     if (l_20 != 0 && ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
@@ -725,11 +725,11 @@ void func_00028547(void)
         return;
     }
     if (l_20 != 0) {
-        D_00190CE5 = 1;
+        scratch_190ce5 = 1;
         l_1C = town_note_get(l_20 - 1);
         l_18 = l_1C;
         scratch_190d68 = *(short *)((char *)l_18);
-        D_00190D6A = *(short *)((char *)l_18 + 2);
+        scratch_190d6a = *(short *)((char *)l_18 + 2);
         mc_strncpy((int)text_buffer, l_1C + 4, 160, (int)D_001707AE, 921);
         town_note_delete(l_20 - 1);
         func_00028210((int)text_buffer);
@@ -793,7 +793,7 @@ void town_map_note_building(struct record *a1, struct building *a2)
     l_18 >>= 6;
     l_18 = ((current_location->height << 6) - l_18) - 1;
     scratch_190d68 = l_1C;
-    D_00190D6A = l_18;
+    scratch_190d6a = l_18;
     town_note_add(l_14);
     mc_set_location(986, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);

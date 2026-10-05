@@ -30,7 +30,7 @@ extern char saved_positions[];
 extern int D_0018DE20;
 extern struct record *creature_list[];
 extern char scratch_190de4[];
-extern char D_00190EE4[];
+extern char scratch_190ee4[];
 extern signed char D_001940D4;
 extern signed char D_001940D6;
 extern struct record *player_entity;
@@ -116,7 +116,7 @@ void spfx_dispel(struct record *a1, int a2, struct record *a3)
             if (l_18->type == 9) {
                 l_1C = &l_18->data.spell;
                 mc_strncpy(l_14, l_1C->name, 4, (int)D_00176D55, 284);
-                *(int *)(D_00190EE4 + (l_10 << 2)) = (int)l_18;
+                *(int *)(scratch_190ee4 + (l_10 << 2)) = (int)l_18;
                 *(int *)(scratch_190de4 + (l_10++ << 2)) = l_14;
                 l_14 += strlen(l_1C->name) + 1;
             }

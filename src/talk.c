@@ -25,7 +25,7 @@ int faction_find(short a)
 /* between the talk.c and faction.c runs: unit not certain */
 int func_0001939C(int a, int b)
 {
-    D_00190BE4 = a;
+    scratch_190be4 = a;
     D_00195B84 = 0;
     func_000193DD(b);
     return D_00195B84;

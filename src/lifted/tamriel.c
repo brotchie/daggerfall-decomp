@@ -26,7 +26,7 @@ extern struct record *quest_root;
 extern struct record *bank_accounts;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct record *location_object;
 extern int creature_count;
 extern int calendar_year;
@@ -229,7 +229,7 @@ void time_pass_minutes(int a1)
                 frame_checkpoint = 2017;
                 spell_tick(player_entity);
                 spfx_walk_effect_records(player_entity, (int)spfx_disease_recover);
-                D_00195AA8 = player_entity;
+                scratch_current_object = player_entity;
                 spfx_walk_effect_records(player_entity->children, (int)poison_tick);
                 fatigue_update();
                 frame_checkpoint = 2018;
@@ -245,8 +245,8 @@ void time_pass_minutes(int a1)
             for (l_30 = 0; l_30 < creature_count; l_30++) {
                 if ((int)creature_list[l_30] == (-1768515946)) continue;
                 spell_tick(creature_list[l_30]);
-                D_00195AA8 = creature_list[l_30];
-                spfx_walk_effect_records(D_00195AA8->children, (int)poison_tick);
+                scratch_current_object = creature_list[l_30];
+                spfx_walk_effect_records(scratch_current_object->children, (int)poison_tick);
             }
             if (player_death_timer < 0) return;
         }

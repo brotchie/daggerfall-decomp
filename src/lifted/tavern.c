@@ -15,7 +15,7 @@ extern char D_001705E0[];
 extern char D_001705EC[];
 extern char tavern_food_names[];
 extern signed char tavern_food_prices[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern signed char tavern_state;
 extern char scratch_190d64[];
 extern signed char D_001940D4;
@@ -268,7 +268,7 @@ void func_0001F6E2(struct record *a1)
     l_18->image = a1->image;
     l_18->id = a1->id;
     l_18->parent_id = a1->parent->id;
-    l_18->repair_due = *(int *)D_00190BE4;
+    l_18->repair_due = *(int *)scratch_190be4;
     mc_memcpy(RECORD_DATA(l_18), RECORD_DATA(a1), 107, (int)D_00170569, 322, 4);
 }
 
@@ -376,9 +376,9 @@ int func_0001FBF5(struct record *a1)
     }
     if (l_1C == 0) return 0;
     if (l_1C->type != 15 && l_1C->type != 1) return 0;
-    *(int *)D_00190BE4 = 2147483647;
+    *(int *)scratch_190be4 = 2147483647;
     if (l_1C->type == 1 && l_1C->id == player_character->house) return 1;
-    *(int *)D_00190BE4 = l_1C->rent_expires;
+    *(int *)scratch_190be4 = l_1C->rent_expires;
     return (((((int)(unsigned char)(l_1C->flags & 2)) != 0) && (((unsigned)l_1C->rent_expires) > game_minutes)) ? 1 : 0);
 }
 

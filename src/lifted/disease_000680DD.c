@@ -6,7 +6,7 @@ struct bf8_0_2 { unsigned char f:2; };
 #include "records.h"
 
 extern struct record *player_entity;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern char D_00195B08[];
 extern char D_00195B84[];
 extern struct character *player_character;
@@ -41,7 +41,7 @@ void item_enchantment_tick(struct item *a1, int a2, int a3)
             player_character->magicka += *(short *)D_00195B08 * 5;
         }
         if (*(int *)D_00195B08 != 0 && ((struct bf8_0_2 *)&game_minutes)->f == 0) {
-            item_damage(D_00195AA8, 1);
+            item_damage(scratch_current_object, 1);
         }
         break;
     case 5:
@@ -57,7 +57,7 @@ L68256:;
             if (player_character->health > player_character->max_health) {
                 player_character->health = player_character->max_health;
             } else if ((rand() % 10) == 0) {
-                item_damage(D_00195AA8, 1);
+                item_damage(scratch_current_object, 1);
             }
         }
         break;
@@ -77,7 +77,7 @@ L68256:;
         if (a1->condition > *(int *)D_00195B08) {
             a1->condition -= *(short *)D_00195B08;
         } else {
-            item_break(D_00195AA8);
+            item_break(scratch_current_object);
         }
         break;
     case 21:
@@ -96,10 +96,10 @@ L68256:;
     case 8:
         *(int *)D_00195B84 = *(int *)D_00195B08;
         object_foreach(player_entity->children, (int)item_repair_cb);
-        if ((rand() % 10) == 0) item_damage(D_00195AA8, 1);
+        if ((rand() % 10) == 0) item_damage(scratch_current_object, 1);
         break;
     case 1:
-        item_damage(D_00195AA8, 1);
+        item_damage(scratch_current_object, 1);
         break;
     case 6:
         if (a3 == 0 && nearest_creature_distance < 128 && player_character->health != player_character->max_health) {
@@ -108,7 +108,7 @@ L68256:;
             if (player_character->health > player_character->max_health) {
                 player_character->health = player_character->max_health;
             }
-            item_damage(D_00195AA8, *(int *)D_00195B08);
+            item_damage(scratch_current_object, *(int *)D_00195B08);
         }
     }
     if (player_character->magicka >= 0) return;

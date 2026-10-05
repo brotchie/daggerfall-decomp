@@ -61,7 +61,7 @@ extern int D_001878D4[];
 extern signed char region_event_flags[];
 extern signed char text_buffer[];
 extern char shelf_book_ids[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern signed char D_001940D4;
 extern signed char D_001940D5;
 extern signed char D_001940D6;
@@ -86,7 +86,7 @@ extern int window_image;
 extern char scratch_buffer[];
 extern struct record *D_00195CE8;
 extern char D_00195D3C[];
-extern char D_00195D54[];
+extern char picked_model_index[];
 extern char click_face_texture[];
 extern signed char climate_weathers[];
 extern short shelf_model_index;
@@ -335,11 +335,11 @@ int click_world_face(int a1)
                         loot_generate(14, (struct record *)D_001960D9, l_24->quality, (int)(unsigned short)(player_character->flags & 1));
                         shelf_object = (struct record *)(*(int *)((char *)a1 + 4));
                         shelf_return_items();
-                        shelf_open_stock((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+                        shelf_open_stock((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)picked_model_index);
                         return 1;
                     }
                 } else if (l_1C < 4) {
-                    shelf_open((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)D_00195D54);
+                    shelf_open((struct record *)*(int *)((char *)a1 + 4), l_24, *(int *)picked_model_index);
                     return 1;
                 }
             }
@@ -741,14 +741,14 @@ void npc_talk(struct record *a1)
 void count_items_cb(struct record *a1)
 {
     if (a1->type != 2) return;
-    (*(int *)D_00190BE4)++;
+    (*(int *)scratch_190be4)++;
 }
 
 int object_count_items(struct record *a1)
 {
-    *(int *)D_00190BE4 = 0;
+    *(int *)scratch_190be4 = 0;
     object_foreach(a1->children, (int)count_items_cb);
-    return *(int *)D_00190BE4;
+    return *(int *)scratch_190be4;
 }
 
 int repair_menu_open(int a1)

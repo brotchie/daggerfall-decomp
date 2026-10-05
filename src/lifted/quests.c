@@ -16,7 +16,7 @@ extern char D_00185128[];
 extern signed char D_0018512E[];
 extern signed char body_part_armor_slots[];
 extern signed char text_buffer[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern char arena2_path[];
 extern char arena2_cd_path[];
 extern struct record *nonworld_root;
@@ -173,7 +173,7 @@ int quest_file_list_add(int a1, int a2)
 int quest_match_person_cb(struct record *a1)
 {
     if (a1->type != 8) return 0;
-    if (a1->data.person.faction_id == *(int *)D_00190BE4) {
+    if (a1->data.person.faction_id == *(int *)scratch_190be4) {
         found_object = a1;
         return 1;
     }
@@ -186,7 +186,7 @@ void func_0004C588(struct record *a1)
 
     if (a1->twin != 0) return;
     if (a1->type == 41 && (((unsigned)a1->id) >> 16) == 800) {
-        *(int *)D_00190BE4 = a1->data.building.faction_id;
+        *(int *)scratch_190be4 = a1->data.building.faction_id;
         found_object = 0;
         object_find((int)location_object, (int)quest_match_person_cb);
         if (found_object == 0) return;

@@ -14,7 +14,7 @@ extern short D_001855D2;
 extern signed char text_buffer[];
 extern char scratch_190d64[];
 extern char scratch_190d66[];
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern int scratch_190de8;
 extern char scratch_190df0[];
 extern int scratch_190df4;
@@ -41,13 +41,13 @@ int classmaker_draw(short a1)
     mc_memcpy(screen_buffer, scratch_190df4, 64000, (int)D_00175420, 235, 4);
     classmaker_draw_dagger();
     if (*(short *)scratch_190d66 & 2) {
-        xn_draw_put_rect(44, (int)(short)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4), (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6), scratch_190de8, 0);
+        xn_draw_put_rect(44, (int)(short)scratch_190d6a, (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4), (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6), scratch_190de8, 0);
         *(signed char *)scratch_190d66 &= 253;
     }
-    xn_draw_get_rect(44, (int)(short)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4), (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6), scratch_190de8, 0);
+    xn_draw_get_rect(44, (int)(short)scratch_190d6a, (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4), (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6), scratch_190de8, 0);
     *(signed char *)scratch_190d66 |= 2;
-    xn_draw_image_transparent(44, (int)(short)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4), (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6), (int)(*(char **)scratch_190df0 + 12));
-    text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (int)text_buffer, 10), (int)(short)(((((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4)) + 1) >> 1) + 43), (int)(short)((((int)(short)D_00190D6A) + (((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6)) >> 1)) - 3), 145, 141);
+    xn_draw_image_transparent(44, (int)(short)scratch_190d6a, (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4), (int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6), (int)(*(char **)scratch_190df0 + 12));
+    text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (int)text_buffer, 10), (int)(short)(((((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 4)) + 1) >> 1) + 43), (int)(short)((((int)(short)scratch_190d6a) + (((int)(unsigned short)*(short *)(*(char **)scratch_190df0 + 6)) >> 1)) - 3), 145, 141);
     if (a1 != 0)
         text_draw_coloured((int)player_class->name, 110, 5, 145, 141);
     text_draw_centred_coloured(itoa(player_class->hp_per_level, (int)text_buffer, 10), 287, 55, 145, 141);

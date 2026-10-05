@@ -90,7 +90,7 @@ extern struct record *camera_object;
 extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct record *location_object;
 extern int D_00195ACC;
 extern int text_macro_book;
@@ -552,7 +552,7 @@ void inv_draw_container_icon(int a1, int a2)
     xn_draw_image_transparent(l_18, l_14, (int)(unsigned short)*(short *)((char *)l_20 + 4), (int)(unsigned short)*(short *)((char *)l_20 + 6), l_20 + 12);
     if (wagon_container == 0 || a2 != 3) return;
     D_001962AE = 1;
-    D_00195AA8 = wagon_container;
+    scratch_current_object = wagon_container;
     mc_set_location(657, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_001770A7, macro_kg_weight());
     text_draw_coloured((int)text_buffer, (int)(short)(l_18 + 1), (int)(short)(l_14 + 1), 145, 156);
@@ -931,7 +931,7 @@ void inv_item_info(struct record *a1, struct item *a2)
     int l_14;
 
     D_0012B508 = 146;
-    D_00195AA8 = a1;
+    scratch_current_object = a1;
     text_macro_item = a2;
     if (a2->enchantments[0].type == 26 && a2->enchantments[0].param == 9) {
         msgbox_show_rsc(1004, 1);

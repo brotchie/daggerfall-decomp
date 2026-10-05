@@ -52,10 +52,10 @@ extern int travel_selected_location;
 extern int D_001889C1;
 extern int terrain_travel_modifiers[];
 extern signed char text_buffer[];
-extern int D_00190CAC;
+extern int scratch_190cac;
 extern signed char scratch_190ce4[];
-extern signed char D_00190CE5;
-extern signed char D_00190CE7;
+extern signed char scratch_190ce5;
+extern signed char scratch_190ce7;
 extern signed char D_00190CE8;
 extern signed char scratch_190d16;
 extern char scratch_190d64[];
@@ -206,16 +206,16 @@ void travel_map_update(void)
             }
         }
     }
-    if (D_00190CE5 != 0) {
+    if (scratch_190ce5 != 0) {
         travel_draw_trip_popup();
         l_30 = 1132;
-        D_00190CAC = *(int *)((char *)l_30);
+        scratch_190cac = *(int *)((char *)l_30);
     }
-    if (D_00190CE5 == 0) {
+    if (scratch_190ce5 == 0) {
         travel_draw_hover_name();
         if (*(int *)D_001AA688 != (-1) && D_00190CE8 == 0) {
             l_2C = 1132;
-            if (((unsigned)(*(int *)((char *)l_2C) - D_00190CAC)) > 50) {
+            if (((unsigned)(*(int *)((char *)l_2C) - scratch_190cac)) > 50) {
                 *(int *)D_001AA688 = -1;
             } else {
                 l_28 = 1132;
@@ -236,10 +236,10 @@ void travel_map_update(void)
         }
     }
     if (((int)(unsigned char)game_mode) != 19) return;
-    if (D_00190CE7 != 0) {
+    if (scratch_190ce7 != 0) {
         while (key_down_enter != 0);
         key_pressed_once(28);
-        D_00190CE7 = 0;
+        scratch_190ce7 = 0;
         l_50 = travel_find_location((int)text_rsc_buffer);
         if (l_50 != (-1)) {
             l_34 = region_locations + l_50;
@@ -261,7 +261,7 @@ void travel_map_update(void)
             *(int *)D_001AA688 = l_4C;
             *(int *)D_001AA68C = l_48 + 13;
             l_24 = 1132;
-            D_00190CAC = *(int *)((char *)l_24);
+            scratch_190cac = *(int *)((char *)l_24);
             text_macro_travel_city = (int)(D_00196A7C + ((travel_selected_location = l_50) << 5)) + 4;
             l_20 = 1132;
             D_001AA694 = (int)(*(char **)((char *)l_20) + 24);
@@ -279,10 +279,10 @@ void travel_map_update(void)
             travel_open_trip();
         } else {
             l_18 = 1132;
-            D_00190CAC = *(int *)((char *)l_18);
+            scratch_190cac = *(int *)((char *)l_18);
         }
     }
-    if (D_00190CE5 != 0) {
+    if (scratch_190ce5 != 0) {
         if (((int)(unsigned char)D_001AA6A6) == 100) {
             l_38 = 10;
             l_3C = 7;
@@ -491,7 +491,7 @@ void travel_mark_player(int a1)
         *(int *)D_001AA688 = l_28;
         *(int *)D_001AA68C = l_24 + 13;
         l_18 = 1132;
-        D_00190CAC = *(int *)((char *)l_18);
+        scratch_190cac = *(int *)((char *)l_18);
         return;
     }
     *(int *)D_001AA688 = -1;
@@ -606,7 +606,7 @@ void travel_popup_exit(void)
         return;
     }
     sound_play(203, (int)player_object, 110);
-    D_00190CE5 = 0;
+    scratch_190ce5 = 0;
 }
 
 void func_0009C27F(void)
@@ -636,7 +636,7 @@ void travel_button_find(void)
     if (strnicmp((int)D_0017748E, (int)text_rsc_buffer, 4) == 0) {
         mc_memcpy((int)text_rsc_buffer, (int)D_00190FE8, (int)&*(signed char *)((char *)strlen((int)text_rsc_buffer) + 1), (int)D_0017743D, 812, 2048);
     }
-    D_00190CE7 = 1;
+    scratch_190ce7 = 1;
 }
 
 int travel_location_at_cursor(void)
@@ -732,7 +732,7 @@ int travel_find_location(int a1)
 void travel_open_trip(void)
 {
     if (travel_selected_location == (-1)) return;
-    D_00190CE5 = 1;
+    scratch_190ce5 = 1;
     D_001AA678 = (region_locations)[travel_selected_location].x_type_flags & 33554431;
     D_001AA67C = (region_locations)[travel_selected_location].z_size & 16777215;
     D_001AA680 = travel_route(player_object->x, player_object->z, D_001AA678, D_001AA67C, 0);
@@ -909,7 +909,7 @@ void travel_button_im_at(void)
     }
     *(int *)D_001AA688 = 0;
     l_18 = 1132;
-    D_00190CAC = *(int *)((char *)l_18);
+    scratch_190cac = *(int *)((char *)l_18);
 }
 
 void travel_draw_buttons(void)

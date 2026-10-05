@@ -6,12 +6,12 @@
 extern struct record *wagon_container;
 extern struct item *text_macro_item;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct record *location_object;
 extern struct record *inv_right_container;
 extern int trade_mode;
 extern int inventory_action;
-extern char D_00195D54[];
+extern char picked_model_index[];
 extern char D_00196120[];
 extern signed char D_001962AE;
 extern struct record *inv_selected_item;
@@ -41,7 +41,7 @@ void inv_click_left_item(struct record *a1)
     {
         int l_3C;
 
-        D_00195AA8 = (inv_selected_item = a1);
+        scratch_current_object = (inv_selected_item = a1);
         l_34 = &a1->data.item;
         text_macro_item = l_34;
         l_3C = inventory_action - 1;
@@ -87,7 +87,7 @@ L94793:;
             a1->caster = 0;
             if (a1->image == 0) a1->image = l_34->dropped_image;
             object_reparent(inv_right_container, a1);
-            if (((int)D_00196120) == (int)a1->parent) a1->owner = *(short *)D_00195D54;
+            if (((int)D_00196120) == (int)a1->parent) a1->owner = *(short *)picked_model_index;
             a1->id = object_new_id(((unsigned)location_object->id) >> 16);
             if (a1->twin != 0) a1->twin->id = a1->id;
             quest_raise_event(5, (int)a1, 0);

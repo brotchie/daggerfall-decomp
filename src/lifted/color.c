@@ -12,7 +12,7 @@ extern int D_00187B76;
 extern signed char D_001886A8[];
 extern signed char D_001886A9[];
 extern char D_001886D2[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern struct record *player_object;
 extern struct record *location_object;
 extern struct location *current_location;
@@ -159,6 +159,6 @@ void building_disable_monster_markers(struct record *a1)
     int l_18;
 
     l_18 = ((unsigned)game_minutes) % 1440;
-    *(int *)D_00190BE4 = (((l_18 > 360) && (l_18 < 1080)) ? 1 : 0);
+    *(int *)scratch_190be4 = (((l_18 > 360) && (l_18 < 1080)) ? 1 : 0);
     object_foreach_post(a1->children, (int)building_disable_monster_marker_cb);
 }

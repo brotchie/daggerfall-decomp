@@ -35,7 +35,7 @@ extern signed char region_event_values[];
 extern signed char text_buffer[];
 extern char D_001903BA[];
 extern signed char scratch_190ce4[];
-extern signed char D_00190CE5;
+extern signed char scratch_190ce5;
 extern char arena2_path[];
 extern char arena2_cd_path[];
 extern signed char D_001940D4;
@@ -432,7 +432,7 @@ void kludge_pick_pockets(void)
     l_1C->type = 18;
     l_18 = rand() % 20;
     scratch_190ce4[0] = 2;
-    D_00190CE5 = *(signed char *)&l_18;
+    scratch_190ce5 = *(signed char *)&l_18;
     monster_init(l_1C, l_18);
     scratch_190ce4[0] = 3;
     mc_set_location(448, (int)D_00171044);

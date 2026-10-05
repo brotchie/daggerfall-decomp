@@ -60,7 +60,7 @@ extern signed char D_0018F063[];
 extern signed char D_0018F064[];
 extern signed char region_event_groups[];
 extern signed char text_buffer[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern signed char D_00190D0F;
 extern signed char D_00190D10;
 extern signed char D_00190D11;
@@ -1520,10 +1520,10 @@ void func_000193DD(struct faction *a1)
     int l_18;
 
     while (a1 != 0) {
-        if ((int)a1 == *(int *)D_00190BE4) *(signed char *)D_00195B84 |= 1;
+        if ((int)a1 == *(int *)scratch_190be4) *(signed char *)D_00195B84 |= 1;
         for (l_18 = 0; l_18 < 3; l_18++) {
-            if ((int)a1->allies[l_18] == *(int *)D_00190BE4) *(signed char *)D_00195B84 |= 1;
-            if ((int)a1->enemies[l_18] == *(int *)D_00190BE4) *(signed char *)D_00195B84 |= 2;
+            if ((int)a1->allies[l_18] == *(int *)scratch_190be4) *(signed char *)D_00195B84 |= 1;
+            if ((int)a1->enemies[l_18] == *(int *)scratch_190be4) *(signed char *)D_00195B84 |= 2;
         }
         if (a1->child != 0) func_000193DD(a1->child);
         a1 = a1->next;

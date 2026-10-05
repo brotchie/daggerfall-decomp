@@ -24,7 +24,7 @@ extern char D_00195A08[];
 extern int D_00195A0C;
 extern int D_00195A78;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct record *location_object;
 extern char hud_bar_image[];
 extern struct character *player_character;
@@ -337,7 +337,7 @@ void quest_cast_spell_on_foe_cb(struct record *a1)
     if ((short)(a1->quest_id) != current_quest->id) return;
     if (a1->image2 != *(short *)scratch_190d64) return;
     D_00196291 = 1;
-    cast_spell_on(D_00195AA8, a1, 1);
+    cast_spell_on(scratch_current_object, a1, 1);
     D_00196291 = 0;
 }
 

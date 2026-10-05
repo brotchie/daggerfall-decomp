@@ -77,19 +77,19 @@ extern char saved_location_name[];
 extern char saved_region_name[];
 extern char region_legal_reputation[];
 extern char region_persecuted_temple[];
-extern char D_00190BE4[];
-extern int D_00190BEC;
+extern char scratch_190be4[];
+extern int scratch_190bec;
 extern int automap_yaw;
 extern int D_00190BF8;
 extern int D_00190BFC;
 extern int D_00190C00;
 extern char D_00190C78[];
-extern int D_00190CAC;
+extern int scratch_190cac;
 extern int D_00190CD4;
 extern int D_00190CD8;
 extern int D_00190CDC;
 extern signed char scratch_190d16;
-extern signed char D_00190D17;
+extern signed char scratch_190d17;
 extern signed char scratch_190d20;
 extern signed char D_00190D21;
 extern signed char D_00190D22;
@@ -114,7 +114,7 @@ extern int D_00195A94;
 extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern int D_00195AC0;
 extern struct record *location_object;
 extern int D_00195ACC;
@@ -395,7 +395,7 @@ int macro_cnr_faction_name(void)
 
 int macro_cri_crime(void)
 {
-    return crime_names[((int)(signed char)D_00190D17)];
+    return crime_names[((int)(signed char)scratch_190d17)];
 }
 
 int macro_cpn_shop_name(void)
@@ -506,7 +506,7 @@ int macro_dbp_codeword(void)
 
 int macro_dtr_days_left(void)
 {
-    return itoa(((unsigned)((D_00195AA8->repair_due - game_minutes) + 1439)) / 1440, (int)text_rsc_buffer, 10);
+    return itoa(((unsigned)((scratch_current_object->repair_due - game_minutes) + 1439)) / 1440, (int)text_rsc_buffer, 10);
 }
 
 int macro_da_trade_total(void)
@@ -693,7 +693,7 @@ int macro_gii_gold_carried(void)
 
 int macro_gtp_fine(void)
 {
-    return itoa(D_00190CAC, (int)text_rsc_buffer, 10);
+    return itoa(scratch_190cac, (int)text_rsc_buffer, 10);
 }
 
 int macro_gdd_temple_god(void)
@@ -751,9 +751,9 @@ int macro_hea_endurance_modifier(void)
 
 int macro_hs_held_soul(void)
 {
-    if (D_00195AA8->children == 0) return (int)D_0017115C;
-    if (D_00195AA8->children->image >= 43) return (int)D_00171164;
-    return *(int *)(monster_names + (D_00195AA8->children->image << 2));
+    if (scratch_current_object->children == 0) return (int)D_0017115C;
+    if (scratch_current_object->children->image >= 43) return (int)D_00171164;
+    return *(int *)(monster_names + (scratch_current_object->children->image << 2));
 }
 
 int macro_hod_holiday_description(void)
@@ -846,7 +846,7 @@ int macro_kg_weight(void)
 {
     int l_1C;
 
-    l_1C = object_weight(D_00195AA8);
+    l_1C = object_weight(scratch_current_object);
     if ((l_1C & 3) != 0) {
         mc_set_location(847, (int)D_0017110C);
         mc_sprintf((int)text_rsc_buffer, (int)D_0017116D, l_1C >> 2, weight_fractions[(l_1C & 3)]);
@@ -905,7 +905,7 @@ int macro_luc_luck(void)
 
 int macro_la_number(void)
 {
-    return itoa(D_00190BEC, (int)text_rsc_buffer, 10);
+    return itoa(scratch_190bec, (int)text_rsc_buffer, 10);
 }
 
 int macro_lev_guild_rank(void)
@@ -1435,7 +1435,7 @@ int macro_qdt_quest_date(void)
     int l_1C;
 
     l_1C = game_minutes;
-    game_minutes = *(int *)D_00190BE4;
+    game_minutes = *(int *)scratch_190be4;
     l_20 = macro_dat_date();
     game_minutes = l_1C;
     return l_20;
@@ -1645,8 +1645,8 @@ int macro_wpn_poison(void)
 {
     struct disease *l_1C;
 
-    if (D_00195AA8->children == 0) return (int)D_0017115C;
-    l_1C = &D_00195AA8->children->data.disease;
+    if (scratch_current_object->children == 0) return (int)D_0017115C;
+    l_1C = &scratch_current_object->children->data.disease;
     return *(int *)(D_00182F92 + (l_1C->id << 2));
 }
 
@@ -1741,7 +1741,7 @@ int macro_1com_greeting(void)
 
 int parse_bio_answer_text(int a1)
 {
-    parse_rsc_text((int)(short)*(short *)(D_00190BE4 + (a1 << 2)), 0, 0);
+    parse_rsc_text((int)(short)*(short *)(scratch_190be4 + (a1 << 2)), 0, 0);
     return (int)text_rsc_buffer;
 }
 

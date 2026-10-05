@@ -7,15 +7,15 @@ extern short D_00188186;
 extern short D_0018818A;
 extern short D_00188192;
 extern short D_00188196;
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern short chargen_selected_attribute;
 
 
 void chargen_select_attribute(short a1)
 {
     chargen_selected_attribute = *(int *)&a1;
-    D_00188186 = (D_00190D6A = *(short *)(D_0018801E + ((((int)(short)a1) + 20) * 12)) + 1);
-    D_0018818A = D_00190D6A + 6;
-    D_00188192 = D_00190D6A + 13;
-    D_00188196 = D_00190D6A + 19;
+    D_00188186 = (scratch_190d6a = *(short *)(D_0018801E + ((((int)(short)a1) + 20) * 12)) + 1);
+    D_0018818A = scratch_190d6a + 6;
+    D_00188192 = scratch_190d6a + 13;
+    D_00188196 = scratch_190d6a + 19;
 }

@@ -14,7 +14,7 @@ extern int D_0018328C;
 extern int D_0018333C;
 extern int D_00183340;
 extern signed char text_buffer[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern struct record *found_object;
 extern struct character *player_character;
 extern signed char crime_current;
@@ -102,6 +102,6 @@ void door_key_match_cb(struct record *a1)
     if (a1->type != 2) return;
     l_18 = &a1->data.item;
     if (l_18->group != 27 || l_18->index != 3) return;
-    if (l_18->value != *(int *)D_00190BE4 || (short)l_18->message != *(short *)D_00190BE4) return;
+    if (l_18->value != *(int *)scratch_190be4 || (short)l_18->message != *(short *)scratch_190be4) return;
     found_object = a1;
 }

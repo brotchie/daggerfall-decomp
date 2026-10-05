@@ -12,9 +12,9 @@ extern int crime_reputation_loss[];
 extern struct shop crime_fine_table[];
 extern char D_00187CA8;
 extern struct row region_legal_reputation[];
-extern int D_00190CAC;
+extern int scratch_190cac;
 extern char scratch_190d16;
-extern signed char D_00190D17;
+extern signed char scratch_190d17;
 extern char court_state;
 extern short court_prison_days;
 extern unsigned char D_001940D5;
@@ -67,7 +67,7 @@ int court_open(int n)
         n--;
         music_play(D_001A4FA0->f4);
         D_0019629C = 1;
-        D_00190D17 = n;
+        scratch_190d17 = n;
         court_reputation_change = crime_reputation_loss[n] >> 1;
         if (player_environment == 2)
             map_goto_location(current_region, 1, location_object->image, 0);
@@ -110,12 +110,12 @@ int court_open(int n)
         window_image = disk_read_file(D_001706D4, 0);
         mc_memcpy(screen_buffer, window_image, 64000, D_001706E1, 114, 4);
         xn_gfx_present_inclusive(1);
-        D_00190CAC = gold;
+        scratch_190cac = gold;
         D_00187CA8 = 0;
         D_001940D5 |= 64;
         D_00195F34 = 194;
         item = guild_find_membership_by_kind(0);
-        if ((D_00190D17 == 4 || D_00190D17 == 3) && item != 0 && item->rank >= rand_range(0, 19)) {
+        if ((scratch_190d17 == 4 || scratch_190d17 == 3) && item != 0 && item->rank >= rand_range(0, 19)) {
             msgbox_show_rsc(551, 1);
             court_restore_vitals();
             court_reputation_restore();
@@ -127,7 +127,7 @@ int court_open(int n)
             return 0;
         }
         item = guild_find_membership_by_kind(3);
-        if ((D_00190D17 <= 2 || D_00190D17 == 11) && item != 0 && item->rank >= rand_range(0, 19)) {
+        if ((scratch_190d17 <= 2 || scratch_190d17 == 11) && item != 0 && item->rank >= rand_range(0, 19)) {
             msgbox_show_rsc(550, 1);
             court_restore_vitals();
             court_reputation_restore();

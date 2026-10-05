@@ -33,7 +33,7 @@ extern char D_00187F46[];
 extern signed char text_buffer[];
 extern signed char D_001903A5;
 extern signed char D_001903A6;
-extern char D_00190EE4[];
+extern char scratch_190ee4[];
 extern signed char D_001940D5;
 extern int D_001950E4;
 extern int D_001950E8;
@@ -794,7 +794,7 @@ void spfx_dispel_magic_cb(int a1)
     int l_1C;
     struct record *l_18;
 
-    l_18 = *(struct record **)(D_00190EE4 + (a1 << 2));
+    l_18 = *(struct record **)(scratch_190ee4 + (a1 << 2));
     if (l_18->caster != player_entity) {
         l_20 = (player_character->level - l_18->caster->data.character.level) * 5;
         l_1C = l_20 + selected_spell->cast_chances[D_001A99F4];

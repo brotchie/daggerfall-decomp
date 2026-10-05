@@ -6,7 +6,7 @@ extern int D_001940D8;
 extern struct record *wagon_container;
 extern struct record *player_object;
 extern struct character *player_character;
-extern int D_00195D54;
+extern int picked_model_index;
 extern struct record *inv_right_rows[];
 extern int inv_right_scroll;
 extern short D_001AA588;
@@ -23,7 +23,7 @@ void inv_list_right_item(struct record *a1, int a2)
         return;
     if (a1->flags & 0x200)
         return;
-    if ((D_001940D6 & 4) && a1->owner != D_00195D54)
+    if ((D_001940D6 & 4) && a1->owner != picked_model_index)
         return;
     if ((!(D_001940D6 & 4) && a1->parent != wagon_container ? 1 : 0) && xn_math_approx_hypot(a1->z - player_object->z, xn_math_approx_dist2d(a1->x, a1->y, player_object->x, player_object->y)) > 160)
         return;

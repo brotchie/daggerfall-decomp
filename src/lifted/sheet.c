@@ -45,10 +45,10 @@ extern int D_00185073;
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
 extern signed char D_001903A5;
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern int D_00190C34;
 extern char scratch_190d64[];
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern short D_00190D8C[];
 extern char scratch_190de4[];
 extern signed char D_001940D4;
@@ -404,10 +404,10 @@ void sheet_select_attribute(int a1)
 
 void sheet_place_spinner(int a1)
 {
-    D_0017B604 = (D_00190D6A = *(short *)(D_0017B508 + (a1 * 12)) + 1);
-    D_0017B608 = D_00190D6A + 6;
-    D_0017B610 = D_00190D6A + 13;
-    D_0017B614 = D_00190D6A + 19;
+    D_0017B604 = (scratch_190d6a = *(short *)(D_0017B508 + (a1 * 12)) + 1);
+    D_0017B608 = scratch_190d6a + 6;
+    D_0017B610 = scratch_190d6a + 13;
+    D_0017B614 = scratch_190d6a + 19;
 }
 
 int health_status_text(void)
@@ -439,8 +439,8 @@ int health_status_text(void)
 void sheet_draw_levelup_points(void)
 {
     if (((struct bf8_2_1 *)&D_001940D9)->f == 0) return;
-    xn_draw_image_transparent(176, (int)(short)D_00190D6A, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
-    text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (int)text_buffer, 10), 182, (int)(short)(((D_00190D6A + 13) - font_height) + 1), 145, 141);
+    xn_draw_image_transparent(176, (int)(short)scratch_190d6a, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (int)text_buffer, 10), 182, (int)(short)(((scratch_190d6a + 13) - font_height) + 1), 145, 141);
 }
 
 void sheet_levelup_adjust(int a1)
@@ -450,9 +450,9 @@ void sheet_levelup_adjust(int a1)
 
     if (((struct bf8_2_1 *)&D_001940D9)->f == 0) return;
     l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)D_00190BE4)) < 6) return;
+    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)scratch_190be4)) < 6) return;
     l_18 = 1132;
-    *(int *)D_00190BE4 = *(int *)((char *)l_18);
+    *(int *)scratch_190be4 = *(int *)((char *)l_18);
     if (a1 == 21) {
         if (*(short *)scratch_190d64 != 0 && player_character->base_attributes[(int)(unsigned char)D_0019626C] < 100) {
             (*(short *)scratch_190d64)--;

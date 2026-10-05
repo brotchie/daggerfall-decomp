@@ -5,7 +5,7 @@ extern char D_001770B0[];
 extern char D_001770B3[];
 extern char D_001770B8[];
 extern signed char text_buffer[];
-extern char D_00195AA8[];
+extern char scratch_current_object[];
 extern char inv_right_container[];
 extern int D_00195B80;
 extern int game_minutes;
@@ -49,7 +49,7 @@ int inv_draw_item_cell(char *a1, short a2, struct Rect *a3)
     short l_14;
 
     l_40 = 0;
-    *(char **)D_00195AA8 = a1;
+    *(char **)scratch_current_object = a1;
     l_38 = a1 + 71;
     if (a1 == *(char **)inv_selected_item && MODE != 10 && MODE2 != 10) {
         for (l_14 = a3[a2].y0; l_14 <= a3[a2].y1; l_14++)

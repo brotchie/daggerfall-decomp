@@ -30,17 +30,17 @@ extern char D_0018590A[];
 extern char D_0018597F[];
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
-extern char D_00190BE4[];
-extern int D_00190BE8;
+extern char scratch_190be4[];
+extern int scratch_190be8;
 extern signed char scratch_190ce4[];
-extern signed char D_00190CEE[];
+extern signed char scratch_190cee[];
 extern signed char D_00190D02[];
 extern signed char D_00190D63;
 extern char scratch_190d64[];
 extern char scratch_190d66[];
 extern short scratch_190d68;
 extern int D_00190EDC;
-extern char D_00190EE4[];
+extern char scratch_190ee4[];
 extern signed char text_rsc_buffer[];
 extern char D_001913E4[];
 extern signed char D_001940D8;
@@ -137,12 +137,12 @@ void func_00058AF7(void);
 
 void itemmaker_reset(void)
 {
-    D_00190BE8 = (*(int *)D_00190BE4 = 0);
+    scratch_190be8 = (*(int *)scratch_190be4 = 0);
     itemmaker_item_object = 0;
     itemmaker_item = 0;
     *(int *)inv_left_scroll = 0;
     mc_memset((int)scratch_190ce4, -1, 10, (int)D_001756A3, 77, 128);
-    mc_memset((int)D_00190CEE, -1, 30, (int)D_001756A3, 78, 4);
+    mc_memset((int)scratch_190cee, -1, 30, (int)D_001756A3, 78, 4);
     mc_memset((int)D_00190D02, -1, 30, (int)D_001756A3, 79, 4);
     mc_memset((int)D_00199868, -1, 120, (int)D_001756A3, 80, 120);
     mc_memset((int)itemmaker_slots, 0, 40, (int)D_001756A3, 81, 40);
@@ -248,7 +248,7 @@ void itemmaker_return_item(void)
     if ((int)itemmaker_item != 0) inv_store_item((int)itemmaker_item_object);
     itemmaker_item_object = 0;
     itemmaker_item = 0;
-    *(int *)D_00190BE4 = 0;
+    *(int *)scratch_190be4 = 0;
 }
 
 void itemmaker_enchant(void)
@@ -322,7 +322,7 @@ void itemmaker_soul_list_cb(struct record *a1)
     if (a1->type != 20 || *(int *)D_00195B84 > 62) return;
     if (D_00190D63 == a1->soul_creature) scratch_object = a1;
     text_rsc_buffer[*(int *)D_00195B84] = (signed char)a1->soul_creature;
-    *(int *)(D_00190EE4 + ((*(int *)D_00195B84)++ << 2)) = D_00190EDC;
+    *(int *)(scratch_190ee4 + ((*(int *)D_00195B84)++ << 2)) = D_00190EDC;
     mc_strncpy(D_00190EDC, *(int *)(monster_names + (a1->soul_creature << 2)), 4, (int)D_001756A3, 526);
     l_18 = D_00190EDC;
     l_18 += strlen(*(int *)(monster_names + (a1->soul_creature << 2))) + 1;
@@ -338,7 +338,7 @@ int itemmaker_pick_param_list(int a1)
         itemmaker_show_param_list(spells_std_names_for_ids(D_00185871[a1]), (int)(short)(a1 - 1));
         break;
     case 4:
-        *(int *)D_00190EE4 = *(int *)scratch_buffer + 20000;
+        *(int *)scratch_190ee4 = *(int *)scratch_buffer + 20000;
         D_00190EDC = *(int *)scratch_buffer + 21000;
         *(int *)D_00195B84 = 0;
         object_foreach(player_entity->children, (int)itemmaker_soul_list_cb);
@@ -346,8 +346,8 @@ int itemmaker_pick_param_list(int a1)
             msgbox_show_string((int)D_001756EC, 1);
             return 0;
         }
-        *(int *)(D_00190EE4 + (*(int *)D_00195B84 << 2)) = 0;
-        itemmaker_show_param_list((int)D_00190EE4, 1000);
+        *(int *)(scratch_190ee4 + (*(int *)D_00195B84 << 2)) = 0;
+        itemmaker_show_param_list((int)scratch_190ee4, 1000);
     }
     return 1;
 }
@@ -398,7 +398,7 @@ void itemmaker_show_list(int a1, int a2)
                 } else if (((int)(short)*(short *)&a2) == 21 && itemmaker_has_health_leech() != 0) {
                 } else {
                     *(signed char *)((char *)(int)(((int)(short)*(short *)&l_14) + *(char **)scratch_buffer) + 64000) = *(signed char *)&l_18;
-                    *(int *)(D_00190EE4 + (((int)(short)*(short *)&l_14) << 2)) = *(int *)((char *)a1);
+                    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&l_14) << 2)) = *(int *)((char *)a1);
                     l_14++;
                 }
             }
@@ -408,8 +408,8 @@ L576C2:;
         (*(short *)&l_18)++;
         a2++;
     }
-    *(int *)(D_00190EE4 + (((int)(short)*(short *)&l_14) << 2)) = 0;
-    list_popup_open((int)D_00190EE4);
+    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&l_14) << 2)) = 0;
+    list_popup_open((int)scratch_190ee4);
 }
 
 int spell_name_by_id(unsigned char a1)
@@ -620,7 +620,7 @@ void itemmaker_pick_item(int a1)
         if (player_character->equipped[a1] == l_1C) player_character->equipped[a1] = 0;
     }
     itemmaker_item_object = l_1C;
-    *(int *)D_00190BE4 = (int)(unsigned short)*(short *)((char *)(*(int *)&itemmaker_item = (int)l_18) + 61);
+    *(int *)scratch_190be4 = (int)(unsigned short)*(short *)((char *)(*(int *)&itemmaker_item = (int)l_18) + 61);
 }
 
 int enchant_item_value(int a1)

@@ -18,7 +18,7 @@ extern char D_00185B30[];
 extern char D_00185B54[];
 extern signed char text_buffer[];
 extern signed char scratch_190ce4[];
-extern signed char D_00190CEE[];
+extern signed char scratch_190cee[];
 extern char D_00190CEF[];
 extern char D_00190CF0[];
 extern signed char D_00190D02[];
@@ -71,7 +71,7 @@ void itemmaker_draw(void)
         if (((char *)D_00199910)[l_20] != 0)
             D_0012B508 = 193;
         if (scratch_190ce4[l_20] == 0) {
-            ((char *)D_00190CEE)[l_1C] = l_20;
+            ((char *)scratch_190cee)[l_1C] = l_20;
             D_00190CEF[l_1C] = 255;
             mc_set_location(179, D_001756A3);
             mc_sprintf(((char *)text_buffer), D_001756B6, enchant_power_names[itemmaker_slots[l_20].a]);

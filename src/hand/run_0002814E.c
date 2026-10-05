@@ -23,7 +23,7 @@ extern char D_0017A0C4[];
 extern char D_0017A103[];
 extern int D_0018507F;
 extern signed char text_buffer[];
-extern signed char D_00190CE5;
+extern signed char scratch_190ce5;
 extern char scratch_190de4[];
 extern struct record *player_object;
 extern struct record *location_object;
@@ -96,7 +96,7 @@ void town_map_open(void)
     }
     D_00196D98 = (D_00196D90 = 0);
     D_00196D94 = 0;
-    D_00190CE5 = 0;
+    scratch_190ce5 = 0;
     mc_memset(*(int *)scratch_buffer, 0, 50000, (int)D_001707AE, 624, 4);
     mc_set_location(625, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
@@ -154,7 +154,7 @@ void town_map_open(void)
         *(int *)D_00196D9C = -1751672937;
     }
     D_00196272 = *(signed char *)&l_1C;
-    if (D_00190CE5 == 0) return;
+    if (scratch_190ce5 == 0) return;
     mc_set_location(686, (int)D_001707AE);
     mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
     disk_write_arena2_file((int)text_buffer, *(int *)scratch_buffer, town_notes_size());

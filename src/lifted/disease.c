@@ -27,7 +27,7 @@ extern signed char scratch_190ce4[];
 extern signed char D_00190D63;
 extern signed char D_001940D8;
 extern struct record *player_entity;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct spell *spell_records;
 extern char D_00195B08[];
 extern int trade_haggle_result;
@@ -164,10 +164,10 @@ int poison_tick(struct disease *a1)
     if (a1->stage == 0) a1->stage = 1;
     switch ((unsigned char)(a1->id - 128)) {
     case 0:
-        damage_apply(D_00195AA8, rand_range(2, 12), 0);
+        damage_apply(scratch_current_object, rand_range(2, 12), 0);
         break;
     case 1:
-        damage_apply(D_00195AA8, 2, 0);
+        damage_apply(scratch_current_object, 2, 0);
         a1->stat_flags[4] = 1;
         a1->drained[4]++;
         player_character->attributes[4]--;
@@ -178,7 +178,7 @@ int poison_tick(struct disease *a1)
         a1->stage = 2;
         break;
     case 2:
-        damage_apply(D_00195AA8, rand_range(1, 10), 0);
+        damage_apply(scratch_current_object, rand_range(1, 10), 0);
         break;
     case 3:
         l_28 = rand_range(5, 10);
@@ -211,7 +211,7 @@ int poison_tick(struct disease *a1)
         fatigue_add(-rand_range(10, 100));
         break;
     case 5:
-        damage_apply(D_00195AA8, rand_range(1, 30), 0);
+        damage_apply(scratch_current_object, rand_range(1, 30), 0);
         break;
     case 6:
         l_28 = rand_range(1, 5);
@@ -222,7 +222,7 @@ int poison_tick(struct disease *a1)
             player_character->attributes[2] = 1;
             a1->drained[2] -= 1 - player_character->attributes[2];
         }
-        l_1C = &D_00195AA8->data.character;
+        l_1C = &scratch_current_object->data.character;
         l_1C->magicka -= rand_range(5, 15);
         if (l_1C->magicka < 0) l_1C->magicka = 0;
         a1->stage = 2;
@@ -282,7 +282,7 @@ int poison_tick(struct disease *a1)
         a1->stage = 2;
         break;
     case 11:
-        l_1C = &D_00195AA8->data.character;
+        l_1C = &scratch_current_object->data.character;
         l_1C->magicka += rand_range(5, 10);
         if (l_1C->magicka > l_1C->max_magicka) l_1C->magicka = l_1C->max_magicka;
         l_28 = rand_range(1, 5);
@@ -818,7 +818,7 @@ void effects_tick(void)
     }
     *(int *)D_00195B08 >>= 2;
     if (*(int *)D_00195B08 != 0) D_00195B44 = game_minutes;
-    D_00195AA8 = 0;
+    scratch_current_object = 0;
     if (*(int *)D_00195B08 != 0 || l_24 != 0) {
         if (player_class->regeneration_flags != 0 && *(int *)D_00195B08 != 0) {
             if (((int)(unsigned char)(player_class->regeneration_flags & 4)) != 0 && (in_dungeon_water != 0 || D_001962A0 != 0)) {
@@ -848,7 +848,7 @@ void effects_tick(void)
         if (player_character->equipped[l_24] != 0) {
             l_18 = &player_character->equipped[l_24]->data.item;
             if (l_18->enchantments[0].type == (-1)) continue;
-            D_00195AA8 = player_character->equipped[l_24];
+            scratch_current_object = player_character->equipped[l_24];
             l_20 = 0;
             while (l_20 < 10 && l_18->enchantments[l_20].type != (-1)) {
                 item_enchantment_tick(l_18, l_18->enchantments[l_20].type, l_18->enchantments[l_20].param);

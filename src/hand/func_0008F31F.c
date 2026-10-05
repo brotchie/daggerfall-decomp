@@ -13,7 +13,7 @@ extern char D_00187FE4[];
 extern char D_00187FE6[];
 extern char D_00187FE8[];
 extern signed char text_buffer[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern signed char D_001940D4;
 extern struct record *player_entity;
 extern struct record *player_object;
@@ -102,7 +102,7 @@ void potionmaker_update(void)
         potionmaker_close();
     }
     if (((struct bf8_2_1 *)&D_001940D4)->f && (l_1C = list_popup_poll()) > -1)
-        potion_make(((struct item **)D_00190BE4)[l_1C]);
+        potion_make(((struct item **)scratch_190be4)[l_1C]);
     if ((char)key_down_esc != 0)
         potionmaker_close();
     if ((char)mouse_buttons == 0 || ((char)mouse_buttons != 0 && (char)mouse_buttons_prev != 0)) return;

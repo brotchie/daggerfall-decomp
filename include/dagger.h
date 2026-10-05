@@ -6,8 +6,8 @@
 
 /* data */
 extern int text_blank;
-extern int D_00190BE4;
-extern int D_00190BE8;
+extern int scratch_190be4;
+extern int scratch_190be8;
 extern unsigned char D_00190C78;
 extern int scratch_190df4;
 extern char *nonworld_root;

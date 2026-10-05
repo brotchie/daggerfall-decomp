@@ -14,7 +14,7 @@ extern char D_00176EFB[];
 extern char potion_recipes[];
 extern char D_00180B42[];
 extern signed char D_00180B7D[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern char scratch_190de4[];
 extern struct record *D_001959E4;
 extern struct record *player_entity;
@@ -123,7 +123,7 @@ void potion_recipe_list_cb(struct record *a1)
     if (a1->type != 2) return;
     l_18 = &a1->data.item;
     if (l_18->group != 27 || l_18->index != 4) return;
-    *(int *)(D_00190BE4 + (*(int *)D_00195B84 << 2)) = (int)l_18;
+    *(int *)(scratch_190be4 + (*(int *)D_00195B84 << 2)) = (int)l_18;
     *(int *)(scratch_190de4 + ((*(int *)D_00195B84)++ << 2)) = (((int)potion_recipes) + (l_18->stack_count * 109)) + 67;
 }
 
@@ -136,7 +136,7 @@ void potionmaker_recipes(void)
         return;
     }
     if (*(int *)D_00195B84 == 1) {
-        potion_make(*(struct item **)D_00190BE4);
+        potion_make(*(struct item **)scratch_190be4);
         return;
     }
     *(int *)(scratch_190de4 + (*(int *)D_00195B84 << 2)) = 0;

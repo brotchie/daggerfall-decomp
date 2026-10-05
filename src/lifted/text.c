@@ -36,7 +36,7 @@ extern signed char D_001940D6;
 extern signed char D_001940DA;
 extern char frame_counter[];
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern int frame_ticks;
 extern struct record *location_object;
 extern int creature_count;
@@ -818,7 +818,7 @@ void guard_spawn(struct record *a1)
         object_delete(l_18);
         l_18 = 0;
     }
-    D_00195AA8 = l_18;
+    scratch_current_object = l_18;
 }
 
 void guards_timer_tick(void)

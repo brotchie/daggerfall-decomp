@@ -10,7 +10,7 @@ extern char D_00170C4D[];
 extern char D_00170C5A[];
 extern char D_00170C67[];
 extern signed char D_00187CA8;
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern char scratch_190d64[];
 extern short D_00190D8C[];
 extern signed char D_001940D9;
@@ -69,7 +69,7 @@ int sheet_open(short a1)
         } else {
             *(short *)scratch_190d64 = rand_range(4, 6);
         }
-        *(int *)D_00190BE4 = 0;
+        *(int *)scratch_190be4 = 0;
         mc_memcpy((int)D_00190D8C, (int)(signed char *)&player_character->base_attributes[0], 16, (int)D_00170C67, 97, 4);
         sheet_place_spinner(13);
         D_0019626C = 0;

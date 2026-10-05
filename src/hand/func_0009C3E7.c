@@ -8,7 +8,7 @@ extern short travel_options;
 extern unsigned char D_00187CA8;
 extern unsigned char D_001889BC;
 extern int travel_selected_location;
-extern unsigned char D_00190CE5;
+extern unsigned char scratch_190ce5;
 extern unsigned last_skill_check_minutes;
 extern struct record *player_object;
 extern struct character *player_character;
@@ -62,7 +62,7 @@ void travel_begin_trip(void)
     else
         player_character->gold = 0;
     sound_play(203, player_object, 110);
-    D_00190CE5 = 0;
+    scratch_190ce5 = 0;
     func_0009BE38();
     quests_suspended = 1;
     D_00196294 = 1;

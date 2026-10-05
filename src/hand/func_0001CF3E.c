@@ -3,7 +3,7 @@
 
 extern char D_00170464[];        /* __FILE__ */
 extern unsigned char scratch_190d16;
-extern unsigned char D_00190D17;
+extern unsigned char scratch_190d17;
 extern signed char text_rsc_buffer[];
 extern int D_00195B84;
 extern int game_minutes;
@@ -38,7 +38,7 @@ void rumor_add_faction(struct faction *a1, struct faction *a2, int a3, unsigned 
     D_0019671C = a1;
     D_0019670C = a2;
     scratch_190d16 = a3;
-    D_00190D17 = a4;
+    scratch_190d17 = a4;
     D_00196708++;
     if (a4 != 0)
         D_00196269 = a4;

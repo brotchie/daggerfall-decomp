@@ -11,7 +11,7 @@ extern char D_0017995C[];
 extern short D_00179966[];
 extern signed char climate_texture_sets[];
 extern signed char scratch_190ce4[];
-extern signed char D_00190CE5;
+extern signed char scratch_190ce5;
 extern struct record *player_object;
 extern struct record *location_object;
 extern char hud_bar_image[];
@@ -19,7 +19,7 @@ extern struct settings *game_settings;
 extern char D_00195C88[];
 extern int grid_visit_func;
 extern char D_00195D3C[];
-extern char D_00195D54[];
+extern char picked_model_index[];
 extern char click_face_texture[];
 extern char D_00196120[];
 extern signed char D_0019629F;
@@ -109,7 +109,7 @@ int pick_model_cb(struct record *a1)
         l_20 = l_24->models;
         for (l_1C = 0; l_24->model_count > l_1C; l_1C++, l_20++) {
             if ((int)&l_20->model == D_0019647C) {
-                *(int *)D_00195D54 = l_1C;
+                *(int *)picked_model_index = l_1C;
                 *(int *)D_00195D3C = (int)l_20;
                 *(signed char *)(*(char **)pick_result) |= 13;
                 *(int *)(*(char **)pick_result + 4) = (int)a1;
@@ -163,7 +163,7 @@ void arch3d_apply_climate_textures(int a1)
     int l_1C;
     int l_18;
 
-    D_00190CE5 = climate_category();
+    scratch_190ce5 = climate_category();
     scratch_190ce4[0] = climate_texture_sets[climate_index];
     l_1C = a1 + *(int *)((char *)a1 + 60);
     for (l_18 = 0; l_18 < *(int *)((char *)a1 + 8); l_18++) {

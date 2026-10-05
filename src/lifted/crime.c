@@ -10,7 +10,7 @@ extern signed char D_00187CA8;
 extern signed char region_punishment_flags[];
 extern char region_legal_reputation[];
 extern struct record *creature_list[];
-extern int D_00190CAC;
+extern int scratch_190cac;
 extern signed char scratch_190d16;
 extern unsigned char court_state;
 extern short court_prison_days;
@@ -78,10 +78,10 @@ void court_frame(void)
                 court_state = 6;
                 return;
             }
-            D_00190CAC >>= 1;
+            scratch_190cac >>= 1;
             court_prison_days >>= 1;
-            if (gold_can_afford(D_00190CAC) != 0) {
-                gold_spend(D_00190CAC);
+            if (gold_can_afford(scratch_190cac) != 0) {
+                gold_spend(scratch_190cac);
                 court_reputation_restore();
                 if (court_prison_days != 0) {
                     court_state = 3;
@@ -90,7 +90,7 @@ void court_frame(void)
                     court_close();
                 }
             } else {
-                court_prison_days += (court_extra_days = ((-(gold_total_alias() - D_00190CAC)) / 40) + 1);
+                court_prison_days += (court_extra_days = ((-(gold_total_alias() - scratch_190cac)) / 40) + 1);
                 gold_remove_all();
                 court_reputation_restore();
                 msgbox_show_rsc(8052, 1);
@@ -156,9 +156,9 @@ void court_frame(void)
         l_1C = rand_range(1, 100);
         l_1C += (int)(short)*(short *)(region_legal_reputation + (((int)(unsigned char)current_region) * 80));
         if (l_1C > 75) {
-            D_00190CAC >>= 1;
+            scratch_190cac >>= 1;
         } else if (l_1C < 25) {
-            D_00190CAC <<= 1;
+            scratch_190cac <<= 1;
         }
         court_state = 2;
         return;

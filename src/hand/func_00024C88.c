@@ -15,10 +15,10 @@ extern int D_0018DDE0;
 extern int D_0018DDE4;
 extern struct dun region_legal_reputation[];
 extern signed char text_buffer[];
-extern int D_00190BE4[];
-extern int D_00190CAC;
+extern int scratch_190be4[];
+extern int scratch_190cac;
 extern short scratch_190d68;
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern struct record *player_entity;
 extern struct character *player_character;
 extern char forced_material;
@@ -122,13 +122,13 @@ unsigned char *career_answer_effect(unsigned char *a1)
         } else
             inv_store_item(o);
     } else if (*a1 == '&')
-        D_00190D6A = 0;
+        scratch_190d6a = 0;
     else if (*a1 == '#')
-        D_00190BE4[D_00190CAC] = atoi(a1 + 1);
+        scratch_190be4[scratch_190cac] = atoi(a1 + 1);
     else if (*a1 == '!')
-        D_00190BE4[D_00190CAC + 12] = atoi(a1 + 1);
+        scratch_190be4[scratch_190cac + 12] = atoi(a1 + 1);
     else if (*a1 == '?')
-        D_00190BE4[D_00190CAC + 24] = atoi(a1 + 1);
+        scratch_190be4[scratch_190cac + 24] = atoi(a1 + 1);
     else if (D_00178630[(unsigned char)(*a1 + 1)] & 0x20) {
         n = atoi(a1);
         if (n >= 35)

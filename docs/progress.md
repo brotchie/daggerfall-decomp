@@ -1533,3 +1533,26 @@ that gives more evidence.
 - A pilot rewrote disease_infect's record accesses with include/records.h's
   `struct record` and compiled to the same bytes.
 
+## 2026-10-04/05: names quality, structured C, record structs
+
+**Names quality (phase 2):**
+- A consistency pass made 127 decisions and set a naming convention (docs/naming.md).
+- Four audits re-examined every candidate, mostly by experiment: direct calls, write tests,
+  watches, surveys of the 18 saves, Daggerfall Unity's tables and formulas, and the game's
+  own help texts.
+- Game functions went from 440 confirmed / 1274 strong / 583 candidate to 530 / 1637 / 130.
+- Several names said the opposite of the code: floor/ceiling, clear/occupied, and a "lock"
+  that never locks.
+- XnGine's 719 functions are named (docs/xngine_map.md). config/names.csv holds about 5200
+  names; 4147 of them are in the source.
+
+**Record structs:**
+- include/records.h covers 25 record types plus unions on the header fields.
+- Phases A to C converted the code: offset casts went from about 7900 to 1530.
+
+**Natural C:**
+- tools/structure.py rewrote the lifter's gotos as if/while/for (11969 -> 71).
+- tools/type_globals.py typed 1273 globals.
+
+Every change compiles byte-identical with Watcom 10.0a, so the build checks all of it.
+

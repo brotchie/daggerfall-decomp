@@ -22,12 +22,12 @@ struct obj {
 struct pc { char pad[367]; struct obj *slots[1]; };
 extern char *text_macro_item;
 extern struct obj *player_object;
-extern struct obj *D_00195AA8;
+extern struct obj *scratch_current_object;
 extern int inv_right_container;
 extern struct pc *player_character;
 extern int trade_mode;
 extern int inventory_action;
-extern short D_00195D54;
+extern short picked_model_index;
 extern char D_00196120[];
 extern struct obj *inv_selected_item;
 extern void quest_raise_event(int, struct obj *, int);
@@ -99,7 +99,7 @@ void inv_click_equip_slot(int slot)
     o = inv_selected_item = player_character->slots[slot];
     if (o == 0)
         return;
-    D_00195AA8 = inv_selected_item;
+    scratch_current_object = inv_selected_item;
     body = (char *)inv_selected_item + 71;
     text_macro_item = body;
     switch (inventory_action) {
@@ -136,7 +136,7 @@ void inv_click_equip_slot(int slot)
         if (o->f26 == 0 && trade_mode == 0)
             object_reparent(inv_right_container, o);
         if (D_00196120 == o->f43)
-            o->f17 = D_00195D54;
+            o->f17 = picked_model_index;
         o->f1f = object_new_id(0);
         quest_raise_event(5, o, 0);
         trade_schedule_repair();

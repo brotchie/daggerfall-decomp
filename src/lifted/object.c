@@ -7,7 +7,7 @@ extern char D_00176E44[];
 extern char D_00176E4D[];
 extern char D_00176E70[];
 extern int next_record_id;
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern signed char scratch_190ce4[];
 extern struct record *nonworld_root;
 extern struct record *player_object;
@@ -496,21 +496,21 @@ struct record *object_find_by_id(struct record *a1, int a2)
 int object_random_type_cb(struct record *a1)
 {
     if (a1->type != scratch_190ce4[0]) return 0;
-    if (*(int *)D_00190BE4 == 0) {
+    if (*(int *)scratch_190be4 == 0) {
         found_object = a1;
         return 1;
     }
-    (*(int *)D_00190BE4)--;
+    (*(int *)scratch_190be4)--;
     return 0;
 }
 
 struct record *object_random_child_of_type(struct record *a1, int a2)
 {
-    if ((*(int *)D_00190BE4 = object_count_type(a1->children, (int)(short)*(short *)&a2)) == 0) {
+    if ((*(int *)scratch_190be4 = object_count_type(a1->children, (int)(short)*(short *)&a2)) == 0) {
         return 0;
     }
     found_object = 0;
-    *(int *)D_00190BE4 = rand() % *(int *)D_00190BE4;
+    *(int *)scratch_190be4 = rand() % *(int *)scratch_190be4;
     scratch_190ce4[0] = *(signed char *)&a2;
     object_find(a1->children, (int)object_random_type_cb);
     return found_object;
@@ -582,14 +582,14 @@ void object_delete_quest_objects(struct record *a1, unsigned char a2)
 
 void object_tree_size_cb(struct record *a1)
 {
-    *(int *)D_00190BE4 += *(int *)((char *)a1 - 6);
+    *(int *)scratch_190be4 += *(int *)((char *)a1 - 6);
 }
 
 int object_tree_size(struct record *a1)
 {
-    *(int *)D_00190BE4 = 0;
+    *(int *)scratch_190be4 = 0;
     object_foreach(a1, (int)object_tree_size_cb);
-    return *(int *)D_00190BE4;
+    return *(int *)scratch_190be4;
 }
 
 void object_delete_type_cb(struct record *a1)

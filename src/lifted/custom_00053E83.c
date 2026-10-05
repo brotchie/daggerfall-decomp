@@ -7,15 +7,15 @@ extern short D_00185646;
 extern short D_0018564A;
 extern short D_00185652;
 extern short D_00185656;
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern short chargen_selected_attribute;
 
 
 void classmaker_select_attribute(short a1)
 {
     chargen_selected_attribute = *(int *)&a1;
-    D_00185646 = (D_00190D6A = *(short *)(D_001854F6 + ((((int)(short)a1) + 18) * 12)) + 1);
-    D_0018564A = D_00190D6A + 6;
-    D_00185652 = D_00190D6A + 13;
-    D_00185656 = D_00190D6A + 19;
+    D_00185646 = (scratch_190d6a = *(short *)(D_001854F6 + ((((int)(short)a1) + 18) * 12)) + 1);
+    D_0018564A = scratch_190d6a + 6;
+    D_00185652 = scratch_190d6a + 13;
+    D_00185656 = scratch_190d6a + 19;
 }

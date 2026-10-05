@@ -22,10 +22,10 @@ extern unsigned char player_environment;
 extern char travel_options[];
 extern int D_0018507B;
 extern signed char D_00187CA8;
-extern int D_00190CAC;
+extern int scratch_190cac;
 extern signed char scratch_190ce4[];
-extern signed char D_00190CE5;
-extern signed char D_00190CE7;
+extern signed char scratch_190ce5;
+extern signed char scratch_190ce7;
 extern signed char D_001940D5;
 extern char location_grid[];
 extern struct record *player_object;
@@ -356,14 +356,14 @@ int travel_map_open(int a1)
         disk_read_file((int)D_00177430, *(int *)scratch_buffer);
         xn_pal_set_all_8bit(*(int *)scratch_buffer + 8);
         *(int *)&l_18 = 1132;
-        D_00190CAC = *(int *)(*(char **)&l_18);
+        scratch_190cac = *(int *)(*(char **)&l_18);
         D_001AA6A4 = (D_001AA6A5 = 0);
-        D_00190CE5 = (scratch_190ce4[0] = 0);
+        scratch_190ce5 = (scratch_190ce4[0] = 0);
         *(int *)D_001AA668 = 0;
         game_mode = 19;
         D_00196272 = 1;
         D_00187CA8 = 0;
-        D_00190CE7 = 0;
+        scratch_190ce7 = 0;
     }
     return ((((int)(unsigned char)game_mode) == 19) ? 1 : 0);
 }

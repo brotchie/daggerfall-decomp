@@ -29,11 +29,11 @@ extern char D_0017A00A[];
 extern signed char text_buffer[];
 extern int D_00190C74;
 extern char D_00190C78[];
-extern int D_00190CAC;
+extern int scratch_190cac;
 extern char scratch_190d64[];
 extern char scratch_190d66[];
 extern short scratch_190d68;
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern char scratch_190de4[];
 extern struct record *player_object;
 extern struct character *player_character;
@@ -96,7 +96,7 @@ void career_background_summary(int a1, int a2)
     mc_memcpy((int)&reputation_baseline, (int)(signed char *)&player_character->reputation[0], 10, (int)D_00170738, 48, 10);
     text_macro_imperial = rand() % 6;
     scratch_190d68 = (unsigned short)(unsigned char)D_00179FF8[rand_range(0, 9)];
-    D_00190D6A = 1;
+    scratch_190d6a = 1;
     D_00190C74 = rand();
     *(int *)D_00190C78 = rand();
     if (a1 == 18) a1 = career_nearest_class();
@@ -233,7 +233,7 @@ void career_apply_answer(int a1)
     int l_1C;
     int l_18;
 
-    D_00190CAC = a1;
+    scratch_190cac = a1;
     l_1C = ((int)(short)*(short *)scratch_190d66) + 97;
     l_18 = xn_str_find_byte_pair(*(int *)scratch_190de4, l_1C + 11776, 2000);
     l_18 = memchr(l_18, 10, 2000);

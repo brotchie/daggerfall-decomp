@@ -30,9 +30,9 @@ extern short D_0018810C;
 extern short D_00188110;
 extern signed char text_buffer[];
 extern char D_00190B44[];
-extern int D_00190BE8;
+extern int scratch_190be8;
 extern short scratch_190d64;
-extern short D_00190D6A;
+extern short scratch_190d6a;
 extern short scratch_190de4[];
 extern short D_00190DEA[];
 extern short scratch_190dec;
@@ -85,7 +85,7 @@ int chargen_screen_loop(int first, int last)
                 *(short *)(D_0018801E + i * 12) < y && *(short *)(D_00188022 + i * 12) > y)
                 (*(void (**)())(D_00188024 + i * 12))(i);
         }
-        if (D_00190BE8 != 0)
+        if (scratch_190be8 != 0)
             return 1;
     }
 }
@@ -119,14 +119,14 @@ void chargen_draw_attributes(void)
     int i;
     short x;
 
-    xn_draw_image_transparent(44, D_00190D6A, (unsigned short)D_00195B5C->r.w, (unsigned short)D_00195B5C->r.h, D_00195B5C->data);
+    xn_draw_image_transparent(44, scratch_190d6a, (unsigned short)D_00195B5C->r.w, (unsigned short)D_00195B5C->r.h, D_00195B5C->data);
     D_0012B508 = 146;
     x = (D_0018810C + D_00188110) >> 1;
     xn_font_select(4);
     for (i = 0; i < 8; i++) {
         text_draw_centred_coloured(itoa(player_character->attributes[i], ((char *)text_buffer), 10), x, (short)(((struct region *)chargen_buttons)[i + 20].y2 - font_height + 1), 145, 141);
     }
-    text_draw_centred_coloured(itoa(scratch_190d64, ((char *)text_buffer), 10), 51, (short)(D_00190D6A + 13 - font_height + 1), 145, 141);
+    text_draw_centred_coloured(itoa(scratch_190d64, ((char *)text_buffer), 10), 51, (short)(scratch_190d6a + 13 - font_height + 1), 145, 141);
     character_reset_magicka(player_character, player_class);
     if (chargen_screen == 255)
         return;

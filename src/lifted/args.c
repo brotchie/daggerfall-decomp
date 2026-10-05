@@ -50,9 +50,9 @@ extern int controls_file;
 extern unsigned char player_environment;
 extern int cfg_texture_memory;
 extern int mem_check_level;
-extern char D_00190BE4[];
-extern int D_00190BE8;
-extern int D_00190BEC;
+extern char scratch_190be4[];
+extern int scratch_190be8;
+extern int scratch_190bec;
 extern signed char D_001917E3[];
 extern char arena2_path[];
 extern signed char D_00191833[];
@@ -360,8 +360,8 @@ int automap_draw_object_cb(struct record *a1)
             }
         }
     }
-    if (abs(a1->y - D_00190BE8) > 700) return 0;
-    if (xn_math_approx_dist2d(a1->x, a1->z, *(int *)D_00190BE4, D_00190BEC) > 2048) return 0;
+    if (abs(a1->y - scratch_190be8) > 700) return 0;
+    if (xn_math_approx_dist2d(a1->x, a1->z, *(int *)scratch_190be4, scratch_190bec) > 2048) return 0;
     a1->draw_handle = 0;
     D_000C5404 = 0;
     switch (a1->type) {
@@ -375,7 +375,7 @@ int automap_draw_object_cb(struct record *a1)
         l_34 = *(int *)((char *)l_3C + 5);
         l_38 = *(int *)((char *)l_3C + 9);
         for (l_28 = 0; ((int)(unsigned char)*(signed char *)((char *)l_3C)) > l_28; l_28++, (*(char (**)[66])&l_34)++) {
-            if (abs(*(int *)((char *)l_34 + 40) - D_00190BE8) > 100) continue;
+            if (abs(*(int *)((char *)l_34 + 40) - scratch_190be8) > 100) continue;
             *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
             if (*(int *)((char *)l_34 + 4) != 0) xn_model_submit(l_34 + 4, 0);
         }
@@ -406,7 +406,7 @@ int automap_draw_object_cb(struct record *a1)
     case 56:
         l_34 = (int)RECORD_DATA(a1);
         for (l_28 = 0; a1->image > l_28; l_28++, (*(char (**)[66])&l_34)++) {
-            if (abs(*(int *)((char *)l_34 + 40) - D_00190BE8) > 100) continue;
+            if (abs(*(int *)((char *)l_34 + 40) - scratch_190be8) > 100) continue;
             *(int *)((char *)l_34 + 4) = model_get((int)(unsigned short)*(short *)((char *)l_34), (int)(unsigned char)*(signed char *)((char *)l_34 + 2), (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
             if (*(int *)((char *)l_34 + 4) != 0) xn_model_submit(l_34 + 4, 0);
         }

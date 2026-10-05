@@ -816,20 +816,29 @@ global,0x00190504,creature_list,strong,"creature objects processed by ai_update_
 global,0x00190704,monster_anim_records,candidate,"the loaded ASCR animation records, read only by XnGine's animation-script interpreter xn_C0100 (exp4). Keep: the evidence (exp4) is another unit's; not re-examined here"
 global,0x00190904,hud_compass_image,strong,"cmpa00i0.bss, frames by yaw, drawn by hud_draw_compass"
 global,0x00190B44,inpstr_saved_text,candidate,"160-byte copy taken at the start, restored on Esc; other code uses it as a scratch string (magic_items_add_cb's parse_expand output)"
+global,0x00190BE4,scratch_190be4,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): object counts, the automap camera x, the sheet's click timer, %qdt (38 functions)"
+global,0x00190BE8,scratch_190be8,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): the automap camera, chargen, classmaker, itemmaker"
+global,0x00190BEC,scratch_190bec,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): the automap camera, chargen, classmaker, itemmaker"
 global,0x00190BF0,automap_pitch,confirmed,"512 looking straight down, 128 in the perspective view: the grid button switched it 512 -> 128 in save_mord"
 global,0x00190BF4,automap_yaw,confirmed,the rotate buttons add/subtract 16 a frame (0 -> 512 after a click in save_mord)
 global,0x00190C34,training_state,candidate,"training_update state: 1234 ask to pay, 1235 done, 1236 skill chosen. Keep: code only (training_offer, training_update)"
+global,0x00190CAC,scratch_190cac,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): the fine, the travel blink timer, career, %gtp"
 global,0x00190CE4,scratch_190ce4,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): itemmakr 10 bytes of slot kinds (-1 empty, 0 power, 1 side effect); travel.c the region shown (region+1, 0 world; 16 functions); object.c the type/quest key of object_find_quest/object_delete_type/object_random_child_of_type; chargen roll arrays; collide_line_of_sight flag; climate texture set; inv_count_cart_cb; was itemmaker_slot_kinds"
+global,0x00190CE5,scratch_190ce5,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): travel, town notes, climate textures"
+global,0x00190CE7,scratch_190ce7,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): travel, town notes, climate textures"
 global,0x00190CE8,travel_zoomed,candidate,"4x zoom on the region map, toggled by travel_toggle_zoom (right click). Keep: code only; a right-click on the region map would settle it"
+global,0x00190CEE,scratch_190cee,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): travel, town notes, climate textures"
 global,0x00190D0F,talk_wrap_to_question,candidate,"while set, talk_wrap_text writes to the question pane instead of the answer log. Keep: code only (talk_wrap_text)"
 global,0x00190D10,talk_face_loaded,candidate,set when talk_load_face has loaded a portrait. Keep: code only (talk_load_face)
 global,0x00190D16,scratch_190d16,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): byte: the court verdict (court_open/court_frame, %pen), saveload_exit/saveload_confirm cancel flag, transport_menu/transport_choose, rumor_add_faction, title_menu; was saveload_cancelled"
+global,0x00190D17,scratch_190d17,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): the crime index, faction, parse"
 global,0x00190D18,court_state,confirmed,"byte: the court state machine (1 plea, 2 guilty sentence, 3 prison, 5 banished, 6 execution, 7 executed, 8 argument, 9 acquitted, 100 close); experiment: 1 -> 100 (guilty), 1 -> 2 (lie failed)"
 global,0x00190D20,scratch_190d20,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): the guild kind/kind bits the membership searches look for (guild_find_membership_by_*), the book-title hero gender for %1hn/%1g1-%1g3, song_init_seeds; was search_kind"
 global,0x00190D23,tavern_state,confirmed,"byte: 0 menu, 1 waiting for the number of days, 2 room offer pending (tavern_frame dispatches on it); experiment: 1 after ROOM, 0 after paying"
 global,0x00190D64,scratch_190d64,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): short: itemmaker slot being filled; sheet level-up bonus points; spellbook/magic-item row count; class question scroll position; book/logbook line length; travel zoom origin; chargen and classmaker counters; tavern room offer; quest op68/op69 callbacks; was itemmaker_slot"
 global,0x00190D66,scratch_190d66,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): short: itemmaker power being added; class question scroll maximum; book/logbook centre flag; travel zoom origin; career answers; classmaker; was itemmaker_power"
 global,0x00190D68,scratch_190d68,strong,"shared scratch slot of the 0x190BE4-0x190E1F temporaries block (consistency pass, global_users.py over src): short: itemmaker_open's argument (2 allows Soul bound without souls); current class question; book goto-page state; town notes x; classmaker advancement dagger; career background; was itemmaker_mode"
+global,0x00190D6A,scratch_190d6a,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): town notes, sheet, classmaker, chargen"
 global,0x00190D6C,classmaker_done,strong,short: set by classmaker_exit_button when the class is valid; ends classmaker_run
 global,0x00190D70,chargen_selected_attribute,confirmed,"short: attribute row selected for the up/down arrows, in the class maker (classmaker_select_attribute) and chargen (chargen_select_attribute); experiment: 2 after clicking WIL"
 global,0x00190D76,classmaker_screen,confirmed,"short: 0 main, 1 reputations, 2 advantages, 3 disadvantages; bit 16 while a picklist is open; experiment: 0 -> 1 -> 0 -> 2 -> 18"
@@ -850,6 +859,7 @@ global,0x00190DFC,scratch_190dfc,strong,"shared scratch slot of the 0x190BE4-0x1
 global,0x00190E0C,classmaker_picklist,candidate,"the string list the specials picklist shows (names, or a sub-list). Keep: code only (classmaker specials screen)"
 global,0x00190E10,classmaker_picklist_costs,candidate,the cost table matching classmaker_picklist. Keep: code only (classmaker specials screen)
 global,0x00190EAC,text_macro_map_location,strong,"build/names/scratch/audit_tq/exp_globals.py save_tlalac_s: a record whose +0x10 points at ""Castle Testing"" -> %map ""Castle Testing"" (+0x10 is a pointer to the name)"
+global,0x00190EE4,scratch_190ee4,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): spfx_dispel's spell list and the itemmaker/classmaker lists"
 global,0x00190FE4,text_rsc_buffer,strong,"the text expansion buffer: macro handlers write their result here (71 parse.c uses), talk copies its answers from it, quest and rumor texts; also borrowed as a plain buffer by savevars_read/write, save_game/load_game, town_load, building_name and as monster_alloc_anim_slot's 128-byte slot bitmap (combat agent)"
 global,0x001910E4,qrc_name,strong,"build/names/scratch/audit_tq/exp_globals.py save_tlalac_s/build/names/scratch/audit_tq/exp_small.py: after quest_load_text: ""s0000008"" (the quest name), or ""00001234"" with quest+0x04 = 1234"
 global,0x001913E4,enchant_text,candidate,text buffer built by enchant_powers_text. Keep: code only (enchant_powers_text)
@@ -908,6 +918,7 @@ global,0x00195A98,camera_object,strong,type-5 object (DFU classic name Eye): ini
 global,0x00195A9C,current_building,strong,"the building entered: +0x12 faction (40 at the Mages Guild hall, experiment), +0x19 quality (spell list size)"
 global,0x00195AA0,player_entity,confirmed,"pointer to the player's creature entity: the character record is at +0x47 (2 saves), its parent (+0x43, the generic record header) is the world object; disease code checks entity+71 == player_character"
 global,0x00195AA4,player_object,confirmed,pointer to the player's world object: x/y/z ints at +7/+11/+15 move the player (fallplay tp); it is player_entity's parent (+0x43)
+global,0x00195AA8,scratch_current_object,strong,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): a 'current object': the poisoned creature, the enchanted item, the wagon, and %kg, %wpn, %hs"
 global,0x00195AB0,frame_ticks,strong,"time of the last frame in milliseconds (frame_ticks_update: timer interrupts * 1828/256, cap 100): timers count down by it, movement is speed*frame_ticks/1000. audit: build/names/scratch/audit_euw/B/exp_run.py clock/walk (save_tlalac_s): 21, 28 or 35 from frame to frame (3-5 interrupts of the ~140 Hz timer), 14-35 in the 18 saves"
 global,0x00195AB8,vertical_velocity,confirmed,"fall speed: gravity adds to it, fall damage from it (sounds 359/360); -8379 just after the jump in exp_steer.py"
 global,0x00195ABC,attack_angle,candidate,code reading (damage code); not tested. Keep: code only (weapon_melee_strike -> damage_resolve_attack -> damage_knockback)
@@ -969,6 +980,7 @@ global,0x00195C44,scratch_buffer,strong,"pointer to a large work buffer: +4 the 
 global,0x00195C48,collide_hit_object,candidate,object a collision test hit (model or creature). Keep: code only (collision tests)
 global,0x00195C50,cfg_map_file,strong,"config key 'mapfile' (12 characters, config flag 4); a name starting with 'd' starts in a dungeon (environment 3)"
 global,0x00195C5C,cfg_item_file,strong,config key 'item' (20 characters)
+global,0x00195C70,moving_model,candidate,the moving model being collided (collision; consistency pass notes; a GLOBAL_TYPES record pointer)
 global,0x00195C74,ceiling_height,confirmed,"y (downwards) an object's head may rise to: the model surface found 60-120 units above its feet by the collision steps' upward scan when rising, levitating or in water (collide_step_player/collide_step_object), else y-120; for a creature in water the water level; object_apply_gravity stops upward velocity at y-80 above it, floating up stops at y-100; saved/restored around test moves; audit: build/names/scratch/audit_euw/A/ceiling.py: levitating up in save_blades it stayed y-120 until the player reached y -1276, where it held -1376 (the ceiling) and the player stopped 100 below it; the floor is collide_height. Old name floor_height (monster+0x9F floor_y stores the same value)"
 global,0x00195C78,trespassing,strong,"int: the main loop's trespass test (interior restriction - building access > 0, or dungeon flag): crime 2 or 3 and guards"
 global,0x00195C7C,hud_vital_bar_images,confirmed,"3 image pointers: main03i0.img, main04i0.img, main05i0.img (init_game_data), the health, fatigue and magicka bars hud_draw draws in part; audit: build/names/scratch/audit_euw/C/s3_engine.py save_morthag1: after hud_draw the screen at x 49/57/65 rows 161-192 held these images' rows: all 32 for full health, 30 and 5 for the partly empty fatigue and magicka"
@@ -976,6 +988,7 @@ global,0x00195C90,flats_cfg_count,strong,number of flats_cfg records
 global,0x00195C94,classmaker_file,strong,"custom class file name from the command line ('custom NAME', args.c 82A63): classmaker_run loads the class from it, classmaker_save_file writes it"
 global,0x00195CB0,ai_los_index,strong,"round-robin AI index: only that creature re-tests line of sight (23C72) this frame, setting/clearing character+0x40 bit 7; ai_update_creatures advances it mod creature_count"
 global,0x00195CB4,sound_last_size,confirmed,size of the sample sound_cache_load returned: 1433 for 203 ButtonClick (exp_chain)
+global,0x00195CB8,floor_object,candidate,the object under the player's feet (collision; consistency pass notes; a GLOBAL_TYPES record pointer)
 global,0x00195CBC,spell_cast_anim_fire,strong,fire00c6.cif (spell_cast_anims_load)
 global,0x00195CC0,spell_cast_anim_frost,strong,frst00c6.cif
 global,0x00195CC4,spell_cast_anim_poison,strong,pois00c6.cif
@@ -998,6 +1011,7 @@ global,0x00195D44,inventory_action,confirmed,"1 info, 2 equip/select, 3 remove, 
 global,0x00195D48,sky_loaded_frame,confirmed,"SKY file*32+frame last loaded by sky_load_day; 10000 forces a reload (town_load, rest_close, loads). audit: build/names/scratch/audit_euw/B/exp_glob.py (save_tlalac_s 09:49): set to 10000, sky_load_day(game_minutes) opened C:\ARENA2\sky05.dat and left 191 (SKY05, frame 31); a second call opened nothing; survey.py: 127/319/651/892/767/191 in the outdoor saves, the frame matching each save's hour"
 global,0x00195D4C,magic_def,strong,"magic.def entries (name, kind, enchantment pairs, condition, value, material) read by magic_def_load"
 global,0x00195D50,quest_potential_questor,strong,person picked by quest_find_potential_questor / quest_npc_offers_quest; %pqn and %pqp read it
+global,0x00195D54,picked_model_index,strong,the index of the clicked model (engine/UI/world audit: shelf clicks; shelf_model_index takes it)
 global,0x00195D58,talk_prostitute_price,strong,"1d(50-75) - disposition, taken from the gold"
 global,0x00195D5C,spell_cast_queue_count,strong,build/names/scratch/audit_tq/exp_people.py save_tlalac_s: spell_cast_queue raised it 0 -> 1
 global,0x00195D60,spell_cast_busy,confirmed,non-zero while a cast is under way: recast (keys_world_actions) and spellbook_open refuse with 'You are not ready yet.'; audit: build/names/scratch/audit_euw/D/exp_globals.py save_gash: at 100 spellbook_open(1) returned 0 and hud_status_set showed 'You are not ready yet.'; at 0 it opened the spellbook (game_mode 5)
@@ -1044,6 +1058,7 @@ global,0x00195F36,text_cursor_x,strong,build/names/scratch/audit_tq/exp_note.py 
 global,0x00195F38,text_cursor_y,strong,build/names/scratch/audit_tq/exp_note.py save_dorian: note_click_page set it to the element's y (12)
 global,0x00195F4E,player_base_speed,strong,"short: (speed * frame_ticks)/1000 from player_frame_update: SPD-based speed (+225 riding, +100 cart, running, swimming) per frame; intrface_steer starts player_speed from it; picks the horse sound. audit: build/names/scratch/audit_euw/B/exp_run.py walk (save_tlalac_s, SPD 100): 7-8 walking, 13-16 with character flags 0x200 (riding); 3-8 in the 18 saves"
 global,0x00195F58,shelf_model_index,strong,"short: the shelf whose items the shop list shows: shelf_open, shelf_open_books and shelf_open_stock store their third argument here, and click_world_face passes D_00195D54, which pick_model_cb sets to the index of the picked model in its interior block (the same index as pick_result+12, confirmed by group C); shelf items (type 36) get it as shelf_owner (+0x1B), and unpaid goods get D_00195D54 as owner (+0x17). Was shelf_shop_id: it identifies the shelf model, not the shop. audit (group A, A/town.py shelf, save_morthag1): shelf_open_books(..., 777) / (..., 778) stored 777 / 778, and the items inventory_close returned got shelf_owner 778"
+global,0x00195F5A,collide_wall_cos,candidate,the cosine of the wall being collided with (engine/UI/world audit)
 global,0x00195F5C,text_macro_n_text,strong,text id the %n macro uses when nonzero (parse.c 4878B); %1com sets it to 7221-7223 (friend/stranger/buddy)
 global,0x00195F62,spell_ready_cost,strong,"short magicka cost of the readied spell: spellbook_frame charges and stores it, cast_recast_last spends it again, the cancel key and spfx_identify refund it; SAVEVARS. audit: build/play/magic1 steps 10->11 (double-click on a spell in the spellbook): magicka 28 -> 14 and this 79 -> 14; 4-84 in the 18 saves"
 global,0x00195F64,mouse_motion_x,strong,"horizontal mouse motion: added to the player's yaw in view mode (player_mouse_look), to view_look_yaw when looking around"
@@ -1055,8 +1070,11 @@ global,0x00195FF8,list_popup_picklist,strong,"the picklist struct of the list po
 global,0x00196033,msgbox_button_keys,strong,"3 scan codes that press the box's buttons (msgbox_yes_no_rsc: 21 Y, 49 N)"
 global,0x00196036,spellmaker_spell,strong,89-byte spell being made: spellmaker_new points spellshop_spell at it and clears it; potion_mix_unknown also builds its spell here
 global,0x0019608F,msgbox_button_ids,strong,"3 button image numbers (4 YES, 5 NO; 0 none) drawn by msgbox_draw_buttons; exp2: YES/NO shown"
+global,0x00196092,furniture_container_1,candidate,"a bare record header used as a furniture container; three of them 0x47 apart at 0x196092, 0x1960D9, 0x196120 (UI struct agent); clicking can never open them (engine/UI/world audit)"
 global,0x001960D9,trade_container,candidate,item list the guild services stock (shop_stock_*) and hand to the trade window (generate.c func_000922F6)
+global,0x00196120,furniture_container_3,candidate,see furniture_container_1
 global,0x001961F5,pending_quest_file,candidate,"13-char quest file name queued by guild_check_invitations (o0a0al00.qbn, l0a01l00.qbn)"
+global,0x0019621B,link_caster,candidate,the static spell caster of link action 9 (engine/UI/world audit)
 global,0x00196263,in_knightly_order_hall,confirmed,"byte, saved at SAVEVARS.DAT 0x1795: click_world_face sets it when the player clicks a building's door (archive 74, even a locked one) to 1 if the building's faction is one of the 21 knightly orders in D_00187644 (FACTION.TXT: 83 The Knights of the Circle ... 410 The Knights of the Flame ... 412 The Host of the True Horn), else 0; leaving clears it; music_choose_song plays 17.hmi in such a temple; audit: 0 in all 18 saves; build/names/scratch/audit_euw/A/knight.py: save_morthag1, clicking the Knights of the Flame hall's door made it 1 and inside it stayed 1 (current_building faction 410); build/names/scratch/audit_euw/A/knight2.py: preset to 1, entering the bank (faction 510) made it 0. Old name savevars_1795"
 global,0x00196266,text_macro_imperial,strong,"build/names/scratch/audit_tq/exp_globals.py save_tlalac_s: 0-3 -> %imp Pelagius, Cephorus, Uriel, Cassynder"
 global,0x00196268,current_region,strong,"byte region index of the player: the world view paints pixels 128+this red (the highlighted region in cheat_morthag1, value 21 Anticlere), I'M AT and travel_mark_player use it, closing the map reloads it"
@@ -1091,6 +1109,7 @@ global,0x00196291,cast_strike_spell,candidate,"byte: 1 while func_0002E2CF casts
 global,0x00196295,text_missing_ok,confirmed,"build/names/scratch/audit_tq/exp_globals.py save_tlalac_s: text_rsc_load(31999) -> ""Bad DAGTEXT number requested : 31999."" with 0, 0 with 1"
 global,0x0019629A,cast_ignore_silence,candidate,"byte: potion_drink sets it so cast_player_spell skips the silence check. Keep: code only (potion_drink, cast_player_spell)"
 global,0x0019629B,night_sky_loaded,strong,"set by sky_load_night, cleared by the day sky and on loads; audit: build/names/scratch/audit_euw/D/survey.py, 18 saves: 1 in the three outdoor night saves (dorian 18:55, keophex 22:47, kralvamp 18:24), 0 outdoors by day and in every dungeon"
+global,0x001962A1,dungeon_block_special,candidate,the dungeon block's special flag (consistency pass notes)
 global,0x001962A6,cfg_artifact,strong,config key 'artifact'
 global,0x001962A9,quests_suspended,strong,build/names/scratch/audit_tq/exp_globals.py save_tlalac_s: set: quests_run_all left current_quest 0; clear: it ran the quests
 global,0x001962AA,exiting,strong,set by game_exit and fatal_error; fatal_error returns at once while it is set (no error during shutdown)
@@ -1243,6 +1262,7 @@ global,0x00198588,moon1_phase,confirmed,"sky_update_moons: (day + 4) & 31 (7, ex
 global,0x001985A8,moon1_direction,strong,"x/y/z of moon 1 on its 3500-minute orbit; audit: build/names/scratch/audit_euw/D/exp_misc.py save_gash: equal to sky_orbit_direction(-1000, minutes % 3500, 3500) = (-8063, 1451, -1000); z is -1000 in every save"
 global,0x001985B4,moon0_direction,strong,"x/y/z of moon 0 on its 2500-minute orbit (sky_update_moons); audit: build/names/scratch/audit_euw/D/exp_misc.py save_gash: equal to sky_orbit_direction(1000, minutes % 2500, 2500) = (-7941, 2015, 1000); z is 1000 in every save"
 global,0x001985C8,sun_direction,strong,"x/y/z of the sun (sky_sun_direction); sky_apply_sunlight uses it; audit: build/names/scratch/audit_euw/D/exp_misc.py save_gash (12:30): (1152, -8110, 0) = sky_sun_direction 390 minutes after 06:00; survey.py: 0 in dungeon saves, y near -8100 (up) at midday, +8111 at 22:47"
+global,0x001995D4,block_quarters,candidate,"the dungeon block quarters, a 2x2 array (consistency pass and struct notes)"
 global,0x0019961C,spell_effect_cost_current,strong,"the 8-byte cost record (4 shorts) of the effect being costed, copied from spell_effect_costs; read by spell_cost_formulas"
 global,0x00199624,spellmaker_settings_image,strong,"mask05i0.img (spellmaker_open): the effect settings panel drawn by spellmaker_settings_update, freed by spellmaker_exit"
 global,0x0019962C,spellmaker_alter_row,candidate,"short: effect row waiting for the ""alter the spell?"" answer (-1 none): yes edits it, no deletes the effect. Keep: code only (spell maker)"
@@ -1329,6 +1349,7 @@ global,0x00199D5A,book_file,strong,short: the open book's file handle (< 1: no b
 global,0x00199D5C,book_page,confirmed,short: page shown (exp2: 0 -> 1 after book_next_page)
 global,0x00199D5E,book_image_count,candidate,code reading; no book images exist
 global,0x00199D60,book_page_count,confirmed,short: pages in the book (exp2: 3)
+global,0x00199D64,spell_scratch,candidate,a spell record pointer used by the magic code (GLOBAL_TYPES spell; consistency pass notes)
 global,0x00199D68,magic_items_saved_screen,strong,64000-byte copy of the screen under the USE MAGIC ITEM list
 global,0x00199D70,hud_pressed_button,strong,"index of the HUD button pressed, 255 none: the handler runs on release over the same button"
 global,0x00199D71,player_under_spell,candidate,set by spell_hud_draw_icons when a spell on the player was cast by someone else; hud_portrait_overlay_index frame 0. Keep: code only (spell_hud_draw_icons)
@@ -1466,6 +1487,7 @@ global,0x001A94C8,climate_index,confirmed,"current_climate - 224 (7 in Ipscart R
 global,0x001A94CC,ground_texture_archive,confirmed,"climate_texture_sets[climate]*100+2 (+1 winter/snow, +2 rain): 302 in save_morthag1 (exp4), DFU's terrain archives 2/102/302/402"
 global,0x001A94D0,nature_texture_archive,confirmed,"nature flat archive of the climate (regflat.bin +0, +1 in winter): 504 in save_morthag1 (exp4); town_block_create_misc_objects puts it on nature flats"
 global,0x001A94D4,region_flats,strong,regflat.bin loaded by region_load_tables: per climate a nature archive and 129 bytes of settings copied to XnGine (climate_set_textures)
+global,0x001A99F4,scratch_1a99f4,candidate,"shared by unrelated units (consistency pass, build/names/audit/consistency.md section 5): spfx's choice-list scratch"
 global,0x001A99F8,recall_anchor_location,strong,"location index (location_object +0x1B) saved when Recall sets the anchor; SAVEVARS. audit: build/names/scratch/audit_euw/B/exp_misc.py: map_goto_location(anchor region, environment, location, building) took save_gash to Trogker (location_object index 50 = this) and save_dorian into a building of Sentinel (index 6 = this)"
 global,0x001A99FC,recall_anchor_region,strong,current_region saved with the Recall anchor; SAVEVARS. audit: build/names/scratch/audit_euw/B/exp_misc.py: the anchor tuple of save_gash (region 17) and save_dorian (20) is a working map_goto_location destination
 global,0x001A9A00,recall_anchor_building,candidate,"the building (player object parent +0x1B) when anchored indoors, else 0"

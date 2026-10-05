@@ -13,7 +13,7 @@ extern char D_0017071B[];
 extern unsigned char player_environment;
 extern char monster_table_flags[];
 extern struct record *creature_list[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern signed char scratch_190ce4[];
 extern unsigned char D_001940D7;
 extern signed char player_motion_flags;
@@ -196,7 +196,7 @@ void collide_vertical_cb(struct record *a1)
             if (*(int *)((char *)l_2C) != 0) {
                 if ((*(int *)D_00196D48 = xn_collide_segment_model(l_2C, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
                     for (l_1C = 0; l_1C < *(int *)(*(char **)D_00196D48); l_1C++) {
-                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < collide_height) {
+                        if ((*(int *)scratch_190be4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < collide_height) {
                             collide_height = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
                             *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
                             D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
@@ -215,7 +215,7 @@ void collide_vertical_cb(struct record *a1)
             if (*(int *)((char *)l_2C) != 0) {
                 if ((*(int *)D_00196D48 = xn_collide_segment_model(l_2C, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
                     for (l_1C = 0; l_1C < *(int *)(*(char **)D_00196D48); l_1C++) {
-                        if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < collide_height) {
+                        if ((*(int *)scratch_190be4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < collide_height) {
                             collide_height = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
                             *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
                             D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
@@ -235,7 +235,7 @@ void collide_vertical_cb(struct record *a1)
             return;
         }
         for (l_1C = 0; l_1C < *(int *)(*(char **)D_00196D48); l_1C++) {
-            if ((*(int *)D_00190BE4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < collide_height) {
+            if ((*(int *)scratch_190be4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30)) < collide_height) {
                 collide_height = *(int *)(*(char **)D_00196D48 + 8 + (l_1C * 30));
                 *(int *)D_00195AB4 = (int)(*(char **)((char *)l_2C) + *(int *)(*(char **)D_00196D48 + 16 + (l_1C * 30)));
                 D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (l_1C * 30));
@@ -343,7 +343,7 @@ int collide_step_player(struct record *a1, int a2, struct move_request *a3)
     l_1C = 0;
     D_00196297 = 1;
     ceiling_height = a1->y - 120;
-    *(int *)D_00190BE4 = 0;
+    *(int *)scratch_190be4 = 0;
     *(int *)((char *)(*(int *)D_00196D4C = (int)a3->probe)) = a3->x;
     *(int *)(*(char **)D_00196D4C + 4) = a3->y;
     *(int *)(*(char **)D_00196D4C + 8) = a3->z;
@@ -374,7 +374,7 @@ int collide_step_player(struct record *a1, int a2, struct move_request *a3)
         }
     }
     if (vertical_velocity < 0 || ((a1 == player_object && ((player_character->conditions & 0x8) != 0 || in_dungeon_water != 0)) || ((struct bf8_5_1 *)&player_motion_flags)->f != 0)) {
-        *(int *)D_00190BE4 = 1;
+        *(int *)scratch_190be4 = 1;
         *(signed char *)collide_flags &= 254;
         *(int *)D_00196B10 = a3->x;
         D_00196B14 = a3->y - 60;
@@ -385,7 +385,7 @@ int collide_step_player(struct record *a1, int a2, struct move_request *a3)
         for (l_14 = 0; l_14 < collide_candidate_count; l_14++) {
             collide_vertical_cb(collide_candidates[l_14]);
         }
-        *(int *)D_00190BE4 = 0;
+        *(int *)scratch_190be4 = 0;
         if (((int)(short)(*(short *)collide_flags & 1)) != 0) {
             ceiling_height = collide_height;
         } else {
@@ -670,7 +670,7 @@ int func_00023FA5(struct record *a1, int a2, struct move_request *a3)
     l_20 = 0;
     D_00196297 = 0;
     ceiling_height = a1->y - 120;
-    *(int *)D_00190BE4 = 0;
+    *(int *)scratch_190be4 = 0;
     l_14 = &a1->data.character;
     *(int *)((char *)(*(int *)D_00196D4C = (int)a3->probe)) = a3->x;
     *(int *)(*(char **)D_00196D4C + 4) = a3->y;
@@ -698,7 +698,7 @@ int func_00023FA5(struct record *a1, int a2, struct move_request *a3)
         }
     }
     if (l_14->fall_velocity < 0 || ((struct bf8_0_1 *)&ai_monster_flags)->f != 0) {
-        *(int *)D_00190BE4 = 1;
+        *(int *)scratch_190be4 = 1;
         *(int *)D_00196B10 = a1->x;
         D_00196B14 = a1->y - 60;
         D_00196B18 = a1->z;
@@ -708,7 +708,7 @@ int func_00023FA5(struct record *a1, int a2, struct move_request *a3)
         for (l_18 = 0; l_18 < collide_candidate_count; l_18++) {
             collide_vertical_cb(collide_candidates[l_18]);
         }
-        *(int *)D_00190BE4 = 0;
+        *(int *)scratch_190be4 = 0;
         if (((int)(short)(*(short *)collide_flags & 1)) != 0) {
             ceiling_height = collide_height;
         } else {

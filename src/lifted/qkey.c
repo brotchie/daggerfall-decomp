@@ -40,7 +40,7 @@ extern char D_00195A08[];
 extern struct item *text_macro_item;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern int D_00195ABC;
 extern char cheat_flags[];
 extern struct record *found_object;
@@ -300,7 +300,7 @@ void damage_resolve_attack(struct record *a1, struct record *a2, int a3)
     l_40 = (int)(unsigned char)struck_body_part_table[rand_range(0, 19)];
     l_50 = &a1->data.character;
     l_4C = &a2->data.character;
-    D_00195AA8 = l_50->equipped[a3];
+    scratch_current_object = l_50->equipped[a3];
     l_48 = &l_50->equipped[a3]->data.item;
     if (l_50->equipped[a3] != 0 && l_48->group == 3 && player_character->race < 9) {
         l_3C = (int)(unsigned char)weapon_skills[l_48->index];

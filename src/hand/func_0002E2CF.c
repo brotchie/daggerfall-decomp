@@ -5,7 +5,7 @@ extern int spell_points_bonus;
 extern int D_00195A08;
 extern int D_00195A0C;
 extern int D_00195A78;
-extern struct record *D_00195AA8;
+extern struct record *scratch_current_object;
 extern struct character *player_character;
 extern int game_minutes;
 extern char D_00196291;
@@ -34,17 +34,17 @@ void damage_weapon_strike_effects(struct item *a1, struct record *a2, struct rec
             D_00196291 = 1;
             if (m2 == player_character) {
                 cast_item_strike_spell(a1->enchantments[i].param, a3);
-                item_damage(D_00195AA8, 10);
+                item_damage(scratch_current_object, 10);
             } else {
                 cast_creature_spell(a2, a3, a1->enchantments[i].param);
-                item_damage(D_00195AA8, 10);
+                item_damage(scratch_current_object, 10);
             }
             D_00196291 = 0;
             D_00196292 = 0;
         } else if (a1->enchantments[i].type == 6 && a1->enchantments[i].param == 1) {
-            item_damage(D_00195AA8, damage_heal(m2, a4 / 2) / 4 + 1);
+            item_damage(scratch_current_object, damage_heal(m2, a4 / 2) / 4 + 1);
         } else if (a1->enchantments[i].type == 26 && a1->enchantments[i].param == 2) {
-            item_damage(D_00195AA8, 2);
+            item_damage(scratch_current_object, 2);
             i = rand_range(1, 6);
             if (m3->magicka > 10) {
                 m3->magicka -= i;

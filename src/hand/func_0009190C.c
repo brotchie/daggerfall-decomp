@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009190C */
 #include "records.h"
 
-extern unsigned D_00190BE4;
+extern unsigned scratch_190be4;
 extern signed char scratch_190ce4[];
 extern short scratch_190d64;
 extern short chargen_selected_attribute;
@@ -9,9 +9,9 @@ extern struct character *player_character;
 
 void chargen_attribute_arrow(int a1)
 {
-    if (*(unsigned *)0x46c - D_00190BE4 < 6)
+    if (*(unsigned *)0x46c - scratch_190be4 < 6)
         return;
-    D_00190BE4 = *(unsigned *)0x46c;
+    scratch_190be4 = *(unsigned *)0x46c;
     if (a1 == 30) {
         if (scratch_190d64 != 0) {
             if (player_character->attributes[chargen_selected_attribute] == 100)

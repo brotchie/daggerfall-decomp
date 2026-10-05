@@ -86,3 +86,16 @@ consistency pass over the first ~4000 names; new names follow it.
   <old name>".
 - Rename when the old name misleads: it names one of several uses, it clashes with another name,
   or it is one letter from another function. Do not rename for style alone.
+
+**Globals at a shifted address.** Watcom folds a constant index offset into an address
+(`table[i - 1]` becomes `(table - 4)[i]`). So a few names land on another variable's bytes:
+`binding_names_base`, `class_answer_kinds` and `class_question_answer_row`. They keep their
+names, and their evidence gives the real table start. The source can be written as
+`table[x - bias]`, which compiles to the same code.
+
+**Confidence in the source.** Only confirmed and strong names go into the source
+(tools/apply_names.py). A candidate stays an address there, so the source shows only
+names that rest on two kinds of evidence. Candidates that remain are dead code, sound code
+(the emulator has no audio device), or situations no save contains; each one's evidence says
+what would settle it.
+

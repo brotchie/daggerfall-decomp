@@ -3,7 +3,7 @@ struct pair { unsigned char a, b; };
 struct row { struct pair p[5]; };
 struct cell { short v; short f2; };
 extern short scratch_190d64;
-extern int D_00190EE4[];
+extern int scratch_190ee4[];
 extern char *scratch_buffer;
 extern struct row D_00199868[];
 extern struct cell itemmaker_slots[];
@@ -35,7 +35,7 @@ void itemmaker_show_param_list(int *a1, short a2)
         else {
             itemmaker_slots[scratch_190d64].v = sv;
             scratch_buffer[cnt + 64000] = c;
-            D_00190EE4[cnt] = *a1;
+            scratch_190ee4[cnt] = *a1;
             cnt++;
         }
 next:
@@ -43,6 +43,6 @@ next:
         c++;
         k++;
     }
-    D_00190EE4[cnt] = 0;
-    list_popup_open(D_00190EE4);
+    scratch_190ee4[cnt] = 0;
+    list_popup_open(scratch_190ee4);
 }

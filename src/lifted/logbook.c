@@ -25,7 +25,7 @@ extern char D_00186DF8[];
 extern int logbook_notes_file;
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
-extern char D_00190BE4[];
+extern char scratch_190be4[];
 extern char scratch_190d64[];
 extern char scratch_190d66[];
 extern signed char text_rsc_buffer[];
@@ -222,7 +222,7 @@ void logbook_build_entries(void)
         for (l_20 = 0; l_20 < 10; l_20++) {
             if (*(short *)((char *)(int)((char *)((l_24 * 20) + l_28) + (l_20 * 2)) + 64) == 0) continue;
             text_macro_city = (l_28 + 1984) + (l_24 << 5);
-            *(int *)D_00190BE4 = *(int *)((char *)((l_28 + (l_24 * 40)) + (l_20 << 2)) + 704);
+            *(int *)scratch_190be4 = *(int *)((char *)((l_28 + (l_24 * 40)) + (l_20 << 2)) + 704);
             text_rsc_buffer[0] = 0;
             quest_load_text(l_1C, (int)(short)*(short *)((char *)(((l_24 * 20) + l_28) + (l_20 * 2)) + 64), 0, 0);
             if (text_rsc_buffer[0] == 0) continue;

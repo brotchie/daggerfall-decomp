@@ -10,11 +10,11 @@ extern short mouse_y;
 extern int screen_buffer;
 extern signed char xn_mouse_cursor_drawn;
 extern char D_00176F41[];
-extern char D_00190BE4[];
-extern int D_00190BE8;
+extern char scratch_190be4[];
+extern int scratch_190be8;
 extern int D_00190CA8;
 extern signed char scratch_190ce4[];
-extern signed char D_00190CEE[];
+extern signed char scratch_190cee[];
 extern char scratch_190d64[];
 extern short D_00190DEA[];
 extern char scratch_190df0[];
@@ -157,15 +157,15 @@ void chargen_skill_arrow(int a1)
     int l_18;
 
     l_1C = 1132;
-    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)D_00190BE4)) < 6) return;
+    if (((unsigned)(*(int *)((char *)l_1C) - *(int *)scratch_190be4)) < 6) return;
     l_18 = 1132;
-    *(int *)D_00190BE4 = *(int *)((char *)l_18);
+    *(int *)scratch_190be4 = *(int *)((char *)l_18);
     a1 += -14;
     l_28 = a1 >> 1;
     if (D_00190DEA[l_28] == 0 && (a1 & 1) != 0) return;
     l_24 = (int)(short)*(short *)(scratch_190df0 + (l_28 * 2));
     l_20 = &player_character->skills[player_class->skills[l_24]];
-    if ((unsigned char)l_20->value == D_00190CEE[l_24] && (a1 & 1) == 0) return;
+    if ((unsigned char)l_20->value == scratch_190cee[l_24] && (a1 & 1) == 0) return;
     if ((a1 & 1) != 0) {
         (*(signed char *)((char *)l_20))++;
         (D_00190DEA[l_28])--;
@@ -196,7 +196,7 @@ void chargen_roll_attributes(void)
 
     if (mouse_buttons_prev != 0) return;
     if (((int)(unsigned char)chargen_screen) == 255) {
-        D_00190BE8 = 1;
+        scratch_190be8 = 1;
         return;
     }
     for (l_1C = 0; l_1C < 8; l_1C++) {
