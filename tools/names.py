@@ -75,8 +75,9 @@ def canonical(text):
 
 def check(rows):
     funcs = set()
-    with open(os.path.join(ROOT, "config", "functions.csv"), newline="") as f:
-        funcs = {int(r["va"], 16) for r in csv.DictReader(f)}
+    for name in ("functions.csv", "xngine_functions.csv"):    # the game's, and object 2's
+        with open(os.path.join(ROOT, "config", name), newline="") as f:
+            funcs |= {int(r["va"], 16) for r in csv.DictReader(f)}
     errs, seen = [], {}
     for r in rows:
         if not re.fullmatch(r"[a-z_][a-z0-9_]*", r["name"]) and not (

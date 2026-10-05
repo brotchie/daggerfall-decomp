@@ -314,3 +314,51 @@ two builds; ticks now land on block boundaries, so a run continues differently f
 with stock Unicorn, deterministically. What remains is mostly retranslation of patched code,
 Apple Silicon's W^X switching for the JIT, and the per-block exit check.
 
+## 2026-10-04: phase 4, names and the engine map
+
+Every one of the 719 functions has a name in config/names.csv: 112 confirmed, 410 strong
+and 193 candidate. Most of the candidates are dead code or never ran in play. There are
+also 481 globals.
+
+**How they were named.** One dossier per function gathered:
+- the game C callers, which are named now, and their call sites;
+- XnGine callers and callees;
+- the data tables, the globals each function reads and writes, strings and ports;
+- the patch fields, play evidence, and the asm itself.
+
+Direct calls confirmed some names. `xn_render_set_mode` 0 draws only span ends (an outline
+view), and 4 draws solid colours without textures.
+
+docs/xngine_map.md is the engine map:
+- **Subsystems:** draw, sys, collide, the VR helmet drivers, world, gfx, span, model, terrain,
+  tex, poly, light, anim, and the rest.
+- **Startup.** `init_video` starts the subsystems in order.
+- **The frame**, in order:
+  1. Texture cache, render pool and lights.
+  2. Camera matrices.
+  3. The game's object loop queues models, flats and lights.
+  4. Outdoors only: the world update and the terrain.
+  5. `xn_render_frame` draws the sorted models, fills the background, runs the span pass,
+     then draws the flats.
+  6. A redraw if the texture cache overflowed, then the water and the present.
+- **The pipeline.**
+  - Projection, outcodes and Sutherland-Hodgman clipping.
+  - A per-row S-buffer of spans, where the nearer span wins by 1/z.
+  - Span routines (solid, textured 8 and 16 px, 64×64 terrain, sprites), each ending its
+    last partial run with a planted `ret`.
+  - Lit polygons get per-pixel shaders compiled from three templates.
+  - The 418-byte texture-mapper template is compiled per texture. Its copies run in play
+    (334 traced episodes).
+- **Corrections.** 0x153400 and 0x160E00 are not video drivers: they are three serial
+  head-tracker (VR helmet) drivers on an 8250 UART driver.
+- **Dead code.** 139 functions have no caller at all and never ran: XnGine's C-wrapper DOS
+  library, a world editor, most collision primitives, star drawing, and the disabled river and
+  path generators.
+- **Bugs found:**
+  - texture eviction can never fail;
+  - the pick routine's stack imbalance;
+  - the cursor clip uses the x hotspot for y;
+  - flat collision has scale 0;
+  - the divide handler doesn't decode SIB forms;
+  - every flat skips its first visible piece.
+
