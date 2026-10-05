@@ -1,13 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008F31F */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
 extern signed char key_down_esc;
 extern char D_00176E94[];
-extern char potionmaker_buttons[];
+extern struct rect potionmaker_buttons[];
 extern char D_00187FE2[];
 extern char D_00187FE4[];
 extern char D_00187FE6[];
@@ -48,24 +48,7 @@ extern int xn_draw_image_drop_shadow();
 extern int xn_font_select();
 extern int xn_tex_cache_lookup();
 
-struct img {
-    short f0;
-    short f2;
-    unsigned short w;
-    unsigned short h;
-    short f8;
-    short f10;
-    short f12;
-    int data;
-};
 
-struct hotspot {
-    short x0;
-    short y0;
-    short x1;
-    short y1;
-    void (*fn)(void);
-};
 
 #define COUNT (potion_cauldron_count)
 #define MOUSE_X (mouse_x)
@@ -74,7 +57,7 @@ struct hotspot {
 void potionmaker_update(void)
 {
     char buf[112];      /* never used: it only sizes the frame */
-    struct img *image;
+    struct texture_header *image;
     struct item *item;
     short i;
     short row;
@@ -91,8 +74,8 @@ void potionmaker_update(void)
     for (COUNT = i = 0; i < 8; i++) {
         if (((int *)potion_cauldron)[i] != 0) {
             item = &((struct record **)potion_cauldron)[i]->data.item;
-            image = *(struct img **)((char *)xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, -1) + 12);
-            xn_draw_image_drop_shadow((COUNT & 1) * 56 + 233 - (image->w >> 1), (COUNT >> 1) * 38 + 42 - (image->h >> 1), image->w, image->h, (char *)image + image->data);
+            image = *(struct texture_header **)((char *)xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, -1) + 12);
+            xn_draw_image_drop_shadow((COUNT & 1) * 56 + 233 - (image->width >> 1), (COUNT >> 1) * 38 + 42 - (image->height >> 1), image->width, image->height, (char *)image + image->data_offset);
             text_draw_centred_coloured((int)item->name, (short)((COUNT & 1) * 56 + 236), (short)((COUNT >> 1) * 40 + 48), 145, 156);
             ((short *)D_001A9B9C)[COUNT++] = i;
         }
@@ -107,10 +90,10 @@ void potionmaker_update(void)
         potionmaker_close();
     if ((char)mouse_buttons == 0 || ((char)mouse_buttons != 0 && (char)mouse_buttons_prev != 0)) return;
     for (i = 0; i < 5; i++) {
-        if (MOUSE_X > ((struct hotspot *)potionmaker_buttons)[i].x0 && MOUSE_X < ((struct hotspot *)potionmaker_buttons)[i].x1
-         && MOUSE_Y > ((struct hotspot *)potionmaker_buttons)[i].y0 && MOUSE_Y < ((struct hotspot *)potionmaker_buttons)[i].y1) {
+        if (MOUSE_X > potionmaker_buttons[i].x0 && MOUSE_X < potionmaker_buttons[i].x1
+         && MOUSE_Y > potionmaker_buttons[i].y0 && MOUSE_Y < potionmaker_buttons[i].y1) {
             sound_play(203, player_object, 100);
-            ((struct hotspot *)potionmaker_buttons)[i].fn();
+            potionmaker_buttons[i].handler();
         }
     }
     if (MOUSE_X > 221 && MOUSE_X < 304 && MOUSE_Y > 30 && MOUSE_Y < 171) {

@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern int screen_buffer;
 extern char D_001709E4[];
@@ -26,7 +26,7 @@ extern int D_00195A78;
 extern struct record *player_object;
 extern struct record *scratch_current_object;
 extern struct record *location_object;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern struct character *player_character;
 extern int game_minutes;
 extern struct settings *game_settings;
@@ -149,7 +149,7 @@ void damage_collapse_exhausted(struct record *target)
     int unused;
 
     start_ticks = xn_timer_bios_ticks();
-    mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)((int)game_settings)) & 1)) != 0) ? 64000 : ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320), (int)D_001709E4, 701, 4);
+    mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)((int)game_settings)) & 1)) != 0) ? 64000 : hud_bar_image->y * 320), (int)D_001709E4, 701, 4);
     time_pass(20160);
     while ((xn_timer_bios_ticks() - start_ticks) < 22);
 }
@@ -159,14 +159,14 @@ void damage_spawn_splash(struct record *target, int image_record, int alt_image_
     int angle;
     struct record *splash;
     struct character *target_char;
-    char *image;
+    struct texture_header *image;
 
     splash = object_create_child(target->parent, 0, 0);
     splash->id = object_new_id(((unsigned)location_object->id) >> 16);
     splash->type = 42;
     splash->x = target->x;
-    image = (char *)xn_tex_cache_lookup_image(target->image >> 7, (int)(unsigned short)(target->image & 127));
-    splash->y = target->y - (((int)(unsigned short)*(short *)(image + 6)) >> 1);
+    image = (struct texture_header *)xn_tex_cache_lookup_image(target->image >> 7, (int)(unsigned short)(target->image & 127));
+    splash->y = target->y - ((image->height) >> 1);
     if (target->type == 18) {
         target_char = &target->data.character;
         if (target_char->race == 1 || target_char->race == 0 || target_char->race == 3) splash->y += 10;

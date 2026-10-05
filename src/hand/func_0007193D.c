@@ -32,7 +32,7 @@ extern signed char D_00196294;
 extern signed char D_00196299;
 extern signed char D_0019629E;
 extern int rest_ticks_per_hour;
-extern char rest_image[];
+extern struct image *rest_image;
 extern signed char rest_loitering;
 extern void msgbox_show_string(int, int);
 extern void msgbox_show_rsc(int, int);
@@ -88,7 +88,7 @@ void rest_update(void)
         return;
     }
     if (D_00190D1A == 0) {
-        xn_draw_image((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
+        xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, (int)rest_image->pixels);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 87, 63, 134, 86) != 0) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
             if (rest_allowed() == 0) {
@@ -97,11 +97,11 @@ void rest_update(void)
             }
             rest_ticks_per_hour = 9;
             D_00190D1A = 1;
-            if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
-                mc_free(*(int *)rest_image, (int)D_001760D6, 165);
-                *(int *)rest_image = -1751672937;
+            if ((int)rest_image != 0 && (int)rest_image != (-1751672937)) {
+                mc_free((int)rest_image, (int)D_001760D6, 165);
+                rest_image = (struct image *)-1751672937;
             }
-            *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
+            rest_image = (struct image *)disk_read_file((int)D_001760DD, 0);
             prompt = (int)(*(char **)scratch_buffer + 55000);
             mc_set_location(168, (int)D_001760D6);
             mc_sprintf(prompt, (int)D_001760EA, D_0017D1FA);
@@ -117,21 +117,21 @@ void rest_update(void)
             }
             rest_ticks_per_hour = 9;
             D_00190D1A = 3;
-            if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
-                mc_free(*(int *)rest_image, (int)D_001760D6, 184);
-                *(int *)rest_image = -1751672937;
+            if ((int)rest_image != 0 && (int)rest_image != (-1751672937)) {
+                mc_free((int)rest_image, (int)D_001760D6, 184);
+                rest_image = (struct image *)-1751672937;
             }
-            *(int *)rest_image = disk_read_file((int)D_0017610F, 0);
+            rest_image = (struct image *)disk_read_file((int)D_0017610F, 0);
             D_00190CBC = *(int *)1132;
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 185, 63, 232, 86) != 0) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
             rest_ticks_per_hour = 32;
             D_00190D1A = 1;
-            if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
-                mc_free(*(int *)rest_image, (int)D_001760D6, 193);
-                *(int *)rest_image = -1751672937;
+            if ((int)rest_image != 0 && (int)rest_image != (-1751672937)) {
+                mc_free((int)rest_image, (int)D_001760D6, 193);
+                rest_image = (struct image *)-1751672937;
             }
-            *(int *)rest_image = disk_read_file((int)D_001760DD, 0);
+            rest_image = (struct image *)disk_read_file((int)D_001760DD, 0);
             prompt = (int)(*(char **)scratch_buffer + 55000);
             mc_set_location(196, (int)D_001760D6);
             mc_sprintf(prompt, (int)D_0017611C, D_0017D1FE);
@@ -164,7 +164,7 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) == 2) {
-        xn_draw_image((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
+        xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, (int)rest_image->pixels);
         text_draw_centred_coloured(itoa((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
             rest_close();
@@ -182,7 +182,7 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) != 3) return;
-    xn_draw_image((int)(unsigned short)*(short *)(*(char **)rest_image), (int)(unsigned short)*(short *)(*(char **)rest_image + 2), (int)(unsigned short)*(short *)(*(char **)rest_image + 4), (int)(unsigned short)*(short *)(*(char **)rest_image + 6), (int)(*(char **)rest_image + 12));
+    xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, (int)rest_image->pixels);
     text_draw_centred_coloured(itoa((int)(short)D_00190DD0, (int)text_buffer, 10), 118, 62, 146, 156);
     if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
         rest_close();

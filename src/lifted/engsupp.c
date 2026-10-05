@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
 extern char D_001702D4[];
 extern unsigned char player_environment;
 extern short D_00179954[];
@@ -14,18 +14,18 @@ extern signed char scratch_190ce4[];
 extern signed char scratch_190ce5;
 extern struct record *player_object;
 extern struct record *location_object;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern struct settings *game_settings;
 extern char D_00195C88[];
 extern int grid_visit_func;
-extern char D_00195D3C[];
+extern struct block_model *D_00195D3C;
 extern char picked_model_index[];
 extern char click_face_texture[];
 extern char D_00196120[];
 extern signed char D_0019629F;
 extern int D_00196478;
 extern int D_0019647C;
-extern char pick_result[];
+extern struct pick_result *pick_result;
 extern int climate_index;
 
 extern int pick_sprite_cb(int);
@@ -52,10 +52,10 @@ int engine_pick_object(int x, int y, int result)
 {
     int view_bottom;
 
-    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     if (y > view_bottom) return 0;
     mc_memset(result, 0, 18, (int)D_001702D4, 38, 4);
-    *(int *)pick_result = result;
+    pick_result = (struct pick_result *)result;
     if (*(int *)((char *)(*(int *)D_00195C88 = xn_render_pick(x, y)) + 4) == 1) return 0;
     if (*(int *)(*(char **)D_00195C88 + 4) != 0) {
         D_0019647C = *(int *)(*(char **)D_00195C88 + 4);
@@ -65,7 +65,7 @@ int engine_pick_object(int x, int y, int result)
         D_00196478 = *(int *)D_00195C88;
         world_for_each_object((int)pick_sprite_cb);
     }
-    return *(int *)(*(char **)pick_result) & 1;
+    return pick_result->flags & 1;
 }
 
 int arch3d_plane_point_at(int plane, short i)
@@ -102,7 +102,7 @@ int pick_model_cb(struct record *object)
     struct block_model *block_model;
     int i;
 
-    if (((struct bf8_0_1 *)(*(char **)pick_result))->f != 0) return 0;
+    if ((pick_result->flags & 1) != 0) return 0;
     switch (object->type) {
     case 43:
         block = &object->data.block;
@@ -110,11 +110,11 @@ int pick_model_cb(struct record *object)
         for (i = 0; block->model_count > i; i++, block_model++) {
             if ((int)&block_model->model == D_0019647C) {
                 *(int *)picked_model_index = i;
-                *(int *)D_00195D3C = (int)block_model;
-                *(signed char *)(*(char **)pick_result) |= 13;
-                *(int *)(*(char **)pick_result + 4) = (int)object;
-                *(int *)(*(char **)pick_result + 8) = (int)&*(signed char *)((char *)(i << 8) + arch3d_plane_index(D_0019647C, *(int *)click_face_texture));
-                *(short *)(*(char **)pick_result + 12) = i;
+                D_00195D3C = block_model;
+                pick_result->flags |= 13;
+                pick_result->object = object;
+                pick_result->plane = (i << 8) + arch3d_plane_index(D_0019647C, *(int *)click_face_texture);
+                pick_result->block_model_index = i;
                 return 1;
             }
         }
@@ -123,22 +123,22 @@ int pick_model_cb(struct record *object)
         block_model = (struct block_model *)RECORD_DATA(object);
         for (i = 0; object->model_count > i; i++, block_model++) {
             if ((int)&block_model->model == D_0019647C) {
-                *(signed char *)(*(char **)pick_result) |= 5;
-                *(int *)(*(char **)pick_result + 4) = (int)object;
-                *(int *)(*(char **)pick_result + 8) = arch3d_plane_index(D_0019647C, *(int *)click_face_texture);
-                *(short *)(*(char **)pick_result + 14) = block_model->id;
-                *(short *)(*(char **)pick_result + 16) = block_model->variant;
+                pick_result->flags |= 5;
+                pick_result->object = object;
+                pick_result->plane = arch3d_plane_index(D_0019647C, *(int *)click_face_texture);
+                pick_result->model_id = block_model->id;
+                pick_result->variant = block_model->variant;
                 return 1;
             }
         }
         return 0;
     case 6:
     case 32:
-        model = (int)RECORD_DATA(object);
+        model = (int)&object->data.instance;
         if (D_0019647C == model) {
-            *(signed char *)(*(char **)pick_result) |= 5;
-            *(int *)(*(char **)pick_result + 4) = (int)object;
-            *(int *)(*(char **)pick_result + 8) = arch3d_plane_index(model, *(int *)click_face_texture);
+            pick_result->flags |= 5;
+            pick_result->object = object;
+            pick_result->plane = arch3d_plane_index(model, *(int *)click_face_texture);
             return 1;
         }
     }

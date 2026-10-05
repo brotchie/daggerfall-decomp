@@ -2,11 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_0_4 { unsigned char f:4; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern int xn_cam_far_z;
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -26,8 +23,7 @@ extern unsigned char player_environment;
 extern int guards_timer;
 extern signed char anim_mirror_facing[];
 extern short D_0017B64F[];
-extern char D_0017B657[];
-extern char D_0017B659[];
+extern struct xz_step D_0017B657[];
 extern signed char D_0017B6CD;
 extern struct record *creature_list[];
 extern signed char D_001940D4;
@@ -541,7 +537,7 @@ int pedestrian_walk(struct record *pedestrian, int player_distance)
         tile_dz = abs((pedestrian->z & 63) - 32);
         if (tile_dx < 8 && tile_dz < 8) {
             if ((rand() & 255) != 0) {
-                can_stand = pedestrian_can_stand_at((int)(pedestrian->x + ((int)(short)*(short *)(D_0017B657 + ((pedestrian->yaw >> 9) << 2)))), ((int)(short)*(short *)(D_0017B659 + ((pedestrian->yaw >> 9) << 2))) + pedestrian->z);
+                can_stand = pedestrian_can_stand_at((int)(pedestrian->x + (D_0017B657[pedestrian->yaw >> 9].dx)), (D_0017B657[pedestrian->yaw >> 9].dz) + pedestrian->z);
             } else {
                 can_stand = 0;
             }
@@ -554,7 +550,7 @@ int pedestrian_walk(struct record *pedestrian, int player_distance)
         while (can_stand == 0) {
             pedestrian->yaw = (pedestrian->yaw + 512) % 2048;
             xn_math_yaw_offset_xz(pedestrian->yaw, (frame_ticks * 19200) / 1000, &dx, &dz);
-            can_stand = pedestrian_can_stand_at(((int)(short)*(short *)(D_0017B657 + ((pedestrian->yaw >> 9) << 2))) + pedestrian->x, ((int)(short)*(short *)(D_0017B659 + ((pedestrian->yaw >> 9) << 2))) + pedestrian->z);
+            can_stand = pedestrian_can_stand_at((D_0017B657[pedestrian->yaw >> 9].dx) + pedestrian->x, (D_0017B657[pedestrian->yaw >> 9].dz) + pedestrian->z);
             if (turn_count++ > 8) {
                 pedestrian->yaw = facing;
                 return 0;

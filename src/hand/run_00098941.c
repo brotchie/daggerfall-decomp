@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of inven from 0x98538 to 0x98941, kept together for its switch table's alignment */
+#include "structs.h"
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
-struct button { short x0, y0, x1, y1; void (*fn)(int); };
 #define FREED ((char *)0x97979797)
 extern char mouse_buttons;
 extern short mouse_x;
@@ -13,7 +13,7 @@ extern char D_001772F3[];
 extern unsigned char player_environment;
 extern char *D_001832B4;
 extern char *D_001832BC;
-extern struct button transport_buttons[];
+extern struct rect transport_buttons[];
 extern signed char scratch_190d16;
 extern unsigned char player_motion_flags;
 extern unsigned char *inv_right_container;
@@ -113,8 +113,8 @@ void transport_menu(void)
             for (button = 0; button < 5; button++) {
                 if ((1 << button) & enabled) {
                     if (mouse_x > transport_buttons[button].x0 && mouse_x < transport_buttons[button].x1 && mouse_y > transport_buttons[button].y0 && mouse_y < transport_buttons[button].y1) {
-                        if (transport_buttons[button].fn != 0)
-                            transport_buttons[button].fn(button);
+                        if (transport_buttons[button].handler != 0)
+                            transport_buttons[button].handler(button);
                         done = 1;
                     }
                 }

@@ -62,7 +62,7 @@ extern int D_001809A2[];
 extern int D_001809B6[];
 extern char *classmaker_advantage_costs[];
 extern char *classmaker_disadvantage_costs[];
-extern char classmaker_buttons[];
+extern struct rect classmaker_buttons[];
 extern short classmaker_attribute_up_box;
 extern short D_00185646;
 extern short D_00185648;
@@ -73,10 +73,8 @@ extern short D_00185652;
 extern short D_00185654;
 extern short D_00185656;
 extern int D_00185658;
-extern char classmaker_reputation_buttons[];
-extern char D_0018565E[];
-extern char D_00185662[];
-extern char classmaker_specials_buttons[];
+extern struct rect classmaker_reputation_buttons[];
+extern struct rect classmaker_specials_buttons[];
 extern short classmaker_help_texts[];
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
@@ -128,7 +126,7 @@ extern signed char classmaker_specials[];
 extern signed char D_00199821[];
 extern signed char D_0019982E[];
 extern signed char D_0019982F[];
-extern char *classmaker_current_buttons;
+extern struct rect *classmaker_current_buttons;
 
 extern int classmaker_draw(short);
 extern int sound_play(int, int, int);
@@ -228,13 +226,13 @@ void classmaker_run(void)
         }
         if (D_00190D86 != 0) (D_00190D86)--;
         if (*(short *)classmaker_screen == 0) {
-            *(int *)&classmaker_current_buttons = (int)classmaker_buttons;
+            classmaker_current_buttons = classmaker_buttons;
             *(int *)&button_count = 28;
         } else if (((int)(short)*(short *)classmaker_screen) == 1) {
-            *(int *)&classmaker_current_buttons = (int)classmaker_reputation_buttons;
+            classmaker_current_buttons = classmaker_reputation_buttons;
             *(int *)&button_count = 6;
         } else {
-            *(int *)&classmaker_current_buttons = (int)classmaker_specials_buttons;
+            classmaker_current_buttons = classmaker_specials_buttons;
             if (((int)(short)(*(short *)classmaker_screen & 16)) != 0) {
                 specials_count = 1;
             } else {
@@ -246,18 +244,18 @@ void classmaker_run(void)
             if (*(short *)classmaker_screen == 0 && mouse_buttons != 0 && mouse_buttons != mouse_buttons_prev) {
                 *(int *)&button = 0;
                 for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
-                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)button) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)button) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)button) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)button) * 12))) {
+                    if (mouse_x > classmaker_current_buttons[(short)button].x0 && mouse_x < classmaker_current_buttons[(short)button].x1 && mouse_y > classmaker_current_buttons[(short)button].y0 && mouse_y < classmaker_current_buttons[(short)button].y1) {
                         sound_play(203, (int)player_object, 100);
-                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)button) * 12))))();
+                        classmaker_current_buttons[(short)button].handler();
                         break;
                     }
                 }
             } else if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
                 *(int *)&button = 0;
                 for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
-                    if (mouse_x > *(short *)((char *)(int)(classmaker_current_buttons + (((int)(short)button) * 12))) && mouse_x < *(short *)(classmaker_current_buttons + 4 + (((int)(short)button) * 12)) && mouse_y > *(short *)(classmaker_current_buttons + 2 + (((int)(short)button) * 12)) && mouse_y < *(short *)(classmaker_current_buttons + 6 + (((int)(short)button) * 12))) {
+                    if (mouse_x > classmaker_current_buttons[(short)button].x0 && mouse_x < classmaker_current_buttons[(short)button].x1 && mouse_y > classmaker_current_buttons[(short)button].y0 && mouse_y < classmaker_current_buttons[(short)button].y1) {
                         sound_play(203, (int)player_object, 100);
-                        ((int (*)())(*(int *)(classmaker_current_buttons + 8 + (((int)(short)button) * 12))))();
+                        classmaker_current_buttons[(short)button].handler();
                         break;
                     }
                 }
@@ -516,7 +514,7 @@ void classmaker_set_reputation(int group)
     int unused;
     int centre;
 
-    centre = (((int)(short)*(short *)(D_0018565E + (((int)(short)*(short *)&group) * 12))) + ((int)(short)*(short *)(D_00185662 + (((int)(short)*(short *)&group) * 12)))) >> 1;
+    centre = ((classmaker_reputation_buttons[(int)(short)*(short *)&group].y0) + (classmaker_reputation_buttons[(int)(short)*(short *)&group].y1)) >> 1;
     if (((int)(short)mouse_y) < 81) {
         player_character->reputation[(int)(short)*(short *)&group] = (((int)(short)mouse_y) - 81) / 5;
     } else if (((int)(short)mouse_y) > 81) {

@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00057F8B */
+#include "records.h"
 extern char D_00175710[];
 extern char D_00185716[];
 extern char D_00185717[];
@@ -32,8 +33,7 @@ extern char D_001998CC[];
 extern char D_001998CD[];
 extern char D_001998D6[];
 extern char D_001998D7[];
-extern char itemmaker_slots[];
-extern char D_001998E2[];
+extern struct enchantment itemmaker_slots[];
 extern signed char D_00199910[];
 extern void msgbox_show_string(char *, int);
 extern void func_00057147(short, short, short, short, short, short, short);
@@ -89,8 +89,8 @@ void itemmaker_add_soul_powers(int soul)
     for (i = 0; i < count; i++) {
         slot = itemmaker_free_slot();
         ((char *)D_00199910)[slot] = 1;
-        *(short *)(itemmaker_slots + slot * 4) = *(short *)(D_001859A4 + soul_row * 20 + i * 4);
-        *(short *)(D_001998E2 + slot * 4) = *(short *)(D_001859A6 + soul_row * 20 + i * 4);
+        itemmaker_slots[slot].type = *(short *)(D_001859A4 + soul_row * 20 + i * 4);
+        itemmaker_slots[slot].param = *(short *)(D_001859A6 + soul_row * 20 + i * 4);
         type = *(short *)(D_001859A4 + soul_row * 20 + i * 4);
         param = *(short *)(D_001859A6 + soul_row * 20 + i * 4);
         if (*(short *)(D_001859A4 + soul_row * 20 + i * 4) < 15) {
@@ -104,7 +104,7 @@ void itemmaker_add_soul_powers(int soul)
             }
         } else {
             ((char *)scratch_190ce4)[slot] = 1;
-            *(short *)(itemmaker_slots + slot * 4) -= 15;
+            itemmaker_slots[slot].type -= 15;
             j = *(unsigned char *)(D_0018597F + type);
             if (j == 0)
                 func_00057147(slot, type, param, -1, -1, -1, -1);

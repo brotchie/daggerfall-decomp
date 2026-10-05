@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_5 { unsigned char f:5; };
 extern char disk_last_file_size[];
 extern int xn_cam_x;
 extern int xn_cam_y;
@@ -53,7 +53,7 @@ extern int D_0019090C;
 extern int D_00190910;
 extern char arena2_path[];
 extern char arena2_cd_path[];
-extern char flats_cfg[];
+extern struct flat_cfg flats_cfg[];
 extern unsigned char D_001940D7;
 extern signed char D_001940D8;
 extern int horse_overlay_image;
@@ -78,12 +78,12 @@ extern struct record *player_object;
 extern struct record *location_object;
 extern int monster_bsa_handle;
 extern int D_00195AD0;
-extern char list_popup_image[];
+extern struct image *list_popup_image;
 extern struct spell *spell_records;
 extern int creature_count;
 extern char current_region_data[];
 extern int D_00195B64;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern int hud_mode_icons;
 extern int paperdoll_mask;
 extern char hud_portrait[];
@@ -442,13 +442,13 @@ void shutdown_free_all(void)
         mc_free(hud_mode_icons, (int)D_00175040, 350);
         hud_mode_icons = -1751672937;
     }
-    if (*(int *)hud_bar_image != 0 && *(int *)hud_bar_image != (-1751672937)) {
-        mc_free(*(int *)hud_bar_image, (int)D_00175040, 351);
-        *(int *)hud_bar_image = -1751672937;
+    if ((int)hud_bar_image != 0 && (int)hud_bar_image != (-1751672937)) {
+        mc_free((int)hud_bar_image, (int)D_00175040, 351);
+        hud_bar_image = (struct image *)-1751672937;
     }
-    if (*(int *)list_popup_image != 0 && *(int *)list_popup_image != (-1751672937)) {
-        mc_free(*(int *)list_popup_image, (int)D_00175040, 352);
-        *(int *)list_popup_image = -1751672937;
+    if ((int)list_popup_image != 0 && (int)list_popup_image != (-1751672937)) {
+        mc_free((int)list_popup_image, (int)D_00175040, 352);
+        list_popup_image = (struct image *)-1751672937;
     }
     if (*(int *)scratch_buffer != 0 && *(int *)scratch_buffer != (-1751672937)) {
         mc_free(*(int *)scratch_buffer, (int)D_00175040, 353);
@@ -627,8 +627,8 @@ int flats_cfg_find(int image)
     int i;
 
     for (i = 0; i < flats_cfg_count; i++) {
-        if (((int)(unsigned short)*(short *)(flats_cfg + (i * 40))) == image) {
-            return ((int)flats_cfg) + (i * 40);
+        if (flats_cfg[i].image == image) {
+            return (int)&flats_cfg[i];
         }
     }
     return 0;
@@ -698,28 +698,28 @@ void init_player_records(struct record *root)
     player_character->mobile_id = 200;
     (inventory_containers[0] = object_create_child(player_entity, 0, 0))->type = 52;
     inventory_containers[0]->flags = 3;
-    inventory_containers[0]->image = 0;
+    inventory_containers[0]->container_index = 0;
     *(signed char *)((char *)(*(int *)&D_001959DC = (int)object_create_child(player_entity, 0, 0))) = 52;
     D_001959DC->flags = 3;
-    D_001959DC->image = 1;
+    D_001959DC->container_index = 1;
     *(signed char *)((char *)(*(int *)&D_001959E0 = (int)object_create_child(player_entity, 0, 0))) = 52;
     D_001959E0->flags = 3;
-    D_001959E0->image = 2;
+    D_001959E0->container_index = 2;
     *(signed char *)((char *)(*(int *)&D_001959E4 = (int)object_create_child(player_entity, 0, 0))) = 52;
     D_001959E4->flags = 3;
-    D_001959E4->image = 3;
+    D_001959E4->container_index = 3;
     *(signed char *)((char *)(*(int *)&house_container = (int)object_create_child(player_entity, 0, 0))) = 52;
     house_container->flags = 3;
-    house_container->image = 5;
+    house_container->container_index = 5;
     *(signed char *)((char *)(*(int *)&ship_container = (int)object_create_child(player_entity, 0, 0))) = 52;
     ship_container->flags = 3;
-    ship_container->image = 6;
+    ship_container->container_index = 6;
     *(signed char *)((char *)(*(int *)&room_storage_container = (int)object_create_child(player_entity, 0, 0))) = 52;
     room_storage_container->flags = 3;
-    room_storage_container->image = 7;
+    room_storage_container->container_index = 7;
     *(signed char *)((char *)(*(int *)&repair_container = (int)object_create_child(player_entity, 0, 0))) = 52;
     repair_container->flags = 3;
-    repair_container->image = 8;
+    repair_container->container_index = 8;
     *(signed char *)((char *)(*(int *)&quest_root = (int)object_create_child(player_entity, 0, 0))) = 16;
     quest_root->flags = 3;
     *(signed char *)((char *)(*(int *)&options_object = (int)object_create_child(player_entity, 0, 6))) = 23;

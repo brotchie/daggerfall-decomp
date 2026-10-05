@@ -3,10 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern signed char quest_faces[];
-extern char quest_faces_quest[];
-extern char quest_faces_object[];
-extern char quest_faces_image[];
+extern struct quest_face quest_faces[];
 extern int quest_face_images[];
 extern int D_00195D14;
 extern struct quest *current_quest;
@@ -18,7 +15,7 @@ void quest_face_add(struct record *object, int name_bank, int gender, int object
     int slot;
     int face_index;
     int i;
-    char *image;
+    struct image *image;
     struct character *character;
 
     if (object->type == 18) {
@@ -28,23 +25,23 @@ void quest_face_add(struct record *object, int name_bank, int gender, int object
         gender = 1;
     }
     slot = 0;
-    while (*(int *)(quest_faces_object + (slot * 10)) != 0 && slot < 10) slot++;
+    while (quest_faces[slot].object_id != 0 && slot < 10) slot++;
     if (slot >= 10) return;
-    *(int *)(quest_faces_object + (slot * 10)) = object_id;
-    *(signed char *)(quest_faces_quest + (slot * 10)) = (signed char)current_quest->id;
+    quest_faces[slot].object_id = object_id;
+    quest_faces[slot].quest_id = current_quest->id;
     if (object->type != 18 && object->data.building.faction_id == 514) {
         face_index = gender + (name_bank * 2);
-        quest_faces[slot * 10] = (((*(signed char *)&gender << 7) + (*(signed char *)&name_bank << 6)) + *(signed char *)&face_index) | 16;
-        image = (char *)D_00195D14;
+        quest_faces[slot].face = (((*(signed char *)&gender << 7) + (*(signed char *)&name_bank << 6)) + *(signed char *)&face_index) | 16;
+        image = (struct image *)D_00195D14;
     } else {
-        quest_faces[slot * 10] = ((*(signed char *)&gender << 7) + (*(signed char *)&name_bank << 6)) + rand_range(0, 9);
-        image = (char *)quest_face_images[((gender * 2) + name_bank)];
+        quest_faces[slot].face = ((*(signed char *)&gender << 7) + (*(signed char *)&name_bank << 6)) + rand_range(0, 9);
+        image = (struct image *)quest_face_images[((gender * 2) + name_bank)];
     }
     i = 0;
-    face_index = (int)(unsigned char)(quest_faces[slot * 10] & 15);
+    face_index = (int)(unsigned char)(quest_faces[slot].face & 15);
     while (i < face_index) {
-        image = (((int)*(unsigned short *)(image + 10)) + image) + 12;
+        image = (struct image *)((char *)image + image->data_size + 12);
         i++;
     }
-    *(char **)(quest_faces_image + (slot * 10)) = image;
+    quest_faces[slot].image = image;
 }

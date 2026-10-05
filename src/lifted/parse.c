@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern char D_0017110C[];
 extern char D_00171134[];
 extern char D_00171146[];
@@ -53,7 +53,7 @@ extern int province_names[];
 extern int province_terrain_names[];
 extern int attribute_rating_names[];
 extern int direction_names[];
-extern char item_templates[];
+extern struct item_template item_templates[];
 extern char D_00182F92[];
 extern char monster_names[];
 extern char ruler_titles[];
@@ -174,7 +174,7 @@ extern int parse_regional_name(int, signed char);
 extern int parse_town_building_name(short);
 extern int calendar_format_date(int, int);
 extern int item_armor_value(int);
-extern int flats_cfg_find(int);
+extern struct flat_cfg *flats_cfg_find(int);
 extern int enchant_powers_text(int);
 extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int rand_range(int, int);
@@ -311,7 +311,7 @@ int macro_brd_regional_name(void)
     npc = (struct record *)parse_stub_zero(511);
     saved_seed = rand();
     srand((npc->id & 65535) ^ (((unsigned)npc->id) >> 16));
-    name = name_generate((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(*(signed char *)((char *)flats_cfg_find(npc->image) + 6) & 1));
+    name = name_generate((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(flats_cfg_find(npc->image)->flags & 1));
     srand(saved_seed);
     return name;
 }
@@ -422,7 +422,7 @@ int macro_dnc_regional_name(void)
     npc = (struct record *)parse_stub_zero(515);
     saved_seed = rand();
     srand((npc->id & 65535) ^ (((unsigned)npc->id) >> 16));
-    name = name_generate((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(*(signed char *)((char *)flats_cfg_find(npc->image) + 6) & 1));
+    name = name_generate((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)(flats_cfg_find(npc->image)->flags & 1));
     srand(saved_seed);
     return name;
 }
@@ -1857,12 +1857,12 @@ void parse_item_name(struct item *item, char *out)
         return;
     }
     if (((int)(unsigned short)(item->item_flags & 32)) == 0) {
-        mc_strncpy((int)text_rsc_buffer, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (item->group << 2)) + (item->index * 2)))) * 48), 2048, (int)D_0017110C, 1973);
+        mc_strncpy((int)text_rsc_buffer, (int)item_templates[((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (item->group << 2)) + (item->index * 2))))].name, 2048, (int)D_0017110C, 1973);
         return;
     }
     while (item->name[i] != 0) {
         if (((int)(unsigned char)item->name[i]) == 37) {
-            mc_strncpy(out, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (item->group << 2)) + (item->index * 2)))) * 48), 4, (int)D_0017110C, 1981);
+            mc_strncpy(out, (int)item_templates[((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (item->group << 2)) + (item->index * 2))))].name, 4, (int)D_0017110C, 1981);
             out += strlen(out);
             i += 3;
         } else {

@@ -1,14 +1,12 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003B6CF */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
+extern struct rect sheet_buttons[];
 extern short font_height;
 extern char D_00170C67[];
 extern char D_00170C6F[];
 extern char D_00170C73[];
-extern char D_0017B50C[];
-extern short D_0017B5A2;
-extern short D_0017B5A6;
 extern char race_names[];
 extern signed char text_buffer[];
 extern signed char D_001940D9;
@@ -54,7 +52,7 @@ void sheet_draw(void)
     mc_set_location(185, D_00170C67);
     mc_sprintf(((char *)text_buffer), D_00170C73, player_character->fatigue >> 6, player_character->attributes[0] + player_character->attributes[4]);
     text_draw_centred_coloured(((char *)text_buffer), 77, 54, 145, 141);
-    x = ((D_0017B5A2 + D_0017B5A6) >> 1) + 1;
+    x = ((sheet_buttons[13].x0 + sheet_buttons[13].x1) >> 1) + 1;
     if (((struct bf8_2_1 *)&D_001940D9)->f) attributes = player_character->base_attributes;
     else attributes = player_character->attributes;
     for (i = 0; i < 8; i++) {
@@ -66,9 +64,9 @@ void sheet_draw(void)
         else if (value > player_character->base_attributes[i]) colour = 96;
         else colour = 145;
         if (i == 0 && ((struct bf8_2_1 *)&D_001940D9)->f == 0)
-            text_draw_centred_coloured(itoa(attributes[i] + *(int *)D_00195A08, ((char *)text_buffer), 10), x, (short)((*(short *)(D_0017B50C + (i + 13) * 12) - font_height) - 2), colour, 141);
+            text_draw_centred_coloured(itoa(attributes[i] + *(int *)D_00195A08, ((char *)text_buffer), 10), x, (short)((sheet_buttons[i + 13].y1 - font_height) - 2), colour, 141);
         else
-            text_draw_centred_coloured(itoa(attributes[i], ((char *)text_buffer), 10), x, (short)((*(short *)(D_0017B50C + (i + 13) * 12) - font_height) - 2), colour, 141);
+            text_draw_centred_coloured(itoa(attributes[i], ((char *)text_buffer), 10), x, (short)((sheet_buttons[i + 13].y1 - font_height) - 2), colour, 141);
     }
     xn_draw_put_rect(192, 1, 125, 197, D_00195B64, 0);
     weight = object_weight(player_entity) >> 2;

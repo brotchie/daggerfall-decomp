@@ -1,12 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004BCFA */
-struct find_t {             /* DOS find buffer */
-    char reserved[21];
-    char attrib;
-    unsigned short wr_time;
-    unsigned short wr_date;
-    unsigned long size;
-    char name[13];
-};
+#include <dos.h>
 extern char D_00174F47[];        /* __FILE__ */
 extern char D_00174F50[];
 extern char D_00174F57[];

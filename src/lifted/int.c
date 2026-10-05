@@ -1,67 +1,66 @@
 /* int.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include <i86.h>
 
 extern char D_00177348[];
 
 extern int mc_memset();
-extern int int386x();
-extern int int386();
-extern int segread();
+#undef _FP_SEG      /* <i86.h>'s is FP_SEG, without the modify list */
 extern unsigned short _FP_SEG( const volatile void __far * );
 #pragma aux _FP_SEG = parm caller [eax dx] value [dx] modify exact [];
 
 void dpmi_get_free_memory(int info)
 {
 {
-    char regs[28];
-    char sregs[12];
+    union REGS regs;
+    struct SREGS sregs;
 
-    mc_memset((int)sregs, 0, 12, (int)D_00177348, 39, 4);
-    *(int *)regs = 1280;
-    *(int *)((char *)regs + 20) = info;
-    *(short *)sregs = _FP_SEG((void *)info);
-    int386x(49, (int)regs, (int)regs, (int)sregs);
+    mc_memset(&sregs, 0, 12, (int)D_00177348, 39, 4);
+    regs.x.eax = 1280;
+    regs.x.edi = info;
+    sregs.es = _FP_SEG((void *)info);
+    int386x(49, &regs, &regs, &sregs);
 }
 }
 
 int dpmi_lock_region(int address, int size)
 {
-    char regs[28];
+    union REGS regs;
 
     if (address == 0 || size == 0) return 0;
-    mc_memset((int)regs, 0, 28, (int)D_00177348, 66, 4);
-    *(short *)regs = 1536;
-    *(short *)((char *)regs + 4) = address >> 16;
-    *(short *)((char *)regs + 8) = address;
-    *(short *)((char *)regs + 16) = size >> 16;
-    *(short *)((char *)regs + 20) = size;
-    int386(49, (int)regs, (int)regs);
-    return *(int *)((char *)regs + 24) & 1;
+    mc_memset(&regs, 0, 28, (int)D_00177348, 66, 4);
+    regs.w.ax = 1536;
+    regs.w.bx = address >> 16;
+    regs.w.cx = address;
+    regs.w.si = size >> 16;
+    regs.w.di = size;
+    int386(49, &regs, &regs);
+    return regs.x.cflag & 1;
 }
 
 int dpmi_unlock_region(int address, int size)
 {
-    char regs[28];
+    union REGS regs;
 
     if (address == 0 || size == 0) return 0;
-    mc_memset((int)regs, 0, 28, (int)D_00177348, 86, 4);
-    *(short *)regs = 1537;
-    *(short *)((char *)regs + 4) = address >> 16;
-    *(short *)((char *)regs + 8) = address;
-    *(short *)((char *)regs + 16) = size >> 16;
-    *(short *)((char *)regs + 20) = size;
-    int386(49, (int)regs, (int)regs);
-    return *(int *)((char *)regs + 24) & 1;
+    mc_memset(&regs, 0, 28, (int)D_00177348, 86, 4);
+    regs.w.ax = 1537;
+    regs.w.bx = address >> 16;
+    regs.w.cx = address;
+    regs.w.si = size >> 16;
+    regs.w.di = size;
+    int386(49, &regs, &regs);
+    return regs.x.cflag & 1;
 }
 
 void causeway_disable_error_dump(void)
 {
-    char regs[28];
-    char sregs[12];
+    union REGS regs;
+    struct SREGS sregs;
 
-    segread((int)sregs);
-    *(signed char *)((char *)regs + 8) = 0;
-    *(short *)regs = 65328;
-    int386x(49, (int)regs, (int)regs, (int)sregs);
+    segread(&sregs);
+    regs.h.cl = 0;
+    regs.w.ax = 65328;
+    int386x(49, &regs, &regs, &sregs);
 }

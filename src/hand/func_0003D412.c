@@ -1,10 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003D412 */
-#pragma pack(1)
-struct ent { short id; int off; };
-#pragma pack()
+#include "structs.h"
 extern char D_00170D55[];
 extern char D_00170D5C[];
-extern struct ent *scratch_buffer;
+extern struct text_rsc_entry *scratch_buffer;
 extern int text_rsc_file;
 extern char text_missing_ok;
 extern char *text_expand_wrap(unsigned short, short, unsigned char *, char *, char *);
@@ -44,8 +42,8 @@ char *text_rsc_load(short id, unsigned short flags, short width)
         mc_sprintf(text, D_00170D5C, id);
         return text;
     }
-    size = scratch_buffer[i + 1].off - scratch_buffer[i].off;
-    lseek(text_rsc_file, scratch_buffer[i].off, 0);
+    size = scratch_buffer[i + 1].offset - scratch_buffer[i].offset;
+    lseek(text_rsc_file, scratch_buffer[i].offset, 0);
     text = mc_malloc(size + 16, D_00170D55, 73);
     wrap_buf = mc_malloc(size < 4096 ? 8192 : size * 2, D_00170D55, 74);
     expand_buf = mc_malloc(size < 4096 ? 8192 : size * 2, D_00170D55, 75);

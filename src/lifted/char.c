@@ -26,16 +26,16 @@ int npc_talk_record_build(struct record *npc)
     char *npc_data;
     int i;
     int saved_seed;
-    char *flat_cfg;
+    struct flat_cfg *flat_cfg;
     struct faction *faction;
 
     saved_seed = rand();
-    flat_cfg = (char *)flats_cfg_find(npc->image);
+    flat_cfg = (struct flat_cfg *)flats_cfg_find(npc->image);
     npc_data = RECORD_DATA(npc);
     mc_memset((int)npc_record_buffer, 0, 560, (int)D_0017573C, 226, 4);
     if (npc->type == 53) {
         *(short *)D_0019995C = ((int)(unsigned short)*(short *)D_0019995C) | ((((int)(unsigned short)(npc->npc_flags & 16384)) != 0) ? 1 : 0);
-    } else if (flat_cfg != 0 && ((int)(unsigned char)(*(signed char *)(flat_cfg + 6) & 1)) != 0) {
+    } else if (flat_cfg != 0 && (flat_cfg->flags & 1) != 0) {
         *(signed char *)D_0019995C |= 1;
     } else if (flat_cfg == 0 && ((int)(unsigned char)(*(signed char *)(npc_data + 2) & 16)) != 0) {
         *(signed char *)D_0019995C |= 1;

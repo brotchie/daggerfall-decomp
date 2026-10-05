@@ -43,7 +43,7 @@ extern char object_debug_watch_copy[];
 extern char potion_ingredient_scroll[];
 extern char potion_ingredient_count[];
 
-extern char *location_find_door(int);
+extern struct location_door *location_find_door(int);
 extern int mem_pool_alloc(int, int);
 extern int mem_pool_release(int);
 extern int object_count_type(struct record *, short);
@@ -555,7 +555,7 @@ int object_new_id(int id_high)
 
 void object_delete_quest_cb(struct record *object)
 {
-    char *door;
+    struct location_door *door;
 
     if (object->quest_id != scratch_190ce4[0]) return;
     if (object->type == 8) {
@@ -568,7 +568,7 @@ void object_delete_quest_cb(struct record *object)
     }
     if (loaded_location_door_count != 0 && (object->id & -65536) == (location_object->id & -65536)) {
         door = location_find_door(object->id);
-        if (door != 0) door[3] &= 15;
+        if (door != 0) door->flags &= 0xFFF;
     }
     unequip_object(object);
     object_delete(object);

@@ -16,16 +16,9 @@ extern char D_00170750[];
 extern char D_0017075D[];
 extern char D_0017077B[];
 extern signed char D_00178630[];
-extern char career_answer_boxes[];
-extern char D_00179F76[];
-extern char D_00179F78[];
-extern char D_00179F7A[];
+extern struct rect career_answer_boxes[];
 extern signed char D_00179FF8[];
-extern char career_bio_buttons[];
-extern char D_0017A004[];
-extern char D_0017A006[];
-extern char D_0017A008[];
-extern char D_0017A00A[];
+extern struct rect career_bio_buttons[];
 extern signed char text_buffer[];
 extern int D_00190C74;
 extern char D_00190C78[];
@@ -184,8 +177,8 @@ int career_draw_lines(int text, int one_line)
     int x;
     int y;
 
-    x = ((int)(short)*(short *)(career_answer_boxes + (((int)(short)*(short *)scratch_190d64) * 12))) + 21;
-    y = (int)(short)*(short *)(D_00179F76 + (((int)(short)*(short *)scratch_190d64) * 12));
+    x = (career_answer_boxes[(int)(short)*(short *)scratch_190d64].x0) + 21;
+    y = career_answer_boxes[(int)(short)*(short *)scratch_190d64].y0;
     if (*(short *)scratch_190d64 != 0) y += 5;
     while (1) {
         line_end = memchr(text, 13, 2000);
@@ -215,7 +208,7 @@ void career_wait_answer(void)
         }
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         for (answer = 0; ((int)(short)*(short *)scratch_190d64) > answer; answer++) {
-            if (mouse_x > *(short *)(career_answer_boxes + ((answer + 1) * 12)) && mouse_x < *(short *)(D_00179F78 + ((answer + 1) * 12)) && mouse_y > *(short *)(D_00179F76 + ((answer + 1) * 12)) && mouse_y < *(short *)(D_00179F7A + ((answer + 1) * 12))) {
+            if (mouse_x > career_answer_boxes[answer + 1].x0 && mouse_x < career_answer_boxes[answer + 1].x1 && mouse_y > career_answer_boxes[answer + 1].y0 && mouse_y < career_answer_boxes[answer + 1].y1) {
                 sound_play(203, (int)player_object, 100);
                 *(short *)scratch_190d66 = answer;
             }
@@ -293,11 +286,11 @@ void career_show_biography(void)
         career_bio_draw();
         if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 1)) == 0) {
             for (button = 0; button < 3; button++) {
-                if (mouse_x > *(short *)(career_bio_buttons + (button * 12)) && mouse_x < *(short *)(D_0017A006 + (button * 12)) && mouse_y > *(short *)(D_0017A004 + (button * 12)) && mouse_y < *(short *)(D_0017A008 + (button * 12))) {
+                if (mouse_x > career_bio_buttons[button].x0 && mouse_x < career_bio_buttons[button].x1 && mouse_y > career_bio_buttons[button].y0 && mouse_y < career_bio_buttons[button].y1) {
                     if (button == 2) {
                         done = 1;
                     } else {
-                        ((int (*)())(*(int *)(D_0017A00A + (button * 12))))();
+                        career_bio_buttons[button].handler();
                     }
                 }
             }

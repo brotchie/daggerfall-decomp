@@ -1,5 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000932C9 */
-struct rect { short x0, y0, x1, y1; char pad[4]; };
+#include "structs.h"
 extern char *screen_buffer;
 extern char D_0017704C[];        /* __FILE__ */
 extern struct rect inv_buttons[];

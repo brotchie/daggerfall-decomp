@@ -2,16 +2,13 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern int dungeon_water_level;
+extern struct monster_template monster_table[];
 extern char D_00170710[];
 extern char D_0017071B[];
 extern unsigned char player_environment;
-extern char monster_table_flags[];
 extern struct record *creature_list[];
 extern char scratch_190be4[];
 extern signed char scratch_190ce4[];
@@ -56,8 +53,8 @@ extern int D_00196B34;
 extern int D_00196B38;
 extern int D_00196B3C;
 extern struct record *collide_candidates[];
-extern char D_00196D48[];
-extern char D_00196D4C[];
+extern struct collide_hits *D_00196D48;
+extern struct collide_probe *D_00196D4C;
 extern int D_00196D50;
 extern char D_00196D54[];
 extern int D_00196D58;
@@ -136,8 +133,8 @@ void collide_segment_model_cb(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
-                        *(int *)click_face_texture = (int)(*model + *(int *)(*(char **)D_00196D48 + 16));
+                    if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && (int)D_00196D48 != (-1)) {
+                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
                     }
@@ -151,8 +148,8 @@ void collide_segment_model_cb(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
-                        *(int *)click_face_texture = (int)(*model + *(int *)(*(char **)D_00196D48 + 16));
+                    if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && (int)D_00196D48 != (-1)) {
+                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
                     }
@@ -162,15 +159,15 @@ void collide_segment_model_cb(struct record *object)
         return;
     case 6:
     case 32:
-        model = (char **)RECORD_DATA(object);
+        model = &object->data.instance.model;
         if (*model == 0) return;
         if (((int)(short)(*(short *)collide_flags & 4)) == 0 || ((int)(short)(*(short *)collide_flags & 2)) != 0) {
             return;
         }
-        if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) == 0 || *(int *)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) == 0 || (int)D_00196D48 == (-1)) {
             return;
         }
-        *(int *)click_face_texture = (int)(*model + *(int *)(*(char **)D_00196D48 + 16));
+        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
         *(signed char *)collide_flags |= 2;
         D_00195C48 = object;
     default:;
@@ -194,12 +191,12 @@ void collide_vertical_cb(struct record *object)
         for (i = 0; block->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
-                    for (j = 0; j < *(int *)(*(char **)D_00196D48); j++) {
-                        if ((*(int *)scratch_190be4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (j * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (j * 30)) < collide_height) {
-                            collide_height = *(int *)(*(char **)D_00196D48 + 8 + (j * 30));
-                            *(int *)D_00195AB4 = (int)(*model + *(int *)(*(char **)D_00196D48 + 16 + (j * 30)));
-                            D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (j * 30));
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && (int)D_00196D48 != (-1)) {
+                    for (j = 0; j < D_00196D48->count; j++) {
+                        if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
+                            collide_height = D_00196D48->hits[j].y;
+                            *(int *)D_00195AB4 = (int)(*model + D_00196D48->hits[j].face);
+                            D_00195CD8 = (int)&D_00196D48->hits[j];
                             D_00195CB8 = object;
                         }
                     }
@@ -213,12 +210,12 @@ void collide_vertical_cb(struct record *object)
         for (i = 0; object->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
-                    for (j = 0; j < *(int *)(*(char **)D_00196D48); j++) {
-                        if ((*(int *)scratch_190be4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (j * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (j * 30)) < collide_height) {
-                            collide_height = *(int *)(*(char **)D_00196D48 + 8 + (j * 30));
-                            *(int *)D_00195AB4 = (int)(*model + *(int *)(*(char **)D_00196D48 + 16 + (j * 30)));
-                            D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (j * 30));
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B28, 0)) != 0 && (int)D_00196D48 != (-1)) {
+                    for (j = 0; j < D_00196D48->count; j++) {
+                        if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
+                            collide_height = D_00196D48->hits[j].y;
+                            *(int *)D_00195AB4 = (int)(*model + D_00196D48->hits[j].face);
+                            D_00195CD8 = (int)&D_00196D48->hits[j];
                             D_00195CB8 = object;
                         }
                     }
@@ -229,16 +226,16 @@ void collide_vertical_cb(struct record *object)
         return;
     case 6:
     case 32:
-        model = (char **)RECORD_DATA(object);
+        model = &object->data.instance.model;
         if (*model == 0) return;
-        if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) == 0 || *(int *)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) == 0 || (int)D_00196D48 == (-1)) {
             return;
         }
-        for (j = 0; j < *(int *)(*(char **)D_00196D48); j++) {
-            if ((*(int *)scratch_190be4 != 0 && *(int *)(*(char **)D_00196D48 + 8 + (j * 30)) > collide_height) || *(int *)(*(char **)D_00196D48 + 8 + (j * 30)) < collide_height) {
-                collide_height = *(int *)(*(char **)D_00196D48 + 8 + (j * 30));
-                *(int *)D_00195AB4 = (int)(*model + *(int *)(*(char **)D_00196D48 + 16 + (j * 30)));
-                D_00195CD8 = (int)(*(char **)D_00196D48 + 4 + (j * 30));
+        for (j = 0; j < D_00196D48->count; j++) {
+            if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
+                collide_height = D_00196D48->hits[j].y;
+                *(int *)D_00195AB4 = (int)(*model + D_00196D48->hits[j].face);
+                D_00195CD8 = (int)&D_00196D48->hits[j];
                 D_00195CB8 = object;
             }
         }
@@ -267,10 +264,10 @@ void func_00022174(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)D_00196D48 = xn_collide_spheres_model(model, *(int *)D_00196D4C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
-                        D_00196D50 = *(int *)D_00196D48;
-                        *(int *)click_face_texture = (int)(*model + *(int *)(*(char **)D_00196D48 + 16));
-                        D_00195CD4 = *(int *)D_00196D48 + 4;
+                    if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 0)) != 0 && (int)D_00196D48 != (-1)) {
+                        D_00196D50 = (int)D_00196D48;
+                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                        D_00195CD4 = (int)D_00196D48->hits;
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
                     }
@@ -284,10 +281,10 @@ void func_00022174(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)D_00196D48 = xn_collide_spheres_model(model, *(int *)D_00196D4C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
-                        D_00196D50 = *(int *)D_00196D48;
-                        *(int *)click_face_texture = (int)(*model + *(int *)(*(char **)D_00196D48 + 16));
-                        D_00195CD4 = *(int *)D_00196D48 + 4;
+                    if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 0)) != 0 && (int)D_00196D48 != (-1)) {
+                        D_00196D50 = (int)D_00196D48;
+                        *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                        D_00195CD4 = (int)D_00196D48->hits;
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
                     }
@@ -300,7 +297,7 @@ void func_00022174(struct record *object)
         if (found_object->type != 18) goto L22468;
         character = &found_object->data.character;
         if ((character->mobile_id & 128) == 0) {
-            if (((int)(unsigned short)(*(short *)(monster_table_flags + (character->race * 29)) & 4)) == 0) goto L22468;
+            if (((int)(unsigned short)(monster_table[character->race].flags & 4)) == 0) goto L22468;
         }
         if (object->lock_level != 0) if ((object->flags & 64) == 0) goto L22468;
         if (door_start_swing(object, 0) == 0) goto L22468;
@@ -308,13 +305,13 @@ void func_00022174(struct record *object)
         return;
     case 6:
 L22468:;
-        model = (char **)RECORD_DATA(object);
+        model = &object->data.instance.model;
         if (*model != 0) {
             if (object->move_frame == *(int *)frame_counter || (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0)) {
-                if ((*(int *)D_00196D48 = xn_collide_spheres_model(model, *(int *)D_00196D4C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
-                    D_00196D50 = *(int *)D_00196D48;
-                    *(int *)click_face_texture = (int)(*model + *(int *)(*(char **)D_00196D48 + 16));
-                    D_00195CD4 = *(int *)D_00196D48 + 4;
+                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 0)) != 0 && (int)D_00196D48 != (-1)) {
+                    D_00196D50 = (int)D_00196D48;
+                    *(int *)click_face_texture = (int)(*model + D_00196D48->hits[0].face);
+                    D_00195CD4 = (int)D_00196D48->hits;
                     *(signed char *)collide_flags |= 2;
                     D_00195C70 = object;
                     D_00195C48 = object;
@@ -324,7 +321,7 @@ L22468:;
         return;
     case 18:
         if (found_object == object) return;
-        if ((*(int *)D_00196D48 = xn_collide_segment_flat_stk(&object->x, (int)D_00196B10, (int)D_00196B28, object->image, 4, 0, 0)) == 0 || *(int *)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_segment_flat_stk(&object->x, (int)D_00196B10, (int)D_00196B28, object->image, 4, 0, 0)) == 0 || (int)D_00196D48 == (-1)) {
             return;
         }
         D_00195C48 = object;
@@ -344,9 +341,9 @@ int collide_step_player(struct record *object, int unused_arg, struct move_reque
     D_00196297 = 1;
     ceiling_height = object->y - 120;
     *(int *)scratch_190be4 = 0;
-    *(int *)((char *)(*(int *)D_00196D4C = (int)request->probe)) = request->x;
-    *(int *)(*(char **)D_00196D4C + 4) = request->y;
-    *(int *)(*(char **)D_00196D4C + 8) = request->z;
+    *(int *)((char *)(*(int *)&D_00196D4C = (int)request->probe)) = request->x;
+    D_00196D4C->position.y = request->y;
+    D_00196D4C->position.z = request->z;
     *(signed char *)collide_flags &= 228;
     found_object = object;
     D_001962A0 = 0;
@@ -415,7 +412,7 @@ int collide_step_player(struct record *object, int unused_arg, struct move_reque
     }
     if (collide_height < request->y) {
         D_00196B14 = (D_00196B2C = collide_height);
-        *(int *)(*(char **)D_00196D4C + 4) = D_00196B14;
+        D_00196D4C->position.y = D_00196B14;
     }
     for (i = 0; i < collide_candidate_count; i++) {
         func_00022174(collide_candidates[i]);
@@ -501,7 +498,7 @@ void collide_gather_cb(struct record *object)
         for (i = 0; block->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)D_00196D48 = xn_collide_spheres_model(model, *(int *)D_00196D4C, 2)) == 0 && *(int *)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 2)) == 0 && (int)D_00196D48 != (-1)) {
                     collide_candidates[collide_candidate_count++] = object;
                     if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
                 }
@@ -513,7 +510,7 @@ void collide_gather_cb(struct record *object)
         for (i = 0; object->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)D_00196D48 = xn_collide_spheres_model(model, *(int *)D_00196D4C, 2)) == 0 && *(int *)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 2)) == 0 && (int)D_00196D48 != (-1)) {
                     collide_candidates[collide_candidate_count++] = object;
                     if (collide_candidate_count > 128) fatal_error((int)D_0017071B);
                 }
@@ -523,9 +520,9 @@ void collide_gather_cb(struct record *object)
     case 32:
         if ((object->flags & 256) != 0) return;
     case 6:
-        model = (char **)RECORD_DATA(object);
+        model = &object->data.instance.model;
         if (*model == 0) return;
-        if ((*(int *)D_00196D48 = xn_collide_spheres_model(model, *(int *)D_00196D4C, 2)) != 0 || *(int *)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (int)D_00196D4C, 2)) != 0 || (int)D_00196D48 == (-1)) {
             return;
         }
         collide_candidates[collide_candidate_count++] = object;
@@ -559,7 +556,7 @@ int collide_line_of_sight_cb(struct record *object)
         for (i = 0; block->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && (int)D_00196D48 != (-1)) {
                     scratch_190ce4[0] = 1;
                     return 1;
                 }
@@ -571,7 +568,7 @@ int collide_line_of_sight_cb(struct record *object)
         for (i = 0; object->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && (int)D_00196D48 != (-1)) {
                     scratch_190ce4[0] = 1;
                     return 1;
                 }
@@ -581,9 +578,9 @@ int collide_line_of_sight_cb(struct record *object)
     case 32:
         if ((object->flags & 256) != 0) break;
     case 6:
-        model = (char **)RECORD_DATA(object);
+        model = &object->data.instance.model;
         if (*model != 0) {
-            if ((*(int *)D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && *(int *)D_00196D48 != (-1)) {
+            if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (int)D_00196B10, (int)D_00196B1C, 0)) != 0 && (int)D_00196D48 != (-1)) {
                 scratch_190ce4[0] = 1;
                 return 1;
             }
@@ -672,9 +669,9 @@ int func_00023FA5(struct record *object, int unused_arg, struct move_request *re
     ceiling_height = object->y - 120;
     *(int *)scratch_190be4 = 0;
     character = &object->data.character;
-    *(int *)((char *)(*(int *)D_00196D4C = (int)request->probe)) = request->x;
-    *(int *)(*(char **)D_00196D4C + 4) = request->y;
-    *(int *)(*(char **)D_00196D4C + 8) = request->z;
+    *(int *)((char *)(*(int *)&D_00196D4C = (int)request->probe)) = request->x;
+    D_00196D4C->position.y = request->y;
+    D_00196D4C->position.z = request->z;
     *(signed char *)collide_flags &= 228;
     found_object = object;
     if (((int)player_environment) == 1) {
@@ -737,7 +734,7 @@ int func_00023FA5(struct record *object, int unused_arg, struct move_request *re
     }
     if (collide_height < request->y) {
         D_00196B14 = (D_00196B2C = collide_height);
-        *(int *)(*(char **)D_00196D4C + 4) = D_00196B14;
+        D_00196D4C->position.y = D_00196B14;
     }
     for (i = 0; i < collide_candidate_count; i++) {
         func_00022174(collide_candidates[i]);

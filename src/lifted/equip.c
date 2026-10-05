@@ -2,20 +2,18 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
+extern struct monster_template monster_table[];
 extern char D_001758B8[];
 extern char D_001758E2[];
 extern char D_001758EE[];
 extern char D_001758F8[];
 extern char D_00175927[];
 extern unsigned char player_environment;
-extern char item_templates[];
+extern struct item_template item_templates[];
 extern char potion_recipes[];
 extern char D_00180B42[];
-extern char monster_table_flags[];
 extern char item_group_templates[];
 extern char D_00185FFC[];
 extern char D_0018606B[];
@@ -376,7 +374,7 @@ void shelf_stock_items(struct record *container, int list_index, int quality)
     int index;
     unsigned char *entry;
     short *template_ids;
-    char *template;
+    struct item_template *template;
     struct item *item_data;
     struct record *item;
 
@@ -399,9 +397,9 @@ void shelf_stock_items(struct record *container, int list_index, int quality)
                     shelf_stock_books(container, quality);
                 } else {
                     while (*template_ids != (-1)) {
-                        template = item_templates + *template_ids * 48;
-                        chance = (((21 - (unsigned char)template[40]) * 5) * chance_mod) / 100;
-                        if ((unsigned char)template[40] <= quality && rand_range(1, 100) <= chance) {
+                        template = &item_templates[*template_ids];
+                        chance = (((21 - template->rarity) * 5) * chance_mod) / 100;
+                        if (template->rarity <= quality && rand_range(1, 100) <= chance) {
                             item = object_create_child(container, 0, 107);
                             item->type = 2;
                             item->x = player_object->x;
@@ -531,19 +529,19 @@ void painting_draw(void)
 {
     int i;
     int frame;
-    unsigned char *image;
+    struct image *image;
 
     mc_set_location(625, (int)D_001758B8);
     mc_sprintf((int)text_buffer, (int)D_001758E2, (((int)(unsigned short)D_00195DC4) >> 3) + 97);
     disk_read_file((int)text_buffer, *(int *)scratch_buffer);
-    image = *(unsigned char **)scratch_buffer;
+    image = *(struct image **)scratch_buffer;
     i = 0;
     frame = (int)(unsigned short)(D_00195DC4 & 7);
     while (i < frame) {
-        image = *(unsigned short *)(image + 10) + image + 12;
+        image = (struct image *)(image->data_size + (char *)image + 12);
         i++;
     }
-    xn_draw_image(160 - ((*(unsigned short *)(image + 4)) >> 1), 50, *(unsigned short *)(image + 4), *(unsigned short *)(image + 6), image + 12);
+    xn_draw_image(160 - ((image->width) >> 1), 50, image->width, image->height, image->pixels);
 }
 
 void item_info_painting(struct item *item)
@@ -926,7 +924,7 @@ void ai_creature_think(struct character *monster_char, struct record *monster, s
         if ((int)monster->parent != cell) object_reparent(cell, monster);
     }
     D_00199D74 = 0;
-    ai_monster_flags = (int)(unsigned short)*(short *)(monster_table_flags + (monster_char->race * 29));
+    ai_monster_flags = (int)(unsigned short)monster_table[monster_char->race].flags;
     monster->yaw &= ~0xF800;
     monster_ambient_sound(monster, monster_char);
     if (((int)(unsigned short)(monster_char->flags & 16384)) == 0 && monster_char->race == 29 && monster_char->health < monster_char->max_health) {
@@ -974,7 +972,7 @@ void ai_creature_think(struct character *monster_char, struct record *monster, s
         monster_char->flags |= 264;
         if (monster_char->give_up_timer == 0) monster_char->give_up_timer = 200;
         if ((reach << 2) < distance && distance < 2048 && ((int)(unsigned short)(monster_char->flags & 128)) != 0) {
-            if (((int)(unsigned short)(*(short *)(monster_table_flags + (monster_char->race * 29)) & 32)) != 0) {
+            if (((int)(unsigned short)(monster_table[monster_char->race].flags & 32)) != 0) {
                 if (angle_delta >= 128) {
                     ai_turn_toward(monster, target_angle);
                     monster_set_action(monster, target_angle, 0);

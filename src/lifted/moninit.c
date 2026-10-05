@@ -3,8 +3,8 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
+extern struct monster_template monster_table[];
 extern char D_00176844[];
-extern char monster_table_flags[];
 extern char monster_spells_imp[];
 extern char monster_spells_ghost[];
 extern char monster_spells_orc_shaman[];
@@ -99,7 +99,7 @@ void monster_init_gear(struct record *monster)
     monster_char = &monster->data.character;
     if (monster_char->race >= 43) {
         monster_give_equipment(monster, monster_char, rand() & 1);
-        if (((int)(unsigned short)(*(short *)(monster_table_flags + (monster_char->race * 29)) & 2)) != 0) {
+        if (((int)(unsigned short)(monster_table[monster_char->race].flags & 2)) != 0) {
             list_index = monster_char->level / 3;
             if (list_index > 6) list_index = 6;
             monster_give_spells(monster, (char *)monster_class_spell_lists[list_index]);

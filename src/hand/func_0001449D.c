@@ -1,10 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001449D */
 #include "records.h"
 
-#pragma pack(1)
-struct P { int x; int y; int z; };
 extern struct record *player_object;
-extern struct P D_00120288;
+extern struct vec3 D_00120288;
 extern void object_set_position(struct record *, int, int, int, int, int, int);
 
 void player_move_by_xn_vector(void)

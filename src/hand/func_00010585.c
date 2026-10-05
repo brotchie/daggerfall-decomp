@@ -4,7 +4,6 @@
 struct bits8 {
     unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1;
 };
-struct w6 { char pad[6]; unsigned short f6; };
 struct nib { unsigned char lo:4; };
 extern unsigned char mouse_buttons;
 extern char D_00170077[];
@@ -25,7 +24,7 @@ extern int frame_ticks;
 extern int clothing_gender_group;
 extern int creature_count;
 extern int clothing_gender_offset;
-extern struct w6 *hud_bar_image;
+extern struct image *hud_bar_image;
 extern struct character *player_character;
 extern struct career *player_class;
 extern unsigned int game_minutes;
@@ -109,7 +108,7 @@ void player_frame_update(void)
             rnd = 0;
         else
             rnd = (*(unsigned int *)0x46c >> 1) & 3;
-        xn_draw_cif_rle_frame(sound, rnd, (game_settings->view_flags & 1) ? hud_bar_image->f6 : 0, 0);
+        xn_draw_cif_rle_frame(sound, rnd, (game_settings->view_flags & 1) ? hud_bar_image->height : 0, 0);
     }
     player_base_speed = (speed * frame_ticks) / 1000;
     if (player_character->flags & 1) {

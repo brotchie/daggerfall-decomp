@@ -1,14 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007B0FC */
-#pragma pack(1)
-struct find_t {
-    char reserved[21];
-    char attrib;
-    unsigned short wr_time;
-    unsigned short wr_date;
-    unsigned long size;
-    char name[13];
-};
-#pragma pack()
+#include <dos.h>
 extern char *D_00147954;
 extern char D_00176884[];
 extern char D_001768DF[];

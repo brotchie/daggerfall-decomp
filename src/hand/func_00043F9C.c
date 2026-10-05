@@ -1,7 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00043F9C */
 #include "records.h"
 
-struct button { short x1, y1, x2, y2; int (*fn)(int); };
 extern char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -9,7 +8,7 @@ extern char D_00170EE8[];
 extern char D_00170F2D[];
 extern char D_00170F3A[];
 extern char D_00170F47[];
-extern struct button options_mouse_buttons[];
+extern struct rect options_mouse_buttons[];
 extern struct record *player_object;
 extern int D_00195B5C;
 extern int D_00195B60;
@@ -45,9 +44,9 @@ int options_mouse_screen(void)
         cursor_draw_arrow();
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
             for (button = 0; button < 7; button++) {
-                if (mouse_x > options_mouse_buttons[button].x1 && mouse_x < options_mouse_buttons[button].x2 && mouse_y > options_mouse_buttons[button].y1 && mouse_y < options_mouse_buttons[button].y2) {
+                if (mouse_x > options_mouse_buttons[button].x0 && mouse_x < options_mouse_buttons[button].x1 && mouse_y > options_mouse_buttons[button].y0 && mouse_y < options_mouse_buttons[button].y1) {
                     sound_play(203, player_object, 100);
-                    done = options_mouse_buttons[button].fn(button);
+                    done = options_mouse_buttons[button].handler(button);
                 }
             }
         }

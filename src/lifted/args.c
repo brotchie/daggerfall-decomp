@@ -2,10 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
-struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 extern int D_000C5404;
 extern int xn_sin_table[];
 extern int xn_cos_table[];
@@ -83,7 +81,7 @@ extern int rmb_origin_z;
 extern int rmb_origin_y;
 extern int rmb_origin_x;
 extern char rmb_origin_yaw[];
-extern char rmb_record_ptr[];
+extern struct block *rmb_record_ptr;
 extern struct record *D_00196DB0;
 extern char cfg_block_str[];
 extern char cfg_mapsave_file[];
@@ -335,7 +333,7 @@ void rotate_xz(int *px, int *pz, int yaw)
 
 int automap_draw_object_cb(struct record *object)
 {
-    int instance;
+    struct model_instance *instance;
     struct block *block;
     struct block_flat *flats;
     struct block_model *model;
@@ -382,23 +380,23 @@ int automap_draw_object_cb(struct record *object)
     case 6:
     case 32:
         if (object->image2 == 0) break;
-        instance = (int)RECORD_DATA(object);
-        *(int *)((char *)instance) = model_get(object->image2, object->image, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-        if (*(int *)((char *)instance) != 0) {
-            *(int *)((char *)instance + 32) = object->x;
-            *(int *)((char *)instance + 36) = object->y;
-            *(int *)((char *)instance + 40) = object->z;
+        instance = &object->data.instance;
+        instance->model = (char *)model_get(object->image2, object->image, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
+        if (instance->model != 0) {
+            instance->x = object->x;
+            instance->y = object->y;
+            instance->z = object->z;
             if (object->image2 == 998) {
                 if (weapon_arrow_update(object) == 0) break;
                 weapon_missile_orient(object);
-                *(int *)((char *)instance + 44) = object->missile_yaw;
-                *(int *)((char *)instance + 48) = object->angle_z;
-                *(int *)((char *)instance + 52) = 0;
+                instance->missile_angles[0] = object->missile_yaw;
+                instance->missile_angles[1] = object->angle_z;
+                instance->missile_angles[2] = 0;
             } else if (object->link_flag != 255) {
-                xn_model_set_angles_yaw_offset(instance + 12, object->wait_state);
+                xn_model_set_angles_yaw_offset(instance->angles, object->wait_state);
             } else {
                 if (object->image2 == 610 && object->image == 32) D_000C5404 = 3;
-                xn_model_compose_angles(instance + 12, object->angle_x, object->yaw + object->wait_state, object->angle_z);
+                xn_model_compose_angles(instance->angles, object->angle_x, object->yaw + object->wait_state, object->angle_z);
             }
             xn_model_submit(instance, 0);
         }
@@ -432,10 +430,10 @@ void rmb_add_doors(struct record *parent, struct block_door *door)
     struct record *object;
     int i;
 
-    if (*(signed char *)(*(char **)rmb_record_ptr + 4) == 0) return;
-    for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) > i; i++, door++) {
+    if (rmb_record_ptr->door_count == 0) return;
+    for (i = 0; rmb_record_ptr->door_count > i; i++, door++) {
         object = rmb_make_door(parent, door->image2, (int)(short)((unsigned short)door->image), 1);
-        xn_model_set_angles(0, (door->yaw + *(int *)rmb_origin_yaw) % 2048, 0, (int)RECORD_DATA(object) + 12);
+        xn_model_set_angles(0, (door->yaw + *(int *)rmb_origin_yaw) % 2048, 0, (int)object->data.instance.angles);
         object->lock_level = (unsigned short)door->lock_level;
         rotate_xz(&door->x, &door->z, *(int *)rmb_origin_yaw);
         door->x += rmb_origin_x;
@@ -452,8 +450,8 @@ void rmb_add_people(struct record *parent, struct block_flat *person)
     struct record *object;
     int i;
 
-    if (*(signed char *)(*(char **)rmb_record_ptr + 3) == 0) return;
-    for (i = 0; ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) > i; i++, person++) {
+    if (rmb_record_ptr->people_count == 0) return;
+    for (i = 0; rmb_record_ptr->people_count > i; i++, person++) {
         object = rmb_make_flat(parent, (int)(short)person->image, (int)(short)person->faction_id, 0);
         rotate_xz(&person->x, &person->z, *(int *)rmb_origin_yaw);
         person->x += rmb_origin_x;

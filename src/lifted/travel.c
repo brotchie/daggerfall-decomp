@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -32,16 +32,8 @@ extern signed char location_type_dot_colour[];
 extern signed char location_type_category[];
 extern short D_00188790[];
 extern short D_00188798[];
-extern char travel_bar_buttons[];
-extern char D_001887A2[];
-extern char D_001887A4[];
-extern char D_001887A6[];
-extern char D_001887A8[];
-extern char travel_popup_buttons[];
-extern char D_001887F6[];
-extern char D_001887F8[];
-extern char D_001887FA[];
-extern char D_001887FC[];
+extern struct rect travel_bar_buttons[];
+extern struct rect travel_popup_buttons[];
 extern char region_map_origins[];
 extern char D_0018889A[];
 extern char D_00188994[];
@@ -65,7 +57,7 @@ extern char D_00190FE8[];
 extern struct record *player_entity;
 extern struct record *player_object;
 extern char cheat_flags[];
-extern char D_00195B5C[];
+extern struct image *D_00195B5C;
 extern struct character *player_character;
 extern int window_image;
 extern char scratch_buffer[];
@@ -82,16 +74,16 @@ extern int town_building_counter;
 extern int region_location_count;
 extern char *D_00196A7C;
 extern struct map_location *region_locations;
-extern char D_001AA64C[];
-extern char D_001AA650[];
-extern char D_001AA654[];
-extern char D_001AA658[];
+extern struct image *D_001AA64C;
+extern struct image *D_001AA650;
+extern struct image *D_001AA654;
+extern struct image *D_001AA658;
 extern char D_001AA65C[];
 extern int D_001AA660;
 extern int D_001AA664;
-extern char D_001AA668[];
+extern struct image *D_001AA668;
 extern int D_001AA66C;
-extern char D_001AA670[];
+extern struct image *D_001AA670;
 extern int travel_ocean_pixels;
 extern int D_001AA678;
 extern int D_001AA67C;
@@ -186,22 +178,22 @@ void travel_map_update(void)
     travel_draw_buttons();
     if (scratch_190ce4[0] != 0) {
         if (D_00190CE8 != 0) {
-            func_0009D5AC(*(char **)&screen_buffer + 3840, *(char **)D_001AA668 + 12, 51200);
+            func_0009D5AC(*(char **)&screen_buffer + 3840, D_001AA668->pixels, 51200);
         } else {
-            mc_memcpy((int)(*(char **)&screen_buffer + 3840), (int)&*(signed char *)(*(char **)D_001AA668 + 12), 51200, (int)D_0017743D, 208, 4);
-            xn_draw_image_transparent((int)(unsigned short)*(short *)(*(char **)D_001AA670), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA670 + 6), (int)(*(char **)D_001AA670 + 12));
+            mc_memcpy((int)(*(char **)&screen_buffer + 3840), (int)D_001AA668->pixels, 51200, (int)D_0017743D, 208, 4);
+            xn_draw_image_transparent(D_001AA670->x, D_001AA670->y, D_001AA670->width, D_001AA670->height, (int)D_001AA670->pixels);
         }
         if (((int)(unsigned char)D_001AA6A4) > 1) {
             if (((int)(unsigned char)(D_001AA6A5 & 1)) == 0) {
-                xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA654), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA654 + 6), (int)(*(char **)D_001AA654 + 12));
+                xn_draw_image(D_001AA654->x, D_001AA654->y, D_001AA654->width, D_001AA654->height, (int)D_001AA654->pixels);
             } else {
-                xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA658), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA658 + 6), (int)(*(char **)D_001AA658 + 12));
+                xn_draw_image(D_001AA658->x, D_001AA658->y, D_001AA658->width, D_001AA658->height, (int)D_001AA658->pixels);
             }
             if (((int)(unsigned char)D_001AA6A4) > 2) {
                 if (((int)(unsigned char)(D_001AA6A5 & 2)) == 0) {
-                    xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA64C), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA64C + 6), (int)(*(char **)D_001AA64C + 12));
+                    xn_draw_image(D_001AA64C->x, D_001AA64C->y, D_001AA64C->width, D_001AA64C->height, (int)D_001AA64C->pixels);
                 } else {
-                    xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_001AA650), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 2), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 4), (int)(unsigned short)*(short *)(*(char **)D_001AA650 + 6), (int)(*(char **)D_001AA650 + 12));
+                    xn_draw_image(D_001AA650->x, D_001AA650->y, D_001AA650->width, D_001AA650->height, (int)D_001AA650->pixels);
                 }
             }
         }
@@ -291,8 +283,8 @@ void travel_map_update(void)
             first_button = 0;
         }
         for (i = 0; i < 10; i++) {
-            if (mouse_x > *(short *)(travel_popup_buttons + (i * 12)) && mouse_x < *(short *)(D_001887F8 + (i * 12)) && mouse_y > *(short *)(D_001887F6 + (i * 12)) && mouse_y < *(short *)(D_001887FA + (i * 12))) {
-                ((int (*)())(*(int *)(D_001887FC + (i * 12))))(i);
+            if (mouse_x > travel_popup_buttons[i].x0 && mouse_x < travel_popup_buttons[i].x1 && mouse_y > travel_popup_buttons[i].y0 && mouse_y < travel_popup_buttons[i].y1) {
+                travel_popup_buttons[i].handler(i);
             }
         }
         return;
@@ -305,8 +297,8 @@ void travel_map_update(void)
         return;
     }
     for (i = 0; i < 7; i++) {
-        if (mouse_x > *(short *)(travel_bar_buttons + (i * 12)) && mouse_x < *(short *)(D_001887A4 + (i * 12)) && mouse_y > *(short *)(D_001887A2 + (i * 12)) && mouse_y < *(short *)(D_001887A6 + (i * 12))) {
-            ((int (*)())(*(int *)(D_001887A8 + (i * 12))))(i);
+        if (mouse_x > travel_bar_buttons[i].x0 && mouse_x < travel_bar_buttons[i].x1 && mouse_y > travel_bar_buttons[i].y0 && mouse_y < travel_bar_buttons[i].y1) {
+            travel_bar_buttons[i].handler(i);
         }
     }
 }
@@ -341,29 +333,29 @@ void travel_button_exit(int button)
         mc_free(D_001AA66C, (int)D_0017743D, 382);
         D_001AA66C = -1751672937;
     }
-    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
-        mc_free(*(int *)D_00195B5C, (int)D_0017743D, 383);
-        *(int *)D_00195B5C = -1751672937;
+    if ((int)D_00195B5C != 0 && (int)D_00195B5C != (-1751672937)) {
+        mc_free((int)D_00195B5C, (int)D_0017743D, 383);
+        D_00195B5C = (struct image *)-1751672937;
     }
-    if (*(int *)D_001AA670 != 0 && *(int *)D_001AA670 != (-1751672937)) {
-        mc_free(*(int *)D_001AA670, (int)D_0017743D, 384);
-        *(int *)D_001AA670 = -1751672937;
+    if ((int)D_001AA670 != 0 && (int)D_001AA670 != (-1751672937)) {
+        mc_free((int)D_001AA670, (int)D_0017743D, 384);
+        D_001AA670 = (struct image *)-1751672937;
     }
-    if (*(int *)D_001AA64C != 0 && *(int *)D_001AA64C != (-1751672937)) {
-        mc_free(*(int *)D_001AA64C, (int)D_0017743D, 385);
-        *(int *)D_001AA64C = -1751672937;
+    if ((int)D_001AA64C != 0 && (int)D_001AA64C != (-1751672937)) {
+        mc_free((int)D_001AA64C, (int)D_0017743D, 385);
+        D_001AA64C = (struct image *)-1751672937;
     }
-    if (*(int *)D_001AA650 != 0 && *(int *)D_001AA650 != (-1751672937)) {
-        mc_free(*(int *)D_001AA650, (int)D_0017743D, 386);
-        *(int *)D_001AA650 = -1751672937;
+    if ((int)D_001AA650 != 0 && (int)D_001AA650 != (-1751672937)) {
+        mc_free((int)D_001AA650, (int)D_0017743D, 386);
+        D_001AA650 = (struct image *)-1751672937;
     }
-    if (*(int *)D_001AA654 != 0 && *(int *)D_001AA654 != (-1751672937)) {
-        mc_free(*(int *)D_001AA654, (int)D_0017743D, 387);
-        *(int *)D_001AA654 = -1751672937;
+    if ((int)D_001AA654 != 0 && (int)D_001AA654 != (-1751672937)) {
+        mc_free((int)D_001AA654, (int)D_0017743D, 387);
+        D_001AA654 = (struct image *)-1751672937;
     }
-    if (*(int *)D_001AA658 != 0 && *(int *)D_001AA658 != (-1751672937)) {
-        mc_free(*(int *)D_001AA658, (int)D_0017743D, 388);
-        *(int *)D_001AA658 = -1751672937;
+    if ((int)D_001AA658 != 0 && (int)D_001AA658 != (-1751672937)) {
+        mc_free((int)D_001AA658, (int)D_0017743D, 388);
+        D_001AA658 = (struct image *)-1751672937;
     }
     if (*(int *)D_001AA65C != 0 && *(int *)D_001AA65C != (-1751672937)) {
         mc_free(*(int *)D_001AA65C, (int)D_0017743D, 389);
@@ -373,9 +365,9 @@ void travel_button_exit(int button)
         mc_free(D_001AA660, (int)D_0017743D, 390);
         D_001AA660 = -1751672937;
     }
-    if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
-        mc_free(*(int *)D_001AA668, (int)D_0017743D, 392);
-        *(int *)D_001AA668 = -1751672937;
+    if ((int)D_001AA668 != 0 && (int)D_001AA668 != (-1751672937)) {
+        mc_free((int)D_001AA668, (int)D_0017743D, 392);
+        D_001AA668 = (struct image *)-1751672937;
     }
     game_mode = 0;
     D_00196272 = 0;
@@ -431,17 +423,17 @@ void travel_open_region(int region)
         region_load_location_names(region);
         travel_load_region_part();
     } else {
-        if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
-            mc_free(*(int *)D_001AA668, (int)D_0017743D, 460);
-            *(int *)D_001AA668 = -1751672937;
+        if ((int)D_001AA668 != 0 && (int)D_001AA668 != (-1751672937)) {
+            mc_free((int)D_001AA668, (int)D_0017743D, 460);
+            D_001AA668 = (struct image *)-1751672937;
         }
         mc_set_location(461, (int)D_0017743D);
         mc_sprintf((int)text_buffer, (int)D_00177446, region);
-        *(int *)D_001AA668 = disk_read_file((int)text_buffer, 0);
+        D_001AA668 = (struct image *)disk_read_file((int)text_buffer, 0);
         maploads_load_region(region);
         region_load_location_names(region);
         saved_screen = screen_buffer;
-        screen_buffer = *(int *)D_001AA668;
+        screen_buffer = (int)D_001AA668;
         travel_draw_locations();
         screen_buffer = saved_screen;
     }
@@ -561,10 +553,10 @@ void travel_button_map(void)
 
 void func_0009BE38(void)
 {
-    if (*(int *)D_001AA668 != 0) {
-        if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
-            mc_free(*(int *)D_001AA668, (int)D_0017743D, 605);
-            *(int *)D_001AA668 = -1751672937;
+    if ((int)D_001AA668 != 0) {
+        if ((int)D_001AA668 != 0 && (int)D_001AA668 != (-1751672937)) {
+            mc_free((int)D_001AA668, (int)D_0017743D, 605);
+            D_001AA668 = (struct image *)-1751672937;
         }
         *(int *)D_001AA688 = -1;
     }
@@ -829,15 +821,15 @@ void travel_load_region_part(void)
 {
     int saved_screen;
 
-    if (*(int *)D_001AA668 != 0 && *(int *)D_001AA668 != (-1751672937)) {
-        mc_free(*(int *)D_001AA668, (int)D_0017743D, 1119);
-        *(int *)D_001AA668 = -1751672937;
+    if ((int)D_001AA668 != 0 && (int)D_001AA668 != (-1751672937)) {
+        mc_free((int)D_001AA668, (int)D_0017743D, 1119);
+        D_001AA668 = (struct image *)-1751672937;
     }
     mc_set_location(1121, (int)D_0017743D);
     mc_sprintf((int)text_buffer, (int)D_00177493, ((int)(unsigned char)D_001AA6A5) + 97, ((int)(signed char)scratch_190ce4[0]) - 1);
-    *(int *)D_001AA668 = disk_read_file((int)text_buffer, 0);
+    D_001AA668 = (struct image *)disk_read_file((int)text_buffer, 0);
     saved_screen = screen_buffer;
-    screen_buffer = *(int *)D_001AA668;
+    screen_buffer = (int)D_001AA668;
     travel_draw_locations();
     screen_buffer = saved_screen;
 }
@@ -920,9 +912,9 @@ void travel_draw_buttons(void)
     int width;
 
     if (scratch_190ce4[0] != 0) {
-        xn_draw_image(3, 175, 45, 22, *(int *)D_00195B5C);
+        xn_draw_image(3, 175, 45, 22, (int)D_00195B5C);
     } else {
-        xn_draw_image(3, 186, 45, 11, *(int *)D_00195B5C + 495);
+        xn_draw_image(3, 186, 45, 11, (int)D_00195B5C + 495);
     }
     for (i = 0; i < 4; i++) {
         frame = 1;

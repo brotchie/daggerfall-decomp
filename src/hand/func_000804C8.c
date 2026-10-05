@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000804C8 */
+#include "structs.h"
 struct bits { unsigned char b0:1; unsigned char b1:1; unsigned char b2:1; };
-struct rec { char pad[4]; unsigned short w; unsigned short h; char pad2[2]; unsigned short len; };
 extern short mouse_x;
 extern short mouse_y;
 extern struct bits D_001940D4;
@@ -14,7 +14,7 @@ extern void xn_draw_image_transparent(int, int, int, int, char *);
 
 void cursor_draw(short region)
 {
-    char *p;
+    struct image *p;
     int unused1, unused2, unused3, unused4, unused5;   /* unused, but they have slots */
     char unused6;
 
@@ -28,8 +28,8 @@ void cursor_draw(short region)
         cursor_draw_arrow();
         return;
     }
-    p = cursor_region_images;
+    p = (struct image *)cursor_region_images;
     while (region-- != 0)
-        p = p + ((struct rec *)p)->len + 12;
-    xn_draw_image_transparent(mouse_x, mouse_y, ((struct rec *)p)->w, ((struct rec *)p)->h, p + 12);
+        p = (struct image *)((char *)p + p->data_size + 12);
+    xn_draw_image_transparent(mouse_x, mouse_y, p->width, p->height, p->pixels);
 }

@@ -1,16 +1,15 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00038911 */
 #include "records.h"
+#include "bitfield.h"
 
 #pragma pack(1)
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct Box { short x0; short y0; short x1; short y1; void (*fn)(); };
 extern unsigned char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
 extern struct spell *selected_spell;
 extern unsigned char spell_effect_school[];
 extern unsigned char spell_effect_cost_formula[];
-extern struct Box spellmaker_setting_buttons[];
+extern struct rect spellmaker_setting_buttons[];
 extern unsigned char magic_school_skills[];
 extern signed char text_buffer[];
 extern unsigned char D_001940D5;
@@ -73,7 +72,7 @@ void spellmaker_settings_update(void)
                 if (r < 3 && (int)(unsigned char)(spellmaker_settings_kind & 1) != 0
                   || r < 6 && (int)(unsigned char)(spellmaker_settings_kind & 2) != 0
                   || (int)(unsigned char)(spellmaker_settings_kind & 4) != 0)
-                    spellmaker_setting_buttons[i % 11].fn(mouse_motion_y);
+                    spellmaker_setting_buttons[i % 11].handler(mouse_motion_y);
                 goto done;
             }
         }
@@ -99,7 +98,7 @@ void spellmaker_settings_update(void)
             if (D_0019962A < 3 && (int)(unsigned char)(spellmaker_settings_kind & 1) != 0
               || D_0019962A < 6 && (int)(unsigned char)(spellmaker_settings_kind & 2) != 0
               || (int)(unsigned char)(spellmaker_settings_kind & 4) != 0)
-                spellmaker_setting_buttons[D_0019962A].fn(D_00199628 / 30);
+                spellmaker_setting_buttons[D_0019962A].handler(D_00199628 / 30);
             D_00199628 = 0;
         }
     }

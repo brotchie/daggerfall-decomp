@@ -1,27 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000122F1 */
+#include "structs.h"
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_set_number;
-struct res {                /* a file loaded whole into memory */
-    unsigned char flags0;
-    unsigned char flags1;
-    char pad2[2];
-    char name[128];
-    char *buf;              /* 0x84 */
-    int size;               /* 0x88 */
-    int bufsize;            /* 0x8c */
-    char *pos;              /* 0x90 */
-    int f94;
-    int f98;
-    int f9c;
-    char *line;             /* 0xa0 */
-    char *next;             /* 0xa4 */
-};
 extern char D_00170129[];        /* __FILE__ */
 extern char *itoa(int, signed char *, int);       /* itoa */
 extern unsigned strlen(signed char *);              /* strlen */
 extern void mc_memmove(char *, char *, int, char *, int, int);
 
-int profile_set_number(struct res *r, int value)
+int profile_set_number(struct profile *r, int value)
 {
     signed char buf[32];
     char *p;
@@ -31,9 +17,9 @@ int profile_set_number(struct res *r, int value)
     unsigned len;
     int cnt;
 
-    if (r->line == 0)
+    if (r->value == 0)
         return 0;
-    p = r->line;
+    p = r->value;
     while (*p == ' ')
         p++;
     q = p;
@@ -47,19 +33,19 @@ int profile_set_number(struct res *r, int value)
         itoa(value, buf, 10);
     len = strlen(buf);
     if (len < n) {
-        cnt = (r->buf + r->size) - q - (n - len);
+        cnt = (r->buffer + r->length) - q - (n - len);
         mc_memmove(q, q + (n - len), cnt, D_00170129, 768, 4);
-        r->size -= n - len;
+        r->length -= n - len;
     } else if (len > n) {
-        if ((len - n) + r->size > r->bufsize)
+        if ((len - n) + r->length > r->capacity)
             return 0;
-        cnt = (r->buf + r->size) - q + (len - n);
+        cnt = (r->buffer + r->length) - q + (len - n);
         mc_memmove(q + (len - n), q, cnt, D_00170129, 786, 4);
-        r->size += len - n;
+        r->length += len - n;
     }
     i = 0;
     while (buf[i] != 0)
         *q++ = buf[i++];
-    r->flags1 |= 128;
+    r->flags |= 128;
     return 1;
 }

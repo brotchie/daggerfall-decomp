@@ -2,11 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -18,11 +15,7 @@ extern char D_00170DEF[];
 extern char D_00170E11[];
 extern char D_00170E17[];
 extern struct spell *selected_spell;
-extern char spellbook_buttons[];
-extern char D_0017B6D2[];
-extern char D_0017B6D4[];
-extern char D_0017B6D6[];
-extern char D_0017B6D8[];
+extern struct rect spellbook_buttons[];
 extern char spell_effect_names[];
 extern char spell_effect_subtype_names[];
 extern char D_0018320A[];
@@ -188,9 +181,9 @@ void spellbook_frame(void)
     }
     *(int *)&button = 0;
     for (; ((int)(short)button) < 9; (*(int *)&button)++) {
-        if (mouse_x > *(short *)(spellbook_buttons + (((int)(short)button) * 12)) && mouse_x < *(short *)(D_0017B6D4 + (((int)(short)button) * 12)) && mouse_y > *(short *)(D_0017B6D2 + (((int)(short)button) * 12)) && mouse_y < *(short *)(D_0017B6D6 + (((int)(short)button) * 12))) {
+        if (mouse_x > spellbook_buttons[(int)(short)button].x0 && mouse_x < spellbook_buttons[(int)(short)button].x1 && mouse_y > spellbook_buttons[(int)(short)button].y0 && mouse_y < spellbook_buttons[(int)(short)button].y1) {
             sound_play(205, player_object, 100);
-            ((int (*)())(*(int *)(D_0017B6D8 + (((int)(short)button) * 12))))();
+            spellbook_buttons[(int)(short)button].handler();
         }
     }
 }

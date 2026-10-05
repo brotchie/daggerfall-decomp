@@ -2,13 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern int xn_snow_turn_shift;
 extern short xn_cam_centre_x;
 extern short xn_cam_centre_y;
@@ -27,16 +22,10 @@ extern short D_001789FD;
 extern short D_001789FF;
 extern short player_speed;
 extern int D_001845C8;
-extern char D_00187B6E[];
-extern char D_00187BB8[];
-extern char D_00187C12[];
-extern int D_00187C86;
-extern int D_00187C8A;
-extern int D_00187C8E;
-extern int D_00187C92;
-extern int D_00187C96;
-extern int D_00187C9A;
-extern int D_00187C9E;
+extern struct collide_probe D_00187B6E;
+extern struct collide_probe D_00187BB8;
+extern struct collide_probe D_00187C12;
+extern struct move_request D_00187C86;   /* the player's move */
 extern int player_momentum;
 extern signed char D_00187CA8;
 extern signed char D_001940D4;
@@ -112,8 +101,8 @@ extern short D_001A5B30;
 extern short steer_key_region;
 extern signed char D_001A5B34;
 
-extern int engine_pick_object(int, int, int);
-extern int collide_move_player(struct record *, int, int, int);
+extern int engine_pick_object(int, int, struct pick_result *);
+extern int collide_move_player(struct record *, int, struct move_request *, int);
 extern int damage_apply(struct record *, int, int);
 extern int key_action_held(int);
 extern int key_action_pressed(int);
@@ -149,7 +138,7 @@ extern void cast_fire_missile(int);
 extern void links_trigger(int, int);
 extern void sound_stop_channel(int);
 extern void fatigue_add(int);
-extern void click_world_object(int, int);
+extern void click_world_object(struct pick_result *, struct record *);
 extern void func_0007EED8(void);
 extern void cursor_draw(short);
 extern void player_mouse_look(void);
@@ -320,23 +309,23 @@ void steer_slide_right(void)
 void click_activate(int at_view_centre)
 {
     {
-        char pick[20];
+        struct pick_result pick;
 
         if (D_00187CA8 == 0) return;
         if (at_view_centre == 0) {
             if (((int)(unsigned char)mouse_control_mode) == 1 && view_cursor_active != 0) {
-                engine_pick_object((int)(short)mouse_x, (int)(short)mouse_y, (int)pick);
+                engine_pick_object((int)(short)mouse_x, (int)(short)mouse_y, &pick);
             } else {
-                engine_pick_object(((int)(short)mouse_x) + 6, (int)&*(signed char *)((char *)((int)(short)mouse_y) + 6), (int)pick);
+                engine_pick_object(((int)(short)mouse_x) + 6, (int)&*(signed char *)((char *)((int)(short)mouse_y) + 6), &pick);
             }
         } else {
             mouse_x = xn_cam_centre_x;
             mouse_y = xn_cam_centre_y;
-            engine_pick_object((int)(short)xn_cam_centre_x, (int)(short)xn_cam_centre_y, (int)pick);
+            engine_pick_object((int)(short)xn_cam_centre_x, (int)(short)xn_cam_centre_y, &pick);
         }
-        if ((*(int *)pick & 1) != 0) {
+        if ((pick.flags & 1) != 0) {
             if (((int)(unsigned char)mouse_control_mode) == 1) {}
-            click_world_object((int)pick, *(int *)((char *)pick + 4));
+            click_world_object(&pick, pick.object);
             return;
         }
         if ((int)spell_ready_missile == 0) return;
@@ -733,22 +722,22 @@ int player_climb_probe(void)
     z += D_001A5A60;
     D_001A5A64 = x & 31;
     D_001A5A60 = z & 31;
-    D_00187C86 = x / 32;
-    D_00187C8A = player_object->y - 32;
-    D_00187C8E = z / 32;
-    D_00187C92 = player_object->angle_x;
-    D_00187C96 = player_object->yaw;
-    D_00187C9A = player_object->angle_z;
+    D_00187C86.x = x / 32;
+    D_00187C86.y = player_object->y - 32;
+    D_00187C86.z = z / 32;
+    D_00187C86.angle_x = player_object->angle_x;
+    D_00187C86.yaw = player_object->yaw;
+    D_00187C86.angle_z = player_object->angle_z;
     if (((struct bf8_2_1 *)&player_motion_flags)->f != 0) {
-        shape = (int)D_00187C12;
+        shape = (int)&D_00187C12;
     } else {
-        shape = (int)D_00187B6E;
+        shape = (int)&D_00187B6E;
     }
-    D_00187C9E = shape;
-    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) D_00187C9E = (int)D_00187BB8;
+    D_00187C86.probe = (struct collide_probe *)shape;
+    if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) D_00187C86.probe = &D_00187BB8;
     *(signed char *)collide_flags |= 4;
     player_motion_flags &= 223;
-    result = collide_move_player(player_object, 0, (int)&D_00187C86, 1);
+    result = collide_move_player(player_object, 0, &D_00187C86, 1);
     return result;
 }
 

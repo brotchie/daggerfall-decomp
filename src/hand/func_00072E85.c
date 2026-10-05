@@ -1,9 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00072E85 */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern int xn_anim_ticks;
 extern char D_00176184[];
 extern short cast_anim_state;
@@ -16,7 +14,7 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern int frame_ticks;
 extern struct record *spell_ready_missile;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern int D_00195B80;
 extern struct character *player_character;
 extern struct settings *game_settings;
@@ -73,7 +71,7 @@ void weapon_player_update(void)
         if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
             bar_height = 0;
         } else {
-            bar_height = (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6);
+            bar_height = hud_bar_image->height;
         }
         xn_draw_img_masked_remap(cif, -bar_height);
     }
@@ -89,9 +87,9 @@ void weapon_player_update(void)
     if (D_001A4A50[0] > 0) D_001A4A50[0] -= frame_ticks;
     if (D_001A4A54 > 0) D_001A4A54 -= frame_ticks;
     if (*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0) {
-        xn_draw_cif_rle_frame(xn_img_cif_group(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
+        xn_draw_cif_rle_frame(xn_img_cif_group(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
     } else {
-        xn_draw_cif_rle_frame(xn_img_cif_group(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), 5 - D_001A4A70[((int)(unsigned char)weapon_active_hand)], ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
+        xn_draw_cif_rle_frame(xn_img_cif_group(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), 5 - D_001A4A70[((int)(unsigned char)weapon_active_hand)], ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
     }
     if (D_001A4A50[((int)(unsigned char)weapon_active_hand)] <= 0) {
         D_001A4A50[((int)(unsigned char)weapon_active_hand)] = (115 - player_character->attributes[6]) * 3;

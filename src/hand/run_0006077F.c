@@ -1,20 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of equip.c from 0x00060430 to 0x0006077F, kept together for its switch table's alignment */
 #include "records.h"
 
-struct pair {
-    unsigned char a;
-    unsigned char b;
-};
-struct magic_template {
-    char name[32];              /* 0x00 */
-    unsigned char artifact;         /* 0x20 */
-    unsigned char group;          /* 0x21 */
-    unsigned char group_index;          /* 0x22 */
-    struct pair pairs[10];      /* 0x23 */
-    short condition;                  /* 0x37 */
-    int value;                    /* 0x39 */
-    unsigned char material;          /* 0x3d */
-};
 extern char D_001758B8[];        /* __FILE__ */
 extern unsigned char D_001865CA[];
 extern unsigned char D_00186634[];
@@ -75,14 +61,14 @@ void item_make_magic(struct item *item, int which)
     while (item->group == 3 && item->index == 18);
     mc_strncpy(item->name, magic_def[i].name, 32, D_001758B8, 1039);
     for (j = 0; j < 10; j++) {
-        if (magic_def[i].pairs[j].a == 255)
+        if (magic_def[i].enchantments[j].type == 255)
             break;
-        if (magic_def[i].pairs[j].b == 255) {
-            item->enchantments[j].type = magic_def[i].pairs[j].a;
+        if (magic_def[i].enchantments[j].param == 255) {
+            item->enchantments[j].type = magic_def[i].enchantments[j].type;
             item->enchantments[j].param = 0xffff;
         } else {
-            item->enchantments[j].type = magic_def[i].pairs[j].a;
-            item->enchantments[j].param = magic_def[i].pairs[j].b;
+            item->enchantments[j].type = magic_def[i].enchantments[j].type;
+            item->enchantments[j].param = magic_def[i].enchantments[j].param;
         }
     }
     item->condition = item->max_condition = magic_def[i].condition;
@@ -125,14 +111,14 @@ void item_make_artifact(struct item *item, int which)
     item_make(magic_def[i].group, magic_def[i].group_index, item);
     mc_strncpy(item->name, magic_def[i].name, 32, D_001758B8, 1094);
     for (j = 0; j < 10; j++) {
-        if (magic_def[i].pairs[j].a == 255)
+        if (magic_def[i].enchantments[j].type == 255)
             break;
-        if (magic_def[i].pairs[j].b == 255) {
-            item->enchantments[j].type = magic_def[i].pairs[j].a;
+        if (magic_def[i].enchantments[j].param == 255) {
+            item->enchantments[j].type = magic_def[i].enchantments[j].type;
             item->enchantments[j].param = 0xffff;
         } else {
-            item->enchantments[j].type = magic_def[i].pairs[j].a;
-            item->enchantments[j].param = magic_def[i].pairs[j].b;
+            item->enchantments[j].type = magic_def[i].enchantments[j].type;
+            item->enchantments[j].param = magic_def[i].enchantments[j].param;
         }
     }
     item->condition = item->max_condition = magic_def[i].condition;

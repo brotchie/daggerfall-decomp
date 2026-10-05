@@ -12,7 +12,7 @@ extern signed char text_buffer[];
 extern struct character *player_character;
 extern struct Q *D_00196A7C;
 extern int D_001AA680;
-extern unsigned short *D_001AA6A0;
+extern struct image *D_001AA6A0;
 extern unsigned char D_001AA6A6;
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern void text_draw_centred_coloured(char *, short, short, int, unsigned char);
@@ -27,7 +27,7 @@ void travel_draw_trip_popup(void)
 {
     int i;
 
-    xn_draw_image(D_001AA6A0[0], D_001AA6A0[1], D_001AA6A0[2], D_001AA6A0[3], (char *)D_001AA6A0 + 12);
+    xn_draw_image(D_001AA6A0->x, D_001AA6A0->y, D_001AA6A0->width, D_001AA6A0->height, D_001AA6A0->pixels);
     if (D_001AA6A6 == 100) {
         mc_strncpy(((char *)text_buffer), D_00196A7C[travel_selected_location].name, 160, D_0017743D, 654);
         text_draw_centred_coloured(((char *)text_buffer), 160, 74, 145, 156);

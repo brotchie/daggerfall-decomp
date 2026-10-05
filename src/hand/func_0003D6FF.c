@@ -1,8 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003D6FF */
-struct entry { short id; int offset; };
+#include "structs.h"
 extern char D_00170D55[];
 extern char D_00170D7F[];
-extern struct entry *scratch_buffer;
+extern struct text_rsc_entry *scratch_buffer;
 extern int text_rsc_file;
 extern int text_expand_wrap(unsigned short, short, unsigned char *, char *, char *);
 extern void lseek(int, int, int);

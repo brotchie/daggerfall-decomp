@@ -1,13 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of jmem.c from 0x0006A0D4 to 0x0006A54B, kept together for its switch table's alignment */
 #include "records.h"
 
-struct blk {                    /* a heap block's header, the data follows */
-    int magic;
-    struct blk *next;
-    struct blk *prev;
-    int size;
-    short flags;
-};
 struct msg { int a; short b; char pad[10]; };
 extern char *screen_buffer;
 extern char D_00175AD4[];       /* __FILE__ */
@@ -29,7 +22,7 @@ extern int engine_running;
 extern struct record *nonworld_root;
 extern struct record *quest_root;
 extern struct record *location_object;
-extern struct blk *object_heap_blocks;
+extern struct mem_block *object_heap_blocks;
 extern int object_heap_size;
 extern void debug_checkpoint(int);
 extern struct qbn_place *quest_section(struct quest *, int);
@@ -48,18 +41,18 @@ extern int func_000A148C(char *, ...);
 
 int mem_pool_release(char *data)
 {
-    struct blk *block;
-    struct blk *neighbour;
+    struct mem_block *block;
+    struct mem_block *neighbour;
     int size;
 
-    block = (struct blk *)(data - 18);
-    if (block->magic != 1768515945 || (block->flags & ~1) != 0)
+    block = (struct mem_block *)(data - 18);
+    if (block->magic != 1768515945 || ((short)block->flags & ~1) != 0)
         fatal_error(D_00175B02);
     *(unsigned char *)&block->flags &= 254;
     size = block->size;
     mc_memset(data, 150, size, D_00175AD4, 182, 4);
     if (block->next != 0) {
-        if (!(block->next->flags & 1)) {
+        if (!((short)block->next->flags & 1)) {
             neighbour = block->next;
             block->size += neighbour->size + 18;
             block->next = neighbour->next;
@@ -68,7 +61,7 @@ int mem_pool_release(char *data)
         }
     }
     if (block->prev != 0) {
-        if (!(block->prev->flags & 1)) {
+        if (!((short)block->prev->flags & 1)) {
             neighbour = block->prev;
             neighbour->size += block->size + 18;
             neighbour->next = block->next;
@@ -112,8 +105,8 @@ void mem_check_quest_ids_cb(struct record *object)
 
 void mem_check_heap(int checkpoint)
 {
-    struct blk *block;
-    struct blk *prev;
+    struct mem_block *block;
+    struct mem_block *prev;
 
     frame_checkpoint = checkpoint;
     if (mem_check_level == 0)
@@ -138,7 +131,7 @@ void mem_check_heap(int checkpoint)
             func_000A148C(D_00175B79, ((unsigned char *)block)[18]);
             fatal_error(D_00175BA8);
         }
-        if (block->size == 0 || block->size > object_heap_size) {
+        if (block->size == 0 || (int)block->size > object_heap_size) {
             mc_set_location(312, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BC1);

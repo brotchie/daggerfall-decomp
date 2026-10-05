@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -27,15 +27,15 @@ extern struct building *current_building;
 extern struct record *found_object;
 extern struct record *inv_right_container;
 extern struct record *inv_right_container_base;
-extern char D_00195B5C[];
-extern char D_00195B60[];
+extern struct image *D_00195B5C;
+extern struct image *D_00195B60;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int window_image;
 extern struct career *player_class;
 extern int game_minutes;
 extern int trade_total;
-extern char D_00195DA8[];
+extern struct record *D_00195DA8;
 extern short D_00195F34;
 extern signed char current_region;
 extern signed char msgbox_kind;
@@ -126,13 +126,13 @@ void chargen_free_images(void)
         mc_free(chargen_face_images, (int)D_00176F41, 224);
         chargen_face_images = -1751672937;
     }
-    if (*(int *)D_00195B60 != 0 && *(int *)D_00195B60 != (-1751672937)) {
-        mc_free(*(int *)D_00195B60, (int)D_00176F41, 225);
-        *(int *)D_00195B60 = -1751672937;
+    if ((int)D_00195B60 != 0 && (int)D_00195B60 != (-1751672937)) {
+        mc_free((int)D_00195B60, (int)D_00176F41, 225);
+        D_00195B60 = (struct image *)-1751672937;
     }
-    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
-        mc_free(*(int *)D_00195B5C, (int)D_00176F41, 226);
-        *(int *)D_00195B5C = -1751672937;
+    if ((int)D_00195B5C != 0 && (int)D_00195B5C != (-1751672937)) {
+        mc_free((int)D_00195B5C, (int)D_00176F41, 226);
+        D_00195B5C = (struct image *)-1751672937;
     }
     if (chargen_reflex_image != 0 && chargen_reflex_image != (-1751672937)) {
         mc_free(chargen_reflex_image, (int)D_00176F41, 227);
@@ -365,7 +365,7 @@ void inv_reset_left_list(void)
 
 void inventory_open_container(struct record *container, int mode, int icon)
 {
-    *(int *)D_00195DA8 = (int)container;
+    D_00195DA8 = container;
     inv_right_container = (inv_right_container_base = container);
     if (inventory_open(2, mode, icon) != 0) return;
     object_free_children(container);

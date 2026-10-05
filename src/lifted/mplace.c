@@ -4,12 +4,12 @@
 #include "records.h"
 
 extern int dungeon_water_level;
+extern struct monster_template monster_table[];
 extern char D_00170788[];
 extern unsigned char player_environment;
 extern signed char loan_collector_monsters[];
 extern int encounter_tables[];
-extern char monster_table_flags[];
-extern char D_00187B6E[];
+extern struct collide_probe D_00187B6E;
 extern unsigned char D_001940D7;
 extern signed char player_motion_flags;
 extern signed char dungeon_water_monster_table[];
@@ -35,7 +35,7 @@ extern char collide_flags[];
 extern int daylight;
 
 extern int climate_category(void);
-extern int collide_move_object(struct record *, int, int, int);
+extern int collide_move_object(struct record *, int, struct move_request *, int);
 extern int spawn_find_point(struct record *, int, int);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
@@ -68,51 +68,52 @@ int place_spawn_from_marker(struct record *marker)
     struct character *character;
     int monster_id;
     {
-        char position[12];
-        char scratch[28];
+        struct move_request request;
+        struct record *creature;
+        int saved_seed;
 
         saved_on_ground = (int)(unsigned char)player_on_ground;
         saved_ceiling = ceiling_height;
         if ((marker->flags & 512) != 0) return 0;
         if (place_marker_in_range(marker, 1) == 0) return 0;
         if (*(int *)frame_counter < 5) return 0;
-        *(int *)((char *)scratch + 24) = rand();
+        saved_seed = rand();
         srand((int)(unsigned short)marker->spawn_seed);
-        *(int *)((char *)scratch + 20) = (int)marker;
-        character = &(*(struct record **)((char *)scratch + 20))->data.character;
-        if ((((int)(unsigned short)(*(short *)(*(char **)((char *)scratch + 20) + 27) & 31)) - 2) == 13) {
+        creature = marker;
+        character = &creature->data.character;
+        if ((((int)(unsigned short)(creature->image & 31)) - 2) == 13) {
             character->flags |= 64;
         } else {
             D_00196293 = marker->link_flag;
         }
-        monster_id = (int)(unsigned short)*(short *)(*(char **)((char *)scratch + 20) + 19);
-        if ((monster_id & 128) == 0 && ((int)(unsigned short)(*(short *)(monster_table_flags + (monster_id * 29)) & 64)) != 0 && (dungeon_water_level == 10000 || (dungeon_water_level - 20) > *(int *)(*(char **)((char *)scratch + 20) + 11))) {
+        monster_id = creature->mobile_id;
+        if ((monster_id & 128) == 0 && ((int)(unsigned short)(monster_table[monster_id].flags & 64)) != 0 && (dungeon_water_level == 10000 || (dungeon_water_level - 20) > creature->y)) {
             return 0;
         }
         if (monster_id == (-1)) {
-            srand(*(int *)((char *)scratch + 24));
+            srand(saved_seed);
             return 0;
         }
-        *(signed char *)(*(char **)((char *)scratch + 20)) = 18;
-        *(signed char *)(*(char **)((char *)scratch + 20) + 21) |= 1;
-        monster_init(*(struct record **)((char *)scratch + 20), monster_id);
-        *(int *)(*(char **)((char *)scratch + 20) + 11) -= 5;
+        creature->type = 18;
+        creature->flags |= 1;
+        monster_init(creature, monster_id);
+        creature->y -= 5;
         character->team = 1;
-        character->career_id = *(short *)(*(char **)((char *)scratch + 20) + 25);
+        character->career_id = creature->spawn_seed;
         character->target = 0;
-        monster_pacify_check(*(struct record **)((char *)scratch + 20));
+        monster_pacify_check(creature);
         D_00196293 = 0;
         D_001940D7 |= 32;
         D_001940D7 |= 128;
-        mc_memcpy((int)position, *(int *)((char *)scratch + 20) + 7, 12, (int)D_00170788, 119, 4);
-        mc_memset((int)scratch, 0, 12, (int)D_00170788, 120, 4);
-        *(int *)((char *)scratch + 12) = (int)D_00187B6E;
+        mc_memcpy((int)&request, (int)&creature->x, 12, (int)D_00170788, 119, 4);
+        mc_memset((int)&request.angle_x, 0, 12, (int)D_00170788, 120, 4);
+        request.probe = &D_00187B6E;
         player_motion_flags |= 8;
-        collide_move_object(*(struct record **)((char *)scratch + 20), 0, (int)position, 0);
+        collide_move_object(creature, 0, &request, 0);
         player_motion_flags &= 247;
         player_on_ground = *(signed char *)&saved_on_ground;
         ceiling_height = saved_ceiling;
-        srand(*(int *)((char *)scratch + 24));
+        srand(saved_seed);
         if (((int)(short)(*(short *)collide_flags & 1)) == 0) marker->flags |= 16;
         return 1;
     }

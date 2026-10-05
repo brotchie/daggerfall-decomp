@@ -1,6 +1,7 @@
 /* sosez.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "structs.h"
 
 extern char D_001700D5[];
 extern int D_0018DC34;
@@ -21,7 +22,7 @@ extern int func_000A021C();
 
 int sos_load_song(char *name)
 {
-    int song;
+    struct sos_song *song;
     int song_handle;
     int buffer;
     int size;
@@ -35,9 +36,9 @@ int sos_load_song(char *name)
     buffer = mc_malloc(size + 32, (int)D_001700D5, 385);
     if (buffer == 0) return 0;
     archive_read_record(midi_bsa, record, buffer + 32);
-    song = buffer;
+    song = (struct sos_song *)buffer;
     mc_memset(song, 0, 32, (int)D_001700D5, 397, 4);
-    *(int *)((char *)song) = buffer + 32;
+    song->data = (char *)(buffer + 32);
     if (func_000A021C(song, (int)&song_handle) != 0) {
         if (buffer != 0 && buffer != (-1751672937)) {
             mc_free(buffer, (int)D_001700D5, 406);

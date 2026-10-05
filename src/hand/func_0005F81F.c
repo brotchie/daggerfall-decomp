@@ -1,12 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005F81F */
-struct find_t {             /* DOS find buffer */
-    char reserved[21];
-    char attrib;
-    unsigned short wr_time;
-    unsigned short wr_date;
-    unsigned long size;
-    char name[13];
-};
+#include <dos.h>
 struct savehdr { char pad[128]; char f128; char pad81[99]; short f228; };
 struct slot { short id; short f2; };
 struct flags16 { unsigned short f0; };

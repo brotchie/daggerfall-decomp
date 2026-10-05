@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 #include "records.h"
+#include "bitfield.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -25,15 +25,7 @@ extern char D_00170D0F[];
 extern char D_00170D4C[];
 extern short msgbox_wrap_width;
 extern short skill_advance_multipliers[];
-extern char sheet_buttons[];
-extern char D_0017B508[];
-extern char D_0017B50A[];
-extern char D_0017B50C[];
-extern char D_0017B50E[];
-extern short D_0017B604;
-extern short D_0017B608;
-extern short D_0017B610;
-extern short D_0017B614;
+extern struct rect sheet_buttons[];
 extern char skill_names[];
 extern signed char skill_governing_attributes[];
 extern int attribute_abbrevs[];
@@ -57,7 +49,7 @@ extern signed char D_001940D9;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern int creature_count;
-extern char D_00195B5C[];
+extern struct image *D_00195B5C;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int window_image;
@@ -76,7 +68,7 @@ extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern signed char D_001962A2;
 extern char D_001962A7;
-extern char D_00199638[];
+extern struct image *D_00199638;
 extern int D_0019963C;
 extern int text_macro_skill;
 extern signed char sheet_hth_damage_line;
@@ -162,13 +154,13 @@ int sheet_close(void)
         mc_free(window_image, (int)D_00170C67, 128);
         window_image = -1751672937;
     }
-    if (*(int *)D_00199638 != 0 && *(int *)D_00199638 != (-1751672937)) {
-        mc_free(*(int *)D_00199638, (int)D_00170C67, 129);
-        *(int *)D_00199638 = -1751672937;
+    if ((int)D_00199638 != 0 && (int)D_00199638 != (-1751672937)) {
+        mc_free((int)D_00199638, (int)D_00170C67, 129);
+        D_00199638 = (struct image *)-1751672937;
     }
-    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
-        mc_free(*(int *)D_00195B5C, (int)D_00170C67, 130);
-        *(int *)D_00195B5C = -1751672937;
+    if ((int)D_00195B5C != 0 && (int)D_00195B5C != (-1751672937)) {
+        mc_free((int)D_00195B5C, (int)D_00170C67, 130);
+        D_00195B5C = (struct image *)-1751672937;
     }
     D_00196272 = 0;
     return 1;
@@ -190,10 +182,10 @@ void sheet_update(void)
     D_0012B508 = 146;
     text_shadow_colour = 92;
     for (button = 0; button < 23; button++) {
-        if (mouse_x > *(short *)(sheet_buttons + (button * 12)) && mouse_x < *(short *)(D_0017B50A + (button * 12)) && mouse_y > *(short *)(D_0017B508 + (button * 12)) && mouse_y < *(short *)(D_0017B50C + (button * 12))) {
+        if (mouse_x > sheet_buttons[button].x0 && mouse_x < sheet_buttons[button].x1 && mouse_y > sheet_buttons[button].y0 && mouse_y < sheet_buttons[button].y1) {
             if (button < 12 && ((struct bf8_2_1 *)&D_001940D9)->f != 0) continue;
             sound_play(203, player_object, 110);
-            ((int (*)())(*(int *)(D_0017B50E + (button * 12))))(button);
+            sheet_buttons[button].handler(button);
         }
     }
 }
@@ -404,10 +396,10 @@ void sheet_select_attribute(int button)
 
 void sheet_place_spinner(int button)
 {
-    D_0017B604 = (scratch_190d6a = *(short *)(D_0017B508 + (button * 12)) + 1);
-    D_0017B608 = scratch_190d6a + 6;
-    D_0017B610 = scratch_190d6a + 13;
-    D_0017B614 = scratch_190d6a + 19;
+    sheet_buttons[21].y0 = (scratch_190d6a = sheet_buttons[button].y0 + 1);
+    sheet_buttons[21].y1 = scratch_190d6a + 6;
+    sheet_buttons[22].y0 = scratch_190d6a + 13;
+    sheet_buttons[22].y1 = scratch_190d6a + 19;
 }
 
 int health_status_text(void)
@@ -439,7 +431,7 @@ int health_status_text(void)
 void sheet_draw_levelup_points(void)
 {
     if (((struct bf8_2_1 *)&D_001940D9)->f == 0) return;
-    xn_draw_image_transparent(176, (int)(short)scratch_190d6a, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), *(int *)D_00195B5C + 12);
+    xn_draw_image_transparent(176, (int)(short)scratch_190d6a, D_00195B5C->width, D_00195B5C->height, (int)D_00195B5C->pixels);
     text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (int)text_buffer, 10), 182, (int)(short)(((scratch_190d6a + 13) - font_height) + 1), 145, 141);
 }
 

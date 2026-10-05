@@ -36,14 +36,11 @@ extern int rmb_origin_x;
 extern char rmb_origin_yaw[];
 extern int town_house_skip_percent;
 extern int town_building_counter;
-extern char rmb_record_ptr[];
+extern struct block *rmb_record_ptr;
 extern signed char location_is_port;
 extern char rmb_block[];
 extern struct model_node model_cache_nodes[];
-extern char sound_cache[];
-extern char D_001A8430[];
-extern char D_001A8434[];
-extern char D_001A8438[];
+extern struct sound_cache_entry sound_cache[];
 extern int model_heap_free;
 extern struct model_node *model_cache_root;
 extern int sound_cache_bytes;
@@ -114,18 +111,18 @@ struct record *rmb_add_subrecord(struct record *parent)
     struct block_model *model;
     struct block_flat *flat;
     int people;
-    int (*entry)[4];
+    struct block_section3 *entry;
     int doors;
-    char *flat_cfg;
+    struct flat_cfg *flat_cfg;
     int i;
     int unused;
     int unused2;
     int size;
 
     size = 17;
-    size += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr)) * 66;
-    size += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 1)) * 17;
-    size += ((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 2)) << 4;
+    size += rmb_record_ptr->model_count * 66;
+    size += rmb_record_ptr->flat_count * 17;
+    size += rmb_record_ptr->section3_count << 4;
     if (size == 17) return 0;
     object = object_create_child(parent, 0, size);
     object->type = 43;
@@ -137,13 +134,13 @@ struct record *rmb_add_subrecord(struct record *parent)
     object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     D_001A9438 = object->id;
     block = &object->data.block;
-    mc_memcpy((int)block, *(int *)rmb_record_ptr, size, (int)D_00176C20, 803, 4);
+    mc_memcpy((int)block, (int)rmb_record_ptr, size, (int)D_00176C20, 803, 4);
     block->models = (struct block_model *)((int)block + 17);
     model = block->models;
     block->flats = (struct block_flat *)((int)model + (block->model_count * 66));
     flat = block->flats;
-    block->section3 = (char *)((int)flat + (block->flat_count * 17));
-    entry = (int (*)[4])block->section3;
+    block->section3 = (struct block_section3 *)((int)flat + (block->flat_count * 17));
+    entry = block->section3;
     for (i = 0; block->model_count > i; i++, model++) {
         rotate_xz(&model->x, &model->z, *(int *)rmb_origin_yaw);
         model->x += rmb_origin_x;
@@ -164,23 +161,23 @@ struct record *rmb_add_subrecord(struct record *parent)
         if ((flat->image >> 7) == 199) {
             rmb_add_editor_marker(parent, flat);
         } else {
-            flat_cfg = (char *)flats_cfg_find(flat->image);
-            if ((flat_cfg[6] & 2) != 0 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
+            flat_cfg = (struct flat_cfg *)flats_cfg_find(flat->image);
+            if ((flat_cfg->flags & 2) != 0 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
                 flat->image = 0;
             }
         }
     }
     for (i = 0; block->section3_count > i; i++, entry++) {
-        rotate_xz(&(*entry)[0], &(*entry)[2], *(int *)rmb_origin_yaw);
-        (*entry)[0] += rmb_origin_x;
-        (*entry)[2] += rmb_origin_z;
-        (*entry)[1] += rmb_origin_y;
+        rotate_xz(&entry->x, &entry->z, *(int *)rmb_origin_yaw);
+        entry->x += rmb_origin_x;
+        entry->z += rmb_origin_z;
+        entry->y += rmb_origin_y;
     }
-    people = (int)(*(char **)rmb_record_ptr + size);
-    doors = people + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 3)) * 17);
+    people = (int)((char *)rmb_record_ptr + size);
+    doors = people + (rmb_record_ptr->people_count * 17);
     rmb_add_people(parent, people);
     rmb_add_doors(parent, doors);
-    *(int *)rmb_record_ptr = doors + (((int)(unsigned char)*(signed char *)(*(char **)rmb_record_ptr + 4)) * 19);
+    rmb_record_ptr = (struct block *)(doors + (rmb_record_ptr->door_count * 19));
     return object;
 }
 
@@ -219,7 +216,7 @@ struct record *rmb_add_building(struct record *parent, int building_index)
     int saved_seed;
     struct record *object;
 
-    *(int *)rmb_record_ptr = *(int *)(*(char **)rmb_block + 1475 + (building_index << 2));
+    rmb_record_ptr = (struct block *)(*(int *)(*(char **)rmb_block + 1475 + (building_index << 2)));
     object = rmb_add_subrecord(parent);
     object->flags = 1;
     object->image2 = building_index;
@@ -518,25 +515,25 @@ int sound_cache_load(int id)
 
     sound_last_id = id;
     for (slot = 0; slot < 256; slot++) {
-        if (*(int *)(D_001A8430 + (slot << 4)) == id) {
-            sound_last_size = *(int *)(D_001A8434 + (slot << 4));
-            return *(int *)(D_001A8438 + (slot << 4));
+        if (sound_cache[slot].id == id) {
+            sound_last_size = sound_cache[slot].size;
+            return (int)sound_cache[slot].data;
         }
     }
     slot = 0;
-    while (*(int *)(D_001A8438 + (slot << 4)) != 0) slot++;
+    while (sound_cache[slot].data != 0) slot++;
     record = archive_find_record(dagger_snd, (int)D_001910AC, id);
     size = archive_record_size(dagger_snd, record);
-    *(int *)(sound_cache + (slot << 4)) = *(int *)frame_counter;
-    *(int *)(D_001A8430 + (slot << 4)) = id;
-    *(int *)(D_001A8434 + (slot << 4)) = size;
-    *(int *)(D_001A8438 + (slot << 4)) = mc_malloc(size, (int)D_00176C20, 1338);
-    dpmi_lock_region(*(int *)(D_001A8438 + (slot << 4)), size + 4096);
-    archive_read_record(dagger_snd, record, *(int *)(D_001A8438 + (slot << 4)));
+    sound_cache[slot].last_frame = *(int *)frame_counter;
+    sound_cache[slot].id = id;
+    sound_cache[slot].size = size;
+    sound_cache[slot].data = (char *)mc_malloc(size, (int)D_00176C20, 1338);
+    dpmi_lock_region((int)sound_cache[slot].data, size + 4096);
+    archive_read_record(dagger_snd, record, (int)sound_cache[slot].data);
     sound_cache_bytes += size;
     sound_cache_trim();
     sound_last_size = size;
-    return *(int *)(D_001A8438 + (slot << 4));
+    return (int)sound_cache[slot].data;
 }
 
 void sound_cache_trim(void)
@@ -550,21 +547,21 @@ void sound_cache_trim(void)
         oldest = -1;
         oldest_frame = *(int *)frame_counter;
         for (i = 0; i < 256; i++) {
-            if (*(int *)(D_001A8438 + (i << 4)) == 0) continue;
-            if (oldest_frame > *(int *)(sound_cache + (i << 4))) {
-                oldest_frame = *(int *)(sound_cache + (i << 4));
+            if (sound_cache[i].data == 0) continue;
+            if (oldest_frame > sound_cache[i].last_frame) {
+                oldest_frame = sound_cache[i].last_frame;
                 oldest = i;
             }
         }
         if (oldest == (-1)) return;
-        dpmi_unlock_region(*(int *)(D_001A8438 + (oldest << 4)), *(int *)(D_001A8434 + (oldest << 4)) + 4096);
-        if (*(int *)(D_001A8438 + (oldest << 4)) != 0 && *(int *)(D_001A8438 + (oldest << 4)) != (-1751672937)) {
-            mc_free(*(int *)(D_001A8438 + (oldest << 4)), (int)D_00176C20, 1375);
-            *(int *)(D_001A8438 + (oldest << 4)) = -1751672937;
+        dpmi_unlock_region((int)sound_cache[oldest].data, sound_cache[oldest].size + 4096);
+        if (sound_cache[oldest].data != 0 && (int)sound_cache[oldest].data != (-1751672937)) {
+            mc_free((int)sound_cache[oldest].data, (int)D_00176C20, 1375);
+            sound_cache[oldest].data = (char *)-1751672937;
         }
-        *(int *)(D_001A8438 + (oldest << 4)) = 0;
-        *(int *)(D_001A8430 + (oldest << 4)) = -1;
-        sound_cache_bytes -= *(int *)(D_001A8434 + (oldest << 4));
+        sound_cache[oldest].data = 0;
+        sound_cache[oldest].id = -1;
+        sound_cache_bytes -= sound_cache[oldest].size;
     }
 }
 
@@ -573,14 +570,14 @@ void sound_cache_free_all(void)
     int i;
 
     for (i = 0; i < 256; i++) {
-        if (*(int *)(D_001A8438 + (i << 4)) != 0) {
-            dpmi_unlock_region(*(int *)(D_001A8438 + (i << 4)), *(int *)(D_001A8434 + (i << 4)) + 1024);
-            if (*(int *)(D_001A8438 + (i << 4)) != 0 && *(int *)(D_001A8438 + (i << 4)) != (-1751672937)) {
-                mc_free(*(int *)(D_001A8438 + (i << 4)), (int)D_00176C20, 1392);
-                *(int *)(D_001A8438 + (i << 4)) = -1751672937;
+        if ((int)sound_cache[i].data != 0) {
+            dpmi_unlock_region((int)sound_cache[i].data, sound_cache[i].size + 1024);
+            if ((int)sound_cache[i].data != 0 && (int)sound_cache[i].data != (-1751672937)) {
+                mc_free((int)sound_cache[i].data, (int)D_00176C20, 1392);
+                sound_cache[i].data = (char *)-1751672937;
             }
-            *(int *)(D_001A8438 + (i << 4)) = 0;
-            *(int *)(D_001A8430 + (i << 4)) = -1;
+            sound_cache[i].data = (char *)0;
+            sound_cache[i].id = -1;
         }
     }
     sound_cache_bytes = 0;

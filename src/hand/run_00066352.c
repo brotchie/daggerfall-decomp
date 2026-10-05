@@ -1,10 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of disease.c from 0x0006630B to 0x00066352, kept together for its switch table's alignment */
 #include "records.h"
 
-struct pick {
-    char pad0[12];
-    struct record *obj;         /* 0x0c */
-};
 extern char D_00175970[];        /* __FILE__ */
 extern unsigned char vampire_spells[];
 extern unsigned char D_001940D8;
@@ -16,7 +12,7 @@ extern unsigned char current_region;
 extern unsigned char D_00196294;
 extern int region_dungeon_type_counts;
 extern struct faction *faction_find_type_in_region(short, int);
-extern void location_load_nth_dungeon_of_type(struct pick *, int, int);
+extern void location_load_nth_dungeon_of_type(struct loaded_location *, int, int);
 extern void msgbox_show_rsc(int, int);
 extern void time_pass(int);
 extern void paperdoll_draw(int, int);
@@ -24,7 +20,7 @@ extern void item_make(int, int, struct item *);
 extern void disease_toggle_memberships_cb(struct record *);
 extern void disease_add_vampire_spell(struct record *, unsigned char);
 extern int disease_is_lycanthrope(void);
-extern void location_free(struct pick *);
+extern void location_free(struct loaded_location *);
 extern void map_goto_location(unsigned char, int, unsigned short, int);
 extern void spfx_cure_disease(struct record *, struct character *);
 extern struct record *object_create_child(struct record *, int, int);
@@ -48,8 +44,7 @@ void disease_toggle_memberships_cb(struct record *obj)
 
 void disease_become_vampire(void)
 {
-    struct pick s;
-    int u48;
+    struct loaded_location s;
     struct record *o2;
     int u40;
     struct disease *p;
@@ -74,7 +69,7 @@ void disease_become_vampire(void)
     D_00196294 = saved;
     if (region_dungeon_type_counts != 0) {
         location_load_nth_dungeon_of_type(&s, 0, rand() % region_dungeon_type_counts);
-        map_goto_location(current_region, 3, s.obj->image, 0);
+        map_goto_location(current_region, 3, s.object->image, 0);
         if (marker_find_nth(location_object, 9, 0) != 0)
             player_to_nearest_marker(location_object, 9);
         location_free(&s);

@@ -1,14 +1,14 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00056004 */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern signed char mouse_double_click;
 extern short mouse_x;
 extern short mouse_y;
 extern signed char D_0012B508;
 extern signed char key_down_esc;
-extern char itemmaker_buttons[];
+extern struct rect itemmaker_buttons[];
 extern signed char D_001940D4;
 extern struct record *player_object;
 extern int list_popup_callback;
@@ -25,8 +25,6 @@ extern int xn_mouse_poll_clamped();
 extern int xn_font_select();
 extern int xn_tex_cache_begin_frame();
 
-struct R { short x0, y0, x1, y1; void (*fn)(int); };
-#define TAB ((struct R *)itemmaker_buttons)
 #define FLAG (((struct bf8_2_1 *)&D_001940D4)->f)
 #define MX (mouse_x)
 #define MY (mouse_y)
@@ -62,9 +60,9 @@ void itemmaker_update(void)
     }
     if (FLAG || (*((char *)&mouse_buttons) == 0 || (*((char *)&mouse_buttons) != 0 && *((char *)&mouse_buttons_prev) != 0))) return;
     for (index = 0; index < 20; index++) {
-        if (MX > TAB[index].x0 && MX < TAB[index].x1 && MY > TAB[index].y0 && MY < TAB[index].y1) {
+        if (MX > itemmaker_buttons[index].x0 && MX < itemmaker_buttons[index].x1 && MY > itemmaker_buttons[index].y0 && MY < itemmaker_buttons[index].y1) {
             sound_play(203, player_object, 100);
-            TAB[index].fn(index);
+            itemmaker_buttons[index].handler(index);
         }
     }
 }

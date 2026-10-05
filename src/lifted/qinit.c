@@ -267,15 +267,15 @@ void qaction_place_foe(struct qbn_op *op, struct qbn_place *place)
     monster_init_gear(foe_object);
 }
 
-int func_000337AD(char *door, struct qbn_place *place, struct building *building)
+int func_000337AD(struct location_door *door, struct qbn_place *place, struct building *building)
 {
     if (place->p2 > (-1)) {
         if (place->p2 >= 17 && place->p2 <= 20 && building->type >= 17 && building->type <= 20) {
-            if (place->p3 == (-1)) return (int)(unsigned short)(*(short *)(door + 2) & 20480);
+            if (place->p3 == (-1)) return (int)(unsigned short)(door->flags & 20480);
             if (place->p3 != 1) {
-                return (((((int)(unsigned short)(*(short *)(door + 2) & 16384)) != 0) && (((int)(unsigned short)(*(short *)(door + 2) & 4096)) == 0)) ? 1 : 0);
+                return (((((int)(unsigned short)(door->flags & 16384)) != 0) && (((int)(unsigned short)(door->flags & 4096)) == 0)) ? 1 : 0);
             }
-            return (int)(unsigned short)(*(short *)(door + 2) & 4096);
+            return (int)(unsigned short)(door->flags & 4096);
         }
     }
     if (place->p2 > (-1)) {
@@ -285,11 +285,11 @@ int func_000337AD(char *door, struct qbn_place *place, struct building *building
             if ((short)(building->type) != place->p2) return 0;
         }
     }
-    if (place->p3 == (-1)) return (int)(unsigned short)(*(short *)(door + 2) & 20480);
+    if (place->p3 == (-1)) return (int)(unsigned short)(door->flags & 20480);
     if (place->p3 != 1) {
-        return (((((int)(unsigned short)(*(short *)(door + 2) & 16384)) != 0) && (((int)(unsigned short)(*(short *)(door + 2) & 4096)) == 0)) ? 1 : 0);
+        return (((((int)(unsigned short)(door->flags & 16384)) != 0) && (((int)(unsigned short)(door->flags & 4096)) == 0)) ? 1 : 0);
     }
-    return (int)(unsigned short)(*(short *)(door + 2) & 4096);
+    return (int)(unsigned short)(door->flags & 4096);
 }
 
 int quest_place_object(struct record *object, struct qbn_place *place)

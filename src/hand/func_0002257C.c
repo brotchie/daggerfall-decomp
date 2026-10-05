@@ -1,18 +1,15 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002257C */
 #include "records.h"
 
-struct vec3 { int x, y, z; };
-struct plane { char pad[16]; int nx, ny, nz; char pad2[2]; };
-struct planes { int count; struct plane p[1]; };
 extern unsigned char player_environment;
-extern struct vec3 D_00179F48;
+extern struct collide_probe D_00179F48;
 extern unsigned char D_001940D7;
 extern int D_00195C70;
 extern int D_00195CB8;
 extern unsigned char player_on_ground;
 extern int collide_candidate_count;
-extern struct vec3 *D_00196D4C;
-extern struct planes *D_00196D50;
+extern struct collide_probe *D_00196D4C;
+extern struct collide_hits *D_00196D50;
 extern int collide_height;
 extern short collide_flags;
 extern void collide_for_each_nearby(struct record *, void (*)(int));
@@ -44,9 +41,9 @@ int collide_move_object(struct record *object, int unused_arg, struct move_reque
     D_00196D50 = 0;
     collide_candidate_count = 0;
     D_00196D4C = &D_00179F48;
-    D_00196D4C->x = request->x;
-    D_00196D4C->y = request->y;
-    D_00196D4C->z = request->z;
+    D_00196D4C->position.x = request->x;
+    D_00196D4C->position.y = request->y;
+    D_00196D4C->position.z = request->z;
     collide_for_each_nearby(object, collide_gather_cb);
     if (player_environment != 1 && collide_candidate_count == 0)
         return 0;
@@ -73,23 +70,23 @@ int collide_move_object(struct record *object, int unused_arg, struct move_reque
         best = 0;
         mindot = 1000000;
         for (i = 0; i < D_00196D50->count; i++) {
-            dot = direction.x * D_00196D50->p[i].nx + direction.z * D_00196D50->p[i].nz;
+            dot = direction.x * D_00196D50->hits[i].nx + direction.z * D_00196D50->hits[i].nz;
             if (dot < mindot) {
                 mindot = dot;
                 best = i;
             }
         }
     } else {
-        mindot = direction.x * D_00196D50->p[0].nx + direction.z * D_00196D50->p[0].nz;
+        mindot = direction.x * D_00196D50->hits[0].nx + direction.z * D_00196D50->hits[0].nz;
         best = 0;
     }
-    dx = (request->x - object->x) * D_00196D50->p[best].nx;
-    dy = (request->y - object->y) * D_00196D50->p[best].ny;
-    dz = (request->z - object->z) * D_00196D50->p[best].nz;
+    dx = (request->x - object->x) * D_00196D50->hits[best].nx;
+    dy = (request->y - object->y) * D_00196D50->hits[best].ny;
+    dz = (request->z - object->z) * D_00196D50->hits[best].nz;
     dx = dz + (dx + dy);
-    dy = dx * D_00196D50->p[best].ny;
-    dz = dx * D_00196D50->p[best].nz;
-    dx = dx * D_00196D50->p[best].nx;
+    dy = dx * D_00196D50->hits[best].ny;
+    dz = dx * D_00196D50->hits[best].nz;
+    dx = dx * D_00196D50->hits[best].nx;
     dx >>= 8;
     dy >>= 8;
     dz >>= 8;

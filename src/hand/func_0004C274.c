@@ -1,14 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004C274 */
 #include "records.h"
+#include <dos.h>
 
-struct find_t {             /* DOS find buffer */
-    char reserved[21];
-    char attrib;
-    unsigned short wr_time;
-    unsigned short wr_date;
-    unsigned long size;
-    unsigned char name[13];
-};
 extern char D_00174F47[];        /* __FILE__ */
 extern char D_00174F69[];
 extern signed char text_buffer[];

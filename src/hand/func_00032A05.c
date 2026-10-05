@@ -2,7 +2,6 @@
 #include "records.h"
 
 #pragma pack(1)
-struct R6 { unsigned short w0; unsigned short flags; unsigned short w4; };
 #pragma pack()
 extern char D_00170A64[];
 extern struct record *nonworld_root;
@@ -11,15 +10,15 @@ extern struct location *current_location;
 extern unsigned *scratch_buffer;
 extern unsigned char current_region;
 extern int loaded_location_door_count;
-extern struct R6 *loaded_location_doors;
+extern struct location_door *loaded_location_doors;
 extern short D_001970C8;
 extern int D_001970CC;
-extern struct R6 *D_001970D0;
+extern struct location_door *D_001970D0;
 extern struct record *D_001970D4;
 extern struct location *D_001970D8;
 extern struct quest *current_quest;
 extern struct faction *faction_find_type_in_region(short, short);
-extern int func_000337AD(struct R6 *, struct qbn_place *, struct building *);
+extern int func_000337AD(struct location_door *, struct qbn_place *, struct building *);
 extern int quest_object_in_use(int);
 extern void location_free(short *);
 extern void quest_pick_location(short *, unsigned short, short, int);
@@ -30,8 +29,8 @@ extern int mc_memcpy();
 
 int quest_init_place(struct qbn_place *place)
 {
-    struct R6 *doors;
-    struct R6 *door;
+    struct location_door *doors;
+    struct location_door *door;
     struct record *loc_object;
     struct record *place_object;
     struct location *location;
@@ -76,22 +75,22 @@ retry:
     candidate_count = 0;
     if (place->p1 == 0) {
         for (candidate_count = i = 0, door = doors; i < door_count; i++, door++) {
-            if (func_000337AD(door, place, &location->buildings[door->w0]))
-                candidates[candidate_count++] = (door->w0 << 16) + door->w4;
+            if (func_000337AD(door, place, &location->buildings[door->building_index]))
+                candidates[candidate_count++] = (door->building_index << 16) + door->id;
         }
     } else {
         for (i = 0, door = doors; i < door_count; i++, door++) {
             switch (place->p3) {
             case -1:
-                candidates[candidate_count++] = door->w4;
+                candidates[candidate_count++] = door->id;
                 break;
             case 0:
                 if ((int)(unsigned short)(door->flags & 0x4000))
-                    candidates[candidate_count++] = door->w4;
+                    candidates[candidate_count++] = door->id;
                 break;
             case 1:
                 if ((int)(unsigned short)(door->flags & 0x1000))
-                    candidates[candidate_count++] = door->w4;
+                    candidates[candidate_count++] = door->id;
                 break;
             }
         }

@@ -1,8 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00099922 */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern unsigned char player_environment;
 extern signed char D_00196297;
 extern char doors_moving[];

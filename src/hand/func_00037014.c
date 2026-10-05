@@ -13,11 +13,7 @@ extern struct spell *selected_spell;
 extern char spell_effect_settings[];
 extern char spell_effect_cost_formula[];
 extern char spell_target_cost_factor[];
-extern char spellmaker_buttons[];
-extern char D_0017B241[];
-extern char D_0017B243[];
-extern char D_0017B245[];
-extern char D_0017B247[];
+extern struct rect spellmaker_buttons[];
 extern char spell_effect_names[];
 extern char spell_effect_subtype_names[];
 extern char D_001845D0[];
@@ -44,7 +40,7 @@ extern int spell_cost(struct spell *, struct character *);
 extern void text_draw_centred(char *, int, int);
 extern void sound_play(int, struct record *, int);
 extern void text_draw_coloured(char *, int, int, int, unsigned char);
-extern void buttons_draw_hover_label(short, short, int, char *, char *);
+extern void buttons_draw_hover_label(short, short, int, struct rect *, char *);
 extern int gold_total_alias(void);
 extern void mc_memset(char *, int, int, char *, int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
@@ -121,9 +117,9 @@ void spellmaker_update(void)
         return;
     if ((unsigned char)game_mode == 2 && !*spellmaker_settings_kind && !D_001940D4.f) {
         for (i = 0; i < 18; i++) {
-            if (mouse_x > *(short *)(spellmaker_buttons + i * 12) && mouse_x < *(short *)(D_0017B243 + i * 12) && mouse_y > *(short *)(D_0017B241 + i * 12) && mouse_y < *(short *)(D_0017B245 + i * 12)) {
+            if (mouse_x > spellmaker_buttons[i].x0 && mouse_x < spellmaker_buttons[i].x1 && mouse_y > spellmaker_buttons[i].y0 && mouse_y < spellmaker_buttons[i].y1) {
                 sound_play(203, player_object, 110);
-                (*(void (**)(void))(D_0017B247 + i * 12))();
+                spellmaker_buttons[i].handler();
             }
         }
     }

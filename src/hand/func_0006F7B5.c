@@ -1,17 +1,14 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006F7B5 */
 #include "records.h"
 
-#pragma pack(1)
-struct Img { unsigned short x; unsigned short y; unsigned short w; unsigned short h; char pad[4]; char data[1]; };
-struct Box { short x0; short y0; short x1; short y1; void (*fn)(); };
 extern unsigned char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
 extern char key_down_esc;
 extern struct spell *selected_spell;
-extern struct Box spellshop_buttons[];
+extern struct rect spellshop_buttons[];
 extern struct spell *spell_records;
-extern struct Img *window_image;
+extern struct image *window_image;
 extern unsigned char *scratch_buffer;
 extern unsigned char mouse_buttons_prev;
 extern char shared_picklist[];
@@ -26,13 +23,13 @@ extern int xn_draw_image();
 void spellshop_update(void)
 {
     int unused1;
-    struct Img *image;
+    struct image *image;
     short i;
     short picked;
     short unused2;
 
     image = window_image;
-    xn_draw_image(image->x, image->y, image->w, image->h, image->data);
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     xn_font_select(4);
     picked = picklist_frame(shared_picklist);
     if (picked > -1) {
@@ -50,6 +47,6 @@ void spellshop_update(void)
     for (i = 0; i < 5; i++) {
         if (mouse_x > spellshop_buttons[i].x0 && mouse_x < spellshop_buttons[i].x1
           && mouse_y > spellshop_buttons[i].y0 && mouse_y < spellshop_buttons[i].y1)
-            spellshop_buttons[i].fn();
+            spellshop_buttons[i].handler();
     }
 }

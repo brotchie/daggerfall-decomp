@@ -2,12 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_0_4 { unsigned char f:4; };
-struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 extern int xn_cam_pitch;
 extern int xn_cam_yaw;
 extern int xn_cam_roll;

@@ -5,12 +5,7 @@ extern signed char D_0012B508;
 extern int screen_buffer;
 extern char D_00175420[];
 extern char skill_names[];
-extern char classmaker_buttons[];
-extern char D_001854F6[];
-extern short D_001855CC;
-extern short D_001855CE;
-extern short D_001855D0;
-extern short D_001855D2;
+extern struct rect classmaker_buttons[];
 extern signed char text_buffer[];
 extern char scratch_190d64[];
 extern char scratch_190d66[];
@@ -54,12 +49,12 @@ int classmaker_draw(short show_name)
     D_0012B508 = 145;
     for (i = 0; i < 12; i++) {
         if (player_class->skills[i] < 35)
-            text_draw_coloured(*(int *)(skill_names + (player_class->skills[i] << 2)), (short)(*(short *)(classmaker_buttons + (i + 2) * 12) + 2), (short)(*(short *)(D_001854F6 + (i + 2) * 12) + 1), 145, 141);
+            text_draw_coloured(*(int *)(skill_names + (player_class->skills[i] << 2)), (short)(classmaker_buttons[i + 2].x0 + 2), (short)(classmaker_buttons[i + 2].y0 + 1), 145, 141);
     }
-    x = (D_001855CC + D_001855D0) >> 1;
-    y_offset = ((D_001855D2 + D_001855CE) >> 1) - D_001855CE + 3;
+    x = (classmaker_buttons[18].x0 + classmaker_buttons[18].x1) >> 1;
+    y_offset = ((classmaker_buttons[18].y1 + classmaker_buttons[18].y0) >> 1) - classmaker_buttons[18].y0 + 3;
     for (i = 0; i < 8; i++) {
-        text_draw_centred_coloured(itoa(player_class->attributes[i], (int)text_buffer, 10), x, (short)(*(short *)(D_001854F6 + (i + 18) * 12) + y_offset), 145, 141);
+        text_draw_centred_coloured(itoa(player_class->attributes[i], (int)text_buffer, 10), x, (short)(classmaker_buttons[i + 18].y0 + y_offset), 145, 141);
     }
     msgbox_update();
     xn_mouse_cursor_draw();

@@ -87,7 +87,7 @@ def check(rows):
             errs.append("%s: confidence %r" % (r["name"], r["confidence"]))
         if r["kind"] == "func" and int(r["address"], 16) not in funcs:
             errs.append("%s: no function at %s" % (r["name"], r["address"]))
-        if r["kind"] == "field" and not re.fullmatch(r"[a-z_]+\+0x[0-9A-Fa-f]+", r["address"]):
+        if r["kind"] == "field" and not re.fullmatch(r"[a-z_][a-z0-9_]*\+0x[0-9A-Fa-f]+", r["address"]):
             errs.append("%s: field address %r is not record+0xOFF" % (r["name"], r["address"]))
         key = (r["kind"] == "field" and r["address"].split("+")[0], r["name"])
         if key in seen:

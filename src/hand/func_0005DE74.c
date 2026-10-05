@@ -1,26 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005DE74 */
 #include "records.h"
 
-#pragma pack(1)
-struct itemdef {
-    char name[24];
-    int f24;                    /* 24 */
-    short f28;                  /* 28 */
-    int f30;                    /* 30 */
-    int f34;                    /* 34 */
-    short f38;                  /* 38 */
-    unsigned char f40;          /* 40 */
-    unsigned char f41;          /* 41 */
-    unsigned char f42;          /* 42 */
-    unsigned char f43;          /* 43 */
-    short f44;                  /* 44 */
-    unsigned short f46;         /* 46 */
-};
-#pragma pack()
 extern char D_001758B8[];
 extern char D_001758C0[];
 extern char D_001758C1[];
-extern struct itemdef item_templates[];
+extern struct item_template item_templates[];
 extern unsigned char D_00190CF2;
 extern char D_001911E4[];
 extern struct character *player_character;
@@ -48,7 +32,7 @@ extern int mc_sprintf(char *, char *, ...);
 
 void item_init_from_template(unsigned short template_id, short group, short index, struct item *item)
 {
-    struct itemdef *template;
+    struct item_template *template;
     unsigned short requested_id;
 
     requested_id = template_id;
@@ -82,30 +66,30 @@ void item_init_from_template(unsigned short template_id, short group, short inde
         fatal_error(D_001911E4);
     }
     template = &item_templates[template_id];
-    if (template->f46 == 32512)
+    if (template->inventory_image == 32512)
         item->index = 0;
     mc_strncpy(item->name, template->name, 32, D_001758B8, 68);
     item->group = group;
     item->index = index;
-    item->value = template->f34;
-    if (template->f30 != 0 && (template->f43 & 1) != 0) {
-        D_0019626E = template->f30;
+    item->value = template->value;
+    if (template->capacity != 0 && (template->flags & 1) != 0) {
+        D_0019626E = template->capacity;
         *(short *)item->pad28 = 0;
     } else {
         D_0019626E = 0;
-        *(short *)item->pad28 = template->f30;
+        *(short *)item->pad28 = template->capacity;
     }
-    item->item_flags = (unsigned short)template->f43;
-    item->condition = item->max_condition = template->f28;
+    item->item_flags = (unsigned short)template->flags;
+    item->condition = item->max_condition = template->condition;
     item->magicka_bonus = 0;
-    if (template->f46 != 0 && template->f44 == 0)
-        item->dropped_image = template->f46;
-    if (template->f44 != 0 && template->f46 == 0)
-        item->inventory_image = template->f44;
-    if (template->f46 != 0)
-        item->inventory_image = template->f46;
-    if (template->f44 != 0)
-        item->dropped_image = template->f44;
+    if (template->inventory_image != 0 && template->dropped_image == 0)
+        item->dropped_image = template->inventory_image;
+    if (template->dropped_image != 0 && template->inventory_image == 0)
+        item->inventory_image = template->dropped_image;
+    if (template->inventory_image != 0)
+        item->inventory_image = template->inventory_image;
+    if (template->dropped_image != 0)
+        item->dropped_image = template->dropped_image;
     if (((unsigned short)item->inventory_image & -128) == 31360 && ((unsigned short)PFLAGS & 1) == 0) {
         item->inventory_image &= 127;
         item->inventory_image |= 31872;
@@ -121,13 +105,13 @@ void item_init_from_template(unsigned short template_id, short group, short inde
     } else {
         item->color = 18;
     }
-    item->weight = template->f24;
-    item->enchant_points = template->f38;
-    item->variants = template->f41;
-    item->draw_order = template->f42;
+    item->weight = template->weight;
+    item->enchant_points = template->enchant_points;
+    item->variants = template->variants;
+    item->draw_order = template->draw_order;
     mc_memset(item->enchantments, -1, 40, D_001758B8, 118, 40);
-    D_0019626D = template->f40;
-    D_00195F28 = template->f42;
+    D_0019626D = template->rarity;
+    D_00195F28 = template->draw_order;
     if (group == 27 && index == 4)
         item->stack_count = rand() % 20;
     if (group == 6 || group == 12 || group == 2) {

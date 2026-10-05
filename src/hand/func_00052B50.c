@@ -1,16 +1,11 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00052B50 */
-struct flc {
-    char pad[18];
-    short pitch;            /* 0x12 */
-    char pad2[10];
-    unsigned char *buf;     /* 0x1e */
-};
+#include "structs.h"
 extern char D_00175404[];   /* __FILE__ */
-extern void xn_str_fill_u16(unsigned char *, unsigned short, int);   /* fill with a word */
-extern void mc_memcpy(unsigned char *, unsigned char *, int, char *, int, int); /* copy */
+extern void xn_str_fill_u16(void *, unsigned short, int);   /* fill with a word */
+extern void mc_memcpy(void *, void *, int, char *, int, int); /* copy */
 
-/* decode an FLC DELTA_FLC (word-oriented delta) chunk into f->buf */
-void flc_decode_ss2(unsigned char *src, struct flc *f)
+/* decode an FLC DELTA_FLC (word-oriented delta) chunk into f->image */
+void flc_decode_ss2(unsigned char *src, struct flc_player *f)
 {
     short line;
     short done;
@@ -29,20 +24,20 @@ void flc_decode_ss2(unsigned char *src, struct flc *f)
         src += 2;
         if ((w & 0xC000) == 0xC000) {
             line += w * -1;
-            offset += w * -1 * f->pitch;
+            offset += w * -1 * f->width;
         } else if ((w & 0xC000) == 0x8000) {
-            f->buf[f->pitch * (line + 1) - 1] = w & 0xff;
+            f->image[f->width * (line + 1) - 1] = w & 0xff;
         } else if (w != 0) {
             x = *src & 0xff;
             ++src;
             for (i = 0; i < w; i++) {
                 count = *src++;
                 if (count < 0) {
-                    xn_str_fill_u16(f->buf + f->pitch * line + x, *(unsigned short *)src, -count * 2);
+                    xn_str_fill_u16(f->image + f->width * line + x, *(unsigned short *)src, -count * 2);
                     x -= count * 2;
                     src += 2;
                 } else if (count > 0) {
-                    mc_memcpy(f->buf + f->pitch * line + x, src, count * 2, D_00175404, 564, 4);
+                    mc_memcpy(f->image + f->width * line + x, src, count * 2, D_00175404, 564, 4);
                     x += count * 2;
                     src += count * 2;
                 }
@@ -53,7 +48,7 @@ void flc_decode_ss2(unsigned char *src, struct flc *f)
             }
             line++;
             done++;
-            offset += f->pitch;
+            offset += f->width;
         } else if (w == 0) {
             line++;
             done++;

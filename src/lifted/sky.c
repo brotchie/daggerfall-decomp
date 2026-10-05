@@ -34,7 +34,7 @@ extern int view_look_pitch;
 extern int view_look_yaw;
 extern struct record *camera_object;
 extern struct record *player_object;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern int game_minutes;
 extern struct settings *game_settings;
 extern char scratch_buffer[];
@@ -45,8 +45,8 @@ extern signed char D_00196286;
 extern signed char night_sky_loaded;
 extern int sky_image_a;
 extern int sky_image_b;
-extern char moon0_image[];
-extern char moon1_image[];
+extern struct cfa_header *moon0_image;
+extern struct cfa_header *moon1_image;
 extern int sun_light;
 extern int moon0_phase;
 extern int moon1_phase;
@@ -96,8 +96,8 @@ void sky_init(void)
 
     night_sky_loaded = 0;
     sky_loaded_frame = 10000;
-    *(int *)moon0_image = disk_read_file((int)D_00170A6C, 0);
-    *(int *)moon1_image = disk_read_file((int)D_00170A79, 0);
+    moon0_image = (struct cfa_header *)disk_read_file((int)D_00170A6C, 0);
+    moon1_image = (struct cfa_header *)disk_read_file((int)D_00170A79, 0);
     sky_image_a = mc_malloc(112640, (int)D_00170A86, 93);
     sky_image_b = mc_malloc(112640, (int)D_00170A86, 94);
     D_00196286 = 13;
@@ -140,13 +140,13 @@ void sky_free(void)
 {
     int unused;
 
-    if (*(int *)moon0_image != 0 && *(int *)moon0_image != (-1751672937)) {
-        mc_free(*(int *)moon0_image, (int)D_00170A86, 368);
-        *(int *)moon0_image = -1751672937;
+    if ((int)moon0_image != 0 && (int)moon0_image != (-1751672937)) {
+        mc_free((int)moon0_image, (int)D_00170A86, 368);
+        moon0_image = (struct cfa_header *)-1751672937;
     }
-    if (*(int *)moon1_image != 0 && *(int *)moon1_image != (-1751672937)) {
-        mc_free(*(int *)moon1_image, (int)D_00170A86, 369);
-        *(int *)moon1_image = -1751672937;
+    if ((int)moon1_image != 0 && (int)moon1_image != (-1751672937)) {
+        mc_free((int)moon1_image, (int)D_00170A86, 369);
+        moon1_image = (struct cfa_header *)-1751672937;
     }
     if (sky_image_a != 0 && sky_image_a != (-1751672937)) {
         mc_free(sky_image_a, (int)D_00170A86, 370);
@@ -263,12 +263,12 @@ void sky_draw_day(int horizon_y, int horizon_y2, int day, int climate)
     int unused;
 
     night_sky_loaded = 0;
-    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     if (((int)(unsigned char)(climate_weathers[climate] & 127)) == 3 || ((int)(unsigned char)(climate_weathers[climate] & 128)) != 0) {
         mc_memset(screen_buffer, 119, view_bottom * 320, (int)D_00170A86, 598, 4);
         return;
     }
-    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     src_offset = (139 - horizon_y) << 9;
     if (src_offset < 0) src_offset = 0;
     column = ((camera_object->yaw + view_look_yaw) - 705) & 2047;
@@ -352,7 +352,7 @@ void sky_draw_night(int horizon_y, int horizon_y2)
     int unused2;
 
     if (night_sky_loaded == 0) sky_load_night();
-    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2));
+    view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     src_offset = (139 - horizon_y) << 9;
     if (src_offset < 0) src_offset = 0;
     column = ((camera_object->yaw + view_look_yaw) - 705) & 2047;

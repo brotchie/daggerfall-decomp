@@ -1,10 +1,10 @@
 /* support.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include <i86.h>
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -47,7 +47,7 @@ extern int frame_ticks;
 extern struct record *location_object;
 extern struct building *tavern_building;
 extern struct record *found_object;
-extern char list_popup_image[];
+extern struct image *list_popup_image;
 extern int D_00195B00;
 extern int creature_count;
 extern struct record *scratch_object;
@@ -135,7 +135,6 @@ extern int mc_set_location(int, int);
 extern int mc_sprintf(int, ...);
 extern int mc_memcpy();
 extern int memchr();
-extern int int386x();
 extern int xn_math_approx_dist2d();
 extern int xn_math_approx_hypot();
 extern int xn_math_angle_to_point();
@@ -343,11 +342,11 @@ void size_fit(short *width, short *height, short max_width, short max_height)
 
 void list_popup_open_strings(char *strings)
 {
-    if (*(int *)list_popup_image == 0) *(int *)list_popup_image = disk_read_file((int)D_00176A1A, 0);
-    D_00195F40 = 160 - (((int)(unsigned short)*(short *)(*(char **)list_popup_image + 4)) >> 1);
-    D_00195F3E = 100 - (((int)(unsigned short)*(short *)(*(char **)list_popup_image + 6)) >> 1);
-    D_00195F42 = *(short *)(*(char **)list_popup_image + 4);
-    D_00195F3C = *(short *)(*(char **)list_popup_image + 6);
+    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file((int)D_00176A1A, 0);
+    D_00195F40 = 160 - (list_popup_image->width >> 1);
+    D_00195F3E = 100 - (list_popup_image->height >> 1);
+    D_00195F42 = list_popup_image->width;
+    D_00195F3C = list_popup_image->height;
     picklist_init((int)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
     while (*strings != 0) {
         picklist_add((int)list_popup_picklist, (int)strings, 0);
@@ -358,11 +357,11 @@ void list_popup_open_strings(char *strings)
 
 void list_popup_open(char **strings)
 {
-    if (*(int *)list_popup_image == 0) *(int *)list_popup_image = disk_read_file((int)D_00176A1A, 0);
-    D_00195F40 = 160 - (((int)(unsigned short)*(short *)(*(char **)list_popup_image + 4)) >> 1);
-    D_00195F3E = 100 - (((int)(unsigned short)*(short *)(*(char **)list_popup_image + 6)) >> 1);
-    D_00195F42 = *(short *)(*(char **)list_popup_image + 4);
-    D_00195F3C = *(short *)(*(char **)list_popup_image + 6);
+    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file((int)D_00176A1A, 0);
+    D_00195F40 = 160 - (list_popup_image->width >> 1);
+    D_00195F3E = 100 - (list_popup_image->height >> 1);
+    D_00195F42 = list_popup_image->width;
+    D_00195F3C = list_popup_image->height;
     picklist_init((int)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
     while (*strings != 0) {
         picklist_add((int)list_popup_picklist, (int)*strings++, 0);
@@ -391,7 +390,7 @@ int picklist_frame(struct picklist *picklist)
 
 int list_popup_update(void)
 {
-    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, *(int *)list_popup_image + 12);
+    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, (int)list_popup_image->pixels);
     return picklist_frame((struct picklist *)list_popup_picklist);
 }
 
@@ -641,29 +640,29 @@ void player_position_restore(int slot)
 
 int flat_anim_finished(struct record *object)
 {
-    char *image;
+    struct texture_header *image;
 
-    image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
+    image = (struct texture_header *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
     if (image == 0) {
         xn_tex_cache_flush();
-        image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
+        image = (struct texture_header *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
     }
-    return ((object->anim_frame >= *(unsigned short *)(image + 20)) ? 1 : 0);
+    return ((object->anim_frame >= image->frame_count) ? 1 : 0);
 }
 
 void flat_anim_step(struct record *object)
 {
-    char *image;
+    struct texture_header *image;
     int elapsed;
 
-    image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
+    image = (struct texture_header *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
     if (image == 0) {
         xn_tex_cache_flush();
-        image = (char *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
+        image = (struct texture_header *)xn_tex_cache_lookup_image(object->image >> 7, (int)(unsigned short)(object->image & 127));
     }
     elapsed = ((xn_anim_ticks >> 5) - object->anim_time) << 5;
-    if (elapsed < 0 || elapsed > 2000) elapsed = *(unsigned short *)(image + 22);
-    if (*(unsigned short *)(image + 22) > elapsed) return;
+    if (elapsed < 0 || elapsed > 2000) elapsed = image->frame_time;
+    if (image->frame_time > elapsed) return;
     object->anim_time = xn_anim_ticks >> 5;
     object->anim_frame++;
 }
@@ -704,12 +703,12 @@ int objects_near_distance_quarter(struct record *object, struct record *other)
     return (distance << 7) / 512;
 }
 
-void buttons_draw_hover_label(int x, int y, int button_count, char *buttons, char **labels)
+void buttons_draw_hover_label(int x, int y, int button_count, struct rect *buttons, char **labels)
 {
     int i;
 
     for (i = 0; i < button_count; i++) {
-        if (mouse_x > *(short *)((i * 12) + buttons) && mouse_x < *(short *)((i * 12) + buttons + 4) && mouse_y > *(short *)((i * 12) + buttons + 2) && mouse_y < *(short *)((i * 12) + buttons + 6)) {
+        if (mouse_x > buttons[i].x0 && mouse_x < buttons[i].x1 && mouse_y > buttons[i].y0 && mouse_y < buttons[i].y1) {
             text_draw_coloured((int)labels[i], (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 156);
         }
     }
@@ -776,14 +775,14 @@ int func_0007EEAF(void)
 
 void func_0007EF20(void)
 {
-    char regs[28];
-    char sregs[12];
+    union REGS regs;
+    struct SREGS sregs;
 
     if (D_00196281 == 0) return;
-    mc_memset((int)sregs, 0, 12, (int)D_00176A10, 1064, 4);
-    *(short *)regs = 257;
-    *(short *)((char *)regs + 12) = D_001A5A54;
-    int386x(49, (int)regs, (int)regs, (int)sregs);
+    mc_memset(&sregs, 0, 12, (int)D_00176A10, 1064, 4);
+    regs.w.ax = 257;
+    regs.w.dx = D_001A5A54;
+    int386x(49, &regs, &regs, &sregs);
     D_00196281 = 0;
 }
 
@@ -1036,7 +1035,7 @@ void location_store_objects(void)
             scratch_object = (struct record *)((int)(house_container = object_create_child(player_entity, 0, 0)));
             house_container->type = 52;
             house_container->flags = 3;
-            house_container->image = 5;
+            house_container->container_index = 5;
         }
         object_foreach_skip_player(object_find_by_id(location_object, player_character->house)->children, (int)func_0007FDEA);
     } else if (player_character->ship_owned != 0 && ((unsigned)(((unsigned)location_object->id) >> 16)) < 1000) {
@@ -1045,7 +1044,7 @@ void location_store_objects(void)
             scratch_object = (struct record *)((int)(ship_container = object_create_child(player_entity, 0, 0)));
             ship_container->type = 52;
             ship_container->flags = 3;
-            ship_container->image = 6;
+            ship_container->container_index = 6;
         }
         object_foreach_skip_player(object_find_by_id(location_object, location_object->id)->children, (int)func_0007FDEA);
     }

@@ -1,7 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002F824 */
 #include "records.h"
 
-struct move { int x, y, z; int f12, f16, f20; char *name; short flags; char pad[26]; int dz; };
+/* a struct move_request (records.h) as this frame holds it: the request, then slots this function
+ * leaves unused, then dz (the shared struct moves dz in the frame: it does not match) */
+struct move { int x, y, z; int angle_x, yaw, angle_z; char *probe; short flags; char pad[26]; int dz; };
 extern char D_00187B44[];
 extern int ceiling_height;
 extern unsigned char player_on_ground;
@@ -27,10 +29,10 @@ void damage_knockback_move(struct record *creature, struct character *creature_c
     m.x = creature->x + dx;
     m.y = creature->y;
     m.z = creature->z + m.dz;
-    m.f12 = creature->angle_x;
-    m.f16 = creature->yaw;
-    m.f20 = creature->angle_z;
-    m.name = D_00187B44;
+    m.angle_x = creature->angle_x;
+    m.yaw = creature->yaw;
+    m.angle_z = creature->angle_z;
+    m.probe = D_00187B44;
     m.flags |= 1;
     collide_flags |= 4;
     collide_move_object(creature, 0, &m, 1);

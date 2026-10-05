@@ -1,6 +1,7 @@
 /* sosez.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "structs.h"
 
 extern char D_001700D5[];
 extern char D_00170112[];
@@ -85,8 +86,8 @@ int sos_load_sample(char *path)
     int handle;
     int size;
     int buffer;
-    int sample;
-    int wav;
+    struct sos_sample *sample;
+    struct wav_header *wav;
 
     handle = open(path, 512);
     if (handle == (-1)) return 0;
@@ -107,28 +108,28 @@ int sos_load_sample(char *path)
     }
     close(handle);
     mc_memset(buffer, 0, 240, (int)D_001700D5, 328, 4);
-    sample = buffer;
+    sample = (struct sos_sample *)buffer;
     if (strncmp(buffer + 240, (int)D_00170112, 4) == 0) {
-        wav = buffer + 240;
-        *(int *)((char *)sample) = buffer + 284;
-        *(int *)((char *)sample + 12) = *(int *)((char *)wav + 40) - 44;
-        *(int *)((char *)sample + 56) = (int)(short)*(short *)((char *)wav + 34);
-        *(int *)((char *)sample + 60) = (int)(short)*(short *)((char *)wav + 22);
-        if (((int)(short)*(short *)((char *)wav + 34)) == 8) {
-            *(int *)((char *)sample + 64) = 32768;
+        wav = (struct wav_header *)(buffer + 240);
+        sample->data = (char *)(buffer + 284);
+        sample->length = wav->data_size - 44;
+        sample->bits = wav->bits;
+        sample->channels = wav->channels;
+        if (wav->bits == 8) {
+            sample->format = 32768;
         } else {
-            *(int *)((char *)sample + 64) = 0;
+            sample->format = 0;
         }
-        *(int *)((char *)sample + 52) = *(int *)((char *)wav + 24);
+        sample->rate = wav->rate;
     } else {
-        *(int *)((char *)sample) = buffer + 240;
-        *(int *)((char *)sample + 12) = size;
-        *(int *)((char *)sample + 56) = 8;
-        *(int *)((char *)sample + 60) = 1;
-        *(int *)((char *)sample + 64) = 32768;
-        *(int *)((char *)sample + 52) = 11025;
+        sample->data = (char *)(buffer + 240);
+        sample->length = size;
+        sample->bits = 8;
+        sample->channels = 1;
+        sample->format = 32768;
+        sample->rate = 11025;
     }
-    *(int *)((char *)sample + 68) = 32768;
-    *(int *)((char *)sample + 44) = 2147450879;
-    return sample;
+    sample->pan = 32768;
+    sample->volume = 2147450879;
+    return (int)sample;
 }

@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern int D_00147954;
 extern char D_001708F0[];
 extern char D_001708F7[];
@@ -64,7 +64,7 @@ extern struct faction *faction_find(short);
 extern int damage_miss_sound(struct item *, int);
 extern void *quest_section(struct quest *, int);
 extern int guards_are_present(void);
-extern int flats_cfg_find(int);
+extern struct flat_cfg *flats_cfg_find(int);
 extern int sound_play(int, struct record *, int);
 extern int disk_open_data(int);
 extern int hud_message_add(int);
@@ -167,7 +167,7 @@ int quest_symbol_text(int symbol, int form, int second_symbol)
                         building = &object->data.building;
                         return building_name(building);
                     }
-                    if ((form & 240) <= 32) return (int)RECORD_DATA(object) + 26;
+                    if ((form & 240) <= 32) return (int)object->data.quest_npc.location_name;
                     if ((form & 240) != 0) {
                         return *(int *)(region_names + (((int)(unsigned short)object->region) << 2));
                     }
@@ -188,7 +188,7 @@ int quest_symbol_text(int symbol, int form, int second_symbol)
                 is_female = 0;
             }
             text_macro_gender = *(signed char *)&is_female;
-            if ((form & 15) == 1) return flats_cfg_find(object->image) + 9;
+            if ((form & 15) == 1) return (int)flats_cfg_find(object->image)->name;
             if ((form & 15) > 1) {
                 if (object->faction_id != 0) return (int)faction_find(object->faction_id)->name;
                 return (int)D_0017090D;
@@ -210,7 +210,7 @@ int quest_symbol_text(int symbol, int form, int second_symbol)
                 if ((object->id >> 16) == 50041) return (int)D_00170959;
                 return building_name(&object->data.building);
             case 32:
-                return (int)RECORD_DATA(object) + 26;
+                return (int)object->data.quest_npc.location_name;
             case 48:
                 return *(int *)(region_names + (object->home_region << 2));
             default:

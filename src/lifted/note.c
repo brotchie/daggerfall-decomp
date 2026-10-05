@@ -2,9 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_4_1 { unsigned char _:4; unsigned char f:1; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 extern short xn_cam_centre_x;
 extern short xn_cam_centre_y;
 extern short mouse_x;
@@ -31,12 +30,11 @@ extern short text_cursor_x;
 extern unsigned short text_cursor_y;
 extern signed char D_00196272;
 extern signed char game_mode;
-extern short D_001997B0;
-extern short D_001997B2;
+extern struct rect D_001997B0;      /* the selection box */
 extern int note_file_size;
 extern int note_rci;
 extern int note_search_text;
-extern char note_selected[];
+extern union note_entry *note_selected;
 extern int D_001997CC;
 extern int note_search_from;
 extern char note_page[];
@@ -84,17 +82,17 @@ extern void text_draw_coloured(char *, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(char *, int, int, int, unsigned char);
 extern void inpstr_begin_number(int);
 extern void inpstr_begin_text(char *, short);
-int note_find_match_cb(char *);
-int note_select_text_cb(char *);
-int note_select_line_cb(char *);
-int rect_overlap(char *, char *);
-int note_keep_text_cb(char *);
-int note_keep_line_cb(char *);
+int note_find_match_cb(struct note_text *);
+int note_select_text_cb(struct note_text *);
+int note_select_line_cb(struct note_line *);
+int rect_overlap(struct rect *, struct rect *);
+int note_keep_text_cb(struct note_text *);
+int note_keep_line_cb(struct note_line *);
 void note_save_page(void);
 void note_reload_page(void);
 void note_load_page(void);
 void note_find(void);
-void note_text_box(char *, char *);
+void note_text_box(struct note_text *, struct rect *);
 void note_delete_selected(void);
 #pragma aux mc_set_location parm routine [];
 
@@ -133,24 +131,24 @@ int note_close(void)
 
 void note_click_page(void)
 {
-    char *entry;
+    struct note_text *entry;
 
     if (note_tool == 0 && note_action == 0) {
         D_001940D5 |= 4;
-        entry = note_page_walk(*(int *)note_page, (int)note_text_hit_cb, 0);
+        entry = (struct note_text *)note_page_walk(*(int *)note_page, (int)note_text_hit_cb, 0);
         if (entry != 0) {
-            if (((int)(unsigned char)(*(signed char *)(entry + 6) & 1)) != 0) {
-                text_cursor_x = (note_cursor_x = 160 - (font_text_width(entry + 11) >> 1));
-                text_cursor_y = (note_cursor_y = *(short *)(entry + 3));
+            if ((entry->flags & 1) != 0) {
+                text_cursor_x = (note_cursor_x = 160 - (font_text_width(entry->text) >> 1));
+                text_cursor_y = (note_cursor_y = entry->y);
             } else {
-                text_cursor_x = (note_cursor_x = *(short *)(entry + 1));
-                text_cursor_y = (note_cursor_y = *(short *)(entry + 3));
+                text_cursor_x = (note_cursor_x = entry->x);
+                text_cursor_y = (note_cursor_y = entry->y);
             }
             note_action = 1;
-            xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)(entry + 5)]));
-            inpstr_begin_text(entry + 11, 79);
+            xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[entry->font]));
+            inpstr_begin_text(entry->text, 79);
             *(signed char *)note_text_flags |= 32;
-            *(int *)note_selected = (int)entry;
+            note_selected = (union note_entry *)entry;
         } else {
             text_cursor_x = (note_cursor_x = mouse_x);
             text_cursor_y = (note_cursor_y = mouse_y);
@@ -176,8 +174,8 @@ void note_click_page(void)
         return;
     }
     note_action = 3;
-    D_001997B0 = mouse_x;
-    D_001997B2 = mouse_y;
+    D_001997B0.x0 = mouse_x;
+    D_001997B0.y0 = mouse_y;
 }
 
 void note_draw_page(void)
@@ -188,7 +186,7 @@ void note_draw_page(void)
     while (*(signed char *)entry != 0) {
         switch (*(unsigned char *)entry) {
         case 1:
-            if (note_silent == 0 && (((int)(short)(*(short *)note_text_flags & 32)) == 0 || entry != *(int *)note_selected)) {
+            if (note_silent == 0 && (((int)(short)(*(short *)note_text_flags & 32)) == 0 || entry != (char *)note_selected)) {
                 xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)(entry + 5)]));
                 if (((int)(unsigned char)(*(signed char *)(entry + 6) & 64)) != 0) {
                     D_0012B508 = (*(signed char *)frame_counter & 15) + 240;
@@ -253,7 +251,7 @@ void note_add_text(char *text)
     *(signed char *)(entry + 5) = *(signed char *)note_font;
     *(signed char *)(entry + 6) = *(signed char *)note_text_flags;
     mc_strncpy(entry + 11, text, 4, (int)D_00174FAC, 381);
-    *(int *)note_selected = (int)entry;
+    note_selected = (union note_entry *)entry;
     entry += 91;
     *(signed char *)entry = 0;
 }
@@ -270,7 +268,7 @@ void note_save_page(void)
 void note_reload_page(void)
 {
     note_load_page();
-    *(int *)note_selected = (note_search_from = 0);
+    note_selected = (union note_entry *)(note_search_from = 0);
 }
 
 void note_load_page(void)
@@ -374,13 +372,13 @@ void note_find_prompt(void)
     mc_memset(note_search_text, 0, 24, (int)D_00174FAC, 543, 4);
     inpstr_begin_text((char *)note_search_text, 23);
     *(signed char *)note_text_flags |= 128;
-    *(int *)note_selected = *(int *)note_page;
+    note_selected = *(union note_entry **)note_page;
 }
 
-int note_find_match_cb(char *entry)
+int note_find_match_cb(struct note_text *entry)
 {
-    if (strstr(entry + 11, note_search_text) != 0) {
-        *(int *)note_selected = (int)entry;
+    if (strstr(entry->text, note_search_text) != 0) {
+        note_selected = (union note_entry *)entry;
         return 1;
     }
     return 0;
@@ -400,24 +398,24 @@ void note_find(void)
     note_save_page();
     *(int *)&page_count = ((unsigned)lseek((int)(short)note_file, 0, 2)) / 3640;
     if (note_search_from != 0) {
-        *(int *)note_selected = note_search_from;
+        note_selected = (union note_entry *)note_search_from;
     } else {
-        *(int *)note_selected = *(int *)note_page;
+        note_selected = *(union note_entry **)note_page;
     }
     while (note_page_index < page_count) {
         note_load_page();
-        if (note_page_walk(*(int *)note_selected, (int)note_find_match_cb, 0) != 0) goto L4E6F9;
+        if (note_page_walk((int)note_selected, (int)note_find_match_cb, 0) != 0) goto L4E6F9;
         note_page_index++;
-        *(int *)note_selected = *(int *)note_page;
+        note_selected = *(union note_entry **)note_page;
     }
     note_page_index = *(int *)&start_page;
     note_reload_page();
     msgbox_show_rsc(1701, 1);
     return;
 L4E6F9:;
-    xn_mouse_set_position((int)(short)*(short *)(*(char **)note_selected + 1), (int)(short)*(short *)(*(char **)note_selected + 3));
+    xn_mouse_set_position(note_selected->text.x, note_selected->text.y);
     note_load_page();
-    note_search_from = *(int *)note_selected;
+    note_search_from = (int)note_selected;
 }
 
 void note_find_next(void)
@@ -446,77 +444,73 @@ void note_clear_page(void)
 void note_toggle_shadow(void)
 {
     mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 622, 4);
-    if (*(int *)note_selected == 0 || ((int)(unsigned char)*(signed char *)(*(char **)note_selected)) != 1) {
+    if (note_selected == 0 || note_selected->kind != 1) {
         return;
     }
-    *(signed char *)(*(char **)note_selected + 6) ^= 2;
+    note_selected->text.flags ^= 2;
 }
 
 void note_toggle_centre(void)
 {
     mc_memcpy(note_page_backup, *(int *)note_page, 3640, (int)D_00174FAC, 629, 4);
-    if (*(int *)note_selected == 0 || ((int)(unsigned char)*(signed char *)(*(char **)note_selected)) != 1) {
+    if (note_selected == 0 || note_selected->kind != 1) {
         return;
     }
-    *(signed char *)(*(char **)note_selected + 6) ^= 1;
+    note_selected->text.flags ^= 1;
 }
 
-int note_select_text_cb(char *entry)
+int note_select_text_cb(struct note_text *entry)
 {
     {
-        char box[12];
+        struct rect box;
 
-        *(signed char *)(entry + 6) &= 191;
-        note_text_box(entry, box);
-        if (rect_overlap((char *)&D_001997B0, box) != 0) *(signed char *)(entry + 6) |= 64;
+        entry->flags &= 191;
+        note_text_box(entry, &box);
+        if (rect_overlap(&D_001997B0, &box) != 0) entry->flags |= 64;
         return 0;
     }
 }
 
-int note_select_line_cb(char *line)
+int note_select_line_cb(struct note_line *line)
 {
     {
-        char end_box[12];
-        char start_box[12];
+        struct rect end_box;
+        struct rect start_box;
 
-        *(signed char *)(line + 10) &= 191;
-        *(short *)((char *)start_box + 4) = *(short *)(line + 1);
-        *(short *)start_box = *(int *)((char *)start_box + 4);
-        *(short *)((char *)start_box + 6) = *(short *)(line + 3);
-        *(short *)((char *)start_box + 2) = *(int *)((char *)start_box + 6);
-        *(short *)((char *)end_box + 4) = *(short *)(line + 5);
-        *(short *)end_box = *(int *)((char *)end_box + 4);
-        *(short *)((char *)end_box + 6) = *(short *)(line + 7);
-        *(short *)((char *)end_box + 2) = *(int *)((char *)end_box + 6);
-        if (rect_overlap((char *)&D_001997B0, start_box) != 0 || rect_overlap((char *)&D_001997B0, end_box) != 0) {
-            *(signed char *)(line + 10) |= 64;
+        line->flags &= 191;
+        start_box.x0 = start_box.x1 = line->x0;
+        start_box.y0 = start_box.y1 = line->y0;
+        end_box.x0 = end_box.x1 = line->x1;
+        end_box.y0 = end_box.y1 = line->y1;
+        if (rect_overlap(&D_001997B0, &start_box) != 0 || rect_overlap(&D_001997B0, &end_box) != 0) {
+            line->flags |= 64;
         }
         return 0;
     }
 }
 
-int rect_overlap(char *box_a, char *box_b)
+int rect_overlap(struct rect *box_a, struct rect *box_b)
 {
-    if (*(short *)(box_b + 4) < *(short *)box_a) return 0;
-    if (*(short *)box_b > *(short *)(box_a + 4)) return 0;
-    if (*(short *)(box_b + 6) < *(short *)(box_a + 2)) return 0;
-    if (*(short *)(box_b + 2) > *(short *)(box_a + 6)) return 0;
+    if (box_b->x1 < box_a->x0) return 0;
+    if (box_b->x0 > box_a->x1) return 0;
+    if (box_b->y1 < box_a->y0) return 0;
+    if (box_b->y0 > box_a->y1) return 0;
     return 1;
 }
 
-void note_text_box(char *entry, char *box)
+void note_text_box(struct note_text *entry, struct rect *box)
 {
     int width;
 
-    xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[(int)(unsigned char)*(signed char *)(entry + 5)]));
-    width = font_text_width(entry + 11);
-    *(short *)box = *(short *)(entry + 1);
-    *(short *)(box + 2) = *(short *)(entry + 3);
-    *(short *)(box + 4) = *(short *)(entry + 1) + width;
-    *(short *)(box + 6) = *(short *)(entry + 3) + font_height;
-    if (((int)(unsigned char)(*(signed char *)(entry + 6) & 1)) == 0) return;
-    *(short *)box = 160 - (((int)(short)*(short *)&width) >> 1);
-    *(short *)(box + 4) = *(short *)box + width;
+    xn_font_select((int)(short)((unsigned short)(unsigned char)D_00185201[entry->font]));
+    width = font_text_width(entry->text);
+    box->x0 = entry->x;
+    box->y0 = entry->y;
+    box->x1 = entry->x + width;
+    box->y1 = entry->y + font_height;
+    if ((entry->flags & 1) == 0) return;
+    box->x0 = 160 - (((int)(short)*(short *)&width) >> 1);
+    box->x1 = box->x0 + width;
 }
 
 void note_delete_in_box(void)
@@ -526,17 +520,17 @@ void note_delete_in_box(void)
     note_delete_selected();
 }
 
-int note_keep_text_cb(char *entry)
+int note_keep_text_cb(struct note_text *entry)
 {
-    if (((int)(unsigned char)(*(signed char *)(entry + 6) & 64)) != 0) return 0;
+    if ((entry->flags & 64) != 0) return 0;
     mc_memcpy(D_001997CC, entry, 91, (int)D_00174FAC, 731, 4);
     D_001997CC = (int)(*(char **)&D_001997CC + 91);
     return 0;
 }
 
-int note_keep_line_cb(char *line)
+int note_keep_line_cb(struct note_line *line)
 {
-    if (((int)(unsigned char)(*(signed char *)(line + 10) & 64)) != 0) return 0;
+    if ((line->flags & 64) != 0) return 0;
     mc_memcpy(D_001997CC, line, 11, (int)D_00174FAC, 739, 4);
     D_001997CC += 11;
     return 0;

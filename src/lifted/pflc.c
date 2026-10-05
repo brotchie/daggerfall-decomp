@@ -3,29 +3,6 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-#pragma pack(1)
-/* the FLC player (44 bytes; flc_open fills it, flc_close frees its buffers) */
-struct flc_player {
-    unsigned short flags;           /* +0x00: 1, 2, 64 own the chunk, palette and image buffers;
-                                       4 ended; 8 the palette changed; 16 keep the palette;
-                                       128 decode into the image instead of the screen */
-    unsigned short handle;          /* +0x02 */
-    short frame_count;              /* +0x04 */
-    short frames_left;              /* +0x06 */
-    unsigned short ticks_per_frame; /* +0x08 */
-    int loop_offset;                /* +0x0A: the second frame's file offset */
-    short x;                        /* +0x0E */
-    short y;                        /* +0x10 */
-    short width;                    /* +0x12 */
-    short height;                   /* +0x14 */
-    char *chunk;                    /* +0x16 */
-    char *palette;                  /* +0x1A: 768 bytes, then the file's */
-    char *image;                    /* +0x1E */
-    char pad22[9];                  /* +0x22 */
-    unsigned char loops;            /* +0x2B: 255 forever */
-};                                  /* +0x2C */
-#pragma pack()
-
 extern signed char mouse_buttons;
 extern signed char key_down_y;
 extern signed char key_down_n;

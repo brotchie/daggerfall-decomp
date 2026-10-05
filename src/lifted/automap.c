@@ -31,11 +31,7 @@ extern char D_001707AE[];
 extern char D_001707B8[];
 extern char D_001707E4[];
 extern unsigned char player_environment;
-extern char automap_buttons[];
-extern char D_0017A02E[];
-extern char D_0017A030[];
-extern char D_0017A032[];
-extern char D_0017A034[];
+extern struct rect automap_buttons[];
 extern signed char D_0017A11D;
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
@@ -82,7 +78,7 @@ extern struct record *quest_event_object2;
 extern struct record *quest_event_object;
 extern signed char cfg_show_markers;
 
-extern int engine_pick_object(int, int, int);
+extern int engine_pick_object(int, int, struct pick_result *);
 extern int town_note_at(short, short);
 extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
@@ -244,11 +240,11 @@ void automap_open(void)
         if (key_down_esc != 0) done = 1;
         if (((int)(unsigned char)(mouse_buttons & 3)) != 0) {
             for (i = 0; i < 12; i++) {
-                if (mouse_x > *(short *)(automap_buttons + (i * 12)) && mouse_x < *(short *)(D_0017A030 + (i * 12)) && mouse_y > *(short *)(D_0017A02E + (i * 12)) && mouse_y < *(short *)(D_0017A032 + (i * 12))) {
+                if (mouse_x > automap_buttons[i].x0 && mouse_x < automap_buttons[i].x1 && mouse_y > automap_buttons[i].y0 && mouse_y < automap_buttons[i].y1) {
                     if (((int)(unsigned char)(mouse_buttons & 3)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 3)) == 0) {
                         sound_play(203, player_object, 100);
                     }
-                    done = ((int (*)())(*(int *)(D_0017A034 + (i * 12))))(i);
+                    done = automap_buttons[i].handler(i);
                 }
             }
         }
@@ -279,14 +275,14 @@ void automap_open(void)
 
 void automap_draw(void)
 {
-    char *image;
+    struct image *image;
 
     xn_shade_set_fog(-1);
     xn_mouse_cursor_erase();
     mc_memcpy(screen_buffer, *(int *)scratch_190de4, 64000, (int)D_001707AE, 192, 4);
-    image = (char *)D_00190E18;
+    image = (struct image *)D_00190E18;
     if (automap_top_down == 0) {
-        xn_draw_image((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
+        xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     }
     automap_render();
     if (((int)player_environment) != 2) {
@@ -476,18 +472,18 @@ int automap_button_downstairs(void)
 
 int automap_button_map_click(void)
 {
-    char pick[20];
+    struct pick_result pick;
 
     if (((int)player_environment) == 1) {
         func_00028547();
         return 0;
     }
-    engine_pick_object((int)(short)mouse_x, (int)(short)mouse_y, (int)pick);
-    if ((*(int *)pick & 1) != 0) {
+    engine_pick_object((int)(short)mouse_x, (int)(short)mouse_y, &pick);
+    if ((pick.flags & 1) != 0) {
         if (((int)(unsigned char)(mouse_buttons & 2)) != 0) {
-            (*(struct record **)(pick + 4))->flags |= 0x400;
+            pick.object->flags |= 0x400;
         } else {
-            D_00196DAC = automap_find_note((struct record *)(*(int *)&D_00196DB0 = *(int *)((char *)pick + 4)));
+            D_00196DAC = automap_find_note(D_00196DB0 = pick.object);
         }
     } else {
         D_00196DB0 = 0;

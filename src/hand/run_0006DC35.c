@@ -68,8 +68,7 @@ extern char D_001960D9[];
 extern int D_00196118;
 extern signed char current_region;
 extern signed char forced_material;
-struct slot { char *p; int f4; int f8; int f12; int f16; };   /* 20 bytes: p is a type-43 record's data */
-extern struct slot bank_houses_for_sale[];
+extern struct house_for_sale bank_houses_for_sale[];
 extern int D_001A41DC;
 extern struct record *D_001A41E4;
 extern signed char bank_house_count;
@@ -491,9 +490,9 @@ void guild_service_dispatch(struct record *npc)
                 object_foreach(location_object, (int)bank_add_house_for_sale);
                 if (bank_house_count == 0) break;
                 choice = rand_range(0, (unsigned char)bank_house_count - 1);
-                player_character->house = bank_houses_for_sale[choice].f12;
-                D_001A41E4 = (struct record *)(bank_houses_for_sale[choice].p - 71);
-                D_001A41DC = bank_houses_for_sale[choice].f4;
+                player_character->house = bank_houses_for_sale[choice].id;
+                D_001A41E4 = (struct record *)((char *)bank_houses_for_sale[choice].block - 71);
+                D_001A41DC = (int)bank_houses_for_sale[choice].building;
                 msgbox_show_rsc(462, 1);
                 mc_strncpy((int)saved_region_name, *(int *)(region_names + (((int)(unsigned char)current_region) << 2)), 32, (int)D_00175EAA, 413);
                 mc_strncpy((int)saved_location_name, (int)current_location, 32, (int)D_00175EAA, 414);

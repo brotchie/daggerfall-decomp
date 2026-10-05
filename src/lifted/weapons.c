@@ -2,9 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern int pick_distance;
 extern signed char mouse_buttons;
 extern int xn_anim_ticks;
@@ -29,10 +28,10 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern int frame_ticks;
 extern struct record *location_object;
-extern char click_hit[];
+extern struct pick_result *click_hit;
 extern int creature_count;
 extern struct record *spell_ready_missile;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern struct settings *game_settings;
@@ -64,7 +63,7 @@ extern int key_action_held(int);
 extern int building_is_open(int);
 extern int sound_play(int, struct record *, int);
 extern int disk_read_file(int, int);
-extern int click_world_face(int);
+extern int click_world_face(struct pick_result *);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int object_free_single(struct record *);
@@ -94,17 +93,17 @@ extern void links_trigger(struct record *, int);
 extern void mem_check_crt_heap(int);
 extern void fatigue_add(int);
 extern void weapon_reload_hand_sprites(void);
-extern void click_item(int, struct record *);
-extern void click_dungeon_model(int, struct record *);
-extern void click_npc(int, struct record *);
-extern void click_creature(int, struct record *);
-extern void click_door(int, struct record *);
-extern void click_marker(int, struct record *);
-extern void click_interior_model(int, struct record *);
-extern void click_corpse(int, struct record *);
-extern void click_pedestrian(int, struct record *);
-extern void click_loot_container(int, struct record *);
-extern void click_town_scenery(int, struct record *);
+extern void click_item(struct pick_result *, struct record *);
+extern void click_dungeon_model(struct pick_result *, struct record *);
+extern void click_npc(struct pick_result *, struct record *);
+extern void click_creature(struct pick_result *, struct record *);
+extern void click_door(struct pick_result *, struct record *);
+extern void click_marker(struct pick_result *, struct record *);
+extern void click_interior_model(struct pick_result *, struct record *);
+extern void click_corpse(struct pick_result *, struct record *);
+extern void click_pedestrian(struct pick_result *, struct record *);
+extern void click_loot_container(struct pick_result *, struct record *);
+extern void click_town_scenery(struct pick_result *, struct record *);
 extern void object_free_later(struct record *);
 extern void spell_cast_queued_run(void);
 extern void inv_merge_arrows(struct record *, struct record *, int);
@@ -206,7 +205,7 @@ void weapon_bow_update(void)
             return;
         }
     }
-    xn_draw_cif_rle_frame(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6))), (int)(unsigned char)weapon_active_hand);
+    xn_draw_cif_rle_frame(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
 }
 
 void weapon_fire_arrow(void)
@@ -229,7 +228,7 @@ void weapon_fire_arrow(void)
     aim[0] += player_object->x;
     aim[1] += player_object->y;
     aim[2] += player_object->z;
-    xn_vec_unit_direction((int)player_object + 7, (int)aim, (char *)arrow + 142);
+    xn_vec_unit_direction((int)player_object + 7, (int)aim, arrow->data.item.arrow.direction);
     arrow->x = player_object->x;
     arrow->y = player_object->y - 70;
     if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) {
@@ -237,7 +236,7 @@ void weapon_fire_arrow(void)
     }
     arrow->z = player_object->z;
     arrow->from_player = 1;
-    xn_vec_advance((char *)arrow + 142, 160, &arrow->x);
+    xn_vec_advance(arrow->data.item.arrow.direction, 160, &arrow->x);
 }
 
 void weapon_missile_orient(struct record *arrow)
@@ -245,7 +244,7 @@ void weapon_missile_orient(struct record *arrow)
 {
     int angles[3];
 
-    mc_memcpy((int)angles, (char *)arrow + 142, 12, (int)D_0017615C, 426, 12);
+    mc_memcpy((int)angles, arrow->data.item.arrow.direction, 12, (int)D_0017615C, 426, 12);
     func_000C2068((int)angles);
     arrow->missile_yaw = (short)angles[0] & 2047;
     arrow->angle_z = (short)angles[1] & 2047;
@@ -269,7 +268,7 @@ int weapon_arrow_update(struct record *arrow)
         dest[0] = arrow->x;
         dest[1] = arrow->y;
         dest[2] = arrow->z;
-        xn_vec_advance((char *)arrow + 142, 40, (int)dest);
+        xn_vec_advance(arrow->data.item.arrow.direction, 40, (int)dest);
         angles[0] = arrow->angle_x;
         angles[1] = arrow->yaw;
         angles[2] = 0;
@@ -327,15 +326,15 @@ void weapon_monster_arrow(struct record *shooter, struct record *target)
     arrow->image = 0;
     item_make(3, 18, &arrow->data.item);
     arrow->data.item.stack_count = 1;
-    xn_vec_unit_direction(&shooter->x, &target->x, (char *)arrow + 142);
+    xn_vec_unit_direction(&shooter->x, &target->x, arrow->data.item.arrow.direction);
     arrow->missile_yaw = 0;
     arrow->angle_z = 0;
     arrow->x = shooter->x;
     arrow->y = shooter->y - 60;
     arrow->z = shooter->z;
     arrow->from_player = 0;
-    *(int *)((char *)arrow + 43) = 1;
-    xn_vec_advance((char *)arrow + 142, 160, &arrow->x);
+    arrow->monster_arrow = 1;
+    xn_vec_advance(arrow->data.item.arrow.direction, 160, &arrow->x);
 }
 
 void weapon_free_sprites(void)
@@ -369,12 +368,12 @@ struct record *monster_nearest_to_point(int x, int y, int z)
     return creature_list[best_index];
 }
 
-void click_world_object(int pick, struct record *object)
+void click_world_object(struct pick_result *pick, struct record *object)
 {
     int location_index;
 
     location_index = loaded_location.index;
-    *(int *)click_hit = pick;
+    click_hit = pick;
     if ((int)spell_ready_missile != 0) {
         if (spell_ready_missile->data.spell.target == 3) {
             spell_cast_queue_count = 0;

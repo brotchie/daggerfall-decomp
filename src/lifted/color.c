@@ -2,13 +2,11 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char D_00177350[];
 extern unsigned char player_environment;
-extern char D_00187B6E[];
-extern int D_00187B72;
-extern int D_00187B76;
+extern struct collide_probe D_00187B6E;
 extern signed char D_001886A8[];
 extern signed char D_001886A9[];
 extern char D_001886D2[];
@@ -117,12 +115,12 @@ int door_blocked_by_player(struct record *door)
     int *model;
     int hit;
 
-    *(int *)D_00187B6E = player_object->x;
-    D_00187B72 = player_object->y;
-    D_00187B76 = player_object->z;
+    D_00187B6E.position.x = player_object->x;
+    D_00187B6E.position.y = player_object->y;
+    D_00187B6E.position.z = player_object->z;
     model = (int *)RECORD_DATA(door);
     if (*model != 0) {
-        hit = xn_collide_spheres_model(model, (int)D_00187B6E, 0);
+        hit = xn_collide_spheres_model(model, (int)&D_00187B6E, 0);
         return (((hit != 0) && (hit != (-1))) ? 1 : 0);
     }
     return 0;

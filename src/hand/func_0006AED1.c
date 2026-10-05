@@ -1,12 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006AED1 */
 #include "records.h"
 
-struct logbook {                /* the logbook record's data (type 24, 3008 bytes) */
-    short quest_ids[32];
-    short message_ids[32][10];
-    int message_times[32][10];
-    char places[32][32];
-};
 extern char D_00175C86[];
 extern struct record *logbook_object;
 extern struct location *current_location;
@@ -24,7 +18,7 @@ void logbook_add_entry(unsigned char quest_id, int message_id, int index)
     int fresh;
     struct quest *quest;
 
-    logbook = (struct logbook *)RECORD_DATA(logbook_object);
+    logbook = &logbook_object->data.logbook;
     slot = -1;
     fresh = 1;
     logbook_prune_quests();

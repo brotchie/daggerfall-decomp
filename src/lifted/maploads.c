@@ -2,16 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-/* an entry of the MAPDITEM record's dungeon table */
-struct dungeon_entry {
-    int offset;                     /* +0x00: from the end of the table */
-    int id;                         /* +0x04: the location id */
-};
-
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -27,11 +19,7 @@ extern char D_0017050E[];
 extern char D_00170522[];
 extern char D_0017053F[];
 extern char D_0017054A[];
-extern char tavern_buttons[];
-extern char D_00179E26[];
-extern char D_00179E28[];
-extern char D_00179E2A[];
-extern char D_00179E2C[];
+extern struct rect tavern_buttons[];
 extern signed char text_buffer[];
 extern signed char tavern_state;
 extern signed char D_001940D4;
@@ -238,7 +226,7 @@ void location_read_record(struct loaded_location *location, int fd)
     int unused;
 
     read(fd, (int)&location->door_count, 4);
-    location->doors = (char *)mc_malloc(location->door_count * 6, (int)D_001704CC, 219);
+    location->doors = (struct location_door *)mc_malloc(location->door_count * 6, (int)D_001704CC, 219);
     read(fd, (int)location->doors, location->door_count * 6);
     location->object = (struct record *)mc_malloc(119, (int)D_001704CC, 223);
     location->data = &location->object->data.location;
@@ -379,7 +367,7 @@ void town_block_create_misc_objects(struct record *block_object)
     struct record *object;
     struct block_model *model;
     struct block_flat *flat;
-    int image;
+    struct texture_header *image;
     int i;
     int size;
     int unused1;
@@ -423,11 +411,11 @@ void town_block_create_misc_objects(struct record *block_object)
                     flat->image = (nature_texture_archive << 7) + (flat->image & 63);
                     break;
                 case 210:
-                    while ((image = xn_tex_cache_lookup_image(flat->image >> 7, flat->image & 49)) == 0) {
+                    while ((image = (struct texture_header *)xn_tex_cache_lookup_image(flat->image >> 7, flat->image & 49)) == 0) {
                         xn_tex_cache_flush();
                     }
-                    if (((int)(unsigned short)*(short *)((char *)image + 6)) < 255) {
-                        height = (int)(unsigned short)*(short *)((char *)image + 6);
+                    if (image->height < 255) {
+                        height = image->height;
                     } else {
                         height = 255;
                     }
@@ -499,7 +487,7 @@ void tavern_frame(void)
 {
     int i;
     int row;
-    int image;
+    struct image *image;
 
     if (tavern_open(0) == 0) return;
     xn_font_select(4);
@@ -517,16 +505,16 @@ void tavern_frame(void)
         return;
     }
     trade_settle_offer();
-    image = tavern_menu_image;
-    xn_draw_image((int)(unsigned short)*(short *)((char *)image), (int)(unsigned short)*(short *)((char *)image + 2), (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), image + 12);
+    image = (struct image *)tavern_menu_image;
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     if (key_down_esc != 0) tavern_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
     for (i = 0; i < 4; i++) {
-        if (mouse_x > *(short *)(tavern_buttons + (i * 12)) && mouse_x < *(short *)(D_00179E28 + (i * 12)) && mouse_y > *(short *)(D_00179E26 + (i * 12)) && mouse_y < *(short *)(D_00179E2A + (i * 12))) {
+        if (mouse_x > tavern_buttons[i].x0 && mouse_x < tavern_buttons[i].x1 && mouse_y > tavern_buttons[i].y0 && mouse_y < tavern_buttons[i].y1) {
             sound_play(203, player_object, 110);
-            ((int (*)())(*(int *)(D_00179E2C + (i * 12))))();
+            tavern_buttons[i].handler();
             return;
         }
     }

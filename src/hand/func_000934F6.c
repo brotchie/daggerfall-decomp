@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000934F6 */
+#include "structs.h"
 extern int screen_buffer;
 extern char D_0017704C[];
 extern char D_001770B0[];
@@ -16,18 +17,16 @@ extern int D_001AA420;
 extern char inv_selected_item[];
 extern char inv_left_container[];
 extern char color_remap_tables[];
-struct Rect { short x0, y0, x1, y1; char pad[4]; };
 
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
-extern void inv_draw_item_image(char *, struct Rect *, short);
-extern void func_00093BD9(char *, struct Rect *, short);
-extern void inv_draw_cell_mark(int, int, struct Rect *, short);
+extern void inv_draw_item_image(char *, struct rect *, short);
+extern void func_00093BD9(char *, struct rect *, short);
+extern void inv_draw_cell_mark(int, int, struct rect *, short);
 extern int mc_strncpy();
 extern int mc_memcpy();
 #pragma aux mc_set_location parm routine [];
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, ...);
-
 
 #define SCREEN (*(char **)&screen_buffer)
 #define BUFS ((char **)&D_001AA420)
@@ -35,7 +34,7 @@ extern int mc_sprintf(char *, ...);
 #define MODE2 (D_0019626F)
 #define U16(p, o) (*(unsigned short *)((p) + (o)))
 
-int inv_draw_item_cell(char *object, short cell, struct Rect *rects)
+int inv_draw_item_cell(char *object, short cell, struct rect *rects)
 {
     short unused1;
     int unused2;

@@ -2,10 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -25,10 +23,7 @@ extern signed char guild_rank_secondary_skill[];
 extern int guild_skill_lists[];
 extern short guild_service_factions[];
 extern int guild_service_labels[];
-extern char guild_menu_buttons[];
-extern char D_0018750B[];
-extern char D_0018750D[];
-extern char D_0018750F[];
+extern struct rect guild_menu_buttons[];
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
 extern int D_00190CBC;
@@ -394,7 +389,7 @@ int guild_service_label(short faction_id)
     return 0;
 }
 
-int guild_menu(int image, int is_member, int label)
+int guild_menu(struct image *image, int is_member, int label)
 {
     int choice;
     int button;
@@ -405,7 +400,7 @@ int guild_menu(int image, int is_member, int label)
     D_00196272 = 1;
     while (choice == (-1)) {
         mc_memcpy(screen_buffer, guild_saved_screen, 64000, (int)D_00175EAA, 1587, 4);
-        xn_draw_image((int)(unsigned short)*(short *)((char *)image), (int)(unsigned short)*(short *)((char *)image + 2), (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), image + 12);
+        xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
         text_draw_centred_coloured(label, 159, 71, 145, 141);
         keys_world_actions();
         player_movement_update();
@@ -417,7 +412,7 @@ int guild_menu(int image, int is_member, int label)
         }
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
             for (button = 0; button < 4; button++) {
-                if (mouse_x > *(short *)(guild_menu_buttons + (button * 12)) && mouse_x < *(short *)(D_0018750D + (button * 12)) && mouse_y > *(short *)(D_0018750B + (button * 12)) && mouse_y < *(short *)(D_0018750F + (button * 12))) {
+                if (mouse_x > guild_menu_buttons[button].x0 && mouse_x < guild_menu_buttons[button].x1 && mouse_y > guild_menu_buttons[button].y0 && mouse_y < guild_menu_buttons[button].y1) {
                     if (button == 0 && is_member != 0) continue;
                     sound_play(203, (int)player_object, 100);
                     choice = button;

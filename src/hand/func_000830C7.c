@@ -2,24 +2,16 @@
 #include "records.h"
 
 #pragma pack(1)
-struct flame {
-    int handle;
-    char pad4[8];
-    char pos[20];
-    int x, y, z;
-    int f44, f48, f52;
-};
 struct stat15 { unsigned short f:15; };
 #pragma pack()
 extern int D_000C5404;
 extern int xn_anim_ticks;
-struct race { unsigned short flags; char pad[27]; };
-extern struct race monster_table_flags[];
+extern struct monster_template monster_table[];
 extern short frame_counter;
 extern unsigned char current_climate;
 extern int daylight;
 extern char cfg_show_markers;
-extern struct flame D_001A945E;
+extern struct model_instance D_001A945E;
 extern unsigned char D_001A949C;
 extern char model_cache_flush_count;
 extern void spell_area_effect(struct record *);
@@ -41,18 +33,18 @@ extern int xn_flat_add();
 
 int object_draw_cb(struct record *object)
 {
-    struct flame *instance;
+    struct model_instance *instance;
     struct block *block;
     struct block_flat *flat;
     struct block_model *model;
-    unsigned char *missile_image;
+    struct texture_header *missile_image;
     struct monster_anim *anim;
     int n;
     int glow;
     int unused;
     int intensity;
     struct character *character;
-    unsigned char *image;
+    struct texture_header *image;
 
     if (model_cache_flush_count != 0)
         return 1;
@@ -67,8 +59,8 @@ int object_draw_cb(struct record *object)
         anim = &object->data.monster.anim;
         xn_anim_update(anim);
         object->image = (object->image & -128) | (anim->anim_record + anim->anim_facing);
-        image = (unsigned char *)xn_tex_cache_lookup_image(object->image >> 7, object->image & 127);
-        anim->frame_count = *(short *)(image + 22);
+        image = (struct texture_header *)xn_tex_cache_lookup_image(object->image >> 7, object->image & 127);
+        anim->frame_count = image->frame_time;
         n = object->image >> 7;
         if (n == 280 || n == 281) {
             xn_light_add(object->x, object->y, object->z, 31, 256, 0);
@@ -80,7 +72,7 @@ int object_draw_cb(struct record *object)
             n = 1;
         character = &object->data.character;
         if ((character->conditions & 4) == 0) {
-            if ((monster_table_flags[character->race].flags & 1) && character->race != 29 && object->y - 90 > character->ceiling_y)
+            if ((monster_table[character->race].flags & 1) && character->race != 29 && object->y - 90 > character->ceiling_y)
                 object->draw_handle = xn_flat_add(object->x, object->y - 30, object->z, object->image, anim->anim_frame, (anim->anim_bits >> 10) & 32 | 4, glow + 256);
             else
                 object->draw_handle = xn_flat_add(object->x, object->y, object->z, object->image, anim->anim_frame, (anim->anim_bits >> 10) & 32 | 4, glow + 256);
@@ -116,17 +108,17 @@ int object_draw_cb(struct record *object)
     case 2:
         if (object->image2 == 998 && object->image == 0) {
             instance = &D_001A945E;
-            instance->handle = model_get(object->image2, object->image, (current_climate << 2) + D_001A949C);
-            if (instance->handle != 0) {
+            instance->model = (char *)model_get(object->image2, object->image, (current_climate << 2) + D_001A949C);
+            if (instance->model != 0) {
                 instance->x = object->x;
                 instance->y = object->y;
                 instance->z = object->z;
                 if (weapon_arrow_update(object) == 0)
                     break;
                 weapon_missile_orient(object);
-                instance->f44 = object->missile_yaw;
-                instance->f48 = object->angle_z;
-                instance->f52 = 0;
+                instance->missile_angles[0] = object->missile_yaw;
+                instance->missile_angles[1] = object->angle_z;
+                instance->missile_angles[2] = 0;
                 xn_model_submit(instance, 0);
                 break;
             }
@@ -159,8 +151,8 @@ int object_draw_cb(struct record *object)
             if (object->image2 & 32768) {
                 if (object->image2 == 32768)
                     spell_area_effect(object);
-                missile_image = (unsigned char *)xn_tex_cache_lookup_image(object->missile_texture >> 7, object->missile_texture & 127);
-                if ((int)((struct stat15 *)&object->image2)->f >= (int)*(unsigned short *)(missile_image + 20)) {
+                missile_image = (struct texture_header *)xn_tex_cache_lookup_image(object->missile_texture >> 7, object->missile_texture & 127);
+                if ((int)((struct stat15 *)&object->image2)->f >= missile_image->frame_count) {
                     object->image2 = 36863;
                 } else {
                     xn_flat_add(object->x, object->y, object->z, object->missile_texture, ((struct stat15 *)&object->image2)->f, 1, 4129024);
@@ -210,9 +202,9 @@ int object_draw_cb(struct record *object)
     case 32:
         if (object->image2 == 0)
             break;
-        instance = (struct flame *)&object->data;
-        instance->handle = model_get(object->image2, object->image, (current_climate << 2) + D_001A949C);
-        if (instance->handle != 0) {
+        instance = &object->data.instance;
+        instance->model = (char *)model_get(object->image2, object->image, (current_climate << 2) + D_001A949C);
+        if (instance->model != 0) {
             instance->x = object->x;
             instance->y = object->y;
             instance->z = object->z;
@@ -220,15 +212,15 @@ int object_draw_cb(struct record *object)
                 if (weapon_arrow_update(object) == 0)
                     break;
                 weapon_missile_orient(object);
-                instance->f44 = object->missile_yaw;
-                instance->f48 = object->angle_z;
-                instance->f52 = 0;
+                instance->missile_angles[0] = object->missile_yaw;
+                instance->missile_angles[1] = object->angle_z;
+                instance->missile_angles[2] = 0;
             } else if (object->link_flag != 255) {
-                xn_model_set_angles_yaw_offset(instance->pos, object->wait_state);
+                xn_model_set_angles_yaw_offset(instance->angles, object->wait_state);
             } else {
                 if (object->image2 == 610 && object->image == 32)
                     D_000C5404 = 3;
-                xn_model_compose_angles(instance->pos, object->angle_x, object->yaw + object->wait_state, object->angle_z);
+                xn_model_compose_angles(instance->angles, object->angle_x, object->yaw + object->wait_state, object->angle_z);
             }
             xn_model_submit(instance, 0);
         }

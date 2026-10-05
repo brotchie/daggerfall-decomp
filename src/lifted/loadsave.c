@@ -37,11 +37,7 @@ extern char D_00178A10[];
 extern int guards_timer;
 extern char D_00178A18[];
 extern int D_001846F8;
-extern char saveload_buttons[];
-extern char D_00187A92[];
-extern char D_00187A94[];
-extern char D_00187A96[];
-extern char D_00187A98[];
+extern struct rect saveload_buttons[];
 extern char savetree_version[];
 extern int D_00187F28;
 extern char saved_location_name[];
@@ -80,7 +76,7 @@ extern struct record *quest_root;
 extern struct record *bank_accounts;
 extern char D_00195A08[];
 extern int D_00195A0C;
-extern signed char quest_faces[];
+extern struct quest_face quest_faces[];
 extern int D_00195A78;
 extern int jump_velocity;
 extern struct record *camera_object;
@@ -613,9 +609,9 @@ void saveload_menu(int saving)
             mouse_double_click = 0;
         } else if (mouse_double_click != 0 || (mouse_buttons != 0 && mouse_buttons_prev == 0)) {
             for (i = 0; i < 14; i++) {
-                if (mouse_x > *(short *)(saveload_buttons + (i * 12)) && mouse_x < *(short *)(D_00187A94 + (i * 12)) && mouse_y > *(short *)(D_00187A92 + (i * 12)) && mouse_y < *(short *)(D_00187A96 + (i * 12))) {
+                if (mouse_x > saveload_buttons[i].x0 && mouse_x < saveload_buttons[i].x1 && mouse_y > saveload_buttons[i].y0 && mouse_y < saveload_buttons[i].y1) {
                     sound_play(203, (int)player_object, 100);
-                    slot = ((int (*)())(*(int *)(D_00187A98 + (i * 12))))(i, saving, slot, used_slots);
+                    slot = saveload_buttons[i].handler(i, saving, slot, used_slots);
                 }
                 if (slot == (-1)) break;
             }
@@ -901,7 +897,7 @@ void load_fix_object_cb(struct record *object)
             return;
         case 6:
         case 32:
-            model_ptr = (char **)RECORD_DATA(object);
+            model_ptr = &object->data.instance.model;
             *model_ptr = 0;
         default:;
         }

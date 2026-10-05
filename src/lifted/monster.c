@@ -2,13 +2,12 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern char D_00175934[];
 extern signed char anim_mirror_facing[];
 extern int D_00186A14[];
-extern char D_00187B44[];
+extern struct collide_probe D_00187B44;
 extern signed char undead_daedra_ids[];
 extern struct record *creature_list[];
 extern char D_00190704[];
@@ -38,7 +37,7 @@ extern int D_00199D74;
 extern char D_00199D9B[];
 extern int link_count;
 
-extern int collide_move_object(struct record *, int, int, int);
+extern int collide_move_object(struct record *, int, struct move_request *, int);
 extern int damage_apply(struct record *, int, int);
 extern int spell_cost(struct spell *, struct character *);
 extern int cast_creature_spell_at(struct record *, struct record *, struct record *);
@@ -121,7 +120,7 @@ void func_0006243B(struct record *monster, struct record *target, int heading)
     int dy;
     unsigned char saved_on_ground;
     {
-        int move[8];
+        struct move_request move;
         char saved_pos[40];             /* +0: the saved D_00196D54; +36: the monster's character */
 
         *(int *)((char *)saved_pos + 36) = (int)&monster->data.character;
@@ -132,42 +131,42 @@ void func_0006243B(struct record *monster, struct record *target, int heading)
         } else {
             xn_math_yaw_offset_xz(heading, speed, (int)&dx, (int)&dz);
         }
-        move[0] = monster->x + dx;
-        move[1] = monster->y;
-        move[2] = monster->z + dz;
+        move.x = monster->x + dx;
+        move.y = monster->y;
+        move.z = monster->z + dz;
         if (((struct bf8_0_1 *)&ai_monster_flags)->f != 0) {
-            dy = move[1] - (target->y - 70);
+            dy = move.y - (target->y - 70);
             if (abs(dy) > 10) {
                 if (dy < 0) {
-                    move[1] += speed;
+                    move.y += speed;
                 } else {
-                    move[1] -= speed;
+                    move.y -= speed;
                 }
             }
         }
-        move[3] = monster->angle_x;
-        move[4] = monster->yaw;
-        move[5] = monster->angle_z;
+        move.angle_x = monster->angle_x;
+        move.yaw = monster->yaw;
+        move.angle_z = monster->angle_z;
         saved_on_ground = player_on_ground;
         saved_velocity = vertical_velocity;
         saved_ceiling = ceiling_height;
         *(signed char *)collide_flags |= 4;
         fall_start = (vertical_velocity = *(int *)(*(char **)((char *)saved_pos + 36) + 76));
         D_001940D7 |= 128;
-        move[6] = (int)D_00187B44;
+        move.probe = &D_00187B44;
         if (((int)(unsigned short)(*(short *)(*(char **)((char *)saved_pos + 36) + 64) & 2080)) != 0) {
-            *(short *)&move[7] |= 1;
+            move.flags |= 1;
         } else {
-            *(short *)&move[7] &= 65534;
+            move.flags &= 65534;
         }
         mc_memcpy((int)saved_pos, (int)D_00196D54, 12, (int)D_00175934, 512, 4);
         *(int *)D_00196D54 = monster->x;
         D_00196D58 = monster->y - (vertical_velocity / 256);
         D_00196D5C = monster->z;
-        if ((move[1] - 90) < *(int *)(*(char **)((char *)saved_pos + 36) + 88)) {
-            move[1] = *(int *)(*(char **)((char *)saved_pos + 36) + 88) + 90;
+        if ((move.y - 90) < *(int *)(*(char **)((char *)saved_pos + 36) + 88)) {
+            move.y = *(int *)(*(char **)((char *)saved_pos + 36) + 88) + 90;
         }
-        collide_move_object(monster, 0, (int)move, 0);
+        collide_move_object(monster, 0, &move, 0);
         player_on_ground = saved_on_ground;
         mc_memcpy((int)D_00196D54, (int)saved_pos, 12, (int)D_00175934, 521, 4);
         if (*(int *)((char *)saved_pos + 36) != (int)player_character) {
@@ -531,7 +530,7 @@ int func_0006379A(struct record *from, struct record *to)
 
 void monster_apply_gravity(void)
 {
-    int move[8];
+    struct move_request move;
     char saved_pos[12];
     int i;
     int fall_start;
@@ -553,20 +552,20 @@ void monster_apply_gravity(void)
         fall_start = monster_char->fall_velocity;
         vertical_velocity = fall_start;
         mc_memcpy((int)D_00196D54, (int)creature_list[i] + 7, 12, (int)D_00175934, 1159, 4);
-        move[0] = creature_list[i]->x;
-        move[1] = (int)(*(char **)((char *)creature_list[i] + 11) + (vertical_velocity / 256));
-        move[2] = creature_list[i]->z;
-        move[3] = creature_list[i]->angle_x;
-        move[4] = creature_list[i]->yaw;
-        move[5] = creature_list[i]->angle_z;
+        move.x = creature_list[i]->x;
+        move.y = (int)(*(char **)((char *)creature_list[i] + 11) + (vertical_velocity / 256));
+        move.z = creature_list[i]->z;
+        move.angle_x = creature_list[i]->angle_x;
+        move.yaw = creature_list[i]->yaw;
+        move.angle_z = creature_list[i]->angle_z;
         if (((int)(unsigned short)(monster_char->flags & 2080)) != 0) {
-            *(short *)&move[7] |= 1;
+            move.flags |= 1;
         } else {
-            *(short *)&move[7] &= 65534;
+            move.flags &= 65534;
         }
-        move[6] = (int)D_00187B44;
+        move.probe = &D_00187B44;
         *(signed char *)collide_flags &= 251;
-        collide_move_object(creature_list[i], 0, (int)move, 0);
+        collide_move_object(creature_list[i], 0, &move, 0);
         if (((int)(short)(*(short *)collide_flags & 16)) != 0) {
             object_apply_gravity(creature_list[i], monster_char);
         } else {

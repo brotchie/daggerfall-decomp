@@ -1,8 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002ECBE */
 #include "records.h"
 
-struct vec3 { int x, y, z; };
-struct move { struct vec3 pos; int f12, f16, f20; char *name; };
 extern unsigned char D_0012B508;
 extern char D_001709A1[];
 extern char D_001709C6[];
@@ -10,7 +8,7 @@ extern char D_001709E4[];
 extern char D_001709ED[];
 struct pic { short file, rec; };
 extern struct pic monster_corpse_textures[];
-extern char D_00187B44[];
+extern struct collide_probe D_00187B44;
 extern signed char text_buffer[];
 extern unsigned char D_001940D7;
 extern struct record *player_entity;
@@ -25,7 +23,7 @@ extern int player_death_timer;
 extern short D_00195DA0;
 extern unsigned char player_on_ground;
 extern short collide_flags;
-extern int collide_move_object(struct record *, int, struct move *, int);
+extern int collide_move_object(struct record *, int, struct move_request *, int);
 extern void damage_find_empty_soul_trap_cb(struct record *);
 extern void damage_drop_at_death_cb(struct record *);
 extern void quest_raise_event(int, struct record *, int);
@@ -44,10 +42,9 @@ extern int mc_sprintf(char *, ...);
 
 void damage_creature_death(struct record *creature)
 {
-    int unused;
     struct character *creature_char;
     struct record *soul;
-    struct move move;
+    struct move_request move;
     int saved_on_ground;
     int saved_ceiling;
     int has_soul_artifact;
@@ -112,8 +109,8 @@ found:
     collide_flags = 0;
     D_001940D7 |= 32;
     mc_memcpy(&move, &creature->x, 12, D_001709E4, 605, 4);
-    mc_memset(&move.f12, 0, 12, D_001709E4, 606, 4);
-    move.name = D_00187B44;
+    mc_memset(&move.angle_x, 0, 12, D_001709E4, 606, 4);
+    move.probe = &D_00187B44;
     collide_move_object(creature, 0, &move, 0);
     player_on_ground = saved_on_ground;
     ceiling_height = saved_ceiling;

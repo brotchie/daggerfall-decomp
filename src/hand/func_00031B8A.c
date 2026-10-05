@@ -2,8 +2,6 @@
 #include "records.h"
 
 #pragma pack(1)
-struct Kind { char pad[6]; unsigned char flags; };
-struct Ent6 { unsigned short a; unsigned short b; unsigned short c; };
 #pragma pack()
 extern char D_00170A64[];
 extern unsigned char D_0017A25C[];
@@ -16,10 +14,10 @@ extern char *scratch_buffer;
 extern struct record *D_00195CE8;
 extern unsigned char current_region;
 extern int loaded_location_door_count;
-extern struct Ent6 *loaded_location_doors;
+extern struct location_door *loaded_location_doors;
 extern char D_001970C8[];
 extern int D_001970CC;
-extern struct Ent6 *D_001970D0;
+extern struct location_door *D_001970D0;
 extern struct record *D_001970D4;
 extern struct location *D_001970D8;
 extern char D_001970DC;
@@ -29,11 +27,11 @@ extern struct faction *faction_find_type_in_region(short, int);
 extern struct faction *faction_find(short);
 extern struct faction *faction_random_of_type(unsigned char);
 extern struct qbn_person *quest_record(struct quest *, int, int);
-extern int func_000339B2(struct Ent6 *, struct qbn_person *, struct building *, int);
+extern int func_000339B2(struct location_door *, struct qbn_person *, struct building *, int);
 extern struct faction *pick_random_of_three(struct faction **);
 extern int faction_random_hostile_id(void);
 extern int quest_object_in_use(int);
-extern struct Kind *flats_cfg_find(unsigned short);
+extern struct flat_cfg *flats_cfg_find(unsigned short);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern void location_free(char *);
@@ -47,8 +45,8 @@ extern int mc_memcpy(void *, void *, int, char *, int, int);
 
 int quest_init_person(struct qbn_person *qbn_person)
 {
-    struct Ent6 *doors;
-    struct Ent6 *door;
+    struct location_door *doors;
+    struct location_door *door;
     int door_count;
     int candidate_count;
     int i;
@@ -61,7 +59,7 @@ int quest_init_person(struct qbn_person *qbn_person)
     struct location *location;
     int *candidates;
     struct building *building;
-    struct Kind *flat_cfg;
+    struct flat_cfg *flat_cfg;
     struct faction *faction;
     struct qbn_person *linked_person;
 
@@ -86,7 +84,7 @@ int quest_init_person(struct qbn_person *qbn_person)
             object->faction_id = D_00195CE8->data.person.faction_id;
         else
             object->faction_id = building->faction_id;
-        mc_strncpy(RECORD_DATA(object) + 26, (char *)current_location, 4, D_00170A64, 76);
+        mc_strncpy(object->data.quest_npc.location_name, current_location->name, 4, D_00170A64, 76);
         mc_memcpy(&object->x, &D_00195CE8->x, 12, D_00170A64, 77, 4);
         object->type = 41;
         object->image = D_00195CE8->image;
@@ -234,17 +232,17 @@ retry:
         D_001970DD = rand() & 1;
     if ((int)(short)(qbn_person->flags & 0x100) == 0) {
         for (candidate_count = i = 0, door = doors; i < door_count; i++, door++) {
-            if (door->a != 65535 && func_000339B2(door, qbn_person, &location->buildings[door->a], 0) != 0)
-                candidates[candidate_count++] = (door->a << 16) + door->c;
+            if (door->building_index != 65535 && func_000339B2(door, qbn_person, &location->buildings[door->building_index], 0) != 0)
+                candidates[candidate_count++] = (door->building_index << 16) + door->id;
         }
     }
     if (qbn_person->kind != -6 && candidate_count == 0 || (int)(short)(qbn_person->flags & 0x100) != 0) {
         any_building = 1;
         for (i = 0, door = doors; i < door_count; i++, door++) {
-            if ((int)(short)(qbn_person->flags & 0x100) != 0 && func_000339B2(door, qbn_person, &location->buildings[door->a], 1) != 0)
-                candidates[candidate_count++] = (door->a << 16) + door->c;
-            else if (door->a != 65535 && func_000339B2(door, qbn_person, &location->buildings[door->a], 1) != 0)
-                candidates[candidate_count++] = (door->a << 16) + door->c;
+            if ((int)(short)(qbn_person->flags & 0x100) != 0 && func_000339B2(door, qbn_person, &location->buildings[door->building_index], 1) != 0)
+                candidates[candidate_count++] = (door->building_index << 16) + door->id;
+            else if (door->building_index != 65535 && func_000339B2(door, qbn_person, &location->buildings[door->building_index], 1) != 0)
+                candidates[candidate_count++] = (door->building_index << 16) + door->id;
         }
     }
     if (candidate_count == 0 && (int)(short)(qbn_person->flags & 0xff) == 0) {
@@ -273,7 +271,7 @@ retry:
     object = object_create_child(nonworld_root, 0, 58);
     mc_memcpy(&object->x, &loc_object->x, 12, D_00170A64, 307, 4);
     mc_memcpy(&object->data, &location->buildings[(unsigned)candidates[i] >> 16], 26, D_00170A64, 308, 4);
-    mc_strncpy(RECORD_DATA(object) + 26, (char *)location, 4, D_00170A64, 309);
+    mc_strncpy(object->data.quest_npc.location_name, location->name, 4, D_00170A64, 309);
     if (object->data.building.faction_id == 0)
         object->data.building.faction_id = faction_find_type_in_region(current_region, 15)->id;
     if (npc_faction_id != 0)

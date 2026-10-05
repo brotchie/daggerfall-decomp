@@ -6,7 +6,7 @@ extern char D_0017684E[];
 extern char D_0017685B[];
 extern char D_00176868[];
 extern char D_00176876[];
-extern char monster_table[];
+extern struct monster_template monster_table[];
 extern signed char class_creature_types[];
 extern signed char text_buffer[];
 extern char D_00190704[];
@@ -41,7 +41,7 @@ void monster_init(struct record *monster, int monster_type)
     struct character *monster_char;
     struct career *career;
     struct monster_anim *anim;
-    char *table_row;
+    struct monster_template *table_row;
     int texture;
     int i;
     int skill_value;
@@ -112,7 +112,7 @@ void monster_init(struct record *monster, int monster_type)
         anim->frame_count = *(short *)(*(char **)((char *)texture + 12) + 22);
         monster_char->magicka = (monster_char->max_magicka = 0);
         if (monster_type == 23 || monster_type == 18) xn_tex_archive_set_translucent(texture_base + monster_type);
-        table_row = monster_table + monster_type * 29;
+        table_row = &monster_table[monster_type];
         if (monster_type >= 43) {
             mc_set_location(112, (int)D_00176844);
             mc_sprintf((int)text_buffer, (int)D_00176868, class_index);
@@ -134,21 +134,21 @@ void monster_init(struct record *monster, int monster_type)
         if (monster_type >= 43) {
             monster_char->level = player_character->level;
             if (monster_char->mobile_id == 146) monster_char->level += rand_range(3, 6);
-            monster_char->health = (monster_char->max_health = monster_roll_class_health(career->hp_per_level, (int)(unsigned char)*(signed char *)table_row, monster_char->level));
+            monster_char->health = (monster_char->max_health = monster_roll_class_health(career->hp_per_level, table_row->hp_bonus, monster_char->level));
         } else {
-            monster_char->level = *(signed char *)(table_row + 28);
-            monster_char->health = (monster_char->max_health = monster_roll_d8_health(career->hp_per_level, (int)(unsigned char)*(signed char *)table_row));
+            monster_char->level = table_row->level;
+            monster_char->health = (monster_char->max_health = monster_roll_d8_health(career->hp_per_level, table_row->hp_bonus));
         }
-        mc_memset(monster_char->armor_values, ((int)(unsigned char)*(signed char *)(table_row + 1)) * 5, 7, (int)D_00176844, 145, 7);
-        monster_char->loot_table = (int)(unsigned char)*(signed char *)(table_row + 2);
-        monster_char->table_flags = *(short *)(table_row + 4);
-        mc_memcpy(monster_char->attack_damage, table_row + 6, 10, (int)D_00176844, 148, 20);
-        monster_char->min_metal_to_hit = *(signed char *)(table_row + 3);
+        mc_memset(monster_char->armor_values, table_row->armor * 5, 7, (int)D_00176844, 145, 7);
+        monster_char->loot_table = table_row->loot_table;
+        monster_char->table_flags = table_row->flags;
+        mc_memcpy(monster_char->attack_damage, table_row->attack_damage, 10, (int)D_00176844, 148, 20);
+        monster_char->min_metal_to_hit = table_row->min_metal_to_hit;
         mc_memcpy(monster_char->attributes, career->attributes, 16, (int)D_00176844, 150, 16);
-        if (*(signed char *)(table_row + 26) == *(signed char *)(table_row + 27)) {
-            monster_char->pad22A = *(signed char *)(table_row + 26);
+        if (table_row->range_min == table_row->range_max) {
+            monster_char->pad22A = table_row->range_min;
         } else {
-            monster_char->pad22A = rand_range((int)(unsigned char)*(signed char *)(table_row + 26), (int)(unsigned char)*(signed char *)(table_row + 27));
+            monster_char->pad22A = rand_range((unsigned char)table_row->range_min, (unsigned char)table_row->range_max);
         }
         monster_char->nav_direction = 2;
         monster_char->nav_blocked = 0;
@@ -165,8 +165,8 @@ void monster_init(struct record *monster, int monster_type)
         monster_init_gear(monster);
         monster_maybe_give_map(monster, monster_char->mobile_id);
         monster->image = (texture_base + monster_type) << 7;
-        if (*(signed char *)(table_row + 2) != 0) {
-            loot_generate(((int)(unsigned char)*(signed char *)(table_row + 2)) - 1, monster, player_character->level, (int)(unsigned short)(player_character->flags & 1));
+        if (table_row->loot_table != 0) {
+            loot_generate(table_row->loot_table - 1, monster, player_character->level, (int)(unsigned short)(player_character->flags & 1));
         }
         monster_char->fall_velocity = 0;
         monster_char->faction_id = 0;

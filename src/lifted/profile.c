@@ -1,6 +1,7 @@
 /* profile.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "structs.h"
 
 extern char D_00170129[];
 extern char D_00170133[];
@@ -8,10 +9,10 @@ extern char D_00170137[];
 extern char D_0017013B[];
 extern int D_00178848[];
 
-extern int profile_find_section(int, ...);
-extern int profile_find_item(int, ...);
-extern int profile_get_string(int, ...);
-extern int profile_set_string(int, ...);
+extern int profile_find_section(struct profile *, ...);
+extern int profile_find_item(struct profile *, ...);
+extern int profile_get_string(struct profile *, ...);
+extern int profile_set_string(struct profile *, ...);
 extern int strlen();
 extern int mc_memmove();
 extern int stricmp();
@@ -25,17 +26,17 @@ int profile_hex_digit(signed char);
 #pragma aux (sosconv) profile_delete_section;
 #pragma aux (sosconv) profile_add_section;
 
-int profile_get_raw_line(int profile, char *line, int size)
+int profile_get_raw_line(struct profile *profile, char *line, int size)
 {
     char *cursor;
     char *end;
     int length;
 
-    cursor = *(char **)((char *)profile + 168);
+    cursor = profile->line;
     if (cursor == 0 || *cursor == 91 || *cursor == 13) {
         return 0;
     }
-    end = *(char **)((char *)profile + 132) + *(int *)((char *)profile + 136);
+    end = profile->buffer + profile->length;
     length = 0;
     while (*cursor == 32) cursor++;
     while (*cursor != 13 && ((unsigned)(size - 1)) > length) {
@@ -44,14 +45,14 @@ int profile_get_raw_line(int profile, char *line, int size)
     line[length] = 0;
     cursor += 2;
     if (cursor >= end) {
-        *(int *)((char *)profile + 168) = 0;
+        profile->line = 0;
     } else {
-        *(char **)((char *)profile + 168) = cursor;
+        profile->line = cursor;
     }
     return 1;
 }
 
-int profile_get_yes(int profile, char *item)
+int profile_get_yes(struct profile *profile, char *item)
 {
     char value[32];
 
@@ -61,14 +62,14 @@ int profile_get_yes(int profile, char *item)
     return 0;
 }
 
-int profile_get_item_string(int profile, char *item, char *value, int size)
+int profile_get_item_string(struct profile *profile, char *item, char *value, int size)
 {
     if ((short)profile_find_item(profile, item) == 0) return 0;
     if ((short)profile_get_string(profile, value, size) == 0) return 0;
     return 1;
 }
 
-int profile_set_yes_no(int profile, char *item, short yes)
+int profile_set_yes_no(struct profile *profile, char *item, short yes)
 {
     if ((short)profile_find_item(profile, item) == 0) return 0;
     if (yes != 0) {
@@ -79,37 +80,37 @@ int profile_set_yes_no(int profile, char *item, short yes)
     return 1;
 }
 
-int profile_delete_section(int profile, char *section)
+int profile_delete_section(struct profile *profile, char *section)
 {
     char *start;
     char *end;
     int length;
 
     if ((short)profile_find_section(profile, section) == 0) return 0;
-    start = *(char **)((char *)profile + 152);
-    end = *(char **)((char *)profile + 132) + *(int *)((char *)profile + 136);
+    start = profile->section_header;
+    end = profile->buffer + profile->length;
     length = 1;
     while (start[length] != 91 && start + length < end) {
         length++;
     }
     mc_memmove(start, start + length, end - (start + length), (int)D_00170129, 1179, 4);
-    *(int *)((char *)profile + 136) -= length;
-    *(signed char *)((char *)profile + 1) |= 128;
+    profile->length -= length;
+    profile->flags |= 128;
     return 1;
 }
 
-int profile_add_section(int profile, char *section)
+int profile_add_section(struct profile *profile, char *section)
 {
     char *cursor;
     int length;
 
     if ((short)profile_find_section(profile, section) != 0) return 0;
-    cursor = *(char **)((char *)profile + 132) + *(int *)((char *)profile + 136);
+    cursor = profile->buffer + profile->length;
     length = strlen(section) + 6;
-    if (((unsigned)(*(int *)((char *)profile + 136) + length)) > *(int *)((char *)profile + 140)) return 0;
+    if (profile->length + length > profile->capacity) return 0;
     *cursor++ = 13;
     *cursor++ = 10;
-    *(char **)((char *)profile + 152) = cursor;
+    profile->section_header = cursor;
     *cursor++ = 91;
     while (*section != 0) {
         *cursor++ = *section++;
@@ -117,10 +118,10 @@ int profile_add_section(int profile, char *section)
     *cursor++ = 93;
     *cursor++ = 13;
     *cursor++ = 10;
-    *(char **)((char *)profile + 168) = cursor;
-    *(char **)((char *)profile + 144) = cursor;
-    *(int *)((char *)profile + 136) += length;
-    *(signed char *)((char *)profile + 1) |= 128;
+    profile->line = cursor;
+    profile->section = cursor;
+    profile->length += length;
+    profile->flags |= 128;
     return 1;
 }
 

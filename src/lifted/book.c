@@ -2,8 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -30,11 +30,7 @@ extern char D_001757C1[];
 extern char D_001757CE[];
 extern char D_001757D7[];
 extern int D_0017D1E6;
-extern char book_buttons[];
-extern char D_00185BE6[];
-extern char D_00185BE8[];
-extern char D_00185BEA[];
-extern char D_00185BEC[];
+extern struct rect book_buttons[];
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
 extern char scratch_190d64[];
@@ -135,9 +131,9 @@ void book_update(void)
     }
     *(int *)&i = 0;
     for (; ((int)(short)i) < 4; (*(int *)&i)++) {
-        if (mouse_x > *(short *)(book_buttons + (((int)(short)i) * 12)) && mouse_x < *(short *)(D_00185BE8 + (((int)(short)i) * 12)) && mouse_y > *(short *)(D_00185BE6 + (((int)(short)i) * 12)) && mouse_y < *(short *)(D_00185BEA + (((int)(short)i) * 12))) {
+        if (mouse_x > book_buttons[(int)(short)i].x0 && mouse_x < book_buttons[(int)(short)i].x1 && mouse_y > book_buttons[(int)(short)i].y0 && mouse_y < book_buttons[(int)(short)i].y1) {
             sound_play(203, (int)player_object, 100);
-            ((int (*)())(*(int *)(D_00185BEC + (((int)(short)i) * 12))))();
+            book_buttons[(int)(short)i].handler();
         }
     }
 }
@@ -200,13 +196,13 @@ void func_0005A230(void)
 
 void func_0005A2BE(void)
 {
-    char *image;
+    struct image *image;
     short i;
 
     *(int *)&i = 0;
     for (; (short)(short)*(int *)&i < D_00199D5E; (*(int *)&i)++) {
-        image = (char *)D_00199C2C[((int)(short)i)];
-        xn_draw_image_transparent((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
+        image = (struct image *)D_00199C2C[((int)(short)i)];
+        xn_draw_image_transparent(image->x, image->y, image->width, image->height, image->pixels);
     }
 }
 

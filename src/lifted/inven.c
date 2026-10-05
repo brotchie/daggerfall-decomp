@@ -2,11 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -47,7 +44,7 @@ extern char D_00177346[];
 extern char D_0017887F[];
 extern int trade_price_scale;
 extern unsigned char player_environment;
-extern char item_templates[];
+extern struct item_template item_templates[];
 extern char potion_recipes[];
 extern int D_001832A4;
 extern int D_00184221;
@@ -57,16 +54,8 @@ extern char item_group_templates[];
 extern signed char D_00187CA8;
 extern signed char D_00187DAC[];
 extern signed char item_group_tab[];
-extern char inv_mode_buttons[];
-extern char D_00188283[];
-extern char D_00188285[];
-extern char D_00188287[];
-extern char D_00188289[];
-extern char inv_buttons[];
-extern char D_00188427[];
-extern char D_00188429[];
-extern char D_0018842B[];
-extern char D_0018842D[];
+extern struct rect inv_mode_buttons[][7];   /* 5 trade modes */
+extern struct rect inv_buttons[];
 extern char weapon_proficiency_bits[];
 extern char region_price_adjustment[];
 extern signed char text_buffer[];
@@ -113,7 +102,7 @@ extern int trade_mode;
 extern int inventory_action;
 extern int free_later_count;
 extern int player_death_timer;
-extern char D_00195DA8[];
+extern struct record *D_00195DA8;
 extern int cfg_magic_repair;
 extern short D_00195F2E;
 extern char saved_player_object[];
@@ -446,9 +435,9 @@ void inventory_frame(void)
     }
     if (((int)(unsigned char)game_mode) != 4) return;
     for (button = 0; button < 7; button++) {
-        if (mouse_x > *(short *)(inv_mode_buttons + ((trade_mode * 84) + (button * 12))) && mouse_x < *(short *)(D_00188285 + ((trade_mode * 84) + (button * 12))) && mouse_y > *(short *)(D_00188283 + ((trade_mode * 84) + (button * 12))) && mouse_y < *(short *)(D_00188287 + ((trade_mode * 84) + (button * 12)))) {
+        if (mouse_x > inv_mode_buttons[trade_mode][button].x0 && mouse_x < inv_mode_buttons[trade_mode][button].x1 && mouse_y > inv_mode_buttons[trade_mode][button].y0 && mouse_y < inv_mode_buttons[trade_mode][button].y1) {
             sound_play(203, player_object, 100);
-            ((int (*)())(*(int *)(D_00188289 + ((trade_mode * 84) + (button * 12)))))(button, 27);
+            inv_mode_buttons[trade_mode][button].handler(button, 27);
             break;
         }
     }
@@ -456,9 +445,9 @@ void inventory_frame(void)
         return;
     }
     for (button = 0; button < 45; button++) {
-        if (mouse_x > *(short *)(inv_buttons + (button * 12)) && mouse_x < *(short *)(D_00188429 + (button * 12)) && mouse_y > *(short *)(D_00188427 + (button * 12)) && mouse_y < *(short *)(D_0018842B + (button * 12))) {
+        if (mouse_x > inv_buttons[button].x0 && mouse_x < inv_buttons[button].x1 && mouse_y > inv_buttons[button].y0 && mouse_y < inv_buttons[button].y1) {
             sound_play(203, player_object, 100);
-            ((int (*)())(*(int *)(D_0018842D + (button * 12))))(button, 27);
+            inv_buttons[button].handler(button, 27);
             return;
         }
     }
@@ -504,8 +493,8 @@ void inventory_close(void)
         inv_right_container->flags |= 0x200;
     }
     if (inv_right_container->type == 33) inv_right_container->flags |= 1;
-    if (((int)(unsigned char)*(signed char *)(*(char **)D_00195DA8)) == 33 && *(int *)(*(char **)D_00195DA8 + 63) == 0) {
-        *(signed char *)(*(char **)D_00195DA8 + 22) |= 2;
+    if (D_00195DA8->type == 33 && D_00195DA8->children == 0) {
+        D_00195DA8->flags |= 0x200;
     }
     if (inventory_close_callback != 0) ((int (*)())(inventory_close_callback))();
     if (inv_temp_pile != 0 && inv_temp_pile->children == 0) object_delete(inv_temp_pile);
@@ -535,21 +524,21 @@ void inventory_close(void)
 
 void inv_draw_container_icon(int button, int icon)
 {
-    int image;
+    struct image *image;
     int i;
     int x;
     int y;
 
-    image = D_001AA440;
+    image = (struct image *)D_001AA440;
     i = 0;
     if (icon == 1 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) icon = 10;
     while (i < icon) {
-        image = (((int)(unsigned short)*(short *)((char *)image + 10)) + image) + 12;
+        image = (struct image *)((char *)image + image->data_size + 12);
         i++;
     }
-    x = ((int)(short)*(short *)(inv_buttons + (button * 12))) + ((((int)&*(signed char *)((char *)(((int)(short)*(short *)(D_00188429 + (button * 12))) - ((int)(short)*(short *)(inv_buttons + (button * 12)))) + 1)) - ((int)(unsigned short)*(short *)((char *)image + 4))) >> 1);
-    y = ((int)(short)*(short *)(D_00188427 + (button * 12))) + ((((((int)(short)*(short *)(D_0018842B + (button * 12))) - ((int)(short)*(short *)(D_00188427 + (button * 12)))) + 1) - ((int)(unsigned short)*(short *)((char *)image + 6))) >> 1);
-    xn_draw_image_transparent(x, y, (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), image + 12);
+    x = inv_buttons[button].x0 + ((((int)&*(signed char *)((char *)(inv_buttons[button].x1 - inv_buttons[button].x0) + 1)) - image->width) >> 1);
+    y = inv_buttons[button].y0 + ((((inv_buttons[button].y1 - inv_buttons[button].y0) + 1) - image->height) >> 1);
+    xn_draw_image_transparent(x, y, image->width, image->height, image->pixels);
     if (wagon_container == 0 || icon != 3) return;
     D_001962AE = 1;
     scratch_current_object = wagon_container;
@@ -559,39 +548,39 @@ void inv_draw_container_icon(int button, int icon)
     D_001962AE = 0;
 }
 
-void func_00093BD9(int unused, int buttons, int button)
+void func_00093BD9(int unused, struct rect *buttons, int button)
 {
-    int image;
+    struct image *image;
     short centre_x;
     short centre_y;
     short width;
     short height;
     short i;
 
-    *(int *)&centre_x = (((int)(short)*(short *)((char *)((button * 12) + buttons))) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 4))) >> 1;
-    *(int *)&centre_y = (((int)(short)*(short *)((char *)((button * 12) + buttons) + 2)) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 6))) >> 1;
-    image = D_001AA440;
+    *(int *)&centre_x = (buttons[button].x0 + buttons[button].x1) >> 1;
+    *(int *)&centre_y = (buttons[button].y0 + buttons[button].y1) >> 1;
+    image = (struct image *)D_001AA440;
     *(int *)&i = 0;
     while (((int)(short)i) < 3) {
-        image = (((int)(unsigned short)*(short *)((char *)image + 10)) + image) + 12;
+        image = (struct image *)((char *)image + image->data_size + 12);
         (*(int *)&i)++;
     }
-    width = *(short *)((char *)image + 4);
-    height = *(short *)((char *)image + 6);
-    size_fit((int)&width, (int)&height, (int)(short)((*(short *)((char *)((button * 12) + buttons) + 4) - *(short *)((char *)((button * 12) + buttons))) - 4), (int)(short)((*(short *)((char *)((button * 12) + buttons) + 6) - *(short *)((char *)((button * 12) + buttons) + 2)) - 4));
-    for (button = 0; ((int)(unsigned short)*(short *)((char *)image + 6)) > button; button++) {
-        mc_memcpy((int)(*(char **)scratch_buffer + (button << 8)), (image + 12) + (((int)(unsigned short)*(short *)((char *)image + 4)) * button), (int)(unsigned short)*(short *)((char *)image + 4), (int)D_0017704C, 787, 4);
+    width = image->width;
+    height = image->height;
+    size_fit((int)&width, (int)&height, (int)(short)((buttons[button].x1 - buttons[button].x0) - 4), (int)(short)((buttons[button].y1 - buttons[button].y0) - 4));
+    for (button = 0; image->height > button; button++) {
+        mc_memcpy((int)(*(char **)scratch_buffer + (button << 8)), image->pixels + (image->width * button), image->width, (int)D_0017704C, 787, 4);
     }
-    xn_draw_image_scaled(((int)(short)centre_x) - (((int)(short)width) >> 1), ((int)(short)centre_y) - (((int)(short)height) >> 1), (int)(short)width, (int)(short)height, (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), 0, *(int *)scratch_buffer);
+    xn_draw_image_scaled(((int)(short)centre_x) - (((int)(short)width) >> 1), ((int)(short)centre_y) - (((int)(short)height) >> 1), (int)(short)width, (int)(short)height, image->width, image->height, 0, *(int *)scratch_buffer);
     mc_set_location(791, (int)D_0017704C);
     mc_sprintf((int)text_buffer, (int)D_001770C0, macro_kg_weight());
-    text_draw_coloured((int)text_buffer, (int)(short)(*(short *)((char *)((button * 12) + buttons)) + 3), (int)(short)(*(short *)((char *)((button * 12) + buttons) + 2) + 2), 145, 156);
+    text_draw_coloured((int)text_buffer, (int)(short)(buttons[button].x0 + 3), (int)(short)(buttons[button].y0 + 2), 145, 156);
 }
 
-void inv_draw_cell_mark(int archive, int record_index, int buttons, int button)
+void inv_draw_cell_mark(int archive, int record_index, struct rect *buttons, int button)
 {
     int texture;
-    int image;
+    struct texture_header *image;
     int centre_x;
     int centre_y;
     int width;
@@ -602,12 +591,12 @@ void inv_draw_cell_mark(int archive, int record_index, int buttons, int button)
         xn_tex_cache_flush();
         texture = xn_tex_cache_lookup(archive, record_index, -1);
     }
-    image = *(int *)((char *)texture + 12);
-    centre_x = (((int)(short)*(short *)((char *)((button * 12) + buttons))) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 4))) >> 1;
-    centre_y = (((int)(short)*(short *)((char *)((button * 12) + buttons) + 2)) + ((int)(short)*(short *)((char *)((button * 12) + buttons) + 6))) >> 1;
-    width = (int)(unsigned short)*(short *)((char *)image + 4);
-    height = (int)(unsigned short)*(short *)((char *)image + 6);
-    xn_draw_image_scaled(centre_x - (width >> 1), centre_y - (height >> 1), width, height, (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), (int)(unsigned short)(*(short *)((char *)image + 8) | 32768), image + *(int *)((char *)image + 14));
+    image = *(struct texture_header **)((char *)texture + 12);
+    centre_x = (buttons[button].x0 + buttons[button].x1) >> 1;
+    centre_y = (buttons[button].y0 + buttons[button].y1) >> 1;
+    width = image->width;
+    height = image->height;
+    xn_draw_image_scaled(centre_x - (width >> 1), centre_y - (height >> 1), width, height, image->width, image->height, (int)(unsigned short)(image->flags | 32768), (char *)image + image->data_offset);
 }
 
 void inv_scroll_left_up(void)
@@ -1228,7 +1217,7 @@ void inv_create_wagon(void)
     if (wagon_container != 0) return;
     (wagon_container = object_create_child(player_entity, 0, 0))->type = 52;
     wagon_container->flags = 3;
-    wagon_container->image = 4;
+    wagon_container->container_index = 4;
 }
 
 void inv_drop_wagon_if_no_cart(void)
@@ -1752,7 +1741,7 @@ void item_refresh_magic_value_cb(struct record *object)
         if (parent->type == 1) return;
         parent = parent->parent;
     }
-    if (parent->pad1B > 4) return;
+    if (parent->container_index > 4) return;
     item = &object->data.item;
     if (item->enchantments[0].type == (-1)) return;
     item->value = enchant_item_value((int)item);
@@ -1817,7 +1806,7 @@ int potion_recipe_text(signed char *recipe)
     text = *(char **)scratch_buffer + 55000;
     *text = 0;
     while (recipe[i] != (-2) && i < 8) {
-        func_000A1054((int)text, ((int)item_templates) + (((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (recipe[i + 10] << 2)) + (recipe[i] * 2)))) * 48), (int)D_0017704C, 3200, 4);
+        func_000A1054((int)text, (int)item_templates[((int)(short)*(short *)((char *)(int)(*(char **)(item_group_templates + (recipe[i + 10] << 2)) + (recipe[i] * 2))))].name, (int)D_0017704C, 3200, 4);
         func_000A1054((int)text, (int)D_00177346, (int)D_0017704C, 3201, 4);
         i++;
     }

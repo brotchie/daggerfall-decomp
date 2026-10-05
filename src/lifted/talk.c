@@ -2,9 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern signed char mouse_double_click;
 extern short mouse_x;
@@ -36,11 +35,7 @@ extern char talk_where_answers[];
 extern char talk_tell_answers[];
 extern char talk_creature_language[];
 extern char D_00179ACE[];
-extern char talk_buttons[];
-extern char D_00179B7A[];
-extern char D_00179B7C[];
-extern char D_00179B7E[];
-extern char D_00179B80[];
+extern struct rect talk_buttons[];
 extern char talk_greeting_texts[];
 extern short talk_ack_texts[];
 extern short talk_regional_ids[];
@@ -285,18 +280,18 @@ void talk_update(void)
     }
     if (D_001966BA != 0) {
         for (button = 10; button < 17; button++) {
-            if (mouse_x > *(short *)(talk_buttons + (button * 12)) && mouse_x < *(short *)(D_00179B7C + (button * 12)) && mouse_y > *(short *)(D_00179B7A + (button * 12)) && mouse_y < *(short *)(D_00179B7E + (button * 12))) {
+            if (mouse_x > talk_buttons[button].x0 && mouse_x < talk_buttons[button].x1 && mouse_y > talk_buttons[button].y0 && mouse_y < talk_buttons[button].y1) {
                 sound_play(203, (int)player_object, 110);
-                ((int (*)())(*(int *)(D_00179B80 + (button * 12))))(button);
+                talk_buttons[button].handler(button);
             }
         }
         return;
     }
     for (button = 0; button < 19; button++) {
-        if (mouse_x > *(short *)(talk_buttons + (button * 12)) && mouse_x < *(short *)(D_00179B7C + (button * 12)) && mouse_y > *(short *)(D_00179B7A + (button * 12)) && mouse_y < *(short *)(D_00179B7E + (button * 12))) {
+        if (mouse_x > talk_buttons[button].x0 && mouse_x < talk_buttons[button].x1 && mouse_y > talk_buttons[button].y0 && mouse_y < talk_buttons[button].y1) {
             if (mouse_buttons != 0 || button == 15) {
                 sound_play(203, (int)player_object, 110);
-                ((int (*)())(*(int *)(D_00179B80 + (button * 12))))(button);
+                talk_buttons[button].handler(button);
             }
         }
     }
@@ -322,16 +317,16 @@ void talk_draw(void)
     talk_clear_question();
     talk_list_max_width = 0;
     D_0012B508 = 244;
-    xn_draw_fill_rect((int)(short)*(short *)(talk_buttons + ((((int)(unsigned char)talk_tone) + 6) * 12)), (int)(short)*(short *)(D_00179B7A + ((((int)(unsigned char)talk_tone) + 6) * 12)), (int)(short)((*(short *)(D_00179B7C + ((((int)(unsigned char)talk_tone) + 6) * 12)) - *(short *)(talk_buttons + ((((int)(unsigned char)talk_tone) + 6) * 12))) + 1), (int)(short)((*(short *)(D_00179B7E + ((((int)(unsigned char)talk_tone) + 6) * 12)) - *(short *)(D_00179B7A + ((((int)(unsigned char)talk_tone) + 6) * 12))) + 1));
+    xn_draw_fill_rect(talk_buttons[((int)(unsigned char)talk_tone) + 6].x0, talk_buttons[((int)(unsigned char)talk_tone) + 6].y0, (int)(short)((talk_buttons[((int)(unsigned char)talk_tone) + 6].x1 - talk_buttons[((int)(unsigned char)talk_tone) + 6].x0) + 1), (int)(short)((talk_buttons[((int)(unsigned char)talk_tone) + 6].y1 - talk_buttons[((int)(unsigned char)talk_tone) + 6].y0) + 1));
     xn_draw_image(4, 26, 107, 40, D_001965E4);
     if (talk_question_mode != 0) {
-        for (offset = ((int)(short)*(short *)(D_00179B7A + ((((int)(unsigned char)talk_topic_tab) + 2) * 12))) * 320; (((int)(short)*(short *)(D_00179B7E + ((((int)(unsigned char)talk_topic_tab) + 2) * 12))) * 320) >= offset; offset += 320) {
-            mc_memcpy(((int)(short)*(short *)(talk_buttons + ((((int)(unsigned char)talk_topic_tab) + 2) * 12))) + (screen_buffer + offset), (window_image + offset) + ((int)(short)*(short *)(talk_buttons + ((((int)(unsigned char)talk_topic_tab) + 2) * 12))), 107, (int)D_001703F0, 417, 4);
+        for (offset = (talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].y0) * 320; ((talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].y1) * 320) >= offset; offset += 320) {
+            mc_memcpy((talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].x0) + (screen_buffer + offset), (window_image + offset) + (talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].x0), 107, (int)D_001703F0, 417, 4);
         }
     }
     src_offset = ((int)(unsigned char)talk_question_mode) * 1070;
-    for (offset = ((int)(short)*(short *)(D_00179B7A + (((int)(unsigned char)talk_question_mode) * 12))) * 320; (((int)(short)*(short *)(D_00179B7E + (((int)(unsigned char)talk_question_mode) * 12))) * 320) >= offset; offset += 320, src_offset += 107) {
-        mc_memcpy(((int)(short)*(short *)(talk_buttons + (((int)(unsigned char)talk_question_mode) * 12))) + (screen_buffer + offset), D_001965F8 + src_offset, 107, (int)D_001703F0, 423, 4);
+    for (offset = (talk_buttons[(int)(unsigned char)talk_question_mode].y0) * 320; ((talk_buttons[(int)(unsigned char)talk_question_mode].y1) * 320) >= offset; offset += 320, src_offset += 107) {
+        mc_memcpy((talk_buttons[(int)(unsigned char)talk_question_mode].x0) + (screen_buffer + offset), D_001965F8 + src_offset, 107, (int)D_001703F0, 423, 4);
     }
     D_001966B7 = 1;
     if (((int)(unsigned char)talk_topic_tab) == 3) {

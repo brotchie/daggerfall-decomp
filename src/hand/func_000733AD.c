@@ -1,7 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000733AD */
 #include "records.h"
 
-struct pick { int flags; struct record *obj; int f8; int fc; int f10; };
 struct w2 { unsigned short f0; unsigned short f2; };
 extern unsigned char player_environment;
 extern struct record *creature_list[];
@@ -17,7 +16,7 @@ extern char crime_current;
 extern char D_001962B2;
 extern struct record *people_list[];
 extern int people_count;
-extern void engine_pick_object(int, int, struct pick *);
+extern void engine_pick_object(int, int, struct pick_result *);
 extern int collide_line_of_sight(struct record *, struct record *);
 extern void town_map_note_building(struct record *, struct building *);
 extern void damage_resolve_attack(struct record *, struct record *, int);
@@ -43,7 +42,7 @@ extern int xn_math_angle_to_point(int, int, int, int);
 
 void weapon_melee_strike(struct record *attacker)
 {
-    struct pick st;
+    struct pick_result st;
     int attacker_team;
     int dist;
     int res;
@@ -116,7 +115,7 @@ void weapon_melee_strike(struct record *attacker)
     engine_pick_object(160, 100, &st);
     if ((st.flags & 1) == 0)
         return;
-    obj = st.obj;
+    obj = st.object;
     links_trigger(obj, 5);
     if (obj->type != 32 && obj->type != 43)
         return;

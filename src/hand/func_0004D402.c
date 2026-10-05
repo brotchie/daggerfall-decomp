@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004D402 */
+#include "structs.h"
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -9,11 +10,7 @@ extern signed char key_down_enter;
 extern short D_00142928;
 extern short D_0014292C;
 extern char D_00174FAC[];
-extern char note_buttons[];
-extern char D_0018514A[];
-extern char D_0018514C[];
-extern char D_0018514E[];
-extern char D_00185150[];
+extern struct rect note_buttons[];
 extern char D_001851F0[];
 extern char note_colour[];
 extern signed char D_00185201[];
@@ -25,12 +22,9 @@ extern int window_image;
 extern unsigned short text_cursor_y;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
-extern short D_001997B0;
-extern short D_001997B2;
-extern short D_001997B4;
-extern short D_001997B6;
+extern struct rect D_001997B0;      /* the selection box */
 extern int note_rci;
-extern char note_selected[];
+extern union note_entry *note_selected;
 extern char note_font[];
 extern char note_text_flags[];
 extern short note_cursor_y;
@@ -86,7 +80,7 @@ void note_update(void)
                 note_add_text((int)text_rsc_buffer);
             }
             if (text_rsc_buffer[0] == 0 && ((int)(short)(*(short *)note_text_flags & 32)) != 0) {
-                *(signed char *)(*(char **)note_selected + 6) |= 64;
+                note_selected->text.flags |= 64;
                 note_delete_selected();
             }
             *(signed char *)note_text_flags &= 223;
@@ -107,24 +101,24 @@ void note_update(void)
         xn_draw_line_to((int)(short)mouse_x, (int)(short)mouse_y);
     } else if (((int)(unsigned char)note_action) == 3) {
         if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
-            D_00142928 = D_001997B0;
-            D_0014292C = D_001997B2;
-            xn_draw_line_to((int)(short)mouse_x, (int)(short)D_001997B2);
+            D_00142928 = D_001997B0.x0;
+            D_0014292C = D_001997B0.y0;
+            xn_draw_line_to((int)(short)mouse_x, (int)(short)D_001997B0.y0);
             xn_draw_line_to((int)(short)mouse_x, (int)(short)mouse_y);
-            xn_draw_line_to((int)(short)D_001997B0, (int)(short)mouse_y);
-            xn_draw_line_to((int)(short)D_001997B0, (int)(short)D_001997B2);
+            xn_draw_line_to((int)(short)D_001997B0.x0, (int)(short)mouse_y);
+            xn_draw_line_to((int)(short)D_001997B0.x0, (int)(short)D_001997B0.y0);
         } else {
-            D_001997B4 = mouse_x;
-            D_001997B6 = mouse_y;
-            if (D_001997B0 > D_001997B4) {
-                D_001997B0 ^= D_001997B4;
-                D_001997B4 ^= D_001997B0;
-                D_001997B0 ^= D_001997B4;
+            D_001997B0.x1 = mouse_x;
+            D_001997B0.y1 = mouse_y;
+            if (D_001997B0.x0 > D_001997B0.x1) {
+                D_001997B0.x0 ^= D_001997B0.x1;
+                D_001997B0.x1 ^= D_001997B0.x0;
+                D_001997B0.x0 ^= D_001997B0.x1;
             }
-            if (D_001997B2 > D_001997B6) {
-                D_001997B2 ^= D_001997B6;
-                D_001997B6 ^= D_001997B2;
-                D_001997B2 ^= D_001997B6;
+            if (D_001997B0.y0 > D_001997B0.y1) {
+                D_001997B0.y0 ^= D_001997B0.y1;
+                D_001997B0.y1 ^= D_001997B0.y0;
+                D_001997B0.y0 ^= D_001997B0.y1;
             }
             note_delete_in_box();
             note_action = 0;
@@ -145,8 +139,8 @@ void note_update(void)
         note_click_page();
     } else if (note_action == 0 && ((int)(unsigned char)(mouse_buttons & 1)) != 0) {
         for (i = 0; ((int)(short)*(short *)&i) < 14; i++) {
-            if (mouse_x > *(short *)(note_buttons + (((int)(short)*(short *)&i) * 12)) && mouse_x < *(short *)(D_0018514C + (((int)(short)*(short *)&i) * 12)) && mouse_y > *(short *)(D_0018514A + (((int)(short)*(short *)&i) * 12)) && mouse_y < *(short *)(D_0018514E + (((int)(short)*(short *)&i) * 12))) {
-                ((int (*)())(*(int *)(D_00185150 + (((int)(short)*(short *)&i) * 12))))();
+            if (mouse_x > note_buttons[(int)(short)*(short *)&i].x0 && mouse_x < note_buttons[(int)(short)*(short *)&i].x1 && mouse_y > note_buttons[(int)(short)*(short *)&i].y0 && mouse_y < note_buttons[(int)(short)*(short *)&i].y1) {
+                note_buttons[(int)(short)*(short *)&i].handler();
             }
         }
     }

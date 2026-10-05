@@ -77,7 +77,7 @@ extern int mc_sprintf(int, ...);
 void title_menu(void)
 {
     char unused1;                  /* unused, but they have slots */
-    int image;
+    struct image *image;
     short choice;
     char unused2;
     signed char pick;
@@ -190,11 +190,11 @@ L3A496:;
         }
         disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
         mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 213, 4);
-        image = disk_read_file((int)D_00170BF3, 0);
+        image = (struct image *)disk_read_file((int)D_00170BF3, 0);
         xn_draw_image(68, 28, 184, 144, image);
-        if (image != 0 && image != (-1751672937)) {
+        if (image != 0 && (int)image != (-1751672937)) {
             mc_free(image, (int)D_00170B88, 217);
-            image = -1751672937;
+            image = (struct image *)-1751672937;
         }
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         xn_mouse_cursor_drawn &= 254;
@@ -260,11 +260,11 @@ L3AABE:;
         }
         disk_read_file((int)D_00170BB5, *(int *)scratch_buffer);
         mc_memcpy(screen_buffer, *(int *)scratch_buffer, 64000, (int)D_00170B88, 299, 4);
-        image = disk_read_file((int)D_00170C0E, 0);
-        xn_draw_image((int)(unsigned short)*(short *)((char *)image), (int)(unsigned short)*(short *)((char *)image + 2), (int)(unsigned short)*(short *)((char *)image + 4), (int)(unsigned short)*(short *)((char *)image + 6), image + 12);
-        if (image != 0 && image != (-1751672937)) {
+        image = (struct image *)disk_read_file((int)D_00170C0E, 0);
+        xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
+        if (image != 0 && (int)image != (-1751672937)) {
             mc_free(image, (int)D_00170B88, 303);
-            image = -1751672937;
+            image = (struct image *)-1751672937;
         }
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         xn_mouse_cursor_drawn &= 254;

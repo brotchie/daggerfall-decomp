@@ -1,21 +1,17 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006BA50 */
 #include "records.h"
 
-struct Img { unsigned short x; unsigned short y; unsigned short w; unsigned short h; char pad[4]; char data[1]; };
-struct ent { unsigned char f0; char pad1[4]; int f5; };
-struct slot { struct ent *e; char pad[16]; };      /* 20 bytes */
-struct rec { char pad[74]; };
 extern char *screen_buffer;
 extern char D_00175CC4[];        /* __FILE__ */
 extern char D_00175CCB[];
 extern char D_00190B44[];
 extern signed char text_rsc_buffer[];
-extern struct Img *D_00195B5C;
-extern struct Img *window_image;
+extern struct image *D_00195B5C;
+extern struct image *window_image;
 extern int game_minutes;
-extern struct slot bank_houses_for_sale[];
+extern struct house_for_sale bank_houses_for_sale[];
 extern char *bank_saved_screen;
-extern struct rec bank_ships_for_sale[];
+extern struct ship_for_sale bank_ships_for_sale[];
 extern struct bank_account *bank_account;
 extern unsigned char bank_screen;
 extern unsigned char bank_selected;
@@ -32,11 +28,11 @@ extern int xn_draw_image();
 void bank_draw(void)
 {
     int saved_minutes;
-    struct Img *image;
+    struct image *image;
 
     image = window_image;
     mc_memcpy(screen_buffer, bank_saved_screen, 64000, D_00175CC4, 216, 4);
-    xn_draw_image(image->x, image->y, image->w, image->h, image->data);
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     switch (bank_screen) {
     case 0:
         text_draw_coloured(itoa(bank_account->balance, ((char *)text_rsc_buffer), 10), 197, 19, 145, 156);
@@ -51,14 +47,14 @@ void bank_draw(void)
         }
         break;
     case 1:
-        xn_draw_image(D_00195B5C->x, D_00195B5C->y, D_00195B5C->w, D_00195B5C->h, D_00195B5C->data);
+        xn_draw_image(D_00195B5C->x, D_00195B5C->y, D_00195B5C->width, D_00195B5C->height, D_00195B5C->pixels);
         bank_draw_house_list();
-        bank_draw_preview(bank_houses_for_sale[bank_selected].e->f0, (void *)bank_houses_for_sale[bank_selected].e->f5);
+        bank_draw_preview(bank_houses_for_sale[bank_selected].block->model_count, bank_houses_for_sale[bank_selected].block->models);
         break;
     case 2:
-        xn_draw_image(D_00195B5C->x, D_00195B5C->y, D_00195B5C->w, D_00195B5C->h, D_00195B5C->data);
+        xn_draw_image(D_00195B5C->x, D_00195B5C->y, D_00195B5C->width, D_00195B5C->height, D_00195B5C->pixels);
         bank_draw_ship_list();
-        bank_draw_preview(1, &bank_ships_for_sale[bank_selected]);
+        bank_draw_preview(1, &bank_ships_for_sale[bank_selected].model);
         break;
     }
 }

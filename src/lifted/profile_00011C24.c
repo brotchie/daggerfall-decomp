@@ -1,36 +1,37 @@
 /* profile.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "structs.h"
+#include "bitfield.h"
 
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern char D_00170129[];
 
-extern int open(int, ...);
+extern int open(char *, ...);
 extern int close();
 extern int mc_free();
 extern int write();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_close;
 
-int profile_close(int profile)
+int profile_close(struct profile *profile)
 {
     int handle;
 
-    if (((struct bf8_7_1 *)((char *)profile + 1))->f != 0) {
-        handle = open(profile + 4, 610, 0);
+    if (((struct bf8_7_1 *)&profile->flags)->f != 0) {
+        handle = open(profile->path, 610, 0);
         if (handle == (-1)) {
-            if (*(int *)((char *)profile + 132) != 0 && *(int *)((char *)profile + 132) != (-1751672937)) {
-                mc_free(*(int *)((char *)profile + 132), (int)D_00170129, 171);
-                *(int *)((char *)profile + 132) = -1751672937;
+            if (profile->buffer != 0 && (int)profile->buffer != (-1751672937)) {
+                mc_free((int)profile->buffer, (int)D_00170129, 171);
+                profile->buffer = (char *)-1751672937;
             }
             return 0;
         }
-        write(handle, *(int *)((char *)profile + 132), *(int *)((char *)profile + 136));
+        write(handle, (int)profile->buffer, profile->length);
         close(handle);
     }
-    if (*(int *)((char *)profile + 132) != 0 && *(int *)((char *)profile + 132) != (-1751672937)) {
-        mc_free(*(int *)((char *)profile + 132), (int)D_00170129, 185);
-        *(int *)((char *)profile + 132) = -1751672937;
+    if (profile->buffer != 0 && (int)profile->buffer != (-1751672937)) {
+        mc_free((int)profile->buffer, (int)D_00170129, 185);
+        profile->buffer = (char *)-1751672937;
     }
     return 1;
 }

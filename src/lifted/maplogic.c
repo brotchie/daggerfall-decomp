@@ -2,13 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf32_30_1 { unsigned _:30; unsigned f:1; };
-struct bf32_31_1 { unsigned _:31; unsigned f:1; };
-struct bf8_0_1 { unsigned char f:1; };
-struct bf8_1_5 { unsigned char _:1; unsigned char f:5; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 extern int xn_world_slot_cells[];
 extern char *xn_world_flat_layer;
 extern char *xn_world_tile_layer;
@@ -198,7 +193,7 @@ void location_free(struct loaded_location *location)
     if (location->doors != 0) {
         if (location->doors != 0 && (int)location->doors != (-1751672937)) {
             mc_free((int)location->doors, (int)D_00176C94, 89);
-            location->doors = (char *)-1751672937;
+            location->doors = (struct location_door *)-1751672937;
         }
     }
     mc_memset(location, 0, 20, (int)D_00176C94, 91, 4);

@@ -2,10 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern int xn_cam_far_z;
 extern int pick_distance;
 extern signed char mouse_buttons;
@@ -38,21 +36,9 @@ extern int D_00183254;
 extern int D_00184329;
 extern int D_001845CC;
 extern int D_00185093;
-extern char repair_menu_buttons[];
-extern char D_001875C2[];
-extern char D_001875C4[];
-extern char D_001875C6[];
-extern char D_001875C8[];
-extern char coven_menu_buttons[];
-extern char D_001875F2[];
-extern char D_001875F4[];
-extern char D_001875F6[];
-extern char D_001875F8[];
-extern char service_menu_buttons[];
-extern char D_00187622[];
-extern char D_00187624[];
-extern char D_00187626[];
-extern char D_00187628[];
+extern struct rect repair_menu_buttons[];
+extern struct rect coven_menu_buttons[];
+extern struct rect service_menu_buttons[];
 extern char D_00187644[];
 extern signed char footstep_sound_ids[];
 extern short music_special_dungeon_ids[];
@@ -75,7 +61,7 @@ extern struct record *player_object;
 extern char D_00195AB4[];
 extern struct record *location_object;
 extern int inventory_close_callback;
-extern char click_hit[];
+extern struct pick_result *click_hit;
 extern int shelf_list_callback;
 extern struct record *shelf_object;
 extern struct record *spell_ready_touch;
@@ -85,7 +71,7 @@ extern struct character *player_character;
 extern int window_image;
 extern char scratch_buffer[];
 extern struct record *D_00195CE8;
-extern char D_00195D3C[];
+extern struct block_model *D_00195D3C;
 extern char picked_model_index[];
 extern char click_face_texture[];
 extern signed char climate_weathers[];
@@ -250,7 +236,7 @@ void count_items_cb(struct record *);
 void repair_menu_close(void);
 void repair_menu_sell(void);
 void coven_menu_close(void);
-void click_show_building_info(int, struct record *);
+void click_show_building_info(struct pick_result *, struct record *);
 void service_menu_close(void);
 void service_menu_sell(void);
 void container_items_to_player(struct record *);
@@ -282,14 +268,14 @@ void click_describe_creature(struct character *unused, struct career *creature_c
     hud_message_add((int)text_buffer);
 }
 
-int click_world_face(int hit)
+int click_world_face(struct pick_result *hit)
 {
     struct building *building;
     int archive;
     int record_index;
 
-    building = object_building((struct record *)*(int *)((char *)hit + 4));
-    if (((int)(unsigned char)*(signed char *)(*(char **)((char *)hit + 4))) != 6 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)hit + 4))) != 43 && ((int)(unsigned char)*(signed char *)(*(char **)((char *)hit + 4))) != 56) {
+    building = object_building(hit->object);
+    if (hit->object->type != 6 && hit->object->type != 43 && hit->object->type != 56) {
         return 0;
     }
     archive = ((int)(unsigned short)*(short *)(*(char **)click_face_texture + 2)) >> 7;
@@ -320,7 +306,7 @@ int click_world_face(int hit)
                         knightly = 0;
                     }
                     in_knightly_order_hall = knightly;
-                    town_map_note_building((struct record *)*(int *)((char *)hit + 4), building);
+                    town_map_note_building(hit->object, building);
                     building_enter(building);
                 } else {
                     building_exit();
@@ -331,15 +317,15 @@ int click_world_face(int hit)
             case 72:
             case 81:
                 if (archive == 72 && record_index == 3) {
-                    if (building_is_open(building) == 0 && lockpick_action_door(building, 19, (struct record *)*(int *)((char *)hit + 4)) != 0) {
+                    if (building_is_open(building) == 0 && lockpick_action_door(building, 19, hit->object) != 0) {
                         loot_generate(14, (struct record *)D_001960D9, building->quality, (int)(unsigned short)(player_character->flags & 1));
-                        shelf_object = (struct record *)(*(int *)((char *)hit + 4));
+                        shelf_object = hit->object;
                         shelf_return_items();
-                        shelf_open_stock((struct record *)*(int *)((char *)hit + 4), building, *(int *)picked_model_index);
+                        shelf_open_stock(hit->object, building, *(int *)picked_model_index);
                         return 1;
                     }
                 } else if (record_index < 4) {
-                    shelf_open((struct record *)*(int *)((char *)hit + 4), building, *(int *)picked_model_index);
+                    shelf_open(hit->object, building, *(int *)picked_model_index);
                     return 1;
                 }
             }
@@ -766,19 +752,19 @@ int repair_menu_open(int opening)
 
 void repair_menu_frame(void)
 {
-    char *image;
+    struct image *image;
     int i;
 
     if (repair_menu_open(0) == 0) return;
-    image = (char *)window_image;
-    xn_draw_image((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
+    image = (struct image *)window_image;
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     if (key_down_esc != 0) repair_menu_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
     for (i = 0; i < 4; i++) {
-        if (mouse_x > *(short *)(repair_menu_buttons + (i * 12)) && mouse_x < *(short *)(D_001875C4 + (i * 12)) && mouse_y > *(short *)(D_001875C2 + (i * 12)) && mouse_y < *(short *)(D_001875C6 + (i * 12))) {
-            ((int (*)())(*(int *)(D_001875C8 + (i * 12))))();
+        if (mouse_x > repair_menu_buttons[i].x0 && mouse_x < repair_menu_buttons[i].x1 && mouse_y > repair_menu_buttons[i].y0 && mouse_y < repair_menu_buttons[i].y1) {
+            repair_menu_buttons[i].handler();
         }
     }
 }
@@ -829,19 +815,19 @@ int coven_menu_open(int opening)
 
 void coven_menu_frame(void)
 {
-    char *image;
+    struct image *image;
     int i;
 
     if (coven_menu_open(0) == 0) return;
-    image = (char *)window_image;
-    xn_draw_image((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
+    image = (struct image *)window_image;
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     if (key_down_esc != 0) coven_menu_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
     for (i = 0; i < 4; i++) {
-        if (mouse_x > *(short *)(coven_menu_buttons + (i * 12)) && mouse_x < *(short *)(D_001875F4 + (i * 12)) && mouse_y > *(short *)(D_001875F2 + (i * 12)) && mouse_y < *(short *)(D_001875F6 + (i * 12))) {
-            ((int (*)())(*(int *)(D_001875F8 + (i * 12))))();
+        if (mouse_x > coven_menu_buttons[i].x0 && mouse_x < coven_menu_buttons[i].x1 && mouse_y > coven_menu_buttons[i].y0 && mouse_y < coven_menu_buttons[i].y1) {
+            coven_menu_buttons[i].handler();
         }
     }
 }
@@ -870,7 +856,7 @@ void coven_menu_summon(void)
     daedra_summon((int)coven_menu_npc);
 }
 
-void click_item(int unused, struct record *object)
+void click_item(struct pick_result *unused, struct record *object)
 {
     struct item *item;
 
@@ -892,12 +878,12 @@ void click_item(int unused, struct record *object)
     }
 }
 
-void click_dungeon_model(int hit, struct record *object)
+void click_dungeon_model(struct pick_result *hit, struct record *object)
 {
     click_show_building_info(hit, object);
 }
 
-void click_npc(int unused, struct record *npc)
+void click_npc(struct pick_result *unused, struct record *npc)
 {
     text_macro_npc = (struct character *)npc_talk_record_build(npc);
     switch (interaction_mode) {
@@ -919,7 +905,7 @@ void click_npc(int unused, struct record *npc)
     }
 }
 
-void click_creature(int unused, struct record *monster)
+void click_creature(struct pick_result *unused, struct record *monster)
 {
     struct character *character;
     struct career *creature_class;
@@ -948,7 +934,7 @@ void click_creature(int unused, struct record *monster)
     }
 }
 
-void click_door(int unused, struct record *door)
+void click_door(struct pick_result *unused, struct record *door)
 {
     if (pick_distance > 128) {
         hud_status_set(D_0017CA14);
@@ -967,11 +953,11 @@ void click_door(int unused, struct record *door)
     }
 }
 
-void click_marker(int unused, int unused2)
+void click_marker(struct pick_result *unused, int unused2)
 {
 }
 
-void click_interior_model(int hit, struct record *object)
+void click_interior_model(struct pick_result *hit, struct record *object)
 {
     struct building *building;
     int stock_count;
@@ -986,7 +972,7 @@ void click_interior_model(int hit, struct record *object)
             return;
         }
         building = object_building(object);
-        if (building != 0 && *(int *)D_00195D3C != 0 && (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 418 || (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 410 && furniture_is_container(((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) + (((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) << 7)) != 0)) && (stock_count = func_000612A1()) != 0) {
+        if (building != 0 && D_00195D3C != 0 && (D_00195D3C->id == 418 || (D_00195D3C->id == 410 && furniture_is_container(D_00195D3C->variant + (D_00195D3C->id << 7)) != 0)) && (stock_count = func_000612A1()) != 0) {
             if (building->id == player_character->house) {
                 D_001940D6 |= 4;
                 inventory_open_container((struct record *)D_00196092, 0, 4);
@@ -1002,12 +988,12 @@ void click_interior_model(int hit, struct record *object)
                     inventory_open_container((struct record *)D_00196120, 0, 4);
                 }
             }
-        } else if (building != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
+        } else if (building != 0 && D_00195D3C != 0 && D_00195D3C->id == 414 && D_00195D3C->variant == 9) {
             ladder_climb();
         }
         return;
     case 1:
-        if (building != 0 && *(int *)D_00195D3C != 0 && ((int)(unsigned short)*(short *)(*(char **)D_00195D3C)) == 414 && ((int)(unsigned char)*(signed char *)(*(char **)D_00195D3C + 2)) == 9) {
+        if (building != 0 && D_00195D3C != 0 && D_00195D3C->id == 414 && D_00195D3C->variant == 9) {
             ladder_climb();
             return;
         }
@@ -1016,7 +1002,7 @@ void click_interior_model(int hit, struct record *object)
     }
 }
 
-void click_corpse(int unused, struct record *corpse)
+void click_corpse(struct pick_result *unused, struct record *corpse)
 {
     struct character *character;
 
@@ -1048,7 +1034,7 @@ void click_corpse(int unused, struct record *corpse)
     }
 }
 
-void click_pedestrian(int unused, struct record *pedestrian)
+void click_pedestrian(struct pick_result *unused, struct record *pedestrian)
 {
     switch (interaction_mode) {
         return;
@@ -1072,7 +1058,7 @@ void click_pedestrian(int unused, struct record *pedestrian)
     }
 }
 
-void click_loot_container(int unused, struct record *container)
+void click_loot_container(struct pick_result *unused, struct record *container)
 {
     if (pick_distance > 128) {
         hud_status_set(D_0017CA14);
@@ -1093,7 +1079,7 @@ void click_loot_container(int unused, struct record *container)
     }
 }
 
-void click_town_scenery(int hit, struct record *object)
+void click_town_scenery(struct pick_result *hit, struct record *object)
 {
     switch (interaction_mode) {
     return;
@@ -1106,12 +1092,12 @@ default:;
 }
 }
 
-void click_show_building_info(int unused, struct record *object)
+void click_show_building_info(struct pick_result *unused, struct record *object)
 {
     struct building *building;
     int unused2;
 
-    if (object->type == 56 && ((int)(short)*(short *)(*(char **)click_hit + 14)) == 417 && ((int)(short)*(short *)(*(char **)click_hit + 16)) == 39) {
+    if (object->type == 56 && click_hit->model_id == 417 && click_hit->variant == 39) {
         rumor_show_local();
         return;
     }
@@ -1177,20 +1163,20 @@ int service_menu_open(int label)
 
 void service_menu_frame(void)
 {
-    char *image;
+    struct image *image;
     int i;
 
     if (service_menu_open(0) == 0) return;
-    image = (char *)window_image;
-    xn_draw_image((int)(unsigned short)*(short *)image, (int)(unsigned short)*(short *)(image + 2), (int)(unsigned short)*(short *)(image + 4), (int)(unsigned short)*(short *)(image + 6), image + 12);
+    image = (struct image *)window_image;
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     text_draw_centred_coloured(service_menu_label, 159, 70, 145, 156);
     if (key_down_esc != 0) service_menu_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
         return;
     }
     for (i = 0; i < 3; i++) {
-        if (mouse_x > *(short *)(service_menu_buttons + (i * 12)) && mouse_x < *(short *)(D_00187624 + (i * 12)) && mouse_y > *(short *)(D_00187622 + (i * 12)) && mouse_y < *(short *)(D_00187626 + (i * 12))) {
-            ((int (*)())(*(int *)(D_00187628 + (i * 12))))();
+        if (mouse_x > service_menu_buttons[i].x0 && mouse_x < service_menu_buttons[i].x1 && mouse_y > service_menu_buttons[i].y0 && mouse_y < service_menu_buttons[i].y1) {
+            service_menu_buttons[i].handler();
         }
     }
 }

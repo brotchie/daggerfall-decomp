@@ -2,15 +2,9 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct logbook {                /* the logbook record's data (type 24, 3008 bytes) */
-    short quest_ids[32];
-    short message_ids[32][10];
-    int message_times[32][10];
-    char places[32][32];
-};
 
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
 extern char disk_last_file_size[];
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -24,11 +18,7 @@ extern int screen_buffer;
 extern int D_00147954;
 extern char D_00175C6C[];
 extern char D_00175C86[];
-extern char logbook_buttons[];
-extern char D_00186DF2[];
-extern char D_00186DF4[];
-extern char D_00186DF6[];
-extern char D_00186DF8[];
+extern struct rect logbook_buttons[];
 extern int logbook_notes_file;
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
@@ -93,8 +83,8 @@ void logbook_update(void)
         return;
     }
     for (i = 0; i < 4; i++) {
-        if (mouse_x > *(short *)(logbook_buttons + (i * 12)) && mouse_x < *(short *)(D_00186DF4 + (i * 12)) && mouse_y > *(short *)(D_00186DF2 + (i * 12)) && mouse_y < *(short *)(D_00186DF6 + (i * 12))) {
-            ((int (*)())(*(int *)(D_00186DF8 + (i * 12))))();
+        if (mouse_x > logbook_buttons[i].x0 && mouse_x < logbook_buttons[i].x1 && mouse_y > logbook_buttons[i].y0 && mouse_y < logbook_buttons[i].y1) {
+            logbook_buttons[i].handler();
         }
     }
 }
@@ -217,7 +207,7 @@ void logbook_build_entries(void)
     }
     text_missing_ok = 1;
     logbook_entry_count = 0;
-    logbook = (struct logbook *)RECORD_DATA(logbook_object);
+    logbook = &logbook_object->data.logbook;
     for (slot = 0; slot < 32; slot++) {
         if (logbook->quest_ids[slot] == 0) continue;
         quest = quest_find_by_id((int)logbook->quest_ids[slot]);
@@ -344,7 +334,7 @@ void logbook_prune_quests(void)
     int slot;
     struct quest *quest;
 
-    logbook = (struct logbook *)RECORD_DATA(logbook_object);
+    logbook = &logbook_object->data.logbook;
     for (slot = 0; slot < 32; slot++) {
         if (logbook->quest_ids[slot] != 0) {
             quest = quest_find_by_id((int)logbook->quest_ids[slot]);

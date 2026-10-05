@@ -1,15 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000529FA */
-struct image {
-    char pad0[18];
-    short pitch;                /* 0x12 */
-    char pad14[10];
-    unsigned char *data;        /* 0x1e */
-};
+#include "structs.h"
 extern char D_00175404[];        /* __FILE__ */
-extern void mc_memset(unsigned char *, int, int, char *, int, int);
-extern void mc_memcpy(unsigned char *, unsigned char *, int, char *, int, int);
+extern void mc_memset(void *, int, int, char *, int, int);
+extern void mc_memcpy(void *, void *, int, char *, int, int);
 
-void flc_decode_lc(unsigned char *chunk, struct image *image)
+void flc_decode_lc(unsigned char *chunk, struct flc_player *anim)
 {
     short y;
     short j;
@@ -32,11 +27,11 @@ void flc_decode_lc(unsigned char *chunk, struct image *image)
                 cnt = *chunk;
                 chunk++;
                 if (cnt < 0) {
-                    mc_memset(image->data + image->pitch * y + col, *chunk, -cnt, D_00175404, 492, 4);
+                    mc_memset(anim->image + anim->width * y + col, *chunk, -cnt, D_00175404, 492, 4);
                     col -= cnt;
                     chunk++;
                 } else if (cnt > 0) {
-                    mc_memcpy(image->data + image->pitch * y + col, chunk, cnt, D_00175404, 498, 4);
+                    mc_memcpy(anim->image + anim->width * y + col, chunk, cnt, D_00175404, 498, 4);
                     col += cnt;
                     chunk += cnt;
                 }

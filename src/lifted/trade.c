@@ -34,8 +34,7 @@ extern double D_001A3ACC;
 extern double trade_haggle_step_size;
 extern int D_001A3ADC;
 extern struct character *D_001A3AE0;
-extern char sound_channels[];
-extern char D_001A3BD8[];
+extern struct sound_channel sound_channels[];
 extern int D_001A3F3C;
 extern int D_001A3F40;
 extern int midi_bsa;
@@ -123,7 +122,7 @@ int sound_init_music(void)
     func_000A1D3C(127);
     midi_bsa = archive_open((int)D_00175AC3, 0, 0);
     for (i = 0; i < 4; i++) {
-        *(int *)(D_001A3BD8 + (i * 268)) = 305419896;
+        sound_channels[i].handle = 305419896;
     }
     sound_enabled = 1;
     dpmi_lock_region((int)sound_channels, 5168);

@@ -53,7 +53,7 @@ void building_grant_access(struct building *building, unsigned char access_level
 int func_0007E441(int mode)
 {
     struct block *block;
-    int (*entry)[4];
+    struct block_section3 *entry;
     struct record *object;
     int dx;
     int dy;
@@ -74,14 +74,14 @@ int func_0007E441(int mode)
     object = object->children;
     while (object->type != 43) object = object->next;
     block = &object->data.block;
-    entry = (int (*)[4])block->section3;
+    entry = block->section3;
     best_distance = 100000;
     result = 0;
     for (i = 0; block->section3_count > i; i++, entry++) {
-        distance = xn_math_approx_hypot((*entry)[1] - dy, xn_math_approx_dist2d(dx, dz, (*entry)[0], (*entry)[2]));
+        distance = xn_math_approx_hypot(entry->y - dy, xn_math_approx_dist2d(dx, dz, entry->x, entry->z));
         if (distance < best_distance) {
             best_distance = distance;
-            result = (unsigned char)((*entry)[3] >> shift);
+            result = (unsigned char)(entry->data >> shift);
         }
     }
     return result;

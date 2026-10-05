@@ -15,11 +15,7 @@ extern char D_001707AE[];
 extern char D_001707B8[];
 extern char D_001707C3[];
 extern unsigned char player_environment;
-extern char town_map_buttons[];
-extern char D_0017A0BE[];
-extern char D_0017A0C0[];
-extern char D_0017A0C2[];
-extern char D_0017A0C4[];
+extern struct rect town_map_buttons[];
 extern char D_0017A103[];
 extern int D_0018507F;
 extern signed char text_buffer[];
@@ -37,7 +33,7 @@ extern int town_map_view_y;
 extern int D_00196D90;
 extern int D_00196D94;
 extern int D_00196D98;
-extern char D_00196D9C[];
+extern struct image *D_00196D9C;
 extern int D_00196DA4;
 extern void screenshot_poll(void);
 extern int automap_move_forward(int);
@@ -112,11 +108,11 @@ void town_map_open(void)
     saved_screen_active = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
     *(int *)scratch_190de4 = disk_read_file((int)D_00170794, 0);
-    *(int *)D_00196D9C = disk_read_file((int)D_001707C3, 0);
+    D_00196D9C = (struct image *)disk_read_file((int)D_001707C3, 0);
     while (done == 0) {
         xn_mouse_cursor_erase();
         town_map_draw();
-        xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_00196D9C), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 2), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 4), (int)(unsigned short)*(short *)(*(char **)D_00196D9C + 6), *(int *)D_00196D9C + 12);
+        xn_draw_image(D_00196D9C->x, D_00196D9C->y, D_00196D9C->width, D_00196D9C->height, (int)D_00196D9C->pixels);
         xn_mouse_cursor_draw();
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();
@@ -133,11 +129,11 @@ void town_map_open(void)
         if (key_down_esc != 0) done = 1;
         if (((int)(unsigned char)(mouse_buttons & 3)) != 0) {
             for (i = 0; i < 6; i++) {
-                if (mouse_x > *(short *)(town_map_buttons + (i * 12)) && mouse_x < *(short *)(D_0017A0C0 + (i * 12)) && mouse_y > *(short *)(D_0017A0BE + (i * 12)) && mouse_y < *(short *)(D_0017A0C2 + (i * 12))) {
+                if (mouse_x > town_map_buttons[i].x0 && mouse_x < town_map_buttons[i].x1 && mouse_y > town_map_buttons[i].y0 && mouse_y < town_map_buttons[i].y1) {
                     if (((int)(unsigned char)(mouse_buttons & 1)) != 0 && ((int)(unsigned char)(mouse_buttons_prev & 1)) == 0) {
                         sound_play(203, player_object, 100);
                     }
-                    done = ((int (*)())(*(int *)(D_0017A0C4 + (i * 12))))(i);
+                    done = town_map_buttons[i].handler(i);
                 }
             }
         }
@@ -149,9 +145,9 @@ void town_map_open(void)
         mc_free(*(int *)scratch_190de4, (int)D_001707AE, 679);
         *(int *)scratch_190de4 = -1751672937;
     }
-    if (*(int *)D_00196D9C != 0 && *(int *)D_00196D9C != (-1751672937)) {
-        mc_free(*(int *)D_00196D9C, (int)D_001707AE, 680);
-        *(int *)D_00196D9C = -1751672937;
+    if ((int)D_00196D9C != 0 && (int)D_00196D9C != (-1751672937)) {
+        mc_free((int)D_00196D9C, (int)D_001707AE, 680);
+        D_00196D9C = (struct image *)-1751672937;
     }
     D_00196272 = *(signed char *)&saved_screen_active;
     if (scratch_190ce5 == 0) return;

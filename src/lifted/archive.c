@@ -2,20 +2,9 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 
-#pragma pack(1)
-/* a BSA directory entry: type 256 archives name their records, the others number them */
-struct bsa_name_entry {
-    char name[14];
-    int size;                       /* +0x0E */
-};                                  /* +0x12 */
-struct bsa_id_entry {
-    int id;                         /* +0x00 */
-    int size;                       /* +0x04 */
-};                                  /* +0x08 */
-#pragma pack()
 extern char D_00170150[];
 extern char D_0017015A[];
 extern char D_00170172[];

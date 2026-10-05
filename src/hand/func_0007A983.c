@@ -1,9 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007A983 */
 #include "records.h"
 
-#pragma pack(1)
-struct Vec { int x; int y; int z; };
-#pragma pack()
 extern int xn_cam_x;
 extern int xn_cam_y;
 extern int xn_cam_z;
@@ -102,7 +99,7 @@ int load_game(char *name)
     int l20;
     int sz;
     unsigned short l18;
-    struct Vec vec;
+    struct vec3 vec;
     int l24;
     char buf[1024];
 

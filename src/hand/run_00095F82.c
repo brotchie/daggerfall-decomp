@@ -1,30 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of inven.c from 0x00095D2C to 0x00095F82, kept together for its switch table's alignment */
-struct node {
-    unsigned char type;
-    char pad1[54];
-    struct node *next;      /* 0x37 */
-    char pad3b[4];
-    struct node *child;     /* 0x3f */
-};
-struct item {
-    char pad0[0x20];
-    unsigned short type;    /* 0x20 */
-    unsigned short sub;     /* 0x22 */
-    int value;              /* 0x24 */
-    char pad28[4];
-    short count;            /* 0x2c */
-    char pad2e[0x37 - 0x2e];
-    unsigned char f37;
-};
-struct pc {
-    char pad0[0x40];
-    unsigned short flags;   /* 0x40 */
-    char pad42[0x16f - 0x42];
-    char *slots[19];        /* 0x16f */
-    char *f1bb;
-    char pad1bf[4];
-    char *f1c3;
-};
+#include "records.h"
 struct flags8 { unsigned char b0:2; unsigned char b2:1; };
 extern char D_0012B508;
 extern char D_0017704C[];       /* __FILE__ */
@@ -34,21 +9,21 @@ extern unsigned char D_00186104[];
 extern short D_00188208[];
 extern signed char text_buffer[];
 extern unsigned char D_001940D8;
-extern struct node *wagon_container;
+extern struct record *wagon_container;
 extern int player_object;
-extern struct node *inv_right_container;
-extern struct node *inv_right_container_base;
-extern struct pc *player_character;
+extern struct record *inv_right_container;
+extern struct record *inv_right_container_base;
+extern struct character *player_character;
 extern unsigned char D_0019626F;
 extern unsigned char game_mode;
 extern unsigned char inv_right_icon;
 extern int D_001AA454;
 extern char inv_right_rows[];
-extern struct node *D_001AA558;
-extern char *inv_selected_item;
+extern struct record *D_001AA558;
+extern struct record *inv_selected_item;
 extern char inv_left_rows[];
-extern struct node *D_001AA578;
-extern struct node *inv_left_container;
+extern struct record *D_001AA578;
+extern struct record *inv_left_container;
 extern short inv_right_count;
 extern short D_001AA586;
 extern short D_001AA588;
@@ -57,28 +32,28 @@ extern void msgbox_show_string(char *, int);
 extern void msgbox_show_rsc(int, int);
 extern int sound_play(int, int, int);
 extern void gold_add(int);
-extern int object_free_single(char *);
+extern int object_free_single(struct record *);
 extern void inv_draw_container_icon(int, unsigned char);
-extern int inv_draw_item_cell(struct node *, short, char *);
-extern void inv_list_left_item(struct node *, char *);
-extern void inv_list_right_item(struct node *, char *);
-extern void inv_equip_in_slot_pair(char *, int, int);
+extern int inv_draw_item_cell(struct record *, short, struct rect *);
+extern void inv_list_left_item(struct record *, struct rect *);
+extern void inv_list_right_item(struct record *, struct rect *);
+extern void inv_equip_in_slot_pair(struct record *, int, int);
 extern void inv_unequip_slot(int);
-extern void inv_equip_in_slot(char *, int);
-extern int item_is_two_handed(char *);
-extern void item_remove_equip_effects(char *, int);
-extern void inv_store_item(char *);
+extern void inv_equip_in_slot(struct record *, int);
+extern int item_is_two_handed(struct record *);
+extern void item_remove_equip_effects(struct record *, int);
+extern void inv_store_item(struct record *);
 extern int item_forbidden_for_class(struct item *);
 extern void mc_memset(char *, int, int, char *, int, int);
 extern int xn_str_find_u32();
 #pragma aux mc_set_location parm routine [];
 extern int mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
-void inv_equip_item(char *obj);
+void inv_equip_item(struct record *object);
 
-void inv_draw_left_list(char *rects)
+void inv_draw_left_list(struct rect *rects)
 {
-    struct node *object;
+    struct record *object;
 
     inv_left_count = D_001AA586 = 0;
     mc_memset(inv_left_rows, 0, 20, D_0017704C, 1627, 20);
@@ -90,17 +65,17 @@ void inv_draw_left_list(char *rects)
     } else if (game_mode != 4 && D_0019626F != 4 && !((struct flags8 *)&D_001940D8)->b2) {
         return;
     }
-    object = inv_left_container->child;
+    object = inv_left_container->children;
     while (object != 0) {
-        inv_list_left_item(object, rects + 12);
+        inv_list_left_item(object, rects + 1);
         object = object->next;
     }
     inv_left_count = D_001AA586;
 }
 
-void inv_draw_right_list(char *rects)
+void inv_draw_right_list(struct rect *rects)
 {
-    struct node *object;
+    struct record *object;
 
     inv_right_count = D_001AA588 = 0;
     mc_memset(inv_right_rows, 0, 20, D_0017704C, 1655, 20);
@@ -108,9 +83,9 @@ void inv_draw_right_list(char *rects)
         inv_draw_item_cell(inv_right_container, 0, rects);
         D_001AA558 = inv_right_container;
     }
-    object = inv_right_container->child;
+    object = inv_right_container->children;
     while (object != 0) {
-        inv_list_right_item(object, rects + 12);
+        inv_list_right_item(object, rects + 1);
         object = object->next;
     }
     inv_right_count = D_001AA588;
@@ -122,7 +97,7 @@ void func_00095EDB(void)
     int unused2;
 
     D_001AA454 = 0;
-    if (xn_str_find_u32(player_character->slots, inv_selected_item, 27) != 0)
+    if (xn_str_find_u32(player_character->equipped, inv_selected_item, 27) != 0)
         return;
     inv_store_item(inv_selected_item);
     inv_equip_item(inv_selected_item);
@@ -135,26 +110,26 @@ void func_00095EDB(void)
     msgbox_show_string(((char *)text_buffer), 1);
 }
 
-void inv_equip_item(char *object)
+void inv_equip_item(struct record *object)
 {
     struct item *item;
     unsigned char *slot_table;
     int unused;
 
-    item = (struct item *)(object + 71);
-    if (item->type == 3 && item->sub == 18)
+    item = &object->data.item;
+    if (item->group == 3 && item->index == 18)
         return;
-    if (item->type == 15 || item->type == 16 || item->type == 17 || item->type == 18 ||
-        item->type == 19 || item->type == 20 || item->type == 21 || item->type == 22)
+    if (item->group == 15 || item->group == 16 || item->group == 17 || item->group == 18 ||
+        item->group == 19 || item->group == 20 || item->group == 21 || item->group == 22)
         return;
-    if (item->count == 0) {
+    if (item->condition == 0) {
         msgbox_show_rsc(29, 1);
         return;
     }
     D_001940D8 |= 8;
-    switch (item->type) {
+    switch (item->group) {
     case 28:
-        switch (item->sub) {
+        switch (item->index) {
         case 0:
             if (game_mode == 4)
                 sound_play(204, player_object, 100);
@@ -166,10 +141,10 @@ void inv_equip_item(char *object)
     case 2:
         if (item_forbidden_for_class(item) != 0)
             return;
-        switch (item->sub) {
+        switch (item->index) {
         case 0:
             if (game_mode == 4)
-                sound_play(item->f37 + 231, player_object, 100);
+                sound_play(item->armor_type + 231, player_object, 100);
             inv_equip_in_slot(object, 18);
             break;
         case 1:
@@ -179,17 +154,17 @@ void inv_equip_item(char *object)
             break;
         case 2:
             if (game_mode == 4)
-                sound_play(item->f37 + 231, player_object, 100);
+                sound_play(item->armor_type + 231, player_object, 100);
             inv_equip_in_slot(object, 23);
             break;
         case 3:
             if (game_mode == 4)
-                sound_play(item->f37 + 231, player_object, 100);
+                sound_play(item->armor_type + 231, player_object, 100);
             inv_equip_in_slot(object, 15);
             break;
         case 4:
             if (game_mode == 4)
-                sound_play(item->f37 + 231, player_object, 100);
+                sound_play(item->armor_type + 231, player_object, 100);
             inv_equip_in_slot(object, 13);
             break;
         case 5:
@@ -199,7 +174,7 @@ void inv_equip_item(char *object)
             break;
         case 6:
             if (game_mode == 4)
-                sound_play(item->f37 + 231, player_object, 100);
+                sound_play(item->armor_type + 231, player_object, 100);
             inv_equip_in_slot(object, 26);
             break;
         case 7:
@@ -208,9 +183,9 @@ void inv_equip_item(char *object)
         case 10:
             if (game_mode == 4)
                 sound_play(233, player_object, 100);
-            if (item_is_two_handed(player_character->f1bb) != 0) {
-                item_remove_equip_effects(player_character->f1bb, 19);
-                player_character->f1bb = 0;
+            if (item_is_two_handed(player_character->equipped[EQUIP_RIGHT_HAND]) != 0) {
+                item_remove_equip_effects(player_character->equipped[EQUIP_RIGHT_HAND], 19);
+                player_character->equipped[EQUIP_RIGHT_HAND] = 0;
                 inv_equip_in_slot(object, 21);
                 return;
             }
@@ -222,29 +197,29 @@ void inv_equip_item(char *object)
         if (item_forbidden_for_class(item) != 0)
             return;
         if (game_mode == 4)
-            sound_play(D_00188208[item->sub], player_object, 100);
+            sound_play(D_00188208[item->index], player_object, 100);
         if (item_is_two_handed(object) != 0) {
-            if (item_is_two_handed(player_character->f1bb) != 0) {
+            if (item_is_two_handed(player_character->equipped[EQUIP_RIGHT_HAND]) != 0) {
                 inv_equip_in_slot(object, 19);
                 return;
             }
-            if (player_character->f1bb == 0 && player_character->f1c3 == 0) {
+            if (player_character->equipped[EQUIP_RIGHT_HAND] == 0 && player_character->equipped[EQUIP_LEFT_HAND] == 0) {
                 inv_equip_in_slot(object, 19);
                 return;
             }
-            if (player_character->f1bb != 0) {
-                if (player_character->f1c3 != 0)
+            if (player_character->equipped[EQUIP_RIGHT_HAND] != 0) {
+                if (player_character->equipped[EQUIP_LEFT_HAND] != 0)
                     inv_unequip_slot(21);
                 inv_equip_in_slot(object, 19);
                 return;
             }
-            if (player_character->f1c3 != 0) {
+            if (player_character->equipped[EQUIP_LEFT_HAND] != 0) {
                 inv_unequip_slot(21);
                 inv_equip_in_slot(object, 19);
                 return;
             }
         } else {
-            if (item_is_two_handed(player_character->f1bb) != 0) {
+            if (item_is_two_handed(player_character->equipped[EQUIP_RIGHT_HAND]) != 0) {
                 inv_equip_in_slot(object, 19);
                 return;
             }
@@ -253,17 +228,17 @@ void inv_equip_item(char *object)
         break;
     case 6:
     case 12:
-        if (item->type == 6 && (player_character->flags & 1))
+        if (item->group == 6 && (player_character->flags & 1))
             return;
-        if (item->type == 12 && !(player_character->flags & 1))
+        if (item->group == 12 && !(player_character->flags & 1))
             return;
         if (game_mode == 4)
             sound_play(234, player_object, 100);
-        if (item->type == 12)
+        if (item->group == 12)
             slot_table = D_00186104;
         else
             slot_table = D_001860DA;
-        switch (slot_table[item->sub]) {
+        switch (slot_table[item->index]) {
         case 12:
             inv_equip_in_slot(object, 12);
             break;
@@ -289,7 +264,7 @@ void inv_equip_item(char *object)
     case 25:
         if (game_mode == 4)
             sound_play(236, player_object, 100);
-        switch (item->sub) {
+        switch (item->index) {
         case 0:
             inv_equip_in_slot_pair(object, 0, 1);
             break;

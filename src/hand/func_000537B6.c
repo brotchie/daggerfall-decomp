@@ -1,12 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000537B6 */
 #include "records.h"
 
-#pragma pack(1)
-struct R { short x0; short y0; short x1; short y1; char pad[4]; };
 extern char D_0012B508;
 extern int screen_buffer;
 extern char D_00175420[];
-extern struct R classmaker_reputation_buttons[];
+extern struct rect classmaker_reputation_buttons[];
 extern signed char text_buffer[];
 extern int scratch_190df4;
 extern char *scratch_190df8;

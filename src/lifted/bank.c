@@ -30,11 +30,7 @@ extern char D_00175CC4[];
 extern char D_00175CD0[];
 extern char D_00175CEF[];
 extern char region_names[];
-extern char bank_buttons[];
-extern char D_00186E26[];
-extern char D_00186E28[];
-extern char D_00186E2A[];
-extern char D_00186E2C[];
+extern struct rect bank_buttons[];
 extern signed char D_00187CA8;
 extern char saved_location_name[];
 extern char saved_region_name[];
@@ -67,24 +63,11 @@ extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern signed char current_climate;
 extern signed char location_is_port;
-extern char bank_houses_for_sale[];
-extern char D_001A3FB0[];
-extern char D_001A3FB4[];
-extern char D_001A3FB8[];
-extern char D_001A3FBC[];
+extern struct house_for_sale bank_houses_for_sale[];
 extern char bank_list_top[];
 extern int D_001A4140;
 extern int bank_saved_screen;
-extern short bank_ships_for_sale;
-extern signed char D_001A414A;
-extern int D_001A414C;
-extern char D_001A418A[];
-extern char D_001A418E[];
-extern short D_001A4192;
-extern signed char D_001A4194;
-extern int D_001A4196;
-extern int D_001A41D4;
-extern int D_001A41D8;
+extern struct ship_for_sale bank_ships_for_sale[];
 extern int D_001A41DC;
 extern int D_001A41E0;
 extern int D_001A41E4;
@@ -232,9 +215,9 @@ void bank_frame(void)
         last = 19;
     }
     for (i = first; i < last; i++) {
-        if (mouse_x > *(short *)(bank_buttons + (i * 12)) && mouse_x < *(short *)(D_00186E28 + (i * 12)) && mouse_y > *(short *)(D_00186E26 + (i * 12)) && mouse_y < *(short *)(D_00186E2A + (i * 12))) {
+        if (mouse_x > bank_buttons[i].x0 && mouse_x < bank_buttons[i].x1 && mouse_y > bank_buttons[i].y0 && mouse_y < bank_buttons[i].y1) {
             sound_play(203, (int)player_object, 100);
-            ((int (*)())(*(int *)(D_00186E2C + (i * 12))))();
+            bank_buttons[i].handler();
         }
     }
 }
@@ -252,32 +235,32 @@ void bank_add_house_for_sale(struct record *object)
     if (((int)(unsigned char)bank_house_count) == 20) return;
     building = &current_location->buildings[object->image];
     if (object->id != building->id || building->type != 1) return;
-    block = (struct block *)(*(int *)(bank_houses_for_sale + (((int)(unsigned char)bank_house_count) * 20)) = (int)RECORD_DATA(object));
+    block = bank_houses_for_sale[(unsigned char)bank_house_count].block = &object->data.block;
     model = block->models;
-    *(int *)(D_001A3FB0 + (((int)(unsigned char)bank_house_count) * 20)) = (int)building;
-    *(int *)(D_001A3FB8 + (((int)(unsigned char)bank_house_count) * 20)) = object->id;
-    *(int *)(D_001A3FBC + (((int)(unsigned char)bank_house_count) * 20)) = model->yaw;
+    bank_houses_for_sale[(unsigned char)bank_house_count].building = building;
+    bank_houses_for_sale[(unsigned char)bank_house_count].id = object->id;
+    bank_houses_for_sale[(unsigned char)bank_house_count].saved_yaw = model->yaw;
     max_radius = 0;
     for (i = max_radius; block->model_count > i; i++, model++) {
         model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
         if (*(int *)(model->model + 12) > max_radius) max_radius = *(int *)(model->model + 12);
     }
-    *(int *)(D_001A3FB4 + (((int)(unsigned char)bank_house_count) * 20)) = max_radius * 5;
+    bank_houses_for_sale[(unsigned char)bank_house_count].price = max_radius * 5;
     bank_house_count++;
 }
 
 void bank_init_ships(void)
 {
-    bank_ships_for_sale = 415;
-    D_001A414A = 6;
-    D_001A414C = model_get(415, 6, ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]) + (((int)(unsigned char)current_climate) << 2));
-    *(int *)D_001A418A = 65011713;
-    *(int *)D_001A418E = 100000;
-    D_001A4192 = 415;
-    D_001A4194 = 11;
-    D_001A4196 = model_get(415, 8, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
-    D_001A41D4 = 65077249;
-    D_001A41D8 = 200000;
+    bank_ships_for_sale[0].model.id = 415;
+    bank_ships_for_sale[0].model.variant = 6;
+    bank_ships_for_sale[0].model.model = (char *)model_get(415, 6, ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]) + (((int)(unsigned char)current_climate) << 2));
+    bank_ships_for_sale[0].id = 65011713;
+    bank_ships_for_sale[0].price = 100000;
+    bank_ships_for_sale[1].model.id = 415;
+    bank_ships_for_sale[1].model.variant = 11;
+    bank_ships_for_sale[1].model.model = (char *)model_get(415, 8, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
+    bank_ships_for_sale[1].id = 65077249;
+    bank_ships_for_sale[1].price = 200000;
     bank_ship_count = 2;
 }
 
@@ -515,7 +498,7 @@ void bank_draw_house_list(void)
             colour = 146;
         }
         mc_set_location(573, (int)D_00175CC4);
-        mc_sprintf((int)text_buffer, (int)D_00175CEF, *(int *)(D_001A3FB4 + (row * 20)));
+        mc_sprintf((int)text_buffer, (int)D_00175CEF, bank_houses_for_sale[row].price);
         text_draw_coloured((int)text_buffer, 52, (int)(short)(((row - *(short *)bank_list_top) * 7) + 38), (int)(short)*(short *)&colour, 156);
     }
     if (*(int *)bank_list_top != 0) {
@@ -543,7 +526,7 @@ void bank_draw_ship_list(void)
         } else {
             *(int *)&colour = 146;
         }
-        text_draw_coloured(itoa(*(int *)(D_001A418E + (row * 74)), (int)text_rsc_buffer, 10), 52, (int)(short)((row * 7) + 38), (int)(short)colour, 156);
+        text_draw_coloured(itoa(bank_ships_for_sale[row].price, (int)text_rsc_buffer, 10), 52, (int)(short)((row * 7) + 38), (int)(short)colour, 156);
     }
 }
 
@@ -580,15 +563,15 @@ void bank_ship_list_click(void)
 
 void bank_house_bought(void)
 {
-    if (bank_account->balance < *(int *)(D_001A3FB4 + (((int)(unsigned char)bank_selected) * 20))) {
+    if (bank_account->balance < bank_houses_for_sale[(unsigned char)bank_selected].price) {
         msgbox_show_rsc(454, 1);
         return;
     }
-    bank_house_price = *(int *)(D_001A3FB4 + (((int)(unsigned char)bank_selected) * 20));
+    bank_house_price = bank_houses_for_sale[(unsigned char)bank_selected].price;
     bank_account->balance -= bank_house_price;
-    player_character->house = *(int *)(D_001A3FB8 + (((int)(unsigned char)bank_selected) * 20));
-    D_001A41E4 = (int)(*(char **)(bank_houses_for_sale + (((int)(unsigned char)bank_selected) * 20)) - 71);
-    D_001A41DC = *(int *)(D_001A3FB0 + (((int)(unsigned char)bank_selected) * 20));
+    player_character->house = bank_houses_for_sale[(unsigned char)bank_selected].id;
+    D_001A41E4 = (int)((char *)bank_houses_for_sale[(unsigned char)bank_selected].block - 71);
+    D_001A41DC = (int)bank_houses_for_sale[(unsigned char)bank_selected].building;
     msgbox_show_rsc(282, 1);
     mc_strncpy((int)saved_region_name, *(int *)(region_names + (((int)(unsigned char)current_region) << 2)), 32, (int)D_00175CC4, 647);
     mc_strncpy((int)saved_location_name, (int)current_location, 32, (int)D_00175CC4, 648);
@@ -597,13 +580,13 @@ void bank_house_bought(void)
 
 void bank_ship_bought(void)
 {
-    if (bank_account->balance < *(int *)(D_001A418E + (((int)(unsigned char)bank_selected) * 74))) {
+    if (bank_account->balance < bank_ships_for_sale[(unsigned char)bank_selected].price) {
         msgbox_show_rsc(454, 1);
         return;
     }
-    bank_account->balance -= *(int *)(D_001A418E + (((int)(unsigned char)bank_selected) * 74));
-    bank_ship_price = *(int *)(D_001A418E + (((int)(unsigned char)bank_selected) * 74));
-    player_character->ship_owned = *(int *)(D_001A418A + (((int)(unsigned char)bank_selected) * 74));
+    bank_account->balance -= bank_ships_for_sale[(unsigned char)bank_selected].price;
+    bank_ship_price = bank_ships_for_sale[(unsigned char)bank_selected].price;
+    player_character->ship_owned = bank_ships_for_sale[(unsigned char)bank_selected].id;
     msgbox_show_rsc(283, 1);
     bank_screen = 0;
 }
@@ -656,6 +639,6 @@ void func_0006CB02(void)
     int i;
 
     for (i = 0; ((int)(unsigned char)bank_house_count) > i; i++) {
-        *(int *)(*(char **)(*(char **)(bank_houses_for_sale + (i * 20)) + 5) + 52) = *(int *)(D_001A3FBC + (i * 20));
+        bank_houses_for_sale[i].block->models->yaw = bank_houses_for_sale[i].saved_yaw;
     }
 }

@@ -1,14 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000411BF */
 #include "records.h"
 
-struct snd { char pad0[4]; unsigned short len; };
 extern char D_00170DC9[];
 extern unsigned char D_0017B667[];
 extern short D_0017B66D[];
 extern short D_0017B69D[];
 extern struct character *text_macro_npc;
 extern int climate_category(void);
-extern struct snd *flats_cfg_find(unsigned short);
+extern struct flat_cfg *flats_cfg_find(unsigned short);
 extern int disk_open_data(char *);
 extern int rand(void);
 extern void srand(int);
@@ -20,7 +19,7 @@ extern short *xn_str_find_u16(short *, short, int);
 void npc_load_face(struct record *npc, char *face)
 {
     short *found_sprite;
-    struct snd *flat;
+    struct flat_cfg *flat;
     int offset;
     int file;
     short saved_seed;
@@ -30,8 +29,8 @@ void npc_load_face(struct record *npc, char *face)
     found_sprite = xn_str_find_u16(D_0017B66D, npc->image >> 7, 24);
     if (found_sprite == 0) {
         flat = flats_cfg_find(npc->image);
-        if (flat != 0 && flat->len != 0)
-            offset = flat->len << 12;
+        if (flat != 0 && flat->face != 0)
+            offset = flat->face << 12;
         else
             offset = (D_0017B69D[D_0017B667[climate_category()] * 8 + (rand() & 3) + ((text_macro_npc->flags & 1) != 0 ? 4 : 0)] + rand() % 10) << 12;
     } else {

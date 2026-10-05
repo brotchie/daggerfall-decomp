@@ -21,40 +21,40 @@ extern void gold_spend(int);
 extern int gold_can_afford(int);
 extern int abs(short);
 
-void blessing_remove(unsigned char *blessing)
+void blessing_remove(struct blessing *blessing)
 {
-    if (blessing[0] == 255) {
-        region_legal_reputation[blessing[6]].value -= blessing[1];
+    if (blessing->target == 255) {
+        region_legal_reputation[blessing->region].value -= blessing->amount;
         return;
     }
-    if (blessing[0] & 128) {
-        player_character->attributes[blessing[0] & 127] -= blessing[1];
+    if (blessing->target & 128) {
+        player_character->attributes[blessing->target & 127] -= blessing->amount;
         return;
     }
-    player_character->skills[blessing[0]].value -= blessing[1];
+    player_character->skills[blessing->target].value -= blessing->amount;
 }
 
-int blessing_apply(unsigned char *blessing, int amount)
+int blessing_apply(struct blessing *blessing, int amount)
 {
     int applied;
 
-    if (blessing[0] == 255) {
+    if (blessing->target == 255) {
         region_legal_reputation[current_region].value += amount;
         if (region_legal_reputation[current_region].value > 100) {
             applied = amount - (region_legal_reputation[current_region].value - 100);
             region_legal_reputation[current_region].value = 100;
         }
-    } else if (blessing[0] & 128) {
-        player_character->attributes[blessing[0] & 127] += amount;
-        if (player_character->attributes[blessing[0] & 127] > 100) {
-            applied = amount - (player_character->attributes[blessing[0] & 127] - 100);
-            player_character->attributes[blessing[0] & 127] = 100;
+    } else if (blessing->target & 128) {
+        player_character->attributes[blessing->target & 127] += amount;
+        if (player_character->attributes[blessing->target & 127] > 100) {
+            applied = amount - (player_character->attributes[blessing->target & 127] - 100);
+            player_character->attributes[blessing->target & 127] = 100;
         }
     } else {
-        player_character->skills[blessing[0]].value += amount;
-        if (player_character->skills[blessing[0]].value > 100) {
-            applied = amount - (player_character->skills[blessing[0]].value - 100);
-            player_character->skills[blessing[0]].value = 100;
+        player_character->skills[blessing->target].value += amount;
+        if (player_character->skills[blessing->target].value > 100) {
+            applied = amount - (player_character->skills[blessing->target].value - 100);
+            player_character->skills[blessing->target].value = 100;
         }
     }
     return amount;

@@ -1,7 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003478D */
 #include "records.h"
 
-struct s12 { int a[3]; };
 extern char D_000346B8[];
 extern int xn_cam_pitch;
 extern int xn_cam_yaw;
@@ -22,15 +21,15 @@ extern int view_look_yaw;
 extern struct record *camera_object;
 extern struct record *player_object;
 extern int frame_ticks;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern int game_minutes;
 extern struct settings *game_settings;
 extern int D_00195CF4;
 extern signed char climate_weathers[];
 extern signed char current_region;
 extern signed char D_001962A1;
-extern char moon0_image[];
-extern char moon1_image[];
+extern struct cfa_header *moon0_image;
+extern struct cfa_header *moon1_image;
 extern int sun_light;
 extern char moon1_direction[];
 extern char moon0_direction[];
@@ -79,7 +78,7 @@ void sky_update(void)
     int unused5;
     unsigned char sun_placed;
 
-    *(struct s12 *)&point_x = *(struct s12 *)D_000346B8;
+    *(struct vec3 *)&point_x = *(struct vec3 *)D_000346B8;
     sun_placed = 0;
     if (D_00187CA8 == 0) return;
     if (((int)player_environment) == 3) {
@@ -172,7 +171,7 @@ void sky_update(void)
             sky_draw_day(screen_y, horizon_y, daylight, climate);
             return;
         }
-        mc_memset(screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : (int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) * 320, (int)D_00170A86, 251, 4);
+        mc_memset(screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y) * 320, (int)D_00170A86, 251, 4);
     } else {
         sky_draw_night(screen_y, horizon_y);
     }
@@ -187,16 +186,16 @@ void sky_update(void)
     xn_mat_transform_ptr((int)&moon_x, (int)&moon_y, (int)&moon_z, (int)xn_cam_rotation);
     if (moon_z > 100) {
         xn_cam_project_ptr(moon_x, moon_y, moon_z, (int)&screen_x, (int)&screen_y);
-        *(short *)(*(char **)moon0_image + 6) = (screen_x + xn_cam_centre_x) - (**(unsigned short **)moon0_image >> 1);
-        *(short *)(*(char **)moon0_image + 8) = (((int)(short)xn_cam_centre_y) + screen_y) - (((int)(unsigned short)*(short *)(*(char **)moon0_image + 2)) >> 1);
+        moon0_image->x = (screen_x + xn_cam_centre_x) - (moon0_image->width >> 1);
+        moon0_image->y = (((int)(short)xn_cam_centre_y) + screen_y) - (moon0_image->height >> 1);
         moons_visible |= 1;
     }
     mc_memcpy((int)&moon_x, (int)moon1_direction, 12, (int)D_00170A86, 281, 4);
     xn_mat_transform_ptr((int)&moon_x, (int)&moon_y, (int)&moon_z, (int)xn_cam_rotation);
     if (moon_z > 100) {
         xn_cam_project_ptr(moon_x, moon_y, moon_z, (int)&screen_x, (int)&screen_y);
-        *(short *)(*(char **)moon1_image + 6) = (screen_x + xn_cam_centre_x) - (**(unsigned short **)moon1_image >> 1);
-        *(short *)(*(char **)moon1_image + 8) = (((int)(short)xn_cam_centre_y) + screen_y) - (((int)(unsigned short)*(short *)(*(char **)moon1_image + 2)) >> 1);
+        moon1_image->x = (screen_x + xn_cam_centre_x) - (moon1_image->width >> 1);
+        moon1_image->y = (((int)(short)xn_cam_centre_y) + screen_y) - (moon1_image->height >> 1);
         moons_visible |= 2;
     }
     xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;

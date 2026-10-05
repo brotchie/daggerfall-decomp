@@ -2,9 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_5_1 { unsigned char _:5; unsigned char f:1; };
-struct bf8_6_1 { unsigned char _:6; unsigned char f:1; };
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -14,11 +13,7 @@ extern char D_00175898[];
 extern char D_001758A0[];
 extern char D_001758A4[];
 extern char D_001758A8[];
-extern char hud_buttons[];
-extern char D_00185C5A[];
-extern char D_00185C5C[];
-extern char D_00185C5E[];
-extern char D_00185C60[];
+extern struct rect hud_buttons[];
 extern signed char D_00187CA8;
 extern short D_00188208[];
 extern char D_00190B44[];
@@ -35,7 +30,7 @@ extern struct record *player_object;
 extern int D_00195ACC;
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern char magic_items_image[];
+extern struct image *magic_items_image;
 extern signed char mouse_control_mode;
 extern signed char view_cursor_active;
 extern signed char D_00196272;
@@ -87,10 +82,10 @@ void hud_buttons_click(int release)
         return;
     }
     for (button = 0; button < 11; button++) {
-        if (mouse_x > *(short *)(hud_buttons + (button * 12)) && mouse_x < *(short *)(D_00185C5C + (button * 12)) && mouse_y > *(short *)(D_00185C5A + (button * 12)) && mouse_y < *(short *)(D_00185C5E + (button * 12))) {
+        if (mouse_x > hud_buttons[button].x0 && mouse_x < hud_buttons[button].x1 && mouse_y > hud_buttons[button].y0 && mouse_y < hud_buttons[button].y1) {
             if (release != 0 && ((int)(unsigned char)hud_pressed_button) == button) {
                 sound_play(203, player_object, 100);
-                ((int (*)())(*(int *)(D_00185C60 + (button * 12))))((int)(unsigned char)mouse_buttons_prev);
+                hud_buttons[button].handler((int)(unsigned char)mouse_buttons_prev);
                 hud_pressed_button = 255;
                 return;
             }
@@ -218,7 +213,7 @@ void magic_items_open(void)
     D_00187CA8 = 0;
     D_001940D8 &= 254;
     D_001940D4 |= 32;
-    *(int *)magic_items_image = disk_read_file((int)D_001758A8, 0);
+    magic_items_image = (struct image *)disk_read_file((int)D_001758A8, 0);
     D_00196272 = 1;
     magic_items_saved_screen = mc_malloc(64000, (int)D_00175898, 358);
     mc_memcpy(magic_items_saved_screen, screen_buffer, 64000, (int)D_00175898, 359, 4);
@@ -230,7 +225,7 @@ void magic_items_frame(void)
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
     mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
-    xn_draw_image((int)(unsigned short)*(short *)(*(char **)magic_items_image), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 2), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 4), (int)(unsigned short)*(short *)(*(char **)magic_items_image + 6), (int)(*(char **)magic_items_image + 12));
+    xn_draw_image(magic_items_image->x, magic_items_image->y, magic_items_image->width, magic_items_image->height, (int)magic_items_image->pixels);
     if (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
         while (key_down_esc != 0);
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -250,9 +245,9 @@ void magic_items_frame(void)
 void magic_items_close(void)
 {
     D_001940D4 &= 223;
-    if (*(int *)magic_items_image != 0 && *(int *)magic_items_image != (-1751672937)) {
-        mc_free(*(int *)magic_items_image, (int)D_00175898, 396);
-        *(int *)magic_items_image = -1751672937;
+    if ((int)magic_items_image != 0 && (int)magic_items_image != (-1751672937)) {
+        mc_free((int)magic_items_image, (int)D_00175898, 396);
+        magic_items_image = (struct image *)-1751672937;
     }
     picklist_free(&shared_picklist);
     D_00196272 = 0;

@@ -3,15 +3,6 @@
 
 #pragma pack(1)
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
-struct img {
-    unsigned short x;
-    unsigned short y;
-    unsigned short w;
-    unsigned short h;
-    unsigned short f8;
-    unsigned short size;        /* 10 */
-    char data[1];               /* 12 */
-};
 #pragma pack()
 extern int xn_paperdoll_background;
 extern int screen_buffer;
@@ -42,7 +33,7 @@ extern void character_update_armor_values(struct record *);
 extern void paperdoll_add_item(struct item *, int);
 extern void paperdoll_draw_items(int, int);
 extern void func_0005E7FC(char *);
-extern struct img *disk_read_file(char *, int);
+extern struct image *disk_read_file(char *, int);
 extern void mc_free(void *, char *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
@@ -56,8 +47,8 @@ extern int mc_sprintf(char *, char *, ...);
 
 void paperdoll_draw(int x, int y)
 {
-    struct img *pic;
-    struct img *strip;
+    struct image *pic;
+    struct image *strip;
     char buf[108];
     int i;
     int n;
@@ -79,16 +70,16 @@ void paperdoll_draw(int x, int y)
         mc_sprintf(((char *)text_buffer), D_0017575D, player_character->race);
     }
     pic = disk_read_file(((char *)text_buffer), 0);
-    xn_draw_image(pic->x + x, pic->y + y, pic->w, pic->h, pic->data);
+    xn_draw_image(pic->x + x, pic->y + y, pic->width, pic->height, pic->pixels);
     mc_memset((void *)D_00147954, 0, 64000, D_0017573C, 48, 4);
     saved = screen_buffer;
     screen_buffer = D_00147954;
-    xn_draw_image(pic->x + x, pic->y + y, pic->w, pic->h, pic->data);
+    xn_draw_image(pic->x + x, pic->y + y, pic->width, pic->height, pic->pixels);
     xn_paperdoll_background = D_00147954;
     screen_buffer = saved;
-    if (pic != 0 && pic != (struct img *)0x97979797) {
+    if (pic != 0 && pic != (struct image *)0x97979797) {
         mc_free(pic, D_0017573C, 54);
-        pic = (struct img *)0x97979797;
+        pic = (struct image *)0x97979797;
     }
     paperdoll_items = scratch_buffer + 64000;
     paperdoll_slots = scratch_buffer + 64500;
@@ -106,10 +97,10 @@ void paperdoll_draw(int x, int y)
         mc_sprintf(((char *)text_buffer), D_0017576C, (unsigned short)(player_character->flags & 1), player_character->race, (game_settings->view_flags & 4) != 0 ? 49 : 48);
     }
     pic = disk_read_file(((char *)text_buffer), 0);
-    xn_draw_image_transparent(pic->x + x, pic->y + y, pic->w, pic->h, pic->data);
-    if (pic != 0 && pic != (struct img *)0x97979797) {
+    xn_draw_image_transparent(pic->x + x, pic->y + y, pic->width, pic->height, pic->pixels);
+    if (pic != 0 && pic != (struct image *)0x97979797) {
         mc_free(pic, D_0017573C, 71);
-        pic = (struct img *)0x97979797;
+        pic = (struct image *)0x97979797;
     }
     n = player_character->face;
     if (player_character->race == 9 || player_character->race == 10) {
@@ -128,12 +119,12 @@ void paperdoll_draw(int x, int y)
     strip = pic;
     i = 0;
     while (i < n) {
-        pic = (struct img *)(pic->size + (char *)pic + 12);
+        pic = (struct image *)(pic->data_size + (char *)pic + 12);
         i++;
     }
     if (player_character->race < 9)
-        xn_draw_image_transparent(pic->x + x, pic->y + y, pic->w, pic->h, pic->data);
-    mc_memcpy(hud_portrait, pic, pic->size + 12, D_0017573C, 99, 4);
+        xn_draw_image_transparent(pic->x + x, pic->y + y, pic->width, pic->height, pic->pixels);
+    mc_memcpy(hud_portrait, pic, pic->data_size + 12, D_0017573C, 99, 4);
     if (player_character->race <= 8) {
         cnt = 0;
         for (i = 12; i <= 26; i++) {
@@ -162,9 +153,9 @@ void paperdoll_draw(int x, int y)
         }
         paperdoll_draw_items(x, y);
     }
-    if (strip != 0 && strip != (struct img *)0x97979797) {
+    if (strip != 0 && strip != (struct image *)0x97979797) {
         mc_free(strip, D_0017573C, 143);
-        strip = (struct img *)0x97979797;
+        strip = (struct image *)0x97979797;
     }
     xn_draw_get_rect(x + 192, y + 1, 125, 197, D_00195B64, 0);
     D_00195B80 = color_remap_tables;

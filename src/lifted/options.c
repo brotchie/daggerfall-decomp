@@ -30,31 +30,15 @@ extern char D_00170F61[];
 extern char D_00170F6E[];
 extern int controls_file;
 extern int binding_names_base[];
-extern char options_buttons[];
-extern char D_0017B792[];
-extern char D_0017B794[];
-extern char D_0017B796[];
-extern char D_0017B798[];
-extern char controls_buttons[];
-extern char D_0017B80A[];
-extern char D_0017B80C[];
-extern char D_0017B80E[];
-extern char D_0017B810[];
-extern char options_joystick_buttons[];
-extern char D_0017BA62[];
-extern char D_0017BA64[];
-extern char D_0017BA66[];
-extern char D_0017BA68[];
-extern short D_0017BA6C;
-extern short D_0017BA6E;
-extern short D_0017BA70;
-extern short D_0017BA72;
+extern struct rect options_buttons[];
+extern struct rect controls_buttons[];
+extern struct rect options_joystick_buttons[];
 extern int key_names[];
 extern char default_key_map[];
 extern signed char D_00187CA8;
 extern struct record *player_object;
-extern char D_00195B5C[];
-extern char D_00195B60[];
+extern struct image *D_00195B5C;
+extern struct image *D_00195B60;
 extern struct settings *game_settings;
 extern signed char mouse_control_mode;
 extern signed char mouse_turn_rate;
@@ -68,7 +52,7 @@ extern unsigned char D_00196271;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
-extern char controls_view_image[];
+extern struct image *controls_view_image;
 extern int options_image;
 extern int options_saved_screen;
 
@@ -129,9 +113,9 @@ void options_frame(void)
         return;
     }
     for (button = 0; ((int)(short)*(short *)&button) < 10; button++) {
-        if (mouse_x >= *(short *)(options_buttons + (((int)(short)*(short *)&button) * 12)) && mouse_x <= *(short *)(D_0017B794 + (((int)(short)*(short *)&button) * 12)) && mouse_y >= *(short *)(D_0017B792 + (((int)(short)*(short *)&button) * 12)) && mouse_y <= *(short *)(D_0017B796 + (((int)(short)*(short *)&button) * 12))) {
+        if (mouse_x >= options_buttons[(int)(short)*(short *)&button].x0 && mouse_x <= options_buttons[(int)(short)*(short *)&button].x1 && mouse_y >= options_buttons[(int)(short)*(short *)&button].y0 && mouse_y <= options_buttons[(int)(short)*(short *)&button].y1) {
             sound_play(203, player_object, 100);
-            ((int (*)())(*(int *)(D_0017B798 + (((int)(short)*(short *)&button) * 12))))();
+            options_buttons[(int)(short)*(short *)&button].handler();
             return;
         }
     }
@@ -156,18 +140,18 @@ int options_close(void)
 
 void options_draw(void)
 {
-    short *image;
-    short *box;
+    struct image *image;
+    struct rect *box;
     int i;
 
     mc_memcpy(screen_buffer, options_saved_screen, 64000, (int)D_00170EE8, 176, 4);
-    image = (short *)options_image;
-    xn_draw_image((unsigned short)image[0], (unsigned short)image[1], (unsigned short)image[2], (unsigned short)image[3], (char *)image + 12);
+    image = (struct image *)options_image;
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     D_0012B508 = 246;
     for (i = 0; i < 2; i++) {
         if ((game_settings->view_flags & (1 << i)) != 0) {
-            box = (short *)(options_buttons + (i + 6) * 12);
-            xn_draw_fill_rect((short)(box[2] - 5), (short)(box[1] + 3), 3, 3);
+            box = &options_buttons[i + 6];
+            xn_draw_fill_rect((short)(box->x1 - 5), (short)(box->y0 + 3), 3, 3);
         }
     }
     if (game_settings->sound_volume != 0) {
@@ -309,7 +293,7 @@ void options_controls_draw(int editing, int background)
 
     mc_memcpy(screen_buffer, background, 64000, (int)D_00170EE8, 355, 4);
     if (((int)(unsigned char)mouse_control_mode) == 1) {
-        xn_draw_image((int)(unsigned short)*(short *)(*(char **)controls_view_image), (int)(unsigned short)*(short *)(*(char **)controls_view_image + 2), (int)(unsigned short)*(short *)(*(char **)controls_view_image + 4), (int)(unsigned short)*(short *)(*(char **)controls_view_image + 6), (int)(*(char **)controls_view_image + 12));
+        xn_draw_image(controls_view_image->x, controls_view_image->y, controls_view_image->width, controls_view_image->height, (int)controls_view_image->pixels);
     }
     for (action = 0; action < 38; action++) {
         if (editing == action) continue;
@@ -317,9 +301,9 @@ void options_controls_draw(int editing, int background)
         if (options_controls_is_duplicate(action) != 0) colour = 244;
         D_0012B508 = *(signed char *)&colour;
         if (((int)(unsigned char)*(signed char *)(key_map + action)) < 200) {
-            text_draw_centred(key_names[((int)(unsigned char)*(signed char *)(key_map + action))], (((int)(short)*(short *)(D_0017B80C + (action * 12))) + ((int)(short)*(short *)(controls_buttons + (action * 12)))) / 2, (int)&*(signed char *)((char *)((int)(short)*(short *)(D_0017B80A + (action * 12))) + 2));
+            text_draw_centred(key_names[((int)(unsigned char)*(signed char *)(key_map + action))], (controls_buttons[action].x1 + controls_buttons[action].x0) / 2, (int)&*(signed char *)((char *)(controls_buttons[action].y0) + 2));
         } else {
-            text_draw_centred(binding_names_base[((int)(unsigned char)*(signed char *)(key_map + action))], (((int)(short)*(short *)(D_0017B80C + (action * 12))) + ((int)(short)*(short *)(controls_buttons + (action * 12)))) / 2, (int)&*(signed char *)((char *)((int)(short)*(short *)(D_0017B80A + (action * 12))) + 2));
+            text_draw_centred(binding_names_base[((int)(unsigned char)*(signed char *)(key_map + action))], (controls_buttons[action].x1 + controls_buttons[action].x0) / 2, (int)&*(signed char *)((char *)(controls_buttons[action].y0) + 2));
         }
     }
 }
@@ -333,7 +317,7 @@ void options_controls_screen(void)
 
     done = 0;
     background = disk_read_file((int)D_00170EF2, 0);
-    *(int *)controls_view_image = disk_read_file((int)D_00170EFF, 0);
+    controls_view_image = (struct image *)disk_read_file((int)D_00170EFF, 0);
     while (done == 0) {
         if (key_down_esc != 0 && options_controls_check() != 0) break;
         mouse_buttons_prev = mouse_buttons;
@@ -342,9 +326,9 @@ void options_controls_screen(void)
         cursor_draw_arrow();
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
             for (button = 0; button < 42; button++) {
-                if (mouse_x > *(short *)(controls_buttons + (button * 12)) && mouse_x < *(short *)(D_0017B80C + (button * 12)) && mouse_y > *(short *)(D_0017B80A + (button * 12)) && mouse_y < *(short *)(D_0017B80E + (button * 12))) {
+                if (mouse_x > controls_buttons[button].x0 && mouse_x < controls_buttons[button].x1 && mouse_y > controls_buttons[button].y0 && mouse_y < controls_buttons[button].y1) {
                     sound_play(203, player_object, 100);
-                    done = ((int (*)())(*(int *)(D_0017B810 + (button * 12))))(button, background);
+                    done = controls_buttons[button].handler(button, background);
                 }
             }
         }
@@ -355,9 +339,9 @@ void options_controls_screen(void)
         mc_free(background, (int)D_00170EE8, 401);
         background = -1751672937;
     }
-    if (*(int *)controls_view_image != 0 && *(int *)controls_view_image != (-1751672937)) {
-        mc_free(*(int *)controls_view_image, (int)D_00170EE8, 402);
-        *(int *)controls_view_image = -1751672937;
+    if ((int)controls_view_image != 0 && (int)controls_view_image != (-1751672937)) {
+        mc_free((int)controls_view_image, (int)D_00170EE8, 402);
+        controls_view_image = (struct image *)-1751672937;
     }
     file = disk_create(controls_file);
     mc_memcpy((int)D_00195E82, (int)xn_joy_calibration, 46, (int)D_00170EE8, 405, 4);
@@ -390,24 +374,24 @@ void options_controls_defaults(void)
 void options_mouse_draw(int background)
 {
     int i;
-    short *image;
+    struct image *image;
 
-    image = (short *)background;
+    image = (struct image *)background;
     mc_memcpy(screen_buffer, options_saved_screen, 64000, (int)D_00170EE8, 480, 4);
-    xn_draw_image((unsigned short)image[0], (unsigned short)image[1], (unsigned short)image[2], (unsigned short)image[3], (char *)image + 12);
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     D_0012B508 = 246;
     xn_draw_fill_rect((int)(short)((mouse_control_mode == 0) ? 134 : 220), 47, 5, 5);
     for (i = 0; ((int)(unsigned char)mouse_sensitivity_x) > i; i++) {
-        xn_draw_image((i * 7) + 139, 108, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
+        xn_draw_image((i * 7) + 139, 108, D_00195B5C->width, D_00195B5C->height, (int)D_00195B5C->pixels);
     }
     for (i = 0; ((int)(unsigned char)mouse_sensitivity_y) > i; i++) {
-        xn_draw_image((i * 7) + 139, 121, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
+        xn_draw_image((i * 7) + 139, 121, D_00195B5C->width, D_00195B5C->height, (int)D_00195B5C->pixels);
     }
     for (i = 0; ((int)(unsigned char)(mouse_turn_rate & 127)) > i; i++) {
-        xn_draw_image((i * 7) + 139, 134, (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B5C + 6), (int)(*(char **)D_00195B5C + 12));
+        xn_draw_image((i * 7) + 139, 134, D_00195B5C->width, D_00195B5C->height, (int)D_00195B5C->pixels);
     }
     if (((int)(unsigned char)(mouse_turn_rate & 128)) == 0) return;
-    xn_draw_image((int)(unsigned short)*(short *)(*(char **)D_00195B60), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 2), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 6), (int)(*(char **)D_00195B60 + 12));
+    xn_draw_image(D_00195B60->x, D_00195B60->y, D_00195B60->width, D_00195B60->height, (int)D_00195B60->pixels);
 }
 
 int options_mouse_cursor_mode(void)
@@ -467,8 +451,8 @@ int options_joystick_screen(void)
 
     done = 0;
     background = disk_read_file((int)D_00170F54, 0);
-    *(int *)D_00195B5C = disk_read_file((int)D_00170F61, 0);
-    *(int *)D_00195B60 = disk_read_file((int)D_00170F6E, 0);
+    D_00195B5C = (struct image *)disk_read_file((int)D_00170F61, 0);
+    D_00195B60 = (struct image *)disk_read_file((int)D_00170F6E, 0);
     while (done == 0) {
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();
@@ -476,21 +460,21 @@ int options_joystick_screen(void)
         cursor_draw_arrow();
         if (mouse_buttons != 0 && mouse_buttons_prev == 0) {
             for (button = 0; button < 6; button++) {
-                if (mouse_x > *(short *)(options_joystick_buttons + (button * 12)) && mouse_x < *(short *)(D_0017BA64 + (button * 12)) && mouse_y > *(short *)(D_0017BA62 + (button * 12)) && mouse_y < *(short *)(D_0017BA66 + (button * 12))) {
+                if (mouse_x > options_joystick_buttons[button].x0 && mouse_x < options_joystick_buttons[button].x1 && mouse_y > options_joystick_buttons[button].y0 && mouse_y < options_joystick_buttons[button].y1) {
                     sound_play(203, player_object, 100);
-                    done = ((int (*)())(*(int *)(D_0017BA68 + (button * 12))))(button, background);
+                    done = options_joystick_buttons[button].handler(button, background);
                 }
             }
         }
         xn_gfx_present_inclusive(0);
     }
-    if (*(int *)D_00195B60 != 0 && *(int *)D_00195B60 != (-1751672937)) {
-        mc_free(*(int *)D_00195B60, (int)D_00170EE8, 580);
-        *(int *)D_00195B60 = -1751672937;
+    if ((int)D_00195B60 != 0 && (int)D_00195B60 != (-1751672937)) {
+        mc_free((int)D_00195B60, (int)D_00170EE8, 580);
+        D_00195B60 = (struct image *)-1751672937;
     }
-    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
-        mc_free(*(int *)D_00195B5C, (int)D_00170EE8, 581);
-        *(int *)D_00195B5C = -1751672937;
+    if ((int)D_00195B5C != 0 && (int)D_00195B5C != (-1751672937)) {
+        mc_free((int)D_00195B5C, (int)D_00170EE8, 581);
+        D_00195B5C = (struct image *)-1751672937;
     }
     if (background != 0 && background != (-1751672937)) {
         mc_free(background, (int)D_00170EE8, 582);
@@ -501,13 +485,13 @@ int options_joystick_screen(void)
 
 void options_joystick_draw(int calibrating, int background)
 {
-    short *image;
+    struct image *image;
     int index;
     int pixels;
 
-    image = (short *)background;
+    image = (struct image *)background;
     mc_memcpy(screen_buffer, options_saved_screen, 64000, (int)D_00170EE8, 593, 4);
-    xn_draw_image((unsigned short)image[0], (unsigned short)image[1], (unsigned short)image[2], (unsigned short)image[3], (char *)image + 12);
+    xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     if (((int)(unsigned char)joystick_setting) == 2) {
         D_0012B508 = 246;
         xn_draw_fill_rect(138, 42, 5, 5);
@@ -520,18 +504,18 @@ void options_joystick_draw(int calibrating, int background)
     } else {
         index = 2;
     }
-    pixels = (int)(*(char **)D_00195B60 + 12);
-    xn_draw_copy_rect_stride((((int)(short)*(short *)(options_joystick_buttons + ((index + 2) * 12))) + pixels) - 113, (int)(*(char **)&screen_buffer + ((((int)(short)*(short *)(D_0017BA62 + ((index + 2) * 12))) * 320) + ((int)(short)*(short *)(options_joystick_buttons + ((index + 2) * 12))))), (int)&*(signed char *)((char *)(((int)(short)*(short *)(D_0017BA64 + ((index + 2) * 12))) - ((int)(short)*(short *)(options_joystick_buttons + ((index + 2) * 12)))) + 1), (int)&*(signed char *)((char *)(((int)(short)*(short *)(D_0017BA66 + ((index + 2) * 12))) - ((int)(short)*(short *)(D_0017BA62 + ((index + 2) * 12)))) + 1), (int)(unsigned short)*(short *)(*(char **)D_00195B60 + 4));
+    pixels = (int)D_00195B60->pixels;
+    xn_draw_copy_rect_stride((options_joystick_buttons[index + 2].x0 + pixels) - 113, (int)(*(char **)&screen_buffer + ((options_joystick_buttons[index + 2].y0 * 320) + options_joystick_buttons[index + 2].x0)), (int)&*(signed char *)((char *)(options_joystick_buttons[index + 2].x1 - options_joystick_buttons[index + 2].x0) + 1), (int)&*(signed char *)((char *)(options_joystick_buttons[index + 2].y1 - options_joystick_buttons[index + 2].y0) + 1), D_00195B60->width);
     if (calibrating == 0) return;
     if (joystick_x == 0) if (joystick_y == 0) return;
-    image = *(short **)D_00195B5C;
+    image = D_00195B5C;
     index = options_joystick_direction();
     if (index == (-1)) return;
     while (index != 0) {
-        image = (short *)((char *)image + (unsigned short)image[5] + 12);
+        image = (struct image *)((char *)image + image->data_size + 12);
         index--;
     }
-    xn_draw_image_transparent((unsigned short)image[0], (unsigned short)image[1], (unsigned short)image[2], (unsigned short)image[3], (char *)image + 12);
+    xn_draw_image_transparent(image->x, image->y, image->width, image->height, image->pixels);
 }
 
 int options_joystick_disable(void)
@@ -562,7 +546,7 @@ int options_joystick_calibrate_button(int button, int background)
         xn_mouse_poll_clamped();
         options_joystick_draw(1, background);
         cursor_draw_arrow();
-        if (mouse_buttons != 0 && mouse_buttons_prev == 0 && mouse_x > D_0017BA6C && mouse_x < D_0017BA70 && mouse_y > D_0017BA6E && mouse_y < D_0017BA72) {
+        if (mouse_buttons != 0 && mouse_buttons_prev == 0 && mouse_x > options_joystick_buttons[1].x0 && mouse_x < options_joystick_buttons[1].x1 && mouse_y > options_joystick_buttons[1].y0 && mouse_y < options_joystick_buttons[1].y1) {
             done = 1;
         }
         xn_gfx_present_inclusive(0);

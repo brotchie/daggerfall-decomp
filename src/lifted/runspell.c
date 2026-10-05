@@ -2,11 +2,8 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "bitfield.h"
 
-struct bf8_1_1 { unsigned char _:1; unsigned char f:1; };
-struct bf8_2_1 { unsigned char _:2; unsigned char f:1; };
-struct bf8_3_1 { unsigned char _:3; unsigned char f:1; };
-struct bf8_7_1 { unsigned char _:7; unsigned char f:1; };
 struct missile_step { int x, y, z; struct record *light; };   /* a step vector, then the missile's light */
 extern short xn_cam_centre_x;
 extern short xn_cam_centre_y;
@@ -47,7 +44,7 @@ extern int creature_count;
 extern struct record *spell_ready_missile;
 extern struct record *spell_ready_touch;
 extern struct record *scratch_object;
-extern char hud_bar_image[];
+extern struct image *hud_bar_image;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern struct record *D_00195C48;
@@ -439,8 +436,8 @@ void cast_fire_missile(struct record *missile)
         aim[1] += missile->y;
         aim[2] += missile->z;
         mc_memset((int)&step, 0, 12, (int)D_001757F4, 717, 4);
-        xn_vec_unit_direction(&missile->x, (int)aim, (char *)missile + 118);
-        xn_vec_advance((char *)missile + 118, 110, (int)&step);
+        xn_vec_unit_direction(&missile->x, (int)aim, missile->data.spell.missile_direction);
+        xn_vec_advance(missile->data.spell.missile_direction, 110, (int)&step);
         missile->x += step.x;
         missile->y += step.y;
         missile->z += step.z;
@@ -513,7 +510,7 @@ void cast_creature_missile(struct record *missile, struct record *caster, struct
     light->y = missile->y;
     light->z = missile->z;
     target->y -= 50;
-    xn_vec_unit_direction(&missile->x, &target->x, (char *)missile + 118);
+    xn_vec_unit_direction(&missile->x, &target->x, missile->data.spell.missile_direction);
     target->y += 50;
     spell = &missile->data.spell;
     missile->missile_texture = *(short *)(spell_missile_textures + (spell->element * 2));
@@ -582,7 +579,7 @@ void cast_anim_update(void)
         if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
             last_y = 0;
         } else {
-            last_y = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
+            last_y = -hud_bar_image->height;
         }
         xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, last_y);
         cast_anim_state = 65535;
@@ -591,7 +588,7 @@ void cast_anim_update(void)
     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
         y = 0;
     } else {
-        y = -((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 6));
+        y = -hud_bar_image->height;
     }
     xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), y);
     cast_anim_state++;
@@ -685,7 +682,7 @@ void spell_hud_draw_icons(void)
                     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {
                         tmp_y = 177;
                     } else {
-                        tmp_y = ((int)(unsigned short)*(short *)(*(char **)hud_bar_image + 2)) - 22;
+                        tmp_y = hud_bar_image->y - 22;
                     }
                     y = tmp_y;
                 } else if (spell->effects[0].type == 35 && spell->effects[1].type == 255 && player_character->shield_points == 0) {

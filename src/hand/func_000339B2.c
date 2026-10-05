@@ -1,11 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000339B2 */
 #include "records.h"
 
-struct door_entry { short f0; unsigned short flags; };  /* loaded_location_doors: 6 bytes */
 extern char D_001970DD;
 extern struct faction *faction_find(short);
 
-int func_000339B2(struct door_entry *door, struct qbn_person *qbn_person, struct building *building, int any_building)
+int func_000339B2(struct location_door *door, struct qbn_person *qbn_person, struct building *building, int any_building)
 {
     struct faction *faction;
 

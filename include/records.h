@@ -271,7 +271,13 @@ struct item {
     unsigned char variants;         /* +0x41: template byte 41: picture variants added to inventory_image;
                                        ingredients: compared by the potion recipes */
     unsigned char draw_order;       /* +0x42: template byte 42: the paperdoll's drawing order */
-    struct enchantment enchantments[10]; /* +0x43 */
+    union {
+        struct enchantment enchantments[10]; /* +0x43 */
+        struct {
+            struct enchantment pad43;   /* +0x43 */
+            int direction[3];           /* +0x47: arrows in flight: the unit direction (weapons.c) */
+        } arrow;
+    };
 };                                  /* +0x6B */
 RECORD_SIZE(item, 107);
 
@@ -304,7 +310,10 @@ struct spell {
     struct spell_range durations[3]; /* +0x0E */
     struct spell_range chances[3];  /* +0x17 */
     struct spell_magnitude magnitudes[3]; /* +0x20 */
-    char name[25];                  /* +0x2F */
+    union {
+        char name[25];              /* +0x2F */
+        int missile_direction[3];   /* +0x2F: a missile in flight: its unit direction (cast_fire_missile) */
+    };
     unsigned char icon;             /* +0x48: 200+slot item spell, 250 item/potion/strike */
     unsigned char id;               /* +0x49 */
     unsigned short cast_durations[3]; /* +0x4A: filled in at cast time */
@@ -598,6 +607,14 @@ RECORD_SIZE(qbn_text_var, 27);
 
 /* ---- NPCs, blessings, the automap -------------------------------------------------------- */
 
+/* the data of a quest NPC (type 41, 58 bytes): its building entry, then its town's name
+ * (quest_init_person copies current_location's; quest_symbol_text reads it) */
+struct quest_npc {
+    struct building building;       /* +0x00 */
+    char location_name[32];         /* +0x1A */
+};                                  /* +0x3A */
+RECORD_SIZE(quest_npc, 58);
+
 /* the data of a type-8 NPC (a flat person in a building or block; 3 bytes, rmb_make_flat) */
 struct person {
     unsigned short faction_id;      /* +0x00: guild_service_dispatch picks the service by it */
@@ -609,11 +626,33 @@ RECORD_SIZE(person, 3);
 /* the data of a blessing (type 30), bought from a temple */
 struct blessing {
     unsigned char target;           /* +0x00: skill id, 128|attribute, or 255 regional legal reputation */
-    signed char amount;             /* +0x01: what blessing_apply added */
+    unsigned char amount;           /* +0x01: what blessing_apply added (blessing_remove reads it unsigned) */
     unsigned int end_time;          /* +0x02: game_minutes when guild_expire_blessings removes it */
     unsigned char region;           /* +0x06: target 255: the region (blessing_remove) */
 };                                  /* +0x07 */
 RECORD_SIZE(blessing, 7);
+
+/* the data of the logbook record (type 24, logbook_object): the quests' log messages */
+struct logbook {
+    short quest_ids[32];            /* +0x000: 0 a free slot */
+    short message_ids[32][10];      /* +0x040: QRC message ids per quest, 0 none */
+    int message_times[32][10];      /* +0x2C0: game_minutes when each was logged */
+    char places[32][32];            /* +0x7C0: the place names (current_location) for %cn */
+};                                  /* +0xBC0 */
+RECORD_SIZE(logbook, 3008);
+
+/* the data of a 3D object (types 6 models, 32 doors; also D_001A945E for arrows in flight):
+ * XnGine's model instance, which object_draw_cb fills and xn_model_submit draws */
+struct model_instance {
+    char *model;                    /* +0x00: model_get's result, 0 none */
+    char pad04[8];                  /* +0x04 */
+    char angles[20];                /* +0x0C: xn_model_set_angles, xn_model_compose_angles */
+    int x;                          /* +0x20 */
+    int y;                          /* +0x24 */
+    int z;                          /* +0x28 */
+    int missile_angles[3];          /* +0x2C: arrows: the heading, angle_z, 0 */
+};                                  /* +0x38 */
+RECORD_SIZE(model_instance, 56);
 
 /* the data of the automap record (type 51), saved as AT%05d.AMF */
 struct automap {
@@ -664,17 +703,28 @@ struct block_door {
 };                                  /* +0x13 */
 RECORD_SIZE(block_door, 19);
 
+/* an RMB block's section-3 record, 16 bytes (DFU RmbBlockSection3Record; rmb_add_subrecord
+ * makes it absolute) */
+struct block_section3 {
+    int x;                          /* +0x00 */
+    int y;                          /* +0x04 */
+    int z;                          /* +0x08 */
+    int data;                       /* +0x0C: func_0007E441 takes byte 0 (or 1, mode 2) of the
+                                       nearest one's */
+};                                  /* +0x10 */
+RECORD_SIZE(block_section3, 16);
+
 /* the data of a type-43 object: an RMB subrecord's counts and lists (rmb_add_subrecord copies
  * the header and the three lists, then points the pointers at the copies) */
 struct block {
     unsigned char model_count;      /* +0x00: struct block_model */
     unsigned char flat_count;       /* +0x01: struct block_flat */
-    unsigned char section3_count;   /* +0x02: 16-byte records */
+    unsigned char section3_count;   /* +0x02: struct block_section3 */
     unsigned char people_count;     /* +0x03: 17-byte people after the subrecord (not copied) */
     unsigned char door_count;       /* +0x04: 19-byte doors after them (not copied) */
     struct block_model *models;     /* +0x05 */
     struct block_flat *flats;       /* +0x09 */
-    char *section3;                 /* +0x0D */
+    struct block_section3 *section3; /* +0x0D */
 };                                  /* +0x11 */
 RECORD_SIZE(block, 17);
 
@@ -693,13 +743,15 @@ union record_data {
     struct location location;       /* 1 the location */
     struct quest quest;             /* 14 a quest: the QBN file */
     struct settings settings;       /* 23 options */
+    struct logbook logbook;         /* 24 */
     struct bank_account bank_accounts[62]; /* 25 one per region */
     struct person person;           /* 8 NPCs */
     struct blessing blessing;       /* 30 */
-    struct building building;       /* 40 quest places, 41 quest NPCs (then the location's name at
-                                       +0x1A), 64 stored buildings */
+    struct building building;       /* 40 quest places, 41 quest NPCs, 64 stored buildings */
+    struct quest_npc quest_npc;     /* 41 */
     struct block block;             /* 43 RMB blocks */
     struct automap automap;         /* 51 */
+    struct model_instance instance; /* 6 models, 32 doors */
 };
 
 /* ---- the header ------------------------------------------------------------------------ */
@@ -767,6 +819,9 @@ struct record {
         unsigned short shelf_index; /* +0x1B: items on a shop shelf (36): the shelf model's index */
         unsigned short location_index; /* +0x1B: the location object: its index, 0xFFFF wilderness */
         unsigned short seen_count;  /* +0x1B: the automap (51): bytes of seen bits */
+        unsigned short container_index; /* +0x1B: item containers (52): their index in
+                                       inventory_containers (0-3 the inventory tabs, 4 the wagon,
+                                       5 house, 6 ship, 7 room storage, 8 repairs) */
     };
     union {
         unsigned short pad1D;       /* +0x1D */
@@ -797,6 +852,8 @@ struct record {
         unsigned int move_frame;    /* +0x2B: models (6): frame_counter when a link last moved it */
         unsigned int move_remainder; /* +0x2B: pedestrians (53): the x and z fractions of the last
                                        move (bytes 0 and 1) */
+        unsigned int monster_arrow; /* +0x2B: arrows in flight (2): 1 when a creature fired it
+                                       (weapon_monster_arrow; no reader found) */
     };
     union {
         unsigned int pad2F;         /* +0x2F */
@@ -840,7 +897,7 @@ RECORD_SIZE(rumor, 34);
 struct loaded_location {
     int index;                      /* +0x00 */
     int door_count;                 /* +0x04 */
-    char *doors;                    /* +0x08: 6-byte door records (location_find_door) */
+    struct location_door *doors;    /* +0x08: door_count of them (location_find_door) */
     struct record *object;          /* +0x0C: the header read from MAPS, then the location (malloc 119) */
     struct location *data;          /* +0x10: object + 0x47 */
 };                                  /* +0x14 */
@@ -887,6 +944,25 @@ struct link {
 };                                  /* +0x27 */
 RECORD_SIZE(link, 39);
 
+/* a house for sale at the bank (bank_houses_for_sale[20], bank_add_house_for_sale) */
+struct house_for_sale {
+    struct block *block;            /* +0x00: the building marker's data (a type-43 object) */
+    struct building *building;      /* +0x04: its entry in current_location->buildings */
+    int price;                      /* +0x08 */
+    unsigned int id;                /* +0x0C: the object's id (player_character->house when bought) */
+    int saved_yaw;                  /* +0x10: block->models[0].yaw, put back by bank_restore_houses */
+};                                  /* +0x14 */
+RECORD_SIZE(house_for_sale, 20);
+
+/* a ship for sale at the bank (bank_ships_for_sale[2], bank_init_ships): a model and its price;
+ * bank_draw_preview draws it as a one-model block */
+struct ship_for_sale {
+    struct block_model model;       /* +0x00: model 415 */
+    unsigned int id;                /* +0x42: the ship's id (0x3E00001, 0x3E10001: ship_owned) */
+    int price;                      /* +0x46 */
+};                                  /* +0x4A */
+RECORD_SIZE(ship_for_sale, 74);
+
 /* a node of the model cache's binary tree (objlib.c) */
 struct model_node {
     struct model_node *left;        /* +0x00 */
@@ -905,11 +981,14 @@ struct move_request {
     int angle_x;                    /* +0x0C */
     int yaw;                        /* +0x10 */
     int angle_z;                    /* +0x14 */
-    int *probe;                     /* +0x18: x, y, z (D_00196D4C) */
+    struct collide_probe *probe;    /* +0x18: the mover's shape (D_00196D4C while it is tested) */
     unsigned short flags;           /* +0x1C: bit 0 (func_00023FA5) */
 };                                  /* +0x1E */
 RECORD_SIZE(move_request, 30);
 
 #pragma pack()
+
+/* the shared structures that are not records */
+#include "structs.h"
 
 #endif

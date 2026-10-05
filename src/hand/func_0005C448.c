@@ -4,26 +4,25 @@
 /* a flying spell is a type-9 record: header +0x17 is its missile texture (bit 0 set once it
  * has hit), image2 0x8000 once it has hit; its velocity is kept at record +0x76 (the spell's
  * name); its first child is the light, whose +0x17 grows on impact */
-struct Vec { int x; int y; int z; };
 extern short spell_impact_sounds[];
 extern struct record *player_object;
 extern int frame_ticks;
 extern int D_00195B84;
 extern struct record *D_00195C48;
 extern unsigned char collide_flags;
-extern int collide_move_missile(struct record *, struct Vec *, struct Vec *);
+extern int collide_move_missile(struct record *, struct vec3 *, struct vec3 *);
 extern void func_0005C856(struct record *, struct record *);
 extern void links_trigger(struct record *, int);
 extern int sound_play(int, struct record *, int);
 extern struct record *monster_nearest_to_point(int, int, int);
-extern int xn_vec_advance(char *, int, struct Vec *);
+extern int xn_vec_advance(int *, int, struct vec3 *);
 extern int xn_math_approx_dist2d();
 extern int xn_math_approx_hypot();
 
 int spell_missile_update(struct record *m, int launch)
 {
-    struct Vec pos;
-    struct Vec ang;
+    struct vec3 pos;
+    struct vec3 ang;
     int hit;
     int dist;
     struct record *obj;
@@ -40,7 +39,7 @@ int spell_missile_update(struct record *m, int launch)
     pos.x = m->x;
     pos.y = m->y;
     pos.z = m->z;
-    xn_vec_advance((char *)m + 118, frame_ticks * 400 / 1000, &pos);
+    xn_vec_advance(m->data.spell.missile_direction, frame_ticks * 400 / 1000, &pos);
     ang.x = m->angle_x;
     ang.y = m->yaw;
     ang.z = 0;

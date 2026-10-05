@@ -18,10 +18,7 @@ extern signed char quest_global_states[];
 extern struct record *inventory_containers[];
 extern struct record *D_001959DC;
 extern struct record *quest_root;
-extern signed char quest_faces[];
-extern char quest_faces_quest[];
-extern char quest_faces_object[];
-extern char quest_faces_image[];
+extern struct quest_face quest_faces[];
 extern struct record *camera_object;
 extern struct record *player_entity;
 extern struct record *player_object;
@@ -51,8 +48,8 @@ extern int tavern_open(int);
 extern int quest_arg_state(struct qbn_op *, int);
 extern void *quest_section(struct quest *, int);
 extern void *quest_record(struct quest *, int, int);
-extern char *location_find_door(int);
-extern char *flats_cfg_find(int);
+extern struct location_door *location_find_door(int);
+extern struct flat_cfg *flats_cfg_find(int);
 extern int hud_message_add(int);
 extern int rand_range(int, int);
 extern int location_contains(int, int);
@@ -140,13 +137,13 @@ void qaction_op04_give_reward(struct quest *quest, struct qbn_op *op)
 void func_0003077F(struct record *object, int delete_twin)
 {
     struct record *twin;
-    char *door;
+    struct location_door *door;
 
     if (object == 0) return;
     twin = object->twin;
     if (loaded_location_door_count != 0 && (object->id & -65536) == (location_object->id & -65536)) {
         door = location_find_door(object->id);
-        if (door != 0) door[3] &= 15;
+        if (door != 0) door->flags &= 0xFFF;
     }
     object_delete(object);
     if (twin == 0) return;
@@ -212,23 +209,23 @@ void quest_faces_after_load(void)
     int slot;
     int face_index;
     int i;
-    char *image;
+    struct image *image;
 
     for (slot = 0; slot < 10; slot++) {
         i = 0;
-        if (((int)(unsigned char)(quest_faces[slot * 10] & 16)) != 0) {
-            image = (char *)D_00195D14;
+        if (((int)(unsigned char)(quest_faces[slot].face & 16)) != 0) {
+            image = (struct image *)D_00195D14;
         } else {
-            image = (char *)quest_face_images[(((int)(unsigned char)quest_faces[slot * 10]) >> 6)];
+            image = (struct image *)quest_face_images[(((int)(unsigned char)quest_faces[slot].face) >> 6)];
         }
-        face_index = (int)(unsigned char)(quest_faces[slot * 10] & 15);
+        face_index = (int)(unsigned char)(quest_faces[slot].face & 15);
         while (i < face_index) {
-            image = (((int)*(unsigned short *)(image + 10)) + image) + 12;
+            image = (struct image *)((char *)image + image->data_size + 12);
             i++;
         }
-        *(char **)(quest_faces_image + (slot * 10)) = image;
-        if (object_find_quest(quest_root->children, (int)(unsigned char)*(signed char *)(quest_faces_quest + (slot * 10))) == 0) {
-            quest_faces_remove_quest((int)(unsigned char)*(signed char *)(quest_faces_quest + (slot * 10)));
+        quest_faces[slot].image = image;
+        if (object_find_quest(quest_root->children, quest_faces[slot].quest_id) == 0) {
+            quest_faces_remove_quest(quest_faces[slot].quest_id);
         }
     }
 }
@@ -237,15 +234,15 @@ void quest_faces_draw(void)
 {
     int slot;
     int drawn_count;
-    char *image;
+    struct image *image;
 
     if (game_mode != 0) return;
     slot = 0;
     drawn_count = slot;
     for (; slot < 10; slot++) {
-        if (*(int *)(quest_faces_object + (slot * 10)) == 0) continue;
-        image = *(char **)(quest_faces_image + (slot * 10));
-        xn_draw_image_transparent((drawn_count << 5) + 8, 36, (int)*(unsigned short *)(image + 4), (int)*(unsigned short *)(image + 6), image + 12);
+        if (quest_faces[slot].object_id == 0) continue;
+        image = quest_faces[slot].image;
+        xn_draw_image_transparent((drawn_count << 5) + 8, 36, image->width, image->height, image->pixels);
         drawn_count++;
     }
 }
@@ -255,8 +252,8 @@ void quest_face_remove(int object_id)
     int slot;
 
     for (slot = 0; slot < 10; slot++) {
-        if (*(int *)(quest_faces_object + (slot * 10)) == object_id) {
-            *(int *)(quest_faces_object + (slot * 10)) = 0;
+        if (quest_faces[slot].object_id == object_id) {
+            quest_faces[slot].object_id = 0;
             return;
         }
     }
@@ -267,8 +264,8 @@ void quest_face_replace_object_id(int old_id, int new_id)
     int slot;
 
     for (slot = 0; slot < 10; slot++) {
-        if (*(int *)(quest_faces_object + (slot * 10)) == old_id) {
-            *(int *)(quest_faces_object + (slot * 10)) = new_id;
+        if (quest_faces[slot].object_id == old_id) {
+            quest_faces[slot].object_id = new_id;
             return;
         }
     }
@@ -280,9 +277,9 @@ void quest_faces_remove_quest(unsigned char quest_id)
         int slot;
 
         for (slot = 0; slot < 10; slot++) {
-            if (*(int *)(quest_faces_object + (slot * 10)) == 0) continue;
-            if (*(unsigned char *)(quest_faces_quest + (slot * 10)) == quest_id) {
-                *(int *)(quest_faces_object + (slot * 10)) = 0;
+            if (quest_faces[slot].object_id == 0) continue;
+            if (quest_faces[slot].quest_id == quest_id) {
+                quest_faces[slot].object_id = 0;
             }
         }
     }
@@ -359,7 +356,7 @@ struct record *func_000310E1(struct record *object, struct record *target)
     struct record *child_twin;
     struct person *person;
     int unused1;
-    char *flat_cfg;
+    struct flat_cfg *flat_cfg;
     int unused2;
     int data_size;
     int old_id;
@@ -457,7 +454,7 @@ struct record *func_000310E1(struct record *object, struct record *target)
             twin->image = faction_find((short)person->faction_id)->flats[0];
         }
         flat_cfg = flats_cfg_find(twin->image);
-        person->flags |= (((flat_cfg[6] & 1) != 0) ? 16 : 0);
+        person->flags |= (((flat_cfg->flags & 1) != 0) ? 16 : 0);
         if (((int)(unsigned short)(object->flags & 4)) != 0) {
             twin->flags |= 4;
         } else {

@@ -1,12 +1,13 @@
 /* profile.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "structs.h"
 
 
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_find_section;
 
-int profile_find_section(int profile, char *section)
+int profile_find_section(struct profile *profile, char *section)
 {
     char *cursor;
     char *header;
@@ -15,14 +16,14 @@ int profile_find_section(int profile, char *section)
     int found;
 
     found = 0;
-    cursor = *(char **)((char *)profile + 132);
+    cursor = profile->buffer;
     offset = 0;
     do {
         if (*cursor == 91) {
             header = cursor;
             cursor++;
             name = section;
-            while (*cursor == *name && ((unsigned)offset) < *(int *)((char *)profile + 136)) {
+            while (*cursor == *name && offset < profile->length) {
                 name++;
                 cursor++;
                 offset++;
@@ -31,14 +32,14 @@ int profile_find_section(int profile, char *section)
                 found = 1;
                 while (*cursor != 10) cursor++;
                 cursor++;
-                *(char **)((char *)profile + 168) = cursor;
-                *(char **)((char *)profile + 144) = cursor;
-                *(int *)((char *)profile + 148) = offset;
-                *(char **)((char *)profile + 152) = header;
+                profile->line = cursor;
+                profile->section = cursor;
+                profile->section_offset = offset;
+                profile->section_header = header;
             }
         }
         cursor++;
         offset++;
-    } while (found == 0 && ((unsigned)offset) < *(int *)((char *)profile + 136));
+    } while (found == 0 && offset < profile->length);
     return found;
 }

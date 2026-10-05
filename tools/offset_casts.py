@@ -49,6 +49,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RECORDS_H = os.path.join(ROOT, "include", "records.h")
+STRUCTS_H = os.path.join(ROOT, "include", "structs.h")     # the shared structures that are not records
 
 # globals that hold a pointer to a record, and the struct they point to. `rewrite --retype`
 # turns a lifted file's `extern char g[];` into `extern struct X *g;`, and `scan` reads
@@ -146,6 +147,31 @@ GLOBAL_TYPES = {
     "D_001995EC": "link",               # the link fs2df.c is building (in D_00199D78[])
     "D_001995E4": "link",               # the first link of its chain
     "model_cache_root": "model_node",
+    # phase 3 (structs.h): IMG/CIF images, the pick result
+    "hud_bar_image": "image",
+    "rest_image": "image",
+    "D_00195B5C": "image",              # the menus' background picture
+    "D_00195B60": "image",
+    "list_popup_image": "image",
+    "magic_items_image": "image",
+    "controls_view_image": "image",
+    "moon0_image": "cfa_header",
+    "moon1_image": "cfa_header",
+    "D_001AA64C": "image",              # travel map pictures
+    "D_001AA650": "image",
+    "D_001AA654": "image",
+    "D_001AA658": "image",
+    "D_001AA668": "image",
+    "D_001AA670": "image",
+    "D_00199638": "image",              # the character sheet's picture
+    "D_00196D9C": "image",              # the town map's picture (town_map_open)
+    "pick_result": "pick_result",       # engine_pick_object's result buffer
+    "click_hit": "pick_result",
+    "D_00195D3C": "block_model",        # the clicked block model (pick_model_cb)
+    "D_00195DA8": "record",             # the loot container being shown (generate.c, inven.c)
+    "rmb_record_ptr": "block",          # the RMB subrecord being read: its header is a block's
+    "D_00196D48": "collide_hits",       # colstuff.c: XnGine's last collision result
+    "D_00196D4C": "collide_probe",      # the probe being tested (move_request.probe)
     # arrays of record pointers
     "inventory_containers[]": "record",
     "D_00190504[]": "record",           # the creatures (creature_count of them)
@@ -187,9 +213,13 @@ def strip_comments(text):
     return re.sub(r"//[^\n]*", "", text)
 
 
-def parse_records(path=RECORDS_H):
-    """{tag: (size, [Field])} with offsets computed (packed), and a list of problems."""
-    raw = open(path).read()
+def parse_records(path=None):
+    """{tag: (size, [Field])} with offsets computed (packed), and a list of problems. Reads
+    records.h, then structs.h (records.h includes it at its end)."""
+    if path is None:
+        raw = "\n".join(open(p).read() for p in (RECORDS_H, STRUCTS_H) if os.path.exists(p))
+    else:
+        raw = open(path).read()
     lines = raw.splitlines()
     text = "\n".join(l for l in lines if not l.lstrip().startswith("#"))
     text = re.sub(r"RECORD_(SIZE|OFFSET)\([^)]*\);", "", text)
@@ -263,16 +293,54 @@ def parse_records(path=RECORDS_H):
                 continue
             ctype, anon = parse_type()
             start = base + (0 if is_union else off)
+            if not anon and peek() == "(":
+                # a function pointer member: `void (*fn)(int);`, 4 bytes
+                take("(")
+                take("*")
+                name = take()
+                take(")")
+                take("(")
+                depth = 1
+                while depth:
+                    t = take()
+                    depth += {"(": 1, ")": -1}.get(t, 0)
+                take(";")
+                unit = None
+                f = Field(name, start, "void *", [], 4, 4)
+                fields.append(f)
+                pending = [f]
+                if is_union:
+                    size = max(size, 4)
+                else:
+                    off += 4
+                    size = off
+                continue
             if anon or peek(1) != ":":
                 unit = None
             if anon:
                 take("{")
                 sub_size, sub_fields = parse_members(start, anon == "anon-union")
                 take("}")
-                take(";")
-                fields += sub_fields
-                pending = sub_fields[:1]
-                msize = sub_size
+                if peek() != ";":
+                    # a named member of an inline struct/union type, `struct { ... } arrow;`:
+                    # its fields become a struct of their own (offsets from its start)
+                    name = take()
+                    tag = "%s__%d" % (name, len(structs))
+                    rel = []
+                    for sf in sub_fields:
+                        c = Field(sf.name, sf.off - start, sf.ctype, sf.dims, sf.size, sf.elem, sf.bits)
+                        rel.append(c)
+                    structs[tag] = (sub_size, rel)
+                    take(";")
+                    f = Field(name, start, "struct " + tag, [], sub_size, sub_size)
+                    fields.append(f)
+                    pending = [f]
+                    msize = sub_size
+                else:
+                    take(";")
+                    fields += sub_fields
+                    pending = sub_fields[:1]
+                    msize = sub_size
             else:
                 msize = 0
                 pending = []
