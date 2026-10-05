@@ -362,3 +362,173 @@ docs/xngine_map.md is the engine map:
   - the divide handler doesn't decode SIB forms;
   - every flat skips its first visible piece.
 
+
+## 2026-10-05: phase 5, literal C
+
+Every XnGine function now has a C version. It is generated from the function's
+instructions, compiled by the real Watcom C32 10.0a, and checked against the record corpus.
+**All 620 recorded functions replay all 8,204 of their records exactly.** That holds with
+one function at a time in C, and with all 719 in C at once. "Exactly" means the exit
+registers, the six arithmetic flags, every byte written, and the port I/O and interrupts.
+
+The game also runs with all of XnGine in C:
+- 2,000 ticks of walking and turning in each of eight saves, with no fault (57M C calls);
+- a still scene stays pixel-identical to the asm after 300 ticks.
+
+| | |
+|---|---|
+| Translated | 719 of 719 functions (39,257 instructions). Two instructions are left to the asm: a `pop ss` in data, and a 16-bit `iret` |
+| Compiled | 719 (73 files, 75,000 lines; 30 s in four DOSBox-X sessions) |
+| Records, one function in C | 620 / 620 functions, 8,204 / 8,204 records |
+| Records, every function in C | 620 / 620 functions, 8,204 / 8,204 records. Inside them the C of 678 functions runs, including the 57 handler blocks that have no records of their own |
+| Differential tests (made-up entry states) | 556 functions, 4,033 tests, all agree. Ten of them are among the 41 functions no record runs at all |
+| Not tested | 31 of the 99 functions without records: 16 that fault when called and 10 that wait on a timer, key or port (no made-up state returned), and 5 that are data |
+
+**The C.** `tools/xn_c.py translate` writes `src/xngine_c/xn_<module>.c` (a module per file,
+big modules in several), and each function becomes `void xn_<va>(void)`, its name and
+evidence from config/names.csv in a comment above it:
+
+```c
+/* xn_span_flat_transparent (strong): Flat sprite span ... */
+void xn_00157620(void)
+{
+    ...
+    R.ebx -= M32(XN(0x157622));                                  /* 157620: sub ebx, 0x2710 */
+    R.ecx >>= 13;                                                /* 157626: shr ecx, 0xd */
+    ...
+    fa = R.ebp; fb = 0x8;                                        /* 157678: cmp ebp, 8 */
+    fr = fa - fb;
+    LF(XF_SUB | 2, fa, fb, fr);
+    if (((s32)fa < (s32)fb)) goto L_15772F;                      /* 15767B: jl 0x15772f */
+```
+
+- **Registers and memory.** The registers are a struct `R` in memory (sub-registers are
+  macros: `AL`, `BX`...). Memory is the game's: `XN(va)` is where address va is loaded, and
+  `M8/M16/M32` read and write it. The stack is `R.esp` in that memory, so pushes, calls (the
+  original return address) and returns write the same bytes as the asm.
+- **Flags** are computed only where something reads them. A forward pass finds, for each
+  reader, the flag writer whose values reach it on every path; when there is one, the reader
+  is a C expression on that writer's operands, held in locals (`cmp` + `jl` becomes a signed
+  compare, across labels too). Other readers use lazy flags: the writer stores its operation,
+  operands and result in `F` (`LF(...)`), which `xn_cond`/`xn_eflags` turn into flags when
+  read. Which writers store is a backward liveness pass. Returns, calls, `pushfd`, a divide
+  (its fault frame holds EFLAGS) and jumps out of the function read every flag; a writer
+  right before one of them stores just there. A writer whose flags no one reads is plain C
+  (`R.ecx >>= 13`). The formulas are QEMU's, undefined flags included (logic ops, shifts and
+  multiplies clear AF; a shift's OF compares the top bits before and after its last step;
+  `bsf`/`bsr` set the logic flags of their source; divides leave the flags alone), checked
+  against Unicorn instruction by instruction first.
+- **Self-modifying code.** An operand the program rewrites (the 337 patch fields) is read
+  from its code bytes when the instruction runs (`M32(XN(0x157622))`), so the C follows
+  every setup routine whether that routine is asm or C. In the 15 functions where a `ret` is
+  planted at a computed instruction, each instruction first checks its own first byte
+  (`if (M8(XN(0x157765)) == 0xC3) { LF(...); RET(0); }`). The three selector loads read the
+  selector the loader wrote.
+- **Control.** A function's body is everything reachable from its entry without passing
+  another function's entry (shared code is translated into each function that reaches it).
+  Jump tables become `switch`es on the table's entries. A call is `PUSH32(return address);
+  xn_call(target)`: through the callee's asm entry, which leads to its C when that function
+  is routed to C. A jump out of the function, or an instruction the translator does not
+  handle, is `GOTO_ASM(address)`: the C returns and the asm continues there, which is always
+  correct. Functions longer than 600 instructions run as parts that pass the next label
+  between them, and modules are cut into files of at most 2,500 lines: Watcom 10.0a's code
+  generator runs out of room ("internal compiler limit") on big functions and big files.
+- **What C cannot say.** Watcom 10.0a has no 64-bit integers, so the 32x32 multiplies and
+  64/32 divides (`imul r/m`, `div`, the overflow test of `idiv`) are one-instruction inline
+  pragmas. `int`, `in`/`out` and `ins`/`outs` are helpers that do the real instruction, so
+  DOS, DPMI and the ports see the same calls.
+
+**The runtime** (`src/xngine_c/runtime.c`, `runtime.h`, `xn_rt.asm`):
+- **Entering C.** The loader writes a stub per function. It saves the CPU in `R`, sets
+  `xn_target`, and enters `xn_thunk`, which switches to a separate C stack and calls the
+  function. When it returns, the thunk loads `R` back and jumps to `xn_ret`: the address its
+  `ret` popped, or wherever it jumps.
+- **Calling asm.** `xn_call` does the reverse. The caller has pushed the original return
+  address; `xn_call` replaces it with a trampoline for its nesting depth, runs the target, and
+  puts the original back when control returns. Two things the engine does needed more than
+  that:
+  - **Returns that skip a frame.** A light handler jumps to the shader setup, which returns
+    to the handler's caller's caller. The depth-tagged trampolines tell `xn_back` which
+    pending call is returning, and the frames in between are dropped, their slots put back.
+  - **Calls that never return.** The span routines leave the row loop by unwinding the
+    stack (0x12A949: `add esp, 18h`) into the loop's next iteration. A C entry finding the
+    asm stack (within 64 KB) above a pending call's return slot drops that call's frame.
+- **Interrupts.** The C runs with interrupts off, and `R.eflags` keeps the program's IF.
+  - On the way in, the flags are pushed on the asm stack and the dead word put back.
+  - On the way out, interrupts come on with an `sti` whose one-instruction shadow covers the
+    final jump.
+
+  An interrupt never finds ESP on the C stack. The stubs set `xn_target` (and the
+  trampolines `xn_back_k`) only after `cli`. Segment registers are loaded
+  only when the C changed them: loading a selector sets its descriptor's accessed bit, a
+  write the asm never made.
+- **The divide error.** A divide that would fault takes a real fault, with the asm's
+  registers and stack (`xn_divfault`: a `div` by a zero in memory). So the program's own
+  handler, asm or C, runs on the same frame, and the emulator logs the same exception. The
+  frame's return address is then made the original instruction's.
+
+**The harness** (`tools/xn_cload.py`):
+- **Link.** A small OMF linker lays the objects out at 0x10000000, in a region it maps in
+  the machine above the emulator's memory, so the C, its data and its stack are never part
+  of a record's compared memory.
+- **Routing.** A function is sent to C by a code hook at its asm entry that moves EIP to its
+  stub. The asm bytes stay as they were, so the patch fields and planted `ret`s land where
+  the C reads them.
+- **Records.** `test` replays each record with only that function in C (`-j 3`: three
+  worker processes). `--all-c` routes every function, so each record also tests everything
+  its call runs, including the 57 handler blocks that have no records of their own.
+- **Differential tests.** `diff` makes up entry states (another record's machine, registers
+  taken from other records, small numbers or random values), records the asm's call from
+  each one that returns without a service call, and replays that with the C. This is for
+  functions the corpus never ran.
+
+**Bring-up.** The first run, on 300 records of 100 functions, passed 97. The fixes on the
+way were in the translator, the flag analysis and the runtime, never by hand in the
+generated C:
+- a function whose code starts before its entry;
+- flags at a planted `ret`;
+- Watcom's limits;
+- selector immediates;
+- descriptor accessed bits;
+- a far-return flag left set after a nested exception handler returned;
+- the two stack tricks above;
+- the interrupt windows (below).
+
+A made-up state can make a function overwrite its own code: 0x147820, given a bogus image,
+remaps 88 KB from inside object 2 through its colour table, and the asm then runs what it
+wrote. Such states are not tests, and `diff` skips them.
+
+The long timeout loops in the serial head-tracker drivers (16M iterations of `cmp`/`loop`)
+take the C several times as many instructions as the asm, so a call that does not return
+within 200M instructions is retried with a 3G limit.
+
+**Run:**
+- `.venv/bin/python tools/xn_c.py translate` (3 s), then `build` (30 s), then
+  `test -j 3` (17 min for the corpus, 5 of them on the head-tracker timeout loops) and
+  `test --all-c -j 3` (14 min). A few functions:
+  `test 0x157620 0x15BC42`.
+- `diff --untested` runs the differential tests. `show 0x157620` prints one function.
+- `play SNAP --ticks N [--script INPUT] --shot out.png` runs the game itself with XnGine
+  in C (`--asm` for the comparison run).
+- Results land in build/xngine/c_report.csv: per function, translated, asm fallbacks,
+  compiled, records passed (alone and all-C), the records its C ran in, the differential
+  tests, and the corpus's coverage note.
+
+**The game in C** (`play`). The emulator delivers interrupts between slices, wherever the
+CPU stopped. A few instructions of the runtime run with interrupts on:
+- the stubs save the registers before their `cli`;
+- the way out is `sti; jmp [xn_leave_to]`, which a CPU never interrupts (the `sti` shadow).
+
+An interrupt there, whose handler calls into C (the sound library's timer calls
+`xn_timer_tick_callback`), would overwrite `R` or the jump target. So `play` steps the CPU out
+of the runtime before delivering one. With that, all eight saves run 2,000 ticks with
+XnGine in C. Timing differs from the asm (the C takes more instructions per frame), so a moving
+scene ends a little differently from the asm's, but renders the same way.
+
+**Left:**
+- **Readable C.** The literal C is the asm's register-level dataflow. The next step is
+  readable C: locals instead of `R`, structs from config/names.csv and docs/structs.md,
+  loops for the unrolled spans, and the generated texture mapper as one routine with
+  parameters.
+- **The runtime is for mixed asm and C**, inside the emulator. Once everything is C, the
+  thunks, trampolines, frame unwinding and interrupt windows go away with the asm.

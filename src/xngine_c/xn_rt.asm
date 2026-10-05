@@ -21,7 +21,7 @@ extrn xn_eflags_:near
 
 public xn_thunk, xn_call, xn_int, xn_divfault
 public _xn_target, _xn_ret, _xn_retcs, _xn_far, _xn_cesp, _xn_depth, _xn_back_k
-public _xn_backtab, xn_back
+public _xn_backtab, xn_back, xn_thunk_c, xn_back_c
 
 R_EAX   equ 0
 R_ECX   equ 4
@@ -73,15 +73,27 @@ SAVE_CPU macro
     mov word ptr _R+R_GS, gs
 endm
 
-; onto the C stack; EFLAGS -> R; interrupts off, DF clear. The segment registers stay as
-; they are (the C uses no string instructions, so ES is never its concern).
-ENTER_C macro
-    mov esp, _xn_cesp
+; EFLAGS -> R, interrupts off, then onto the C stack with DF clear. The flags are pushed on
+; the asm stack (an interrupt must never find ESP on the C stack while they are still on), and
+; the dead word they overwrite there is put back. The segment registers stay as they are (the
+; C uses no string instructions, so ES is never its concern).
+ENTER_FLAGS macro
+    mov eax, dword ptr [esp-4]
     pushfd
-    pop dword ptr _R+R_EFL
     cli
+    pop dword ptr _R+R_EFL
+    mov dword ptr [esp-4], eax
+endm
+
+ENTER_STACK macro
+    mov esp, _xn_cesp
     cld
     mov dword ptr _F, 0
+endm
+
+ENTER_C macro
+    ENTER_FLAGS
+    ENTER_STACK
 endm
 
 ; a segment register from R, only if the C changed it: loading a selector sets the accessed bit
@@ -108,29 +120,67 @@ LOAD_REGS macro
     mov esp, dword ptr _R+R_ESP
 endm
 
-; R -> CPU, EFLAGS last, onto the asm stack (R.esp), and jump to xn_leave_to (DS, if it
-; changes, is loaded last, so the two ways out differ only there)
+; R -> CPU, EFLAGS last, onto the asm stack (R.esp), and jump to xn_leave_to. EFLAGS is loaded
+; with IF clear, and an `sti` (whose one-instruction shadow covers the jump) turns interrupts
+; on only once ESP is the asm's: an interrupt must never find ESP in the C's data. The
+; selectors are flat, so DS can be loaded before the last reads of R.
 LEAVE_C macro
-    local keepds
+    local noif
     call xn_eflags_
+    mov edx, eax
+    and eax, not 0200h
     mov xn_flagslot, eax
     LOAD_SEG es, R_ES
     LOAD_SEG fs, R_FS
     LOAD_SEG gs, R_GS
-    mov ax, ds
-    cmp ax, word ptr _R+R_DS
-    je keepds
+    LOAD_SEG ds, R_DS
+    test edx, 0200h
+    je noif
     LOAD_REGS
-    mov ds, word ptr _R+R_DS
-    jmp dword ptr cs:xn_leave_to
-keepds:
+    sti
+    jmp dword ptr xn_leave_to
+noif:
     LOAD_REGS
-    jmp dword ptr cs:xn_leave_to
+    jmp dword ptr xn_leave_to
 endm
 
+; The loader's stubs do SAVE_CPU and ENTER_FLAGS themselves and only then (interrupts off)
+; set xn_target and come in at xn_thunk_c: an interrupt taken on the way in would run handlers
+; whose own stubs set xn_target too. The trampolines do the same for xn_back_k (xn_back_c).
 xn_thunk:
     SAVE_CPU
-    ENTER_C
+    ENTER_FLAGS
+xn_thunk_c:
+    ENTER_STACK
+    ; C calls whose return slot the asm has since popped (it left the callee some other way,
+    ; as the span routines leave the row loop) never return: drop their frames, and put the
+    ; slot back if the asm has not reused it. (A slot 64 KB or more below ESP is taken for
+    ; another stack's, such as an interrupt handler's, and left alone.)
+    mov ecx, _xn_cesp
+thunk_unwind:
+    cmp dword ptr _xn_depth, 0
+    je thunk_go
+    mov eax, dword ptr [ecx]            ; the frame's depth (-1: not a call)
+    cmp eax, -1
+    je thunk_go
+    mov ebx, dword ptr [ecx+4]          ; its return slot
+    mov edx, dword ptr _R+R_ESP
+    sub edx, ebx
+    jbe thunk_go                        ; the slot is still on the stack: live
+    cmp edx, 10000h
+    jae thunk_go                        ; far above: another stack (an interrupt's)
+    mov edx, dword ptr _xn_backtab[eax*4]
+    cmp dword ptr [ebx], edx
+    jne thunk_reused
+    mov edx, dword ptr [ecx+8]
+    mov dword ptr [ebx], edx
+thunk_reused:
+    mov _xn_depth, eax
+    mov ecx, dword ptr [ecx+12]
+    mov _xn_cesp, ecx
+    jmp thunk_unwind
+thunk_go:
+    mov esp, _xn_cesp
     mov dword ptr _xn_far, 0
     call dword ptr _xn_target
     mov eax, _xn_ret
@@ -175,7 +225,9 @@ xn_call:
     LEAVE_C
 xn_back:
     SAVE_CPU
-    ENTER_C
+    ENTER_FLAGS
+xn_back_c:
+    ENTER_STACK
     mov ecx, _xn_back_k
 back_find:
     cmp dword ptr [esp], ecx
