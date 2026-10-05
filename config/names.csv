@@ -1769,7 +1769,7 @@ field,monster+0x2D5,anim_request,confirmed,"exp_c1: monster_set_action writes th
 field,monster+0x2D6,anim_facing,strong,"exp_c1: 0-4 written by monster_set_action (view of the sprite from the player, mirrored for 5-7)"
 field,monster+0x2D7,anim_record,strong,"exp_c1: XnGine C02DF writes the texture record group of the state: 0 move, 5 attack, 15 idle, 20 spell (DFU records 0-4, 5-9, 15-19, 20-24)"
 field,monster+0x2D8,anim_current,confirmed,"exp_c1: XnGine C013B writes the state it started (48, 8, 32) after monster_set_action requested it"
-field,monster+0x9F,floor_y,candidate,int (character+0x58 for creatures): monster_move_in_direction / monster_move_to store D_00195C74 (-120 in exp_c1) and keep y >= it + 90; 'floor' is a reading of that
+field,monster+0x9F,ceiling_y,candidate,the same value as ceiling_height (engine/UI/world audit); int (character+0x58 for creatures): monster_move_in_direction / monster_move_to store D_00195C74 (-120 in exp_c1) and keep y >= it + 90; 'floor' is a reading of that
 field,monster+0xB3,knockback_angle,strong,short (character+0x6C): direction of the hit (attack_angle) set by damage_knockback; damage_knockback_move moves along it
 field,monster+0xBB,attack_timer,strong,"int (character+0x74; the player's +0x74 is house): exp_c1: counts down by frame_ticks in ai_creature_think (clamped at 0); a melee attack needs 0 and resets it to random(1500,3000)-(player level-10)*50+(reflexes-2)*450 = DFU MeleeTimer"
 field,monster+0xD8,loot_table,strong,"short (records.h union with character+0x91 reputation[0]): creatures: the loot table, 1-based: monster_init copies monster_table +2 and passes it - 1 to loot_generate (magic/combat struct agent)"

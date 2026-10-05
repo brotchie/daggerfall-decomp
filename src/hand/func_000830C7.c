@@ -93,7 +93,7 @@ int object_draw_cb(struct record *a1)
             l_34 = 1;
         l_24 = &a1->data.character;
         if ((l_24->conditions & 4) == 0) {
-            if ((monster_table_flags[l_24->race].flags & 1) && l_24->race != 29 && a1->y - 90 > l_24->floor_y)
+            if ((monster_table_flags[l_24->race].flags & 1) && l_24->race != 29 && a1->y - 90 > l_24->ceiling_y)
                 a1->draw_handle = xn_flat_add(a1->x, a1->y - 30, a1->z, a1->image, l_38->anim_frame, (l_38->anim_bits >> 10) & 32 | 4, l_30 + 256);
             else
                 a1->draw_handle = xn_flat_add(a1->x, a1->y, a1->z, a1->image, l_38->anim_frame, (l_38->anim_bits >> 10) & 32 | 4, l_30 + 256);

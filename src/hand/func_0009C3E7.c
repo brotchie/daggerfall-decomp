@@ -50,7 +50,7 @@ void travel_begin_trip(void)
     unsigned saved;
     int dir;
 
-    dir = (((xn_math_angle_to_point(player_object->x, player_object->z, region_locations[travel_selected_location].x_type_flags & 33554431, region_locations[travel_selected_location].y_size & 16777215) >> 2) + 32) & 511) >> 6;
+    dir = (((xn_math_angle_to_point(player_object->x, player_object->z, region_locations[travel_selected_location].x_type_flags & 33554431, region_locations[travel_selected_location].z_size & 16777215) >> 2) + 32) & 511) >> 6;
     if (((unsigned char)mouse_buttons & 1) == 0 || ((unsigned char)mouse_buttons_prev & 1) != 0) return;
     r = health_status_text();
     if (r != 0 || D_001962A2 != 0) {

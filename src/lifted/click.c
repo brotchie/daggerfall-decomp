@@ -430,7 +430,7 @@ int shelf_collect_items(struct record *a1, int a2, int a3)
     a1 = a1->children;
     while (a1 != 0) {
         l_18 = a1->next;
-        if (a1->type == 36 && a1->shelf_owner == a3) {
+        if (a1->type == 36 && a1->shelf_index == a3) {
             l_14 = &a1->data.item;
             if (((struct bf8_1_1 *)&D_001940D7)->f != 0 && l_14->enchantments[0].type != (-1)) {
                 a1 = l_18;
@@ -466,7 +466,7 @@ void shelf_return_items(void)
         object_detach(l_1C);
         object_reparent(shelf_object, l_1C);
         l_1C->type = 36;
-        l_1C->shelf_owner = shelf_model_index;
+        l_1C->shelf_index = shelf_model_index;
         l_1C = l_18;
     }
 }

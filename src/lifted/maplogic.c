@@ -540,13 +540,13 @@ void location_flatten_terrain(int a1, int a2)
         l_20 = 1;
         l_28 = (location_here->x_type_flags & 33554431) + 1536;
         l_28 = (l_28 & 32767) >> 8;
-        l_24 = ((location_here->y_size & 16777215) + ((((unsigned)location_here->y_size) >> 28) << 12)) - 1537;
+        l_24 = ((location_here->z_size & 16777215) + ((((unsigned)location_here->z_size) >> 28) << 12)) - 1537;
         l_24 = 128 - ((l_24 & 32767) >> 8);
     } else {
         l_20 = 2;
         l_28 = (location_here->x_type_flags & 33554431) + 3584;
         l_28 = (l_28 & 32767) >> 8;
-        l_24 = ((location_here->y_size & 16777215) + (((((unsigned)location_here->y_size) >> 28) - 1) << 12)) + 511;
+        l_24 = ((location_here->z_size & 16777215) + (((((unsigned)location_here->z_size) >> 28) - 1) << 12)) + 511;
         l_24 = 128 - ((l_24 & 32767) >> 8);
     }
     l_34 = a1;
@@ -555,8 +555,8 @@ void location_flatten_terrain(int a1, int a2)
     a1 = l_34;
     a2 += l_24 << 8;
     a2 += l_28;
-    l_1C = (((((unsigned)(location_here->y_size << 4)) >> 28) - l_20) << 4) + 8;
-    l_18 = (((((unsigned)location_here->y_size) >> 28) - l_20) << 4) + 8;
+    l_1C = (((((unsigned)(location_here->z_size << 4)) >> 28) - l_20) << 4) + 8;
+    l_18 = (((((unsigned)location_here->z_size) >> 28) - l_20) << 4) + 8;
     if (((128 - l_28) - 4) < l_1C) l_1C = (128 - l_28) - 4;
     if (((128 - l_24) - 4) < l_18) l_18 = (128 - l_24) - 4;
     l_30 = l_34 + (l_18 << 8);

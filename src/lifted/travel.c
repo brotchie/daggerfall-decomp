@@ -251,7 +251,7 @@ void travel_map_update(void)
                 l_40 = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
             }
             l_4C = ((unsigned)((l_34->x_type_flags & 33554431) - l_44)) >> 15;
-            l_48 = ((unsigned)(-((l_34->y_size & 16777215) - l_40))) >> 15;
+            l_48 = ((unsigned)(-((l_34->z_size & 16777215) - l_40))) >> 15;
             if (((int)(signed char)scratch_190ce4[0]) == 62 || ((int)(signed char)scratch_190ce4[0]) == 20) {
                 l_4C <<= 2;
                 l_48 <<= 2;
@@ -407,7 +407,7 @@ void travel_draw_locations(void)
         }
         if ((((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)(l_30->x_type_flags << 2)) >> 27]))) == 0) continue;
         l_20 = ((unsigned)((l_30->x_type_flags & 33554431) - l_2C)) >> 15;
-        l_1C = ((unsigned)(-((l_30->y_size & 16777215) - l_28))) >> 15;
+        l_1C = ((unsigned)(-((l_30->z_size & 16777215) - l_28))) >> 15;
         if (((int)(signed char)scratch_190ce4[0]) == 62 || ((int)(signed char)scratch_190ce4[0]) == 20) {
             l_20 <<= 2;
             l_1C <<= 2;
@@ -683,7 +683,7 @@ int travel_location_at_cursor(void)
             continue;
         }
         l_34 = ((unsigned)((l_44->x_type_flags & 33554431) - l_3C)) >> 15;
-        l_30 = ((unsigned)(-((l_44->y_size & 16777215) - l_38))) >> 15;
+        l_30 = ((unsigned)(-((l_44->z_size & 16777215) - l_38))) >> 15;
         l_2C = xn_math_approx_dist2d(l_34, l_30, l_20, l_1C);
         if (l_2C < l_28) {
             l_40 = l_44;
@@ -734,7 +734,7 @@ void travel_open_trip(void)
     if (travel_selected_location == (-1)) return;
     D_00190CE5 = 1;
     D_001AA678 = (region_locations)[travel_selected_location].x_type_flags & 33554431;
-    D_001AA67C = (region_locations)[travel_selected_location].y_size & 16777215;
+    D_001AA67C = (region_locations)[travel_selected_location].z_size & 16777215;
     D_001AA680 = travel_route(player_object->x, player_object->z, D_001AA678, D_001AA67C, 0);
     if (((int)(unsigned short)(*(short *)travel_options & 3)) == 2) {
         D_001AA680 = (D_001AA680 << 7) / 256;
@@ -774,7 +774,7 @@ int func_0009CD32(int a1)
     for (l_28 = 0; l_28 < region_location_count; l_28++) {
         if ((((unsigned)(l_48->x_type_flags << 2)) >> 27) != a1) continue;
         l_38 = ((unsigned)((l_48->x_type_flags & 33554431) - l_40)) >> 15;
-        l_34 = ((unsigned)(-((l_48->y_size & 16777215) - l_3C))) >> 15;
+        l_34 = ((unsigned)(-((l_48->z_size & 16777215) - l_3C))) >> 15;
         l_30 = xn_math_approx_dist2d(l_38, l_34, l_24, l_20);
         if (l_30 < l_2C) {
             l_1C = l_28;

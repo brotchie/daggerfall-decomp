@@ -29,7 +29,7 @@ void func_0009C29C(void)
     int l_1C;
     int l_18;
 
-    l_18 = (((xn_math_angle_to_point(player_object->x, player_object->z, region_locations[travel_selected_location].x_type_flags & 0x1ffffff, region_locations[travel_selected_location].y_size & 0xffffff) >> 2) + 32) & 511) >> 6;
+    l_18 = (((xn_math_angle_to_point(player_object->x, player_object->z, region_locations[travel_selected_location].x_type_flags & 0x1ffffff, region_locations[travel_selected_location].z_size & 0xffffff) >> 2) + 32) & 511) >> 6;
     if ((mouse_buttons & 1) == 0 || (mouse_buttons_prev & 1) != 0)
         return;
     sound_play(203, player_object, 110);

@@ -110,7 +110,7 @@ struct character {
     unsigned int skills_raised_hi;          /* +0x054 */
     union {
         int level_skill_sum_start;          /* +0x058: player */
-        int floor_y;                        /* +0x058: creatures (monster+0x9F) */
+        int ceiling_y;                      /* +0x058: creatures (monster+0x9F): the ceiling height, as ceiling_height */
     };
     int max_health_base;                    /* +0x05C */
     int lycanthrope_kill_time;              /* +0x060: player */
@@ -207,7 +207,7 @@ struct character {
     unsigned char team;                     /* +0x229 */
     unsigned char pad22A;                   /* +0x22A: creatures: rand_range(table +26, +27) (monster_init) */
     unsigned char resist_chances[5];        /* +0x22B: by element */
-    struct career career;                   /* +0x230: names.csv class; player_class points here */
+    struct career career;                   /* +0x230: the class record (names.csv class+ rows); player_class points here */
 };                                          /* +0x27A */
 RECORD_SIZE(character, 634);
 
@@ -395,7 +395,8 @@ struct map_location {
         struct { unsigned x:25; unsigned type:5; unsigned discovered:1; unsigned hidden:1; };
     };
     union {
-        unsigned int y_size;        /* +0x08 */
+        unsigned int z_size;        /* +0x08: z (north), then width and height in blocks (larger than
+                                       the town for small places: 1x1 is 3,3) */
         struct { unsigned z:24; unsigned width:4; unsigned height:4; };
     };
     unsigned char dungeon_type;     /* +0x0C: 255 none */
@@ -617,7 +618,7 @@ RECORD_SIZE(blessing, 7);
 /* the data of the automap record (type 51), saved as AT%05d.AMF */
 struct automap {
     char notes[2048];               /* +0x0000: u16 object id, string */
-    unsigned char seen_bits[8192];  /* +0x0800: a bit per object id (record_id low word) */
+    unsigned char seen_bits[8192];  /* +0x0800: a bit per object id (id low word) */
 };                                  /* +0x2800 */
 RECORD_SIZE(automap, 10240);
 
@@ -718,13 +719,13 @@ struct record {
     union {
         unsigned short pad13;       /* +0x13: 8000 flats, lights and doors; 32768 RMB blocks (43) and
                                        town blocks (38) */
-        unsigned short mobile_id;   /* +0x13: markers: the creature to spawn (a monster table index,
-                                       then its id; bit 7 no water check); corpses (34): the creature's */
+        unsigned short mobile_id;   /* +0x13: markers (34): the creature to spawn (a monster table index,
+                                       then its id; bit 7 no water check); corpses (44): the creature's */
         unsigned short anim_time;   /* +0x13: animated flats: the frame time (ticks >> 5) */
         unsigned char block_special; /* +0x13: dungeon block quarters (47): the start marker's special
                                        flag (castle music, no ambient sound) */
     };
-    unsigned short flags;           /* +0x15: names.csv object_flags; 0x20 not owned, 0x02 not listed */
+    unsigned short flags;           /* +0x15: 0x20 not owned, 0x02 not listed */
     union {
         unsigned short pad17;       /* +0x17 */
         unsigned short owner;       /* +0x17: shop items: the shop; quest places (40): the quest id;
@@ -748,23 +749,22 @@ struct record {
         unsigned short lockpick_skill_tried; /* +0x19: doors */
         short faction_id;           /* +0x19: quest NPCs (41, 65): qbn_person.faction_id */
         short region;               /* +0x19: quest places (40) */
-        unsigned short npc_flags;   /* +0x19: pedestrians (53): 0x4000 female (npc_talk_record_build;
-                                       click_pedestrian sets it before pickpocket_attempt), 0x8000 a
-                                       failed pickpocket */
+        unsigned short npc_flags;   /* +0x19: pedestrians (53): 0x4000 set before every pickpocket
+                                       attempt (click_pedestrian), 0x8000 a failed pickpocket */
         short water_level;          /* +0x19: dungeon block quarters (47): 10000 none */
         unsigned short spawn_seed;  /* +0x19: markers: the spawn's srand() seed; corpses get it back */
         short from_player;          /* +0x19: arrows in flight (2): 1 fired by the player */
     };
     union {
         unsigned short pad1B;       /* +0x1B */
-        unsigned short image;       /* +0x1B: names.csv world_image; archive<<7 | record */
+        unsigned short image;       /* +0x1B: archive<<7 | record */
         unsigned short soul_creature; /* +0x1B: trapped souls (20): the creature (monster) id */
         unsigned short trap_chance; /* +0x1B: soul-trap effects (19): the chance (cast_chances) */
         unsigned short model_count; /* +0x1B: type 56: its 66-byte RMB models */
         unsigned short building_index; /* +0x1B: building objects, building markers (43), stored
                                        buildings (64): index into current_location->buildings */
         unsigned short block_number; /* +0x1B: dungeon block quarters (47): the RDB block number */
-        unsigned short shelf_owner; /* +0x1B: items on a shop shelf (36): the shop */
+        unsigned short shelf_index; /* +0x1B: items on a shop shelf (36): the shelf model's index */
         unsigned short location_index; /* +0x1B: the location object: its index, 0xFFFF wilderness */
         unsigned short seen_count;  /* +0x1B: the automap (51): bytes of seen bits */
     };
@@ -773,7 +773,7 @@ struct record {
         unsigned short image2;      /* +0x1D: DFU Picture2; 3D objects: the model id's hundreds */
         unsigned short trap_duration; /* +0x1D: soul-trap effects (19): rounds (cast_durations) */
     };
-    unsigned int id;                /* +0x1F: names.csv record_id */
+    unsigned int id;                /* +0x1F */
     unsigned char link_flag;        /* +0x23 */
     union {
         short pad24;                /* +0x24 */

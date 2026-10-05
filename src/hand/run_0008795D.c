@@ -80,7 +80,7 @@ void map_goto_location(int a1, int a2, int a3, int a4)
     switch (player_environment) {
     case 1:
         xn_cam_x = player_object->x = region_locations[a3].x_type_flags & 33554431;
-        xn_cam_z = player_object->z = region_locations[a3].y_size & 16777215;
+        xn_cam_z = player_object->z = region_locations[a3].z_size & 16777215;
         xn_world_reload();
         mc_memset(terrain_cell_dirty, 0, 16, D_00176C94, 783, 16);
         mc_memset(terrain_cell_ids, 0, 16, D_00176C94, 784, 16);
@@ -94,7 +94,7 @@ void map_goto_location(int a1, int a2, int a3, int a4)
         break;
     case 2:
         xn_cam_x = player_object->x = region_locations[a3].x_type_flags & 33554431;
-        xn_cam_z = player_object->z = region_locations[a3].y_size & 16777215;
+        xn_cam_z = player_object->z = region_locations[a3].z_size & 16777215;
         xn_world_reload();
         mc_memset(terrain_cell_dirty, 0, 16, D_00176C94, 803, 16);
         mc_memset(terrain_cell_ids, 0, 16, D_00176C94, 804, 16);

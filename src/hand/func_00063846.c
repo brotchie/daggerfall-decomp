@@ -91,7 +91,7 @@ int monster_move_step(struct record *o, struct record *target, int angle)
     player_on_ground = saved277;
     mc_memcpy(&D_00196D54, &saved, 12, D_00175934, 1121, 4);
     if (p != player_character)
-        p->floor_y = ceiling_height;
+        p->ceiling_y = ceiling_height;
     if ((collide_flags & (short)16) != 0 && !ai_monster_flags.b0)
         vertical_velocity = 1;
     p->fall_velocity = vertical_velocity;

@@ -19,7 +19,7 @@ it can be trusted.
 | address | what | confidence | evidence | uses in the decomp |
 |---|---|---|---|---|
 | `D_00195AA4` | pointer to the player object | confirmed | moving the object's x/z (+7/+15) teleports the player (`fallplay tp`) | 790 in 104 files |
-| `D_00195AA0` | pointer to the player's creature entity: the character record is at +0x47, and +0x40 points to the world object | confirmed | in 2 saves; the disease code tests `entity + 71 == player character` | |
+| `D_00195AA0` | pointer to the player's creature entity: the character record is at +0x47, and its parent (+0x43) is the world object | confirmed | in 2 saves; the disease code tests `entity + 71 == player character` | |
 | `D_00195BE0` | pointer to the player character record (below), which is the entity + 0x47. It is a separate allocation from the world object: their distance differs between saves (0x197, 0x1CF) | confirmed | it points at the name; the stats, gold and so on follow it in every save | 1228 in 118 files |
 | `D_001789FA` (byte) | where the player is: 1 outside, 2 inside a building, 3 in a dungeon (palaces too) | confirmed | constant in 4 outside, 3 building and 9 dungeon/palace states | 182 in 50 files |
 | `D_00196274` (byte) | the game mode, i.e. which screen has the input: 0 world, 3 character sheet, 4 inventory, 5 spellbook, 7 options, 14 logbook, 16 rest, 19 travel map | strong | the same value from 3 saves for each screen, and different between screens; an earlier hand-matched file already calls it `MODE` | 219 in 59 files |
@@ -42,7 +42,6 @@ The record is packed: fields sit at odd offsets.
 |---|---|---|---|
 | +0x00 | name, 32 bytes | confirmed | "Dafydd gen orbo" (save_blades) |
 | +0x20 | attributes, 8 × u16: STR INT WIL AGI END PER SPD LUC | confirmed | 100 100 100 98 100 92 100 97, as on the sheet |
-| +0x30 | 8 × u16, a second set of attributes (base values before bonuses?) | candidate | 85 100 75 70 80 65 80 70 in save_blades |
 | +0x30 | base attributes (8 × u16); the sheet shows an attribute in red when it is below its base | strong | sheet code |
 | +0x43 (byte) | race, or current form: 8 vampire, 9 werewolf. Above 8 blocks the inventory | confirmed | writing 2 shows "Nord"; F6 in save_kralwolf refuses |
 | +0x58 | the skill sum at the start: level = (skill sum − this + 28) / 15 | strong | the formula matches Daggerfall Unity's |
@@ -165,7 +164,7 @@ in at cast time.
 - Casting spell 82 (Orc Strength) through 0x5A91A raised STR from 80 to 100. `spell_end`
   (0x8A4E4) put it back.
 
-**Effect handlers** are a 60-entry table at 0xCAF40, in the XnGine object, reached through
+**Effect handlers** are a 64-entry table at 0xCAF40 (51–63 are the debug menu's handlers), in the XnGine object, reached through
 the thunk at 0xCAE0E.
 - Entries 0–50 are the spell effects, named from FALL.EXE's own effect-name table at
   0x182686.
