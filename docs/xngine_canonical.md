@@ -314,16 +314,43 @@ whatever the caller left. What a service returns is compared in the registers it
 | `tools/xn_rc.py frames SNAP --boundary` | the old frames command through the scenario runner, compared at the boundary |
 | `tools/xn_rc.py test --boundary [FUNC...]` | the game's calls of the boundary's entries |
 | `tools/xn_rc.py test FUNC/SUBSYS` | records through shims (canonical) or the old routes |
-| `tools/xn_cover.py cfg / corpus / scenarios / report` | asm basic-block coverage; a block no input can reach is justified by its reason in the tool's `JUSTIFIED` table (a block range, the reason, why: from a group's analysis or a quirk), listed in `report.md` |
-| `tools/xn_equiv.py [FUNC...] [-j 2]` | pure helpers, asm against C, at scale: the pilot's, group A's, B's and E's specs (`--list`); a function's dropped register and flag outputs (`config/xngine_dropped.csv`, `XN_DROPPED`) are not compared, as in the record tests |
-| `tools/xn_mkrec.py a / b / e / all [CASE...]` | the groups' crafted records (direct calls with made-up inputs, for coverage), regenerated into the corpus (`build/xngine/records`: `grpa_*`, `b_*`, `group_e_*`); `check [a b e]` replays them on the asm, `--against DIR` compares them with another copy |
+| `tools/xn_cover.py cfg / corpus / scenarios / report` | asm basic-block coverage of the corpus, the scenarios and the equivalence runs (`xn_equiv.py --cover`: `equiv.bin`; every `.bin` in `build/xn_canon/coverage` is a source); a block no input can reach is justified by its reason in the tool's `JUSTIFIED` table (a block range, the reason, why: from a group's analysis or a quirk), listed in `report.md` |
+| `tools/xn_equiv.py [FUNC...] [-j 2] [--cover]` | pure helpers, asm against C, at scale: the pilot's, group A's, B's, C's, D's and E's specs (`--list`); a function's dropped register and flag outputs (`config/xngine_dropped.csv`, `XN_DROPPED`) are not compared, as in the record tests; `--cover` ORs the asm's coverage into `build/xn_canon/coverage/equiv.bin` (remove it to start afresh) |
+| `tools/xn_mkrec.py a / b / c / d / e / all [CASE...]` | the groups' crafted records (direct calls with made-up inputs, for coverage), regenerated into the corpus (`build/xngine/records`: `grpa_*`, `b_*`, `group_c_*`, `group_d_*`, `group_e_*`); `check [a b c d e]` replays them on the asm, `--against DIR` compares them with another copy |
 
-The crafted records are part of the corpus (561: A 61, B 401, E 99): regenerate them with
-`.venv/bin/python tools/xn_mkrec.py all` (or `a`, `b`, `e`; a case or job name or prefix picks
-some; one machine at a time, about three minutes in all), then `tools/xn_mkrec.py check a b e`
-(every record replays exactly on the asm). Regenerated, they are identical to the groups' own
-(each record's entry state, pages, exit, writes and I/O). A new group's generator adds its
-cases there, beside A's, B's and E's, rather than in a folder of its own and `XN_RECORDS`.
+The crafted records are part of the corpus (676: A 61, B 401, C 86, D 29, E 99): regenerate
+them with `.venv/bin/python tools/xn_mkrec.py all` (or `a`, `b`, `c`, `d`, `e`; a case or job
+name or prefix picks some; one machine at a time, a little over three minutes in all), then
+`tools/xn_mkrec.py check a b c d e` (every record replays exactly on the asm). Regenerated,
+they are identical to the groups' own (each record's entry state, pages, exit, writes and
+I/O). A new group's generator adds its cases there, beside the others, rather than in a
+folder of its own and `XN_RECORDS`. Group C's: `group_c_span`, the flats' translucent span
+(157E20, a ghost's or wraith's flat, which never ran in play: a crafted flat, counts 1..40,
+both u directions, two depths), and `group_c_frame`, the frame's clamps and full pools (the
+ambient row below 0 and beyond the last row, a screen not 320 wide, the frame with the
+texture cache full, a light radius beyond 512, more than 32 lights, the texture mapper's pool
+full). Group D's: `group_d_tex`, `_model`, `_flat`, `_cam` (the cache full, the heap's fits
+and merges, an animated compiled image, models with frames and degenerate faces, the side
+planes' inner distance).
+
+The equivalence specs (140, 217.2 million samples of which 89.3 million exhaustive, no
+difference): a spec gives each sample registers and, for a helper that takes pointers, its
+own memory (64 bytes, or the spec's `stride`), compared after the call. `binds` ties a global
+the helper reads and writes to the sample's memory (copied in before the call and back after
+it, so it is an input and a compared output): the S-buffer's pool pointer, polygon and slope
+(`xn_span_insert`), the point-light slots (`xn_light_add_point`), the shade row being
+accumulated (the directional lights). `setup` and `teardown` are asm calls around a spec's
+batches: `xn_shade_fog_span@START` sets the fog with the asm's `xn_shade_set_fog`, which
+patches the asm's operands and sets the globals the C reads. `ignore` leaves out scratch the
+asm writes as a leftover (a rejected point light's intensity slot, unreachable with the
+game's intensities and radii). The generators keep to the callers' domain where the asm
+would read outside its memory (the fog: a positive 1/z, within the far plane at a constant
+depth) and say so. C's specs: the span insert, the point light's falloff, the directional
+lights (models and terrain), the fog at seven starts (0 and 1: Q-SHADE-02), the draw lists'
+sort; D's: the projection, the outcodes, the six clip intersections, the view matrix's
+scaling, the sphere cull and the side planes' distances, the flats' corner offsets; the
+pilot's corners: a matrix with no angles, a direction between the same points, an advance
+too far.
 
 Scenario syntax (`tools/xn_scenarios.py`): a snapshot; a prelude, asm only (`poke`, `water`,
 `time`, `teleport`, `play`: tools/fallplay.py steps such as `["door", "13"]`, then `script`

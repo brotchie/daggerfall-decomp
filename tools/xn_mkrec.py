@@ -21,6 +21,21 @@ Recorder keeping the calls of the functions it lists. A file per job, in the cor
         shipped movies (sampled) and on two synthetic ones written into the overlay, masked
         and RLE images above the view, the dead remaps, the banked VESA present. From
         safe_cheat_tlalac_s.
+  c     group C (the rasteriser and the frame): two jobs. group_c_span: the flats'
+        translucent span (157E20 and its tail 157FA0), which never ran in play (it needs a
+        ghost's or a wraith's flat in view): a crafted flat with 16-row texels and a
+        translucency table drawn into a scratch row, counts 1..40, both u directions, two
+        depths (From safe_cheat_tlalac_s). group_c_frame: the frame's clamps and full pools:
+        the ambient row below 0 and beyond the last row, a screen not 320 wide, the frame
+        with the texture cache full, a light's radius beyond 512, more than 32 lights, the
+        texture mapper's pool full (from safe_save_tlalac_s).
+  d     group D (the 3D objects): four jobs, group_d_tex / _model / _flat / _cam, a record a
+        case: the texture cache full, an animated compiled image, a crafted archive marked
+        translucent, loads with no backslash and with no room, the heap's first fits and
+        merges; "v2.5" models, models with frames, degenerate faces, angles with no angles,
+        a model drawn with the cache full and a framed one; a translucent flat's light setup
+        and more than 32 lights; the side planes' distance from the inner side. From
+        safe_save_tlalac_s.
   e     group E (world and collision): five jobs, group_e_collide / _world / _terrain / _sky
         / _water, a record a case: collision against crafted ARCH3D models, spheres, planes
         and flats; world streaming, the cell reader, heightmap noise, the dead editor's writes,
@@ -28,15 +43,16 @@ Recorder keeping the calls of the functions it lists. A file per job, in the cor
         water at levels above and below the eye. From safe_save_tlalac_s (outdoors) and
         safe_save_mord (a dungeon with water).
 
-usage: xn_mkrec.py a|b|e|all [CASE ...] [--out DIR] [--list]
+usage: xn_mkrec.py a|b|c|d|e|all [CASE ...] [--out DIR] [--list]
            regenerate a group's jobs (CASE: a case's or job's name, or a prefix of it)
-       xn_mkrec.py check a|b|e|all [--out DIR] [--against DIR ...]
+       xn_mkrec.py check a|b|c|d|e|all [--out DIR] [--against DIR ...]
            replay every record of the group's jobs on the asm (exactly, xn_record.replay); with
            --against, compare them with the records of the same jobs there (functions, counts,
            and each record's entry, exit, writes and I/O)
 
-One machine at a time (about 1 GB). a: 15 s (61 records); b: 2-3 minutes (the movies); e: 30 s
-(99 records). Regenerated, they are identical to the groups' first ones.
+One machine at a time (about 1 GB). a: 15 s (61 records); b: 2-3 minutes (the movies); c and
+d: 15 s (86 records) and 5 s (29); e: 30 s (99 records). Regenerated, they are identical to the groups'
+first ones.
 """
 import argparse
 import collections
@@ -1442,20 +1458,575 @@ def run_b(names, out):
 
 
 def run_e(names, out):
+    run_jobs(E_JOBS, names, out, "group_e", "tools/xn_mkrec.py e")
+
+
+# ==== group C: the rasteriser and the frame ==============================================
+# The flat spans' translucent routine, which never ran in play (it needs a ghost's or a
+# wraith's flat, archives 273 and 278, in view), and the frame's clamps and full pools.
+C_CENTRE_X = 0xCEA30
+
+
+def c_flat_record(texels, table, u_offset, v_offset, du_dx, dv_dx, u_dx=0, u_c=0, v_dx=0,
+                  v_c=0):
+    """a struct xn_flat (xnstruct.h) as the spans read it"""
+    f = bytearray(100)
+    struct.pack_into("<iiI", f, 0x08, du_dx, dv_dx, 0)          # +08 du_dx, +0C dv_dx, +10 row
+    struct.pack_into("<ii", f, 0x18, u_offset, v_offset)
+    struct.pack_into("<iiiiii", f, 0x24, u_dx, 0, u_c, v_dx, 0, v_c)
+    struct.pack_into("<I", f, 0x40, texels)
+    struct.pack_into("<I", f, 0x4C, table)
+    return bytes(f)
+
+
+def c_flat_translucent(params):
+    """A crafted flat (100 bytes) with 16-row texels (colours 0..15, a fifth of them 0:
+    transparent) and a 16 x 256 translucency table, drawn into a scratch row of 64 pixels"""
+    n, du8, mirror, z_index, x, seed = params
+
+    def setup(emu, b):
+        import random
+        rng = random.Random(seed)
+        texels = bytes((rng.randrange(16) if rng.random() > 0.2 else 0) for _ in range(16 * 256))
+        table = bytes(rng.randrange(256) for _ in range(16 * 256))
+        pix = bytes(rng.randrange(256) for _ in range(64))
+        a_tex = b.put(texels, 256)
+        a_tab = b.put(table, 256)
+        a_pix = b.put(pix, 16)
+        z = 0x1000000 // z_index                    # the 1/z table's entry at inv_z >> 13
+        du_dx = (du8 << 16) // z * (-1 if mirror else 1)
+        dv_dx = 0x100000 // z
+        m = rng.randrange(256)
+        row = rng.randrange(8)
+        f = c_flat_record(a_tex, a_tab, -(m << 23), -(row << 24), du_dx, dv_dx,
+                          u_dx=rng.randrange(-64, 64), v_dx=rng.randrange(-8, 8))
+        a_flat = b.put(f, 4)
+        return {"esi": a_flat, "ecx": z_index << 13, "ebx": x, "ebp": n, "edi": a_pix - 1,
+                "eax": rng.randrange(1 << 32), "edx": rng.randrange(1 << 32)}, []
+    return setup
+
+
+def c_span_cases():
+    """xn_span_flat_translucent (157E20, and its tail 157FA0): counts 1..40 (every tail
+    length, 0..5 blocks), mirrored and plain u steps, two depths, several columns"""
+    import random
+    out = []
+    rng = random.Random(0x157E20)
+    k = 0
+    for n in list(range(1, 41)) + [7, 8, 9, 15, 16, 17]:
+        for du8, mirror in ((0x800, False), (0x600, True)):
+            if k % 3 == 2 and n > 20:
+                k += 1
+                continue
+            z_index = 0x400 if k % 2 == 0 else 0x700
+            x = 20 + (k * 37) % 250
+            seed = rng.randrange(1 << 30)
+            out.append(("flat_translucent_n%d_%s_z%X_x%d" % (n, "m" if mirror else "p", z_index, x),
+                        0x157E20, SAFE,
+                        c_flat_translucent((n, du8, mirror, z_index, x, seed)),
+                        [0x157E20, 0x157FA0]))
+            k += 1
+    return out
+
+
+def c_poke(*pairs):
+    """a setup that writes dwords (preferred address, value) and passes the given registers"""
+    def setup(emu, b, regs=None, stack=()):
+        for va, v in pairs:
+            emu.write(L + va, u32(v))
+        return {}, []
+    return setup
+
+
+def c_frame_cases():
+    """The frame's clamps and full pools (object-2 globals, config/names.csv):
+      begin_frame   xn_light_ambient below 0 and beyond the last row (both clamped), the
+                    screen not 320 wide (a VESA mode's span-routine choice)
+      frame         xn_render_frame with the texture cache full: it returns 1 at once
+      light_add     a radius beyond 512 (clamped)
+      light_to_view more than 32 lights counted (clamped)
+      tmap_compile  the texture mapper's pool full (768 copies): the cache is marked full"""
+    width, ambient, cache_full = 0x142930, 0x136911, 0x132F58
+    light_count, tmap_count = 0x13690D, 0x15C158
+
+    def light_add(emu, b):
+        x, y, z = (rd32(emu, a) for a in (EG["cam_x"], EG["cam_y"], EG["cam_z"]))
+        return {"eax": x + 0x800, "edx": y, "ebx": z + 0x800, "ecx": 16}, [600, 0]
+
+    def full_cache(emu, b):
+        emu.write(L + cache_full, b"\x01")
+        return {"eax": 2}, []
+
+    def tmap_full(emu, b):
+        emu.write(L + tmap_count, u32(0x2FF))
+        return {"eax": b.put(bytes(64)), "edx": 0}, []
+    return [
+        ("begin_frame_ambient_negative", 0x12A4F0, OUTDOOR, c_poke((ambient, -0x200))),
+        ("begin_frame_ambient_beyond", 0x12A4F0, OUTDOOR, c_poke((ambient, 0x4100))),
+        ("begin_frame_wide", 0x12A4F0, OUTDOOR, c_poke((width, 640))),
+        ("frame_cache_full", 0x12A870, OUTDOOR, full_cache),
+        ("light_add_radius_600", 0x136AD8, OUTDOOR, light_add),
+        ("light_to_view_40", 0x136BD8, OUTDOOR, c_poke((light_count, 40))),
+        ("tmap_compile_pool_full", 0x15C274, OUTDOOR, tmap_full),
+    ]
+
+
+C_JOBS = {
+    "group_c_span": c_span_cases,
+    "group_c_frame": c_frame_cases,
+}
+
+
+# ==== group D: the 3D objects ==============================================================
+# addresses (preferred)
+TEX_FULL = 0x132F58
+TEX_ARCHIVES = 0x132F6C
+TEX_HEAP_FREE = 0x1343E0
+TEX_HEAP_HEAD = 0x1343E4
+TMAP_POOL = 0x15C150
+CFG_LAST_PATH = 0x191884
+LIGHT_COUNT = 0x13690D
+MODEL_QUEUE = 0x13F784
+MODEL_QUEUE_COUNT = 0x13F76C
+PICK_VIEW_X = 0x120288
+PICK_VIEW_Y = 0x12028C
+PICK_DISTANCE = 0x120290
+CAM_XYZ = 0x0C23C4
+
+D_F = {
+    "set_translucent": 0x0CDC99, "lookup": 0x135D00, "lookup_image": 0x135DE4,
+    "load_archive": 0x135EAB, "first_fit": 0x1361B8, "heap_alloc": 0x1360EE,
+    "compose_angles": 0x0C7F14, "prepare": 0x13FE15, "set_frame": 0x140369,
+    "set_frame_regs": 0x14037A, "model_draw": 0x140284, "light_setup": 0x155610,
+    "dist_x": 0x15D03C, "dist_y": 0x15D05C, "heap_free": 0x13622F, "centroid_to_pick": 0x0C80CC,
+    "xz_extent": 0x0CE828,
+}
+
+
+def r32(emu, va):
+    return struct.unpack("<I", emu.read(L + va, 4))[0]
+
+
+def w32(emu, va, v):
+    emu.write(L + va, u32(v))
+
+
+def w8(emu, va, v):
+    emu.write(L + va, bytes([v & 0xFF]))
+
+
+def lin_r32(emu, a):
+    return struct.unpack("<I", emu.read(a, 4))[0]
+
+
+# ---- the texture cache ---------------------------------------------------------------------
+
+def unloaded_archive(emu):
+    """an archive number the cache does not hold"""
+    for a in range(511, 0, -1):
+        if r32(emu, TEX_ARCHIVES + 4 * a) == 0:
+            return a
+    raise RuntimeError("every archive is loaded")
+
+
+def fake_archive(emu, b, image=None):
+    """a one-record archive (a heap block's header in front of it) holding `image`"""
+    hdr = b.put(bytes(0x16) + bytes(0x40), 4)
+    a = hdr + 0x16
+    rec = bytearray(0x1A + 20)
+    struct.pack_into("<H", rec, 0, 1)
+    struct.pack_into("<HI", rec, 0x1A, 0x0101, image or 0)
+    emu.write(a, bytes(rec))
+    return a
+
+
+def animated_image(emu, b):
+    """an animated (2 frames), compiled image: 2 x 2 RLE frames, its mapper in the mapper
+    pool's last slot (767: never handed out)"""
+    frames = []
+    for k in range(2):
+        frames.append(struct.pack("<HH", 2, 2) + bytes([0, 2, 0x11 + k, 0x22 + k, 0, 2, 0x33 + k,
+                                                        0x44 + k]))
+    off0 = 8
+    off1 = off0 + len(frames[0])
+    hdr = bytearray(0x1C)
+    struct.pack_into("<I", hdr, 0, 0x01FF01FF)      # wrap masks
+    struct.pack_into("<HHH", hdr, 4, 2, 2, 0)       # width, height, flags (compiled)
+    copy = lin_r32(emu, L + TMAP_POOL) + 767 * 418
+    struct.pack_into("<I", hdr, 0x0A, copy)         # the mapper
+    struct.pack_into("<I", hdr, 0x0E, 0x1C + 8)     # pixels (overwritten by the decode)
+    struct.pack_into("<HHHhh", hdr, 0x12, 0, 2, 1, 0, 0)    # frames 2, 1 tick each
+    tab = struct.pack("<II", off0, off1)
+    return b.put(bytes(hdr) + tab + frames[0] + frames[1], 4)
+
+
+def case_lookup_full(emu, b):
+    w8(emu, TEX_FULL, 1)
+    return {"eax": 2, "edx": 0, "ebx": 0xFFFFFFFF}, []
+
+
+def case_lookup_image_full(emu, b):
+    w8(emu, TEX_FULL, 1)
+    return {"eax": 2, "edx": 0, "ebx": 0}, []
+
+
+def lookup_rebase(frame):
+    def setup(emu, b):
+        img = animated_image(emu, b)
+        a = fake_archive(emu, b, img)
+        n = unloaded_archive(emu)
+        w32(emu, TEX_ARCHIVES + 4 * n, a)
+        w8(emu, TEX_FULL, 0)
+        return {"eax": n, "edx": 0, "ebx": frame}, []
+    return setup
+
+
+def case_translucent(emu, b):
+    img = animated_image(emu, b)
+    a = fake_archive(emu, b, img)
+    n = unloaded_archive(emu)
+    w32(emu, TEX_ARCHIVES + 4 * n, a)
+    return {"eax": n}, []
+
+
+def path_backslash(emu, b):
+    """the configured path without the backslash at its end (the load adds one)"""
+    p = bytearray(emu.read(L + CFG_LAST_PATH, 80))
+    s = p[:p.index(0)]
+    while s.endswith(b"\\"):
+        s = s[:-1]
+    emu.write(L + CFG_LAST_PATH, bytes(s) + b"\0")
+
+
+def shipped_archives():
+    """the TEXTURE.nnn the game ships (build/game/ARENA2)"""
+    return sorted(int(n[8:]) for n in os.listdir(os.path.join(ROOT, "build", "game", "ARENA2"))
+                  if n.upper().startswith("TEXTURE.") and n[8:].isdigit())
+
+
+def first_free_archive_file(emu):
+    """a TEXTURE.nnn the game ships that the cache does not hold"""
+    for n in shipped_archives():
+        if r32(emu, TEX_ARCHIVES + 4 * n) == 0:
+            return n
+    raise RuntimeError("no free archive")
+
+
+def case_load_backslash(emu, b):
+    path_backslash(emu, b)
+    w8(emu, TEX_FULL, 0)
+    return {"eax": first_free_archive_file(emu)}, []
+
+
+def case_load_no_room(emu, b):
+    """every block used and stamped in the future (none older than now): nothing to evict, no
+    fit"""
+    blk = lin_r32(emu, L + TEX_HEAP_HEAD)
+    k = 0
+    while blk and k < 10000:
+        flags = struct.unpack("<H", emu.read(blk + 0x0C, 2))[0]
+        emu.write(blk + 0x0C, struct.pack("<H", flags | 1))
+        emu.write(blk + 0x12, u32(0xFFFFFFFF))
+        blk = lin_r32(emu, blk)
+        k += 1
+    w8(emu, TEX_FULL, 0)
+    return {"eax": first_free_archive_file(emu)}, []
+
+
+def heap(emu, b, blocks):
+    """a crafted heap after xn_tex_heap_head: blocks of (size, used); their addresses"""
+    addrs = []
+    for size, used in blocks:
+        addrs.append(b.put(bytes(0x16 + size + 0x20), 4))
+    prev = L + TEX_HEAP_HEAD
+    for k, (size, used) in enumerate(blocks):
+        a = addrs[k]
+        nxt = addrs[k + 1] if k + 1 < len(addrs) else 0
+        emu.write(a, u32(nxt) + u32(prev) + u32(size) + struct.pack("<H", 1 if used else 0) +
+                  u32(L + TEX_ARCHIVES + 8) + u32(0))
+        prev = a
+    w32(emu, TEX_HEAP_HEAD, addrs[0])
+    w32(emu, TEX_HEAP_FREE, sum(s for s, u in blocks if not u))
+    return addrs
+
+
+def case_fit_split_next(emu, b):
+    heap(emu, b, [(0x400, False), (0x100, True)])
+    return {"eax": 0x100}, []
+
+
+def case_fit_exact(emu, b):
+    heap(emu, b, [(0x80, True), (0x100, False)])
+    return {"eax": 0x100}, []
+
+
+def case_fit_none(emu, b):
+    heap(emu, b, [(0x80, False), (0x40, True)])
+    return {"eax": 0x100}, []
+
+
+def case_free_merge_next(emu, b):
+    """the freed block's next one is free and has a next: the two merge"""
+    addrs = heap(emu, b, [(0x80, True), (0x100, False), (0x40, True)])
+    return {"eax": addrs[0] + 0x16}, []
+
+
+def case_free_merge_both(emu, b):
+    """free on both sides: the block takes its next, then joins its previous"""
+    addrs = heap(emu, b, [(0x80, False), (0x100, True), (0x40, False), (0x20, True)])
+    return {"eax": addrs[1] + 0x16}, []
+
+
+def case_xz_extent(emu, b):
+    """points beyond the swapped starting extents (Q-MODEL-01): every comparison taken"""
+    pts = vec(-200000, 0, -200000) + vec(200000, 0, 200000) + vec(0, 0, 0)
+    m = bytearray(0x40 + len(pts))
+    struct.pack_into("<4sii", m, 0, b"v2.7", 3, 0)
+    struct.pack_into("<i", m, 0x30, 0x40)
+    m[0x40:] = pts
+    return {"eax": b.put(bytes(m), 4), "edx": b.put(bytes(4)), "ebx": b.put(bytes(4))}, []
+
+
+def case_centroid(emu, b):
+    m = arch3d(b)
+    h = b.put(u32(m) + bytes(0x3C), 4)
+    return {"eax": h}, []
+
+
+# ---- models --------------------------------------------------------------------------------
+
+def arch3d(b, version=b"v2.7", frames=0, degenerate=False, tex=0x0102):
+    """A model: 4 points of a square (side 2 * 4000h, z = 0), one textured face of 4 points (a
+    second face of 3 points too: degenerate, two of them equal, when asked), normals, face data
+    and, with frames, a frame table (each frame the same lists). Vertex offsets are index * 12
+    ("v2.5": index * 4). Returns the model's address."""
+    pts = vec(-0x4000, -0x4000, 0) + vec(0x4000, -0x4000, 0) + vec(0x4000, 0x4000, 0) + \
+        vec(-0x4000, 0x4000, 0)
+    unit = 4 if version < b"v2.6" else 12
+    faces = bytes([4, 0]) + struct.pack("<H", tex) + u32(0)
+    uv = [(0, 0), (0x40, 0), (0, 0x40), (0, 0)]
+    for k in range(4):
+        faces += u32(k * unit) + struct.pack("<hh", *uv[k])
+    nfaces = 1
+    if degenerate:
+        for pts3 in ((0, 0, 1), (0, 1, 2)):          # p0 = p1; then (below) e2 along e1
+            faces += bytes([3, 0]) + struct.pack("<H", tex) + u32(0)
+            for i, k in enumerate(pts3):
+                faces += u32(k * unit) + struct.pack("<hh", 0x10 * i, 0x10 * i)
+            nfaces += 1
+    hdr_size = 0x40
+    point_off = hdr_size
+    normal_off = point_off + len(pts)
+    face_off = normal_off + 12 * nfaces
+    data_off = face_off + len(faces)
+    frame_off = data_off + 24 * nfaces
+    total = frame_off + 16 * frames
+    m = bytearray(total)
+    struct.pack_into("<4siiiiii", m, 0, version, 4, nfaces, 0x5A82, frames, frame_off, data_off)
+    struct.pack_into("<ii", m, 0x30, point_off, normal_off)
+    struct.pack_into("<i", m, 0x3C, face_off)
+    m[point_off:point_off + len(pts)] = pts
+    m[face_off:face_off + len(faces)] = faces
+    for k in range(frames):
+        struct.pack_into("<iiii", m, frame_off + 16 * k, point_off, normal_off, data_off, 0)
+    return b.put(bytes(m), 4)
+
+
+def arch3d_degenerate_e2(b):
+    """a model whose second face has e2 along e1 (p0, p1, p2 on a line)"""
+    pts = vec(0, 0, 0) + vec(0x1000, 0, 0) + vec(0x2000, 0, 0) + vec(0, 0x1000, 0)
+    face = bytes([3, 0]) + struct.pack("<H", 0x0102) + u32(0)
+    for i, k in enumerate((0, 1, 2)):
+        face += u32(k * 12) + struct.pack("<hh", 0x10 * i, 0)
+    m = bytearray(0x40 + len(pts) + 12 + len(face) + 24)
+    struct.pack_into("<4siiiiii", m, 0, b"v2.7", 4, 1, 0x2000, 0, 0, 0x40 + len(pts) + 12 +
+                     len(face))
+    struct.pack_into("<ii", m, 0x30, 0x40, 0x40 + len(pts))
+    struct.pack_into("<i", m, 0x3C, 0x40 + len(pts) + 12)
+    m[0x40:0x40 + len(pts)] = pts
+    m[0x40 + len(pts) + 12:0x40 + len(pts) + 12 + len(face)] = face
+    return b.put(bytes(m), 4)
+
+
+def case_prepare_v25(emu, b):
+    return {"eax": arch3d(b, version=b"v2.5")}, []
+
+
+def case_prepare_frames(emu, b):
+    return {"eax": arch3d(b, frames=2)}, []
+
+
+def case_prepare_degenerate(emu, b):
+    return {"eax": arch3d(b, degenerate=True)}, []
+
+
+def case_prepare_line(emu, b):
+    return {"eax": arch3d_degenerate_e2(b)}, []
+
+
+def case_set_frame(frame):
+    def setup(emu, b):
+        return {"eax": arch3d(b, frames=2), "edx": frame}, []
+    return setup
+
+
+def case_set_frame_regs(frame):
+    def setup(emu, b):
+        m = arch3d(b, frames=3)
+        return {"eax": frame, "ebx": 3, "esi": m}, []
+    return setup
+
+
+def case_compose_fail(emu, b):
+    h = b.put(bytes(0x40), 4)
+    return {"eax": h + 0x0C, "edx": 512, "ebx": 0, "ecx": 0}, []
+
+
+def queued_handle(emu):
+    n = r32(emu, MODEL_QUEUE_COUNT)
+    if n == 0:
+        raise RuntimeError("no model queued")
+    best = None
+    for k in range(min(n, 199)):
+        key, h = struct.unpack("<iI", emu.read(L + MODEL_QUEUE + 8 * k, 8))
+        if best is None or key < best[0]:
+            best = (key, h)
+    return best[1]
+
+
+def case_draw_cache_full(emu, b):
+    w8(emu, TEX_FULL, 1)
+    return {"edi": queued_handle(emu)}, []
+
+
+def case_draw_frames(emu, b):
+    """a crafted handle of the framed model 40 units in front of the eye (on the view axis: the
+    camera's rotation's row 2)"""
+    m = arch3d(b, frames=2, tex=0x0000)
+    # the model prepared first by the asm itself would be a second call: the face plane and
+    # normal are set here as prepare leaves them (normal +z with 8 fraction bits)
+    mm = bytearray(emu.read(m, 0x40))
+    normal_off = struct.unpack_from("<i", mm, 0x34)[0]
+    emu.write(m + normal_off, vec(0, 0, 0))               # a back face: n . eye + d = 1
+    face_off = struct.unpack_from("<i", mm, 0x3C)[0]
+    data_off = struct.unpack_from("<i", mm, 0x18)[0]
+    emu.write(m + face_off + 0x14, u32(1))                  # plane d
+    emu.write(m + face_off + 0x1C, u32(m + data_off))       # face data
+    cx, cy, cz = struct.unpack("<iii", emu.read(L + CAM_XYZ, 12))
+    rot = struct.unpack("<9i", emu.read(L + 0x136E00, 36))
+    fx, fy, fz = rot[6], rot[7], rot[8]
+    d = 400
+    px = cx + ((fx >> 14) * d >> 14)
+    py = cy + ((fy >> 14) * d >> 14)
+    pz = cz + ((fz >> 14) * d >> 14)
+    h = bytearray(0x40)
+    struct.pack_into("<I", h, 0, m)
+    struct.pack_into("<iii", h, 0x14, (px - cx) << 8, (py - cy) << 8, (pz - cz) << 8)
+    struct.pack_into("<iii", h, 0x20, px, py, pz)
+    struct.pack_into("<B", h, 0x38, 1)
+    w8(emu, TEX_FULL, 0)
+    return {"edi": b.put(bytes(h), 4)}, []
+
+
+# ---- flats ---------------------------------------------------------------------------------
+
+def d_flat(b, table=0, light=0, z=0x10000):
+    f = bytearray(0x64)
+    struct.pack_into("<I", f, 0x44, 0x100 | light << 16)
+    struct.pack_into("<I", f, 0x4C, table)
+    struct.pack_into("<iii", f, 0x50, 0, 0, z)
+    return b.put(bytes(f), 4)
+
+
+def case_flat_translucent(emu, b):
+    return {"esi": d_flat(b, table=0x12345678)}, []
+
+
+def case_flat_many_lights(emu, b):
+    w32(emu, LIGHT_COUNT, 40)
+    return {"esi": d_flat(b)}, []
+
+
+# ---- the camera ----------------------------------------------------------------------------
+
+def case_dist(view_va):
+    def setup(emu, b):
+        w32(emu, view_va, 0x1000)
+        w32(emu, PICK_DISTANCE, 0x1000)
+        return {"eax": 0x10000, "ebx": 0x10000, "edi": 0x100}, []
+    return setup
+
+
+def d_cases(cases):
+    return lambda: [(label, va, OUTDOOR, setup) for label, va, setup in cases]
+
+
+D_JOBS = {
+    "group_d_tex": d_cases([
+        ("lookup_full", D_F["lookup"], case_lookup_full),
+        ("lookup_image_full", D_F["lookup_image"], case_lookup_image_full),
+        ("lookup_rebase_0", D_F["lookup"], lookup_rebase(0)),
+        ("lookup_rebase_clock", D_F["lookup"], lookup_rebase(0xFFFFFFFF)),
+        ("translucent_crafted", D_F["set_translucent"], case_translucent),
+        ("load_no_backslash", D_F["load_archive"], case_load_backslash),
+        ("load_no_room", D_F["load_archive"], case_load_no_room),
+        ("fit_split_next", D_F["first_fit"], case_fit_split_next),
+        ("fit_exact", D_F["first_fit"], case_fit_exact),
+        ("fit_none", D_F["first_fit"], case_fit_none),
+        ("free_merge_next", D_F["heap_free"], case_free_merge_next),
+        ("free_merge_both", D_F["heap_free"], case_free_merge_both),
+    ]),
+    "group_d_model": d_cases([
+        ("prepare_v25", D_F["prepare"], case_prepare_v25),
+        ("prepare_frames", D_F["prepare"], case_prepare_frames),
+        ("prepare_degenerate", D_F["prepare"], case_prepare_degenerate),
+        ("prepare_line", D_F["prepare"], case_prepare_line),
+        ("set_frame_high", D_F["set_frame"], case_set_frame(5)),
+        ("set_frame_low", D_F["set_frame"], case_set_frame(0xFFFFFFFF)),
+        ("set_frame_regs_mid", D_F["set_frame_regs"], case_set_frame_regs(1)),
+        ("set_frame_regs_high", D_F["set_frame_regs"], case_set_frame_regs(9)),
+        ("compose_no_angles", D_F["compose_angles"], case_compose_fail),
+        ("draw_cache_full", D_F["model_draw"], case_draw_cache_full),
+        ("draw_frames", D_F["model_draw"], case_draw_frames),
+        ("centroid_to_pick", D_F["centroid_to_pick"], case_centroid),
+        ("xz_extent_wide", D_F["xz_extent"], case_xz_extent),
+    ]),
+    "group_d_flat": d_cases([
+        ("light_translucent", D_F["light_setup"], case_flat_translucent),
+        ("light_many", D_F["light_setup"], case_flat_many_lights),
+    ]),
+    "group_d_cam": d_cases([
+        ("dist_x_inner", D_F["dist_x"], case_dist(PICK_VIEW_X)),
+        ("dist_y_inner", D_F["dist_y"], case_dist(PICK_VIEW_Y)),
+    ]),
+}
+
+
+def run_jobs(jobs, names, out, kind, tool):
+    """Groups C, D and E: each job a list of cases (label, va, base, setup[, only]), each case
+    from a fresh copy of its base: setup(emu, buf) -> (registers, stack arguments), then the
+    call, recording the case's function (or the functions `only` lists)."""
     for name in names:
-        cases = E_JOBS[name]()
+        cases = jobs[name]()
         t0 = time.time()
         records, store, notes = [], {}, []
         attempts, dropped = collections.Counter(), collections.Counter()
         base_used = None
-        for label, va, base, setup in cases:
+        for case in cases:
+            label, va, base, setup = case[:4]
+            only = case[4] if len(case) > 4 else [va]
             base_used = base_used or base
             emu, ov = load(base, name)
             try:
-                rec = R.Recorder(emu, per=1, only=[va], base=base, name=name,
+                rec = R.Recorder(emu, per=1, only=only, base=base, name=name,
                                  state="%s:%s" % (name, label))
                 b = Buf(emu)
-                regs, stack = setup(emu, b)
+                try:
+                    regs, stack = setup(emu, b)
+                except Exception as e:          # noqa: BLE001
+                    notes.append("%s: setup %r" % (label, e))
+                    print("  %-32s setup failed: %r" % (label, e), flush=True)
+                    continue
                 ok = run_call(emu, rec, va, regs, stack)
                 got = len(rec.records)
                 for r in rec.records:
@@ -1471,17 +2042,26 @@ def run_e(names, out):
                     notes.append("%s: no record" % label)
             finally:
                 done(emu, ov)
-        spec = {"name": name, "kind": "group_e", "tool": "tools/xn_mkrec.py e",
-                "cases": [c[0] for c in cases]}
+        spec = {"name": name, "kind": kind, "tool": tool, "cases": [c[0] for c in cases]}
         R.write_job(out, name, spec, os.path.join(ROOT, base_used), records, store, set(),
                     attempts, dropped, set(), notes, t0, 0, None, 0, 0, 1)
         print("%s: %d records in %.0f s" % (name, len(records), time.time() - t0), flush=True)
+
+
+def run_c(names, out):
+    run_jobs(C_JOBS, names, out, "group_c", "tools/xn_mkrec.py c")
+
+
+def run_d(names, out):
+    run_jobs(D_JOBS, names, out, "group_d", "tools/xn_mkrec.py d")
 
 
 # ---- the groups -------------------------------------------------------------------------------
 GROUPS = {
     "a": (lambda: ["grpa_" + n for n in A_CASES], run_a, "grpa_"),
     "b": (lambda: ["b_" + n for n in sorted(B_CASES)], run_b, "b_"),
+    "c": (lambda: list(C_JOBS), run_c, ""),
+    "d": (lambda: list(D_JOBS), run_d, ""),
     "e": (lambda: list(E_JOBS), run_e, ""),
 }
 
@@ -1570,7 +2150,7 @@ def check(group, want, out, against):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("what", choices=("a", "b", "e", "all", "check"))
+    ap.add_argument("what", choices=("a", "b", "c", "d", "e", "all", "check"))
     ap.add_argument("names", nargs="*", help="cases or jobs (prefixes); for check: the groups")
     ap.add_argument("--out", default=OUT, help="the records' folder (the corpus)")
     ap.add_argument("--against", action="append", help="check: another copy of the jobs")
