@@ -47,7 +47,7 @@ extern char collide_flags[];
 extern char D_001A4A30[];
 extern int D_001A4A38[];
 extern int D_001A4A48[];
-extern int weapon_hand_cif[];
+extern iptr weapon_hand_cif[];
 extern int D_001A4A5C;
 extern int D_001A4A60[];
 extern char D_001A4A68[];
@@ -62,9 +62,9 @@ extern int people_check_witnesses(void);
 extern int key_action_held(int);
 extern int building_is_open(struct building *);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int click_world_face(struct pick_result *);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern struct record *object_free_single(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
@@ -72,8 +72,8 @@ extern int inv_take_arrow(int);
 extern int door_start_swing(struct record *, int);
 extern int mc_free();
 extern int mc_memset();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
 extern int xn_vec_unit_direction();
 extern int xn_vec_advance();
@@ -126,19 +126,19 @@ L72941:;
         if (item_data->group != 3) goto L72941;
         cif_index = (int)(unsigned char)weapon_cif_by_index[item_data->index];
         if (cif_index == 9) {
-            *(int *)(D_001A4A68 + (hand << 2)) = (int)D_001875B7;
+            *(iptr *)(D_001A4A68 + (hand << 2)) = (iptr)D_001875B7;
         } else {
             *(int *)(D_001A4A68 + (hand << 2)) = 0;
         }
         D_001A4A60[hand] = 0;
     }
-    *(int *)(D_001A4A30 + (hand << 2)) = (int)item;
+    *(iptr *)(D_001A4A30 + (hand << 2)) = (iptr)item;
     if (item != 0 && item_data->enchantments[0].type != (-1) && item_data->index != 17 && item_data->index != 16) {
-        mc_set_location(85, (int)D_0017615C);
-        mc_sprintf((int)text_buffer, (int)D_00176166, cif_index);
+        mc_set_location(85, (iptr)D_0017615C);
+        mc_sprintf((iptr)text_buffer, (iptr)D_00176166, cif_index);
     } else {
-        mc_set_location(87, (int)D_0017615C);
-        mc_sprintf((int)text_buffer, (int)D_00176175, cif_index);
+        mc_set_location(87, (iptr)D_0017615C);
+        mc_sprintf((iptr)text_buffer, (iptr)D_00176175, cif_index);
     }
     weapon_hand_cif[hand] = disk_read_file(text_buffer, 0);
 }
@@ -166,7 +166,7 @@ int weapon_start_swing(int hand)
     swing_to_hit = swing_to_hit_mods[motion];
     swing_damage = swing_damage_mods[motion];
     if (((int)(unsigned char)weapon_swing_types[motion]) == 2 && player_character->equipped[((int)(unsigned char)weapon_active_hand) * 2 + 19] == 0) {
-        *(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) = (int)D_001875AE;
+        *(iptr *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) = (iptr)D_001875AE;
         D_001A4A60[((int)(unsigned char)weapon_active_hand)] = 0;
     } else {
         *(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) = 0;
@@ -189,23 +189,23 @@ void weapon_bow_update(void)
     if (D_001A4A60[((int)(unsigned char)weapon_active_hand)] == 200) {
         D_001A4A60[((int)(unsigned char)weapon_active_hand)] = 0;
     }
-    if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 3) {
+    if (((int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 3) {
         if (((int)(unsigned char)(mouse_buttons_prev & 2)) == 0 && ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
             sound_play(6, player_object, 100);
             (D_001A4A60[((int)(unsigned char)weapon_active_hand)])++;
         }
     } else {
         (D_001A4A60[((int)(unsigned char)weapon_active_hand)])++;
-        if (((int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 5) {
+        if (((int)(unsigned char)*(signed char *)((char *)(*(iptr *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 5) {
             weapon_fire_arrow();
             fatigue_add(-11);
         }
-        if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 7) {
+        if (((int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 7) {
             D_001A4A60[((int)(unsigned char)weapon_active_hand)] = ((100 - player_character->attributes[6]) * 10) + 1000;
             return;
         }
     }
-    xn_draw_cif_rle_frame(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
+    xn_draw_cif_rle_frame(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], (int)(unsigned char)*(signed char *)((char *)(*(iptr *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
 }
 
 void weapon_fire_arrow(void)
@@ -214,7 +214,7 @@ void weapon_fire_arrow(void)
     struct record *arrow;
 
     if (inv_take_arrow(1) == 0) {
-        hud_message_add((int)D_00176184);
+        hud_message_add((iptr)D_00176184);
         return;
     }
     arrow = object_create_child(player_object->parent, 0, 107);
@@ -223,12 +223,12 @@ void weapon_fire_arrow(void)
     arrow->image = 0;
     item_make(3, 18, &arrow->data.item);
     arrow->data.item.stack_count = 1;
-    mc_memset((int)aim, 0, 12, (int)D_0017615C, 404, 4);
-    xn_math_advance_pitch_yaw(player_object->angle_x, player_object->yaw, 1024, (int)aim);
+    mc_memset((iptr)aim, 0, 12, (iptr)D_0017615C, 404, 4);
+    xn_math_advance_pitch_yaw(player_object->angle_x, player_object->yaw, 1024, (iptr)aim);
     aim[0] += player_object->x;
     aim[1] += player_object->y;
     aim[2] += player_object->z;
-    xn_vec_unit_direction((int)player_object + 7, (int)aim, arrow->data.item.arrow.direction);
+    xn_vec_unit_direction((int)(iptr)player_object + 7, (iptr)aim, arrow->data.item.arrow.direction);
     arrow->x = player_object->x;
     arrow->y = player_object->y - 70;
     if (((int)(unsigned short)(game_settings->view_flags & 1)) == 0) {
@@ -244,8 +244,8 @@ void weapon_missile_orient(struct record *arrow)
 {
     int angles[3];
 
-    mc_memcpy((int)angles, arrow->data.item.arrow.direction, 12, (int)D_0017615C, 426, 12);
-    func_000C2068((int)angles);
+    mc_memcpy((iptr)angles, arrow->data.item.arrow.direction, 12, (iptr)D_0017615C, 426, 12);
+    func_000C2068((iptr)angles);
     arrow->missile_yaw = (short)angles[0] & 2047;
     arrow->angle_z = (short)angles[1] & 2047;
 }
@@ -268,7 +268,7 @@ int weapon_arrow_update(struct record *arrow)
         dest[0] = arrow->x;
         dest[1] = arrow->y;
         dest[2] = arrow->z;
-        xn_vec_advance(arrow->data.item.arrow.direction, 40, (int)dest);
+        xn_vec_advance(arrow->data.item.arrow.direction, 40, (iptr)dest);
         angles[0] = arrow->angle_x;
         angles[1] = arrow->yaw;
         angles[2] = 0;
@@ -340,11 +340,11 @@ void weapon_monster_arrow(struct record *shooter, struct record *target)
 void weapon_free_sprites(void)
 {
     if (weapon_hand_cif[0] != 0 && weapon_hand_cif[0] != (-1751672937)) {
-        mc_free(weapon_hand_cif[0], (int)D_0017615C, 542);
+        mc_free(weapon_hand_cif[0], (iptr)D_0017615C, 542);
         weapon_hand_cif[0] = -1751672937;
     }
     if (D_001A4A5C == 0 || D_001A4A5C == (-1751672937)) return;
-    mc_free(D_001A4A5C, (int)D_0017615C, 543);
+    mc_free(D_001A4A5C, (iptr)D_0017615C, 543);
     D_001A4A5C = -1751672937;
 }
 
@@ -374,7 +374,7 @@ void click_world_object(struct pick_result *pick, struct record *object)
 
     location_index = loaded_location.index;
     click_hit = pick;
-    if ((int)spell_ready_missile != 0) {
+    if ((iptr)spell_ready_missile != 0) {
         if (spell_ready_missile->data.spell.target == 3) {
             spell_cast_queue_count = 0;
             spell_ready_missile->x = player_object->x;

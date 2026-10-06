@@ -26,15 +26,15 @@ int profile_set_string(struct profile *profile, char *value)
     while (*cursor++ != 13) old_length++;
     new_length = strlen(value);
     if (((unsigned)new_length) < old_length) {
-        count = (profile->buffer + profile->length - start) - (old_length - new_length);
-        mc_memmove(start, (old_length - new_length) + start, count, (int)D_00170129, 870, 4);
+        count = (int)(profile->buffer + profile->length - start) - (old_length - new_length);
+        mc_memmove(start, (old_length - new_length) + start, count, (iptr)D_00170129, 870, 4);
         profile->length -= old_length - new_length;
     } else if (((unsigned)new_length) > old_length) {
         if ((new_length - old_length) + profile->length > profile->capacity) {
             return 0;
         }
-        count = (profile->buffer + profile->length - start) + (new_length - old_length);
-        mc_memmove((new_length - old_length) + start, start, count, (int)D_00170129, 888, 4);
+        count = (int)(profile->buffer + profile->length - start) + (new_length - old_length);
+        mc_memmove((new_length - old_length) + start, start, count, (iptr)D_00170129, 888, 4);
         profile->length += new_length - old_length;
     }
     while (*value != 0) {

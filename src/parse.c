@@ -2,10 +2,10 @@
 
 #include "dagger.h"
 
-int macro_bn_biography_name(void)
+iptr macro_bn_biography_name(void)
 {
     int saved_seed;
-    int name;
+    iptr name;
     saved_seed = rand();
     srand(parse_name_seed + 0xd81);
     name = name_generate(player_character[0x43], D_00190C78 & 1);
@@ -13,6 +13,6 @@ int macro_bn_biography_name(void)
     return name;
 }
 
-int macro_fae_player_ally_npc_enemy(void) { return scratch_190df4 + 3; }
+iptr macro_fae_player_ally_npc_enemy(void) { return scratch_190df4 + 3; }
 
 int macro_pnq_blank(void) { return text_blank; }

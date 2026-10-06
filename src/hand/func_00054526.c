@@ -1,8 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00054526 */
+#include "ptrint.h"
 struct AB { unsigned char a; unsigned char b; };
 extern short mouse_y;
 extern short font_height;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00175420[];
 extern char *classmaker_advantage_names[];
 extern char *classmaker_disadvantage_names[];
@@ -12,7 +13,7 @@ extern short classmaker_screen;
 extern unsigned char classmaker_special_counts[];
 extern short classmaker_special_list;
 extern short D_00190D84;
-extern int scratch_190df4;
+extern iptr scratch_190df4;
 extern char *scratch_190dfc;
 extern char *D_00190E00;
 extern char **D_00190E0C;

@@ -6,7 +6,7 @@
 extern char D_00175ACC[];
 extern unsigned char player_environment;
 extern int D_00186DEC;
-extern int D_0018DC34;
+extern iptr D_0018DC34;
 extern int D_0018DD54;
 extern int D_0018DD5C;
 extern int D_0018DD60;
@@ -24,18 +24,18 @@ extern int ambient_crickets_channel;
 extern int ambient_fire_channel;
 extern int D_001A3F2C;
 extern int D_001A3F30;
-extern int D_001A3F48;
+extern iptr D_001A3F48;
 extern char music_current[];
 extern signed char sound_enabled;
 extern int D_001A5AD0;
 
-extern int sos_load_song(int, ...);
+extern int sos_load_song(iptr, ...);
 extern int climate_category(void);
 extern int ai_angle_diff(int, int, int *);
-extern int sound_play_sample(int, int, struct record *, int);
-extern int sound_cache_load(int);
-extern int dpmi_lock_region(int, int);
-extern int dpmi_unlock_region(int, int);
+extern int sound_play_sample(iptr, int, struct record *, int);
+extern iptr sound_cache_load(int);
+extern int dpmi_lock_region(iptr, int);
+extern int dpmi_unlock_region(iptr, int);
 extern int func_0009E2BB();
 extern int func_0009E61A();
 extern int mc_free();
@@ -55,7 +55,7 @@ extern int func_000A2941();
 extern int xn_math_approx_dist2d();
 extern int xn_math_approx_hypot();
 extern int xn_math_angle_to_point();
-int sound_play_sample_flat(int, int);
+int sound_play_sample_flat(iptr, int);
 int sound_play_ambient_loop(int, struct record *, int);
 void sound_stop_channel(int);
 void music_stop(void);
@@ -65,7 +65,7 @@ void sound_channel_set_source(struct record *object, int channel)
 {
     sound_channels[channel].source = object;
     if (object == 0) return;
-    mc_memcpy(sound_channels[channel].position, &object->x, 12, (int)D_00175ACC, 95, 4);
+    mc_memcpy(sound_channels[channel].position, &object->x, 12, (iptr)D_00175ACC, 95, 4);
 }
 
 void sound_volume_pan(int *listener, int *source, int *volume, int *pan, struct record *object)
@@ -76,7 +76,7 @@ void sound_volume_pan(int *listener, int *source, int *volume, int *pan, struct 
     int offset;
     int saved_distance;
 
-    mc_memcpy(listener, source, 12, (int)D_00175ACC, 148, 4);
+    mc_memcpy(listener, source, 12, (iptr)D_00175ACC, 148, 4);
     listener = &player_object->x;
     distance = xn_math_approx_hypot(listener[1] - source[1], xn_math_approx_dist2d(listener[0], listener[2], source[0], source[2]));
     saved_distance = distance;
@@ -105,7 +105,7 @@ void sound_volume_pan(int *listener, int *source, int *volume, int *pan, struct 
     *volume = (*volume * ((int)(short)game_settings->sound_volume)) / 128;
 }
 
-int func_00069281(int sample, int length)
+int func_00069281(iptr sample, int length)
 {
     int channel;
     int volume;
@@ -131,7 +131,7 @@ int func_00069281(int sample, int length)
     if (channel == 3) return -1;
     volume = 32767;
     pan = 32768;
-    mc_memset(&sound_channels[channel].sample, 0, 240, (int)D_00175ACC, 291, 4);
+    mc_memset(&sound_channels[channel].sample, 0, 240, (iptr)D_00175ACC, 291, 4);
     sound_channels[channel].priority = 127;
     sound_channels[channel].sample.data = (char *)sample;
     sound_channels[channel].sample.length = length;
@@ -148,7 +148,7 @@ int func_00069281(int sample, int length)
     return channel;
 }
 
-int sound_play_sample_flat(int sample, int length)
+int sound_play_sample_flat(iptr sample, int length)
 {
     int channel;
     int unused1;
@@ -172,7 +172,7 @@ int sound_play_sample_flat(int sample, int length)
         }
     }
     if (channel == 3) return -1;
-    mc_memset(&sound_channels[channel].sample, 0, 240, (int)D_00175ACC, 336, 4);
+    mc_memset(&sound_channels[channel].sample, 0, 240, (iptr)D_00175ACC, 336, 4);
     sound_channels[channel].priority = 90;
     sound_channels[channel].sample.data = (char *)sample;
     sound_channels[channel].sample.length = length;
@@ -203,10 +203,10 @@ int sound_channel_done(int channel)
 void music_play(char *name)
 {
     if (sound_enabled == 0) return;
-    if (stricmp((int)music_current, name) == 0) return;
+    if (stricmp((iptr)music_current, name) == 0) return;
     music_stop();
-    mc_strncpy((int)music_current, name, 13, (int)D_00175ACC, 374);
-    D_001A3F30 = sos_load_song((int)music_current);
+    mc_strncpy((iptr)music_current, name, 13, (iptr)D_00175ACC, 374);
+    D_001A3F30 = sos_load_song((iptr)music_current);
     if (D_0018DC34 != 0) {
         dpmi_lock_region(D_0018DC34, func_000A277F(D_0018DC34));
     }
@@ -220,7 +220,7 @@ void music_stop(void)
     func_000A0517(D_001A3F30);
     dpmi_unlock_region(D_0018DC34, func_000A277F(D_0018DC34));
     if (D_001A3F48 != 0 && D_001A3F48 != (-1751672937)) {
-        mc_free(D_001A3F48, (int)D_00175ACC, 393);
+        mc_free(D_001A3F48, (iptr)D_00175ACC, 393);
         D_001A3F48 = -1751672937;
     }
     D_0018DC34 = 0;
@@ -244,7 +244,7 @@ void music_update(void)
 
 int sound_play(int id, struct record *object, int priority)
 {
-    int sample;
+    iptr sample;
 
     if (sound_enabled == 0) return -1;
     sample = sound_cache_load(id);
@@ -253,7 +253,7 @@ int sound_play(int id, struct record *object, int priority)
 
 int sound_play_ui(int id)
 {
-    int sample;
+    iptr sample;
 
     if (sound_enabled == 0) return -1;
     sample = sound_cache_load(id);
@@ -262,7 +262,7 @@ int sound_play_ui(int id)
 
 int sound_play_ambient_loop(int id, struct record *object, int priority)
 {
-    int sample;
+    iptr sample;
 
     if (sound_enabled == 0) return -1;
     sample = sound_cache_load(id);
@@ -271,19 +271,19 @@ int sound_play_ambient_loop(int id, struct record *object, int priority)
 
 int sound_play_loop(int id, struct record *object, int priority)
 {
-    int sample;
+    iptr sample;
 
     if (sound_enabled == 0) return -1;
     sample = sound_cache_load(id);
     return sound_play_sample(sample, sound_last_size, object, -2);
 }
 
-int sound_timer_add(int callback, int rate)
+int sound_timer_add(iptr callback, int rate)
 {
     int handle;
 
     if (sound_enabled == 0) return -1;
-    func_0009E2BB(rate, callback, (int)&handle);
+    func_0009E2BB(rate, callback, (iptr)&handle);
     return handle;
 }
 

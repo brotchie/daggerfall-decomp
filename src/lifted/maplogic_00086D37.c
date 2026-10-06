@@ -35,7 +35,7 @@ extern void sound_stop_ambient(void);
 extern void location_store_objects(void);
 extern void location_free(struct loaded_location *);
 extern void object_foreach(struct record *, void (*)());
-extern void object_delete_block(int, int);
+extern void object_delete_block(iptr, int);
 extern void func_0008EB52(void);
 extern void inv_assign_item_id(struct record *);
 
@@ -56,16 +56,16 @@ void location_unload(int image)
         object_foreach(player_entity->children, inv_assign_item_id);
         people_clear();
         creature_count = 0;
-        mc_memset((int)((char *)creature_list), 0, 512, (int)D_00176C94, 450, 512);
-        object_delete_block((int)location_object->children, location_object->id);
+        mc_memset((iptr)((char *)creature_list), 0, 512, (iptr)D_00176C94, 450, 512);
+        object_delete_block((iptr)location_object->children, location_object->id);
         location_id = location_object->id;
         location_object->image = 65535;
         location_object->id = -65535;
         model_cache_flush_count = 1;
         D_00187F2C = 0;
         location_free(&loaded_location);
-        mc_memset((int)&loaded_location, 0, 20, (int)D_00176C94, 461, 4);
-        mc_memset((int)current_location, 0, 48, (int)D_00176C94, 462, 4);
+        mc_memset((iptr)&loaded_location, 0, 20, (iptr)D_00176C94, 461, 4);
+        mc_memset((iptr)current_location, 0, 48, (iptr)D_00176C94, 462, 4);
         automap_save();
         automap_free_town_map();
         if (((int)player_environment) == 3) {
@@ -74,11 +74,11 @@ void location_unload(int image)
             terrain_cell_at_player = -1;
             func_00064301();
             xn_world_reload();
-            mc_memset((int)terrain_cell_dirty, 0, 16, (int)D_00176C94, 477, 16);
-            mc_memset((int)terrain_cell_ids, 0, 16, (int)D_00176C94, 478, 16);
+            mc_memset((iptr)terrain_cell_dirty, 0, 16, (iptr)D_00176C94, 477, 16);
+            mc_memset((iptr)terrain_cell_ids, 0, 16, (iptr)D_00176C94, 478, 16);
             camera_object->yaw = player_object->yaw;
             if ((location_id - 65536) == D_00187F28) {
-                mc_memcpy((int)player_object, (int)saved_player_object, 55, (int)D_00176C94, 483, 4);
+                mc_memcpy((int)(iptr)player_object, (iptr)saved_player_object, 55, (iptr)D_00176C94, 483, 4);
             } else {
                 D_00187F2C++;
             }

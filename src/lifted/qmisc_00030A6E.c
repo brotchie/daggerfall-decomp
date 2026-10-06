@@ -4,8 +4,8 @@
 #include "records.h"
 
 extern struct quest_face quest_faces[];
-extern int quest_face_images[];
-extern int D_00195D14;
+extern iptr quest_face_images[];
+extern iptr D_00195D14;
 extern struct quest *current_quest;
 
 extern int rand_range(int, int);

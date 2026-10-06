@@ -22,7 +22,7 @@ extern short mouse_motion_y;
 extern unsigned char msgbox_kind;
 extern char game_mode;
 extern unsigned char mouse_buttons_prev;
-extern int spellmaker_settings_image;
+extern iptr spellmaker_settings_image;
 extern short D_00199628;
 extern short D_0019962A;
 extern unsigned char spellmaker_settings_kind;

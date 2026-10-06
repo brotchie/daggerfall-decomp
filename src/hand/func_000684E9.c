@@ -15,7 +15,7 @@ extern double trade_haggle_asking;
 extern double D_001A3ABC;
 extern int D_001A3ADC;
 extern struct character *D_001A3AE0;
-extern int D_001A3AE4;
+extern iptr D_001A3AE4;
 extern void trade_haggle_show_offer(void);
 extern void trade_haggle_step(void);
 extern void mode_push(void);
@@ -25,7 +25,7 @@ extern double exp(double);
 void trade_haggle_start(int price, int quantity, struct record *seller, struct record *buyer)
 {
     D_001A3ADC = -1;
-    D_001A3AE4 = (int)&seller->data.character;
+    D_001A3AE4 = (iptr)&seller->data.character;
     D_001A3AE0 = &buyer->data.character;
     if (quantity > 1) {
         /* the original multiplied by a literal (fmul [const]); with the constant as an extern

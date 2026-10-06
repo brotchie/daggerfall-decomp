@@ -31,27 +31,27 @@ int sos_read_settings(char *path)
 {
     struct profile profile;
 
-    mc_memset((int)D_0018DC38, 0, 268, (int)D_001700D5, 217, 4);
-    mc_memset((int)D_0018DD64, 0, 46, (int)D_001700D5, 218, 4);
+    mc_memset((iptr)D_0018DC38, 0, 268, (iptr)D_001700D5, 217, 4);
+    mc_memset((iptr)D_0018DD64, 0, 46, (iptr)D_001700D5, 218, 4);
     if ((short)profile_open(&profile, path) == 0) return 0;
-    if ((short)profile_find_section(&profile, (int)D_001700DD) == 0) {
+    if ((short)profile_find_section(&profile, (iptr)D_001700DD) == 0) {
         profile_close(&profile);
         return 0;
     }
-    profile.result = profile_get_item_number(&profile, (int)D_001700E5, (int)&D_0018DD5C);
-    profile.result = profile_get_item_number(&profile, (int)D_001700EE, (int)D_0018DC94);
-    profile.result = profile_get_item_number(&profile, (int)D_001700F9, (int)D_0018DC9C);
-    profile.result = profile_get_item_number(&profile, (int)D_00170103, (int)D_0018DC98);
+    profile.result = profile_get_item_number(&profile, (iptr)D_001700E5, (iptr)&D_0018DD5C);
+    profile.result = profile_get_item_number(&profile, (iptr)D_001700EE, (iptr)D_0018DC94);
+    profile.result = profile_get_item_number(&profile, (iptr)D_001700F9, (iptr)D_0018DC9C);
+    profile.result = profile_get_item_number(&profile, (iptr)D_00170103, (iptr)D_0018DC98);
     if ((short)profile.result == 0) {
         profile_close(&profile);
         return 0;
     }
-    if ((short)profile_find_section(&profile, (int)D_0017010D) == 0) {
+    if ((short)profile_find_section(&profile, (iptr)D_0017010D) == 0) {
         profile_close(&profile);
         return 0;
     }
-    profile.result = profile_get_item_number(&profile, (int)D_001700E5, (int)&D_0018DD54);
-    profile.result = profile_get_item_number(&profile, (int)D_001700EE, (int)D_0018DD86);
+    profile.result = profile_get_item_number(&profile, (iptr)D_001700E5, (iptr)&D_0018DD54);
+    profile.result = profile_get_item_number(&profile, (iptr)D_001700EE, (iptr)D_0018DD86);
     if ((short)profile.result == 0) {
         profile_close(&profile);
         return 0;

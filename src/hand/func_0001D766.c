@@ -37,7 +37,7 @@ void rumor_add_quest(struct quest *quest, int message, int target, int flags)
     rumor.message = message;
     rumor.target = target;
     rumor.flags = flags;
-    rumor.expires = (unsigned)(game_minutes + days * 1440);
+    rumor.expires = (unsigned)(uptr)(game_minutes + days * 1440);
     rumor.text_length = strlen(((char *)text_rsc_buffer)) + 1;
     write(rumor_file, &rumor, 34);
     write(rumor_file, ((char *)text_rsc_buffer), rumor.text_length);

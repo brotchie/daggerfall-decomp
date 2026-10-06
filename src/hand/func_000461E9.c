@@ -7,7 +7,7 @@ extern struct record *D_00199720;
 extern struct record *kludge_find_door(void);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int object_new_id(int);
 extern struct record *marker_find_nth(struct record *, int, int);
 

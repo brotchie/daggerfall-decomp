@@ -1,14 +1,14 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000595DF */
 #include "records.h"
 
-extern int paperdoll_mask;
-extern int D_00195B80;
+extern iptr paperdoll_mask;
+extern iptr D_00195B80;
 extern char scratch_buffer[];
 extern char color_remap_tables[];
 extern int xn_draw_image_scaled();
 extern int xn_draw_paperdoll_mask();
 extern int xn_draw_paperdoll_item();
-extern int xn_tex_cache_lookup();
+extern iptr xn_tex_cache_lookup();
 extern int xn_tex_cache_flush();
 
 void paperdoll_draw_item(struct item *item, int x, int y, int mask_value)
@@ -23,7 +23,7 @@ void paperdoll_draw_item(struct item *item, int x, int y, int mask_value)
     short mask_x;
     short mask_y;
 
-    D_00195B80 = (int)(*(char **)color_remap_tables + (item->color << 8));
+    D_00195B80 = (iptr)(*(char **)color_remap_tables + (item->color << 8));
     texture = (char *)xn_tex_cache_lookup(item->inventory_image >> 7, (int)(unsigned short)(item->inventory_image & 127), -1);
     if (texture == 0) {
         xn_tex_cache_flush();

@@ -1,11 +1,12 @@
 /* text.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
 extern signed char msgbox_border_sizes[];
 extern signed char D_0017B631[];
-extern int msgbox_spop_tiles[];
-extern int msgbox_border_tiles;
+extern iptr msgbox_spop_tiles[];
+extern iptr msgbox_border_tiles;
 extern short msgbox_tile_size;
 extern short msgbox_tile_h;
 extern short msgbox_tile_w;

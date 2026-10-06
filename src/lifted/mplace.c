@@ -105,8 +105,8 @@ int place_spawn_from_marker(struct record *marker)
         D_00196293 = 0;
         D_001940D7 |= 32;
         D_001940D7 |= 128;
-        mc_memcpy((int)&request, (int)&creature->x, 12, (int)D_00170788, 119, 4);
-        mc_memset((int)&request.angle_x, 0, 12, (int)D_00170788, 120, 4);
+        mc_memcpy((iptr)&request, (iptr)&creature->x, 12, (iptr)D_00170788, 119, 4);
+        mc_memset((iptr)&request.angle_x, 0, 12, (iptr)D_00170788, 120, 4);
         request.probe = &D_00187B6E;
         player_motion_flags |= 8;
         collide_move_object(creature, 0, &request, 0);
@@ -122,7 +122,7 @@ int place_spawn_from_marker(struct record *marker)
 int encounter_pick_monster(int underwater)
 {
     struct building *building;
-    int table;
+    iptr table;
     int n;
     int in_town;
     int low;
@@ -135,7 +135,7 @@ L25BFC:;
         in_town = 0;
         n = -1;
         if (((int)player_environment) != 3) {
-            if ((int)location_here != 0) {
+            if ((iptr)location_here != 0) {
                 if (location_here_contains(player_object->x, player_object->z) != 0) {
                     n = ((unsigned)(location_here->x_type_flags << 2)) >> 27;
                     in_town = 1;

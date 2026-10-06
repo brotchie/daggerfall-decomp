@@ -7,7 +7,7 @@ extern signed char text_buffer[];
 extern struct career *player_class;
 extern struct career *scratch_buffer;     /* scratch_buffer: the 18 classes CLASS00-17.CFG */
 extern int career_slot_weight(int);
-extern int disk_read_file(char *, struct career *);
+extern iptr disk_read_file(char *, struct career *);
 extern int abs(int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern char *memchr(char *, int, int);
@@ -34,7 +34,7 @@ int career_nearest_class(void)
     for (i = 0; i < 12; i++) {
         weight = career_slot_weight(i);
         for (j = 0; j < 18; j++) {
-            k = memchr((char *)classes[j].skills, player_class->skills[i], 12) - (char *)classes[j].skills;
+            k = (int)(memchr((char *)classes[j].skills, player_class->skills[i], 12) - (char *)classes[j].skills);
             if (k >= 0) {
                 if (career_slot_weight(k) == weight)
                     scores[j] += weight;

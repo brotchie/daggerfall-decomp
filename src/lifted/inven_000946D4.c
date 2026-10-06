@@ -58,8 +58,8 @@ void inv_click_left_item(struct record *object)
         case 2:
 L94793:;
             if (item->group == 23 && trade_mode != 2) return;
-            if (item->group == 23 && (int)inv_right_container == (int)wagon_container) return;
-            if ((int)inv_right_container == (int)wagon_container) {
+            if (item->group == 23 && (iptr)inv_right_container == (int)(iptr)wagon_container) return;
+            if ((iptr)inv_right_container == (int)(iptr)wagon_container) {
                 weight = object_weight(object);
                 D_001962AE = 1;
                 wagon_weight = object_weight(wagon_container);
@@ -87,7 +87,7 @@ L94793:;
             object->caster = 0;
             if (object->image == 0) object->image = item->dropped_image;
             object_reparent(inv_right_container, object);
-            if (((int)D_00196120) == (int)object->parent) object->owner = *(short *)picked_model_index;
+            if (((iptr)D_00196120) == (iptr)object->parent) object->owner = *(short *)picked_model_index;
             object->id = object_new_id(((unsigned)location_object->id) >> 16);
             if (object->twin != 0) object->twin->id = object->id;
             quest_raise_event(5, object, 0);

@@ -36,7 +36,7 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *location_object;
 extern int creature_count;
-extern int spfx_popup_handler;
+extern iptr spfx_popup_handler;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int game_minutes;
@@ -57,10 +57,10 @@ extern char D_001AA458[];
 extern struct faction *faction_find(short);
 extern int damage_apply(struct record *, int, struct record *);
 extern int list_popup_poll(void);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern int spfx_damage(struct record *, int, struct record *);
-extern int name_generate(unsigned char, unsigned char);
+extern iptr name_generate(unsigned char, unsigned char);
 extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
@@ -76,7 +76,7 @@ extern void msgbox_show_rsc(int, int);
 extern void spell_remove_effect_type(struct record *, int);
 extern void fatigue_add(int);
 extern void weapon_reload_hand_sprites(void);
-extern void list_popup_open(int);
+extern void list_popup_open(iptr);
 extern void msgbox_choice_rsc(short, short, short, short, unsigned char, unsigned char, unsigned char);
 extern void object_free_later(struct record *);
 extern void object_free_pending(void);
@@ -91,10 +91,10 @@ extern void inv_unequip_all_saved(void);
 extern void inv_reequip_saved(void);
 extern void transport_choose(int);
 int spfx_drain(struct record *, int, struct record *);
-int name_generate_seeded(unsigned char, unsigned char, int);
+iptr name_generate_seeded(unsigned char, unsigned char, int);
 void spfx_dispel_creatures(int, int);
 void spfx_heal(struct record *, int, struct record *);
-void spfx_show_choice_list(int, int);
+void spfx_show_choice_list(iptr, iptr);
 void spfx_created_item_expire_cb(struct record *);
 
 void spfx_dispel(struct record *spell, int slot, struct record *target)
@@ -114,15 +114,15 @@ void spfx_dispel(struct record *spell, int slot, struct record *target)
         while (active != 0) {
             if (active->type == 9) {
                 active_data = &active->data.spell;
-                mc_strncpy(text, active_data->name, 4, (int)D_00176D55, 284);
-                *(int *)(scratch_190ee4 + (count << 2)) = (int)active;
+                mc_strncpy(text, active_data->name, 4, (iptr)D_00176D55, 284);
+                *(iptr *)(scratch_190ee4 + (count << 2)) = (iptr)active;
                 *(int *)(scratch_190de4 + (count++ << 2)) = text;
                 text += strlen(active_data->name) + 1;
             }
             active = active->next;
         }
         *(int *)(scratch_190de4 + (count << 2)) = 0;
-        spfx_show_choice_list((int)scratch_190de4, (int)spfx_dispel_magic_cb);
+        spfx_show_choice_list((iptr)scratch_190de4, (iptr)spfx_dispel_magic_cb);
         selected_spell = spell_data;
         D_001A99F4 = slot;
         return;
@@ -283,10 +283,10 @@ int spfx_soul_trap(struct record *spell, int slot, struct record *target)
     struct spell *spell_data;
 
     if (target->data.character.mobile_id >= 128) {
-        hud_message_add((int)D_00176D5C);
+        hud_message_add((iptr)D_00176D5C);
         return 0;
     }
-    hud_message_add((int)D_00176D7D);
+    hud_message_add((iptr)D_00176D7D);
     spell_data = &spell->data.spell;
     trap = object_create_child(target, 0, 0);
     trap->type = 19;
@@ -656,7 +656,7 @@ int func_0008A858(struct record *object, int effect_type, int with_roll)
             if (found_slot != 0) {
                 if (with_roll != 0) {
                     /* compares with the address of cast_chances, not a chance: an original bug */
-                    return ((((unsigned)rand_range(1, 100)) < ((int)spell_data->cast_chances)) ? 1 : 0);
+                    return ((((unsigned)rand_range(1, 100)) < ((iptr)spell_data->cast_chances)) ? 1 : 0);
                 }
                 return 1;
             }
@@ -841,7 +841,7 @@ L8B013:;
     inv_reequip_saved();
 }
 
-void spfx_show_choice_list(int strings, int callback)
+void spfx_show_choice_list(iptr strings, iptr callback)
 {
     list_popup_open(strings);
     spfx_popup_handler = callback;
@@ -869,7 +869,7 @@ void spfx_popup_update(void)
         } else {
             map_goto_location(recall_anchor_region, recall_anchor_environment, recall_anchor_location, D_001A9A00);
             player_position_restore(1);
-            mc_memset((int)saved_positions, 0, 48, (int)D_00176D55, 1342, 48);
+            mc_memset((iptr)saved_positions, 0, 48, (iptr)D_00176D55, 1342, 48);
         }
         spfx_popup_handler = 0;
         return;
@@ -948,10 +948,10 @@ void spfx_expire_created_items(void)
     weapon_reload_hand_sprites();
 }
 
-int name_generate_seeded(unsigned char bank, unsigned char female, int seed)
+iptr name_generate_seeded(unsigned char bank, unsigned char female, int seed)
 {
     int saved_seed;
-    int name;
+    iptr name;
 
     saved_seed = rand();
     srand(seed);
@@ -960,7 +960,7 @@ int name_generate_seeded(unsigned char bank, unsigned char female, int seed)
     return name;
 }
 
-int npc_display_name(struct record *npc)
+iptr npc_display_name(struct record *npc)
 {
     struct person *npc_data;
     struct faction *faction;
@@ -969,7 +969,7 @@ int npc_display_name(struct record *npc)
     npc_data = &npc->data.person;
     if (npc_data->faction_id != 0) {
         faction = faction_find((short)npc_data->faction_id);
-        if (faction->type == 4) return (int)faction->name;
+        if (faction->type == 4) return (iptr)faction->name;
     }
     if (npc->twin != 0) {
         return name_generate_seeded((int)(unsigned char)D_001841E3[(int)(unsigned char)current_region], (int)(unsigned char)((signed char)npc->flags & 4), npc->name_seed);

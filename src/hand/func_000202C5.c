@@ -72,7 +72,7 @@ void daedra_summon(struct record *object)
             msgbox_show_rsc(480, 1);
             return;
         }
-        daedra_id = (day_entry - D_00179E60) / 2 + 1;
+        daedra_id = (int)((day_entry - D_00179E60) / 2) + 1;
         daedra = faction_find(daedra_id);
         D_0019671C = daedra;
         if (REGION(daedra) == 56) {
@@ -108,7 +108,7 @@ void daedra_summon(struct record *object)
             msgbox_show_rsc(480, 1);
             return;
         }
-        daedra_id = (day_entry - D_00179E60) / 2 + 1;
+        daedra_id = (int)((day_entry - D_00179E60) / 2) + 1;
         for (n = 0; n < 3; n++) {
             if (guild->enemies[n] != 0 && guild->enemies[n]->id == daedra_id) {
                 msgbox_show_string(D_00170604, 1);

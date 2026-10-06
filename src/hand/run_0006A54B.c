@@ -28,7 +28,7 @@ extern void debug_checkpoint(int);
 extern struct qbn_place *quest_section(struct quest *, int);
 extern void fatal_error(char *);
 extern void object_foreach(struct record *, void (*)());
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int mc_memset();
 extern int func_000A2A2B(void);
 extern int func_000A2A76(struct msg *);
@@ -136,7 +136,7 @@ void mem_check_heap(int checkpoint)
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BC1);
         }
-        if (block < object_heap_blocks || (int)object_heap_blocks + object_heap_size < (int)block) {
+        if (block < object_heap_blocks || (iptr)object_heap_blocks + object_heap_size < (iptr)block) {
             mc_set_location(318, D_00175AD4);
             func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
             fatal_error(D_00175BDC);

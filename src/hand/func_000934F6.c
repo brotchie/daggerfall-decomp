@@ -1,7 +1,7 @@
 #include "records.h"
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000934F6 */
 #include "structs.h"
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_0017704C[];
 extern char D_001770B0[];
 extern char D_001770B3[];
@@ -9,12 +9,12 @@ extern char D_001770B8[];
 extern signed char text_buffer[];
 extern char scratch_current_object[];
 extern char inv_right_container[];
-extern int D_00195B80;
+extern iptr D_00195B80;
 extern int game_minutes;
 extern int trade_mode;
 extern unsigned char D_0019626F;
 extern signed char game_mode;
-extern int D_001AA420;
+extern iptr D_001AA420;
 extern char inv_selected_item[];
 extern char inv_left_container[];
 extern char color_remap_tables[];
@@ -53,17 +53,17 @@ int inv_draw_item_cell(char *object, short cell, struct rect *rects)
     item = object + 71;
     if (object == *(char **)inv_selected_item && MODE != 10 && MODE2 != 10) {
         for (y = rects[cell].y0; y <= rects[cell].y1; y++)
-            mc_memcpy(SCREEN + y * 320 + rects[cell].x0, (char *)(int)BUFS[0] + y * 320 + rects[cell].x0,
+            mc_memcpy(SCREEN + y * 320 + rects[cell].x0, (char *)(iptr)BUFS[0] + y * 320 + rects[cell].x0,
                           rects[cell].x1 - rects[cell].x0 + 1, D_0017704C, 681, 4);
     }
     if (*(unsigned char *)object == 54) {
         for (y = rects[cell].y0; y <= rects[cell].y1; y++)
-            mc_memcpy(SCREEN + y * 320 + rects[cell].x0, (char *)(int)BUFS[1] + y * 320 + rects[cell].x0,
+            mc_memcpy(SCREEN + y * 320 + rects[cell].x0, (char *)(iptr)BUFS[1] + y * 320 + rects[cell].x0,
                           rects[cell].x1 - rects[cell].x0 + 1, D_0017704C, 687, 4);
     }
     if (object[38] != 0) {
         for (y = rects[cell].y0; y <= rects[cell].y1; y++)
-            mc_memcpy(SCREEN + y * 320 + rects[cell].x0, (char *)(int)BUFS[2] + y * 320 + rects[cell].x0,
+            mc_memcpy(SCREEN + y * 320 + rects[cell].x0, (char *)(iptr)BUFS[2] + y * 320 + rects[cell].x0,
                           rects[cell].x1 - rects[cell].x0 + 1, D_0017704C, 693, 4);
     }
     if (object != *(char **)inv_left_container && object != *(char **)inv_right_container && *(short *)(item + 67) != -1

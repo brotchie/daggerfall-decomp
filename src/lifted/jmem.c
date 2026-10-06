@@ -12,7 +12,7 @@ extern signed char D_00187CA8;
 extern int mem_check_level;
 extern int frame_checkpoint;
 extern struct record *player_object;
-extern int window_image;
+extern iptr window_image;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
@@ -21,12 +21,12 @@ extern char logbook_show_notes[];
 
 extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
-extern int func_0009DA1C(int, int);
-extern int printf(int, ...);
+extern iptr disk_read_file(char *, iptr);
+extern int func_0009DA1C(int, iptr);
+extern int printf(iptr, ...);
 extern int mc_free();
 extern int mc_memset();
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int func_000A2D9E();
 extern int xn_gfx_restore_mode();
 extern void fatal_error(char *);
@@ -41,8 +41,8 @@ void mem_pool_init(struct mem_pool *pool, int size)
 {
     struct mem_block *block;
 
-    mc_memset((int)pool, 0, 4, (int)D_00175AD4, 60, 4);
-    pool->first = (struct mem_block *)mc_malloc(size, (int)D_00175AD4, 62);
+    mc_memset((iptr)pool, 0, 4, (iptr)D_00175AD4, 60, 4);
+    pool->first = (struct mem_block *)mc_malloc(size, (iptr)D_00175AD4, 62);
     block = pool->first;
     if (block == 0) fatal_error(D_00175ADB);
     pool->size = size;
@@ -54,12 +54,12 @@ void mem_pool_init(struct mem_pool *pool, int size)
 
 void mem_pool_free(struct mem_pool *pool)
 {
-    if (pool->first == 0 || (int)pool->first == (-1751672937)) return;
-    mc_free((int)pool->first, (int)D_00175AD4, 84);
-    pool->first = (struct mem_block *)-1751672937;
+    if (pool->first == 0 || (iptr)pool->first == (-1751672937)) return;
+    mc_free((iptr)pool->first, (iptr)D_00175AD4, 84);
+    pool->first = (struct mem_block *)(iptr)-1751672937;
 }
 
-int mem_pool_alloc(struct mem_pool *pool, int size)
+iptr mem_pool_alloc(struct mem_pool *pool, int size)
 {
     struct mem_block *block;
     struct mem_block *next;
@@ -78,7 +78,7 @@ int mem_pool_alloc(struct mem_pool *pool, int size)
     }
     if (block == 0) return 0;
     if ((int)block->size != block_size) {
-        next = (struct mem_block *)((int)block + block_size);
+        next = (struct mem_block *)((iptr)block + block_size);
         next->next = block->next;
         next->prev = block;
         next->size = (int)block->size - block_size;
@@ -93,7 +93,7 @@ int mem_pool_alloc(struct mem_pool *pool, int size)
     block->size = block_size - 18;
     block->flags |= 1;
     block->magic = 1768515945;
-    return (int)block + 18;
+    return (iptr)block + 18;
 }
 
 int mem_block_size(char *data)
@@ -107,8 +107,8 @@ int mem_block_size(char *data)
 void crash_screen(void)
 {
     xn_gfx_restore_mode();
-    func_0009DA1C(394, (int)D_00175AD4);
-    printf((int)D_00175C2D, frame_checkpoint);
+    func_0009DA1C(394, (iptr)D_00175AD4);
+    printf((iptr)D_00175C2D, frame_checkpoint);
     while (key_down_enter == 0);
     sound_shutdown_music();
     func_000A2D9E();

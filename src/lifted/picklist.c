@@ -23,18 +23,18 @@ void picklist_update_thumb(struct picklist *list)
 void picklist_free(struct picklist *list)
 {
     if (list->framed != 0) {
-        if (list->list_background != 0 && (int)list->list_background != (-1751672937)) {
-            mc_free((int)list->list_background, (int)D_00176E38, 110);
-            list->list_background = (char *)-1751672937;
+        if (list->list_background != 0 && (iptr)list->list_background != (-1751672937)) {
+            mc_free((iptr)list->list_background, (iptr)D_00176E38, 110);
+            list->list_background = (char *)(iptr)-1751672937;
         }
-        if (list->bar_background != 0 && (int)list->bar_background != (-1751672937)) {
-            mc_free((int)list->bar_background, (int)D_00176E38, 111);
-            list->bar_background = (char *)-1751672937;
+        if (list->bar_background != 0 && (iptr)list->bar_background != (-1751672937)) {
+            mc_free((iptr)list->bar_background, (iptr)D_00176E38, 111);
+            list->bar_background = (char *)(iptr)-1751672937;
         }
     }
-    if (list->entries != 0 && (int)list->entries != (-1751672937)) {
-        mc_free((int)list->entries, (int)D_00176E38, 114);
-        list->entries = (struct picklist_entry *)-1751672937;
+    if (list->entries != 0 && (iptr)list->entries != (-1751672937)) {
+        mc_free((iptr)list->entries, (iptr)D_00176E38, 114);
+        list->entries = (struct picklist_entry *)(iptr)-1751672937;
     }
     list->framed = 0;
     list->count = 0;

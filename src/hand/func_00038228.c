@@ -7,7 +7,7 @@ extern char spell_effect_settings[];
 extern char spell_effect_costs[];
 extern char spell_effect_cost_index[];
 extern char spell_effect_subtype_names[];
-extern int list_popup_callback;
+extern iptr list_popup_callback;
 extern char scratch_buffer[];
 extern short spell_effect_slot;
 extern char spell_effect_cost_current[];
@@ -52,7 +52,7 @@ void spellmaker_pick_effect_cb(short effect_type)
             s = s + strlen(s) + 1;
         }
         *s = 0;
-        list_popup_callback = (int)spellmaker_pick_subtype_cb;
+        list_popup_callback = (iptr)spellmaker_pick_subtype_cb;
         list_popup_open_strings(*(char **)scratch_buffer);
     }
 }

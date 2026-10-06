@@ -3,7 +3,7 @@
 extern int D_00185097;
 extern struct character *player_character;
 extern void spell_remove_effect_type(struct record *, int);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern void spfx_cure_disease(struct record *, struct character *);
 extern struct record *object_free_single(struct record *);

@@ -35,7 +35,7 @@ extern int game_minutes;
 extern struct settings *game_settings;
 extern int realtime_clock_tick;
 extern int sky_loaded_frame;
-extern int D_00195D84;
+extern iptr D_00195D84;
 extern int D_00195DA0;
 extern char view_cursor_active;
 extern unsigned char current_region;

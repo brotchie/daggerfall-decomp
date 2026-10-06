@@ -7,11 +7,11 @@ extern int scratch_buffer;
 extern int flats_cfg_count;
 extern void cfg_read_line(int *, char *);
 extern int cfg_read_number(int *);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 
 void flats_cfg_load(void)
 {
-    int fh;
+    iptr fh;
     int a;
     int b;
 

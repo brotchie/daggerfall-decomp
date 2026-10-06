@@ -23,7 +23,7 @@ extern short xn_gfx_clip_left;
 extern short xn_gfx_clip_top;
 extern short xn_gfx_clip_right;
 extern short xn_gfx_clip_bottom;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_001757A8[];
 extern char D_001757AF[];
 extern char D_001757C1[];
@@ -42,15 +42,15 @@ extern struct record *player_entity;
 extern struct record *player_object;
 extern char inpstr_result[];
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern char scratch_buffer[];
 extern int trade_mode;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern signed char inv_right_icon;
-extern int D_00199C2C[];
-extern int book_page_offsets;
+extern iptr D_00199C2C[];
+extern iptr book_page_offsets;
 extern char book_header[];
 extern short book_file;
 extern short book_page;
@@ -58,7 +58,7 @@ extern short D_00199D5E;
 extern short book_page_count;
 
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int disk_open_data(char *);
 extern int key_pressed_once(unsigned char);
 extern struct record *object_free_single(struct record *);
@@ -66,10 +66,10 @@ extern struct record *object_delete(struct record *);
 extern int inventory_open(int, int, int);
 extern int close();
 extern int mc_free();
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int read();
 extern int strlen();
-extern int mc_set_location(int, int);
+extern int mc_set_location(int, iptr);
 extern int mc_sprintf(char *, ...);
 extern int mc_memcpy();
 extern int xn_font_draw_string();
@@ -91,12 +91,12 @@ void spell_tick_spell(struct record *, struct record *);
 
 void book_open(short book_id)
 {
-    mc_set_location(37, (int)D_001757A8);
-    mc_sprintf((char *)text_buffer, (int)D_001757AF, (int)(short)book_id);
+    mc_set_location(37, (iptr)D_001757A8);
+    mc_sprintf((char *)text_buffer, (iptr)D_001757AF, (int)(short)book_id);
     book_file = disk_open_data(text_buffer);
-    read((int)(short)book_file, (int)book_header, 234);
-    read((int)(short)book_file, (int)&book_page_count, 2);
-    book_page_offsets = mc_malloc(((int)(short)book_page_count) << 2, (int)D_001757A8, 43);
+    read((int)(short)book_file, (iptr)book_header, 234);
+    read((int)(short)book_file, (iptr)&book_page_count, 2);
+    book_page_offsets = mc_malloc(((int)(short)book_page_count) << 2, (iptr)D_001757A8, 43);
     read((int)(short)book_file, book_page_offsets, ((int)(short)book_page_count) << 2);
     window_image = disk_read_file(D_001757C1, 0);
     func_0005A230();
@@ -114,7 +114,7 @@ void book_update(void)
 
     if (((int)(short)book_file) < 1) return;
     D_001940D8 |= 16;
-    mc_memcpy(screen_buffer, window_image, 64000, (int)D_001757A8, 65, 4);
+    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_001757A8, 65, 4);
     book_draw_page((int)(short)book_page);
     if (scratch_190d68 != 0 && ((int)(unsigned char)game_mode) != 8) {
         scratch_190d68 = 0;
@@ -145,11 +145,11 @@ void book_close(void)
     D_001940D8 &= 239;
     close((int)(short)book_file);
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (int)D_001757A8, 101);
+        mc_free(window_image, (iptr)D_001757A8, 101);
         window_image = -1751672937;
     }
     if (book_page_offsets != 0 && book_page_offsets != (-1751672937)) {
-        mc_free(book_page_offsets, (int)D_001757A8, 102);
+        mc_free(book_page_offsets, (iptr)D_001757A8, 102);
         book_page_offsets = -1751672937;
     }
     func_0005A230();
@@ -176,8 +176,8 @@ void book_flush_line(void)
 
 void func_0005A1C8(char *name)
 {
-    mc_set_location(218, (int)D_001757A8);
-    mc_sprintf((char *)text_buffer, (int)D_001757CE, name);
+    mc_set_location(218, (iptr)D_001757A8);
+    mc_sprintf((char *)text_buffer, (iptr)D_001757CE, name);
     D_00199C2C[((int)(short)(D_00199D5E)++)] = disk_read_file(text_buffer, 0);
 }
 
@@ -187,7 +187,7 @@ void func_0005A230(void)
 
     for (i = 0; ((int)(short)D_00199D5E) > i; i++) {
         if (D_00199C2C[i] != 0 && D_00199C2C[i] != (-1751672937)) {
-            mc_free(D_00199C2C[i], (int)D_001757A8, 228);
+            mc_free(D_00199C2C[i], (iptr)D_001757A8, 228);
             D_00199C2C[i] = -1751672937;
         }
     }
@@ -226,8 +226,8 @@ void book_goto_page_prompt(void)
 
     D_0012B508 = 146;
     prompt = *(char **)scratch_buffer + 55000;
-    mc_set_location(268, (int)D_001757A8);
-    mc_sprintf(prompt, (int)D_001757D7, D_0017D1E6);
+    mc_set_location(268, (iptr)D_001757A8);
+    mc_sprintf(prompt, (iptr)D_001757D7, D_0017D1E6);
     *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
     msgbox_show_string(prompt, 2);
     inpstr_begin_number(((int)(short)book_page) + 1);

@@ -42,14 +42,14 @@ extern signed char sound_enabled;
 
 extern int sos_init(int, ...);
 extern int sos_shutdown(void);
-extern int sos_read_settings(int, ...);
-extern int archive_open(char *, int, int);
-extern int sound_timer_add(int, int);
-extern int dpmi_lock_region(int, int);
-extern int dpmi_unlock_region(int, int);
+extern int sos_read_settings(iptr, ...);
+extern int archive_open(char *, iptr, int);
+extern int sound_timer_add(iptr, int);
+extern int dpmi_lock_region(iptr, int);
+extern int dpmi_unlock_region(iptr, int);
 extern int strlen();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int func_000A1D3C();
 extern void archive_close(int);
 extern void msgbox_show_string(char *, short);
@@ -70,8 +70,8 @@ void trade_haggle_show_offer(void)
     msgbox_button_keys = 30;
     D_00196034 = 19;
     D_00196035 = 46;
-    mc_set_location(131, (int)D_00175A30);
-    mc_sprintf((int)text_buffer, (int)D_00175A38, (int)trade_haggle_asking);
+    mc_set_location(131, (iptr)D_00175A30);
+    mc_sprintf((iptr)text_buffer, (iptr)D_00175A38, (int)trade_haggle_asking);
     msgbox_show_string(text_buffer, 5);
 }
 
@@ -81,8 +81,8 @@ void trade_counter_offer(void)
 
     D_0012B508 = 146;
     text = *(char **)scratch_buffer + 55000;
-    mc_set_location(141, (int)D_00175A30);
-    mc_sprintf((int)text, (int)D_00175A6A);
+    mc_set_location(141, (iptr)D_00175A30);
+    mc_sprintf((iptr)text, (iptr)D_00175A6A);
     *(strlen(text) + text + 1) = 0;
     msgbox_show_string(text, 2);
     inpstr_begin_number((int)trade_haggle_asking);
@@ -116,7 +116,7 @@ int sound_init_music(void)
 {
     int i;
 
-    if ((short)sos_read_settings((int)D_00175AB8) == 0) return 0;
+    if ((short)sos_read_settings((iptr)D_00175AB8) == 0) return 0;
     if (sos_init(D_0018DD5C, D_0018DD54) != 0) return 0;
     D_0018DC64 = 2048;
     func_000A1D3C(127);
@@ -125,10 +125,10 @@ int sound_init_music(void)
         sound_channels[i].handle = 305419896;
     }
     sound_enabled = 1;
-    dpmi_lock_region((int)sound_channels, 5168);
-    dpmi_lock_region((int)D_000CDDA8, 4096);
-    dpmi_lock_region((int)&D_001A3F40, 4096);
-    D_001A3F3C = sound_timer_add((int)D_000CDDA8, 140);
+    dpmi_lock_region((iptr)sound_channels, 5168);
+    dpmi_lock_region((iptr)D_000CDDA8, 4096);
+    dpmi_lock_region((iptr)&D_001A3F40, 4096);
+    D_001A3F3C = sound_timer_add((iptr)D_000CDDA8, 140);
     return 1;
 }
 
@@ -144,7 +144,7 @@ void sound_shutdown_music(void)
         sound_stop_channel(channel);
     }
     sos_shutdown();
-    dpmi_unlock_region((int)sound_channels, 5168);
-    dpmi_unlock_region((int)D_000CDDA8, 4096);
-    dpmi_unlock_region((int)&D_001A3F40, 4096);
+    dpmi_unlock_region((iptr)sound_channels, 5168);
+    dpmi_unlock_region((iptr)D_000CDDA8, 4096);
+    dpmi_unlock_region((iptr)&D_001A3F40, 4096);
 }

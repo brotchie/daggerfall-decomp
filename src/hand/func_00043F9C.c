@@ -10,16 +10,16 @@ extern char D_00170F3A[];
 extern char D_00170F47[];
 extern struct rect options_mouse_buttons[];
 extern struct record *player_object;
-extern int D_00195B5C;
-extern int D_00195B60;
+extern iptr D_00195B5C;
+extern iptr D_00195B60;
 extern unsigned char mouse_sensitivity_x;
 extern unsigned char mouse_sensitivity_y;
 extern char mouse_buttons_prev;
-extern void options_mouse_draw(int);
+extern void options_mouse_draw(iptr);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern void cursor_draw_arrow(void);
-extern void mc_free(int, char *, int);
+extern void mc_free(iptr, char *, int);
 extern void xn_gfx_present_inclusive(int);
 extern void xn_mouse_get_sensitivity(unsigned char *, unsigned char *);
 extern void xn_mouse_poll_clamped(void);
@@ -28,7 +28,7 @@ int options_mouse_screen(void)
 {
     int button;
     int done;
-    int background;
+    iptr background;
 
     done = 0;
     background = disk_read_file(D_00170F2D, 0);

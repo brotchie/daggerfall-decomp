@@ -2,19 +2,19 @@
 #include "records.h"
 
 extern char xn_gfx_row_offset[];
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00175898[];
 extern char D_00185CDC[];
 extern int spell_points_bonus;
 extern char hud_bar_image[];
-extern int hud_mode_icons;
+extern iptr hud_mode_icons;
 extern char hud_portrait[];
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern int hud_vital_bar_images;
 extern int D_00195C80;
 extern int D_00195C84;
-extern int hud_portrait_overlays;
+extern iptr hud_portrait_overlays;
 extern unsigned char interaction_mode;
 extern void hud_draw_compass(void);
 extern int hud_portrait_overlay_index(void);

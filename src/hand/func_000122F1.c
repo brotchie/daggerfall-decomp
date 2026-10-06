@@ -33,13 +33,13 @@ int profile_set_number(struct profile *r, int value)
         itoa(value, buf, 10);
     len = strlen(buf);
     if (len < n) {
-        cnt = (r->buffer + r->length) - q - (n - len);
+        cnt = (int)((r->buffer + r->length) - q) - (n - len);
         mc_memmove(q, q + (n - len), cnt, D_00170129, 768, 4);
         r->length -= n - len;
     } else if (len > n) {
         if ((len - n) + r->length > r->capacity)
             return 0;
-        cnt = (r->buffer + r->length) - q + (len - n);
+        cnt = (int)((r->buffer + r->length) - q) + (len - n);
         mc_memmove(q + (len - n), q, cnt, D_00170129, 786, 4);
         r->length += len - n;
     }

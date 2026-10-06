@@ -15,7 +15,7 @@ extern struct location *current_location;
 extern signed char game_mode;
 extern signed char crime_current;
 extern char people_witness_flags[];
-extern int D_00196DA4;
+extern iptr D_00196DA4;
 extern struct record *people_list[];
 extern int people_count;
 
@@ -23,13 +23,13 @@ extern int collide_line_of_sight(struct record *, struct record *);
 extern int is_guard_sprite(struct record *);
 extern struct record *object_delete(struct record *);
 extern int mc_memset();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int func_000A134C();
 extern int xn_draw_image_masked_at_origin();
 extern void pedestrian_place(struct record *);
 extern void guards_summon(int);
-extern void text_draw(int, int, int);
+extern void text_draw(iptr, int, int);
 extern void guild_count_crime(int, int);
 int people_check_witnesses(void);
 #pragma aux mc_set_location parm routine [];
@@ -42,7 +42,7 @@ void people_clear(void)
         if (people_list[i] != 0) object_delete(people_list[i]);
     }
     people_count = 0;
-    mc_memset((int)((char *)people_list), 0, 120, (int)D_00170DC0, 554, 120);
+    mc_memset((iptr)((char *)people_list), 0, 120, (iptr)D_00170DC0, 554, 120);
 }
 
 int people_check_witnesses(void)
@@ -106,7 +106,7 @@ void people_debug_map(void)
     y >>= 6;
     y = ((current_location->height << 6) - y) - 1;
     func_000A134C((short)x, (short)y, 244);
-    mc_set_location(677, (int)D_00170DC0);
-    mc_sprintf((int)text_buffer, (int)D_00170DD6, x, y);
-    text_draw((int)text_buffer, 0, (int)&*(signed char *)((char *)(current_location->height << 6) + 2));
+    mc_set_location(677, (iptr)D_00170DC0);
+    mc_sprintf((iptr)text_buffer, (iptr)D_00170DD6, x, y);
+    text_draw((iptr)text_buffer, 0, (int)(iptr)&*(signed char *)((char *)(iptr)(current_location->height << 6) + 2));
 }

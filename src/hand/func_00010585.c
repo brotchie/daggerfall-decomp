@@ -50,7 +50,7 @@ extern void guards_summon(int);
 extern void spell_remove_effect_type(struct record *, int);
 extern void func_0006987B(void);
 extern void sound_update_ambient(void);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern int building_access_level(struct building *);
 extern int func_0007E441(int);
 extern void xn_draw_cif_rle_frame(int, int, int, int);

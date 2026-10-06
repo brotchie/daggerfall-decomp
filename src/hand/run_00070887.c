@@ -15,14 +15,14 @@ extern char D_001960D9[];
 extern char D_001961F5[];
 extern struct membership *guild_membership;
 extern void msgbox_show_rsc(short, int);
-extern void shop_stock_soul_traps(int);
+extern void shop_stock_soul_traps(iptr);
 extern int blessing_apply(struct blessing *, int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
 extern void spfx_cure_disease(struct record *, struct character *);
-extern void object_free_children(int);
+extern void object_free_children(iptr);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern void inventory_open_container(int, int, int);
+extern void inventory_open_container(iptr, int, int);
 extern int trade_adjust_price(int, int);
 extern void trade_make_offer(void);
 extern int trade_settle_offer(void);
@@ -37,14 +37,14 @@ void guild_check_invitations(void)
     if (player_character->thieves_invite_count != 100 && player_character->thieves_invite_time != 0 && ((unsigned)player_character->thieves_invite_time) < game_minutes && ((int)player_environment) == 1) {
         player_character->thieves_invite_count = 100;
         player_character->thieves_invite_time = 0;
-        mc_strncpy((int)D_001961F5, (int)D_00176089, 13, (int)D_00175EAA, 1233);
+        mc_strncpy((iptr)D_001961F5, (iptr)D_00176089, 13, (iptr)D_00175EAA, 1233);
     }
     if (player_character->brotherhood_invite_count == 100 || player_character->brotherhood_invite_time == 0 || ((unsigned)player_character->brotherhood_invite_time) >= game_minutes || ((int)player_environment) != 1) {
         return;
     }
     player_character->brotherhood_invite_count = 100;
     player_character->brotherhood_invite_time = 0;
-    mc_strncpy((int)D_001961F5, (int)D_00176096, 13, (int)D_00175EAA, 1243);
+    mc_strncpy((iptr)D_001961F5, (iptr)D_00176096, 13, (iptr)D_00175EAA, 1243);
 }
 
 void guild_teleport(void)
@@ -91,9 +91,9 @@ int guild_confirm_price(int price)
 
 void guild_buy_soulgems(void)
 {
-    object_free_children((int)D_001960D9);
-    shop_stock_soul_traps((int)D_001960D9);
-    inventory_open_container((int)D_001960D9, 1, 4);
+    object_free_children((iptr)D_001960D9);
+    shop_stock_soul_traps((iptr)D_001960D9);
+    inventory_open_container((iptr)D_001960D9, 1, 4);
 }
 
 void guild_cure_diseases(void)

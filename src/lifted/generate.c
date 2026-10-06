@@ -7,7 +7,7 @@
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern signed char xn_mouse_cursor_drawn;
 extern char D_00176F41[];
 extern char scratch_190be4[];
@@ -31,7 +31,7 @@ extern struct image *D_00195B5C;
 extern struct image *D_00195B60;
 extern char D_00195B84[];
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern struct career *player_class;
 extern int game_minutes;
 extern int trade_total;
@@ -44,7 +44,7 @@ extern signed char mouse_buttons_prev;
 extern char chargen_saved_minimums[];
 extern short chargen_saved_attributes[];
 extern int chargen_face_images;
-extern int chargen_reflex_image;
+extern iptr chargen_reflex_image;
 extern signed char chargen_roll_saved;
 extern signed char chargen_saved_points;
 extern signed char chargen_screen;
@@ -66,7 +66,7 @@ extern int xn_draw_image();
 extern void msgbox_open_rsc(int, int);
 extern void msgbox_update(void);
 extern void keys_world_actions(void);
-extern void text_draw_coloured(int, int, int, int, unsigned char);
+extern void text_draw_coloured(iptr, int, int, int, unsigned char);
 extern void object_free_later(struct record *);
 extern void object_free_children(struct record *);
 extern void chargen_draw_face(void);
@@ -85,7 +85,7 @@ int chargen_draw(void)
 
     mouse_buttons_prev = mouse_buttons;
     xn_mouse_poll_clamped();
-    mc_memcpy(screen_buffer, window_image, 64000, (int)D_00176F41, 181, 4);
+    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_00176F41, 181, 4);
     if (((int)(unsigned char)(chargen_screen & 2)) != 0) chargen_draw_face();
     if (((int)(unsigned char)(chargen_screen & 4)) != 0) chargen_draw_attributes();
     if (((int)(unsigned char)(chargen_screen & 8)) != 0) chargen_draw_skills();
@@ -97,7 +97,7 @@ int chargen_draw(void)
             y_offset = 0;
             x_offset = y_offset;
         }
-        xn_draw_image(x_offset + 127, y_offset + ((player_character->reflexes * 9) + 148), 66, 9, (int)(*(char **)&chargen_reflex_image + 12 + (player_character->reflexes * 594)));
+        xn_draw_image(x_offset + 127, y_offset + ((player_character->reflexes * 9) + 148), 66, 9, (iptr)(*(char **)&chargen_reflex_image + 12 + (player_character->reflexes * 594)));
     }
     if (((int)(unsigned char)(chargen_screen & 16)) != 0 && ((int)(unsigned char)chargen_screen) != 255 && ((int)(unsigned char)msgbox_kind) != 4) {
         msgbox_open_rsc(307, 4);
@@ -105,7 +105,7 @@ int chargen_draw(void)
         D_00195F34 = 125;
     }
     if (((int)(unsigned char)chargen_screen) == 255 && ((int)(unsigned char)game_mode) != 8) {
-        text_draw_coloured((int)player_character, 80, 5, 145, 141);
+        text_draw_coloured((iptr)player_character, 80, 5, 145, 141);
     }
     if (((int)(unsigned char)(chargen_screen & 1)) == 0) keys_world_actions();
     msgbox_update();
@@ -123,23 +123,23 @@ void chargen_free_images(void)
 {
     chargen_screen = 0;
     if (chargen_face_images != 0 && chargen_face_images != (-1751672937)) {
-        mc_free(chargen_face_images, (int)D_00176F41, 224);
+        mc_free(chargen_face_images, (iptr)D_00176F41, 224);
         chargen_face_images = -1751672937;
     }
-    if ((int)D_00195B60 != 0 && (int)D_00195B60 != (-1751672937)) {
-        mc_free((int)D_00195B60, (int)D_00176F41, 225);
-        D_00195B60 = (struct image *)-1751672937;
+    if ((iptr)D_00195B60 != 0 && (iptr)D_00195B60 != (-1751672937)) {
+        mc_free((iptr)D_00195B60, (iptr)D_00176F41, 225);
+        D_00195B60 = (struct image *)(iptr)-1751672937;
     }
-    if ((int)D_00195B5C != 0 && (int)D_00195B5C != (-1751672937)) {
-        mc_free((int)D_00195B5C, (int)D_00176F41, 226);
-        D_00195B5C = (struct image *)-1751672937;
+    if ((iptr)D_00195B5C != 0 && (iptr)D_00195B5C != (-1751672937)) {
+        mc_free((iptr)D_00195B5C, (iptr)D_00176F41, 226);
+        D_00195B5C = (struct image *)(iptr)-1751672937;
     }
     if (chargen_reflex_image != 0 && chargen_reflex_image != (-1751672937)) {
-        mc_free(chargen_reflex_image, (int)D_00176F41, 227);
+        mc_free(chargen_reflex_image, (iptr)D_00176F41, 227);
         chargen_reflex_image = -1751672937;
     }
     if (window_image == 0 || window_image == (-1751672937)) return;
-    mc_free(window_image, (int)D_00176F41, 228);
+    mc_free(window_image, (iptr)D_00176F41, 228);
     window_image = -1751672937;
 }
 

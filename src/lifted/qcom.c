@@ -15,9 +15,9 @@ extern signed char text_buffer[];
 extern char D_001911E4[];
 extern signed char quest_global_states[];
 extern char D_00195984[];
-extern int D_00195988;
-extern int D_0019598C;
-extern int D_00195990;
+extern iptr D_00195988;
+extern iptr D_0019598C;
+extern iptr D_00195990;
 extern struct record *nonworld_root;
 extern struct record *quest_root;
 extern struct record *player_entity;
@@ -28,16 +28,16 @@ extern struct character *player_character;
 extern int game_minutes;
 extern struct record *quest_tick_object;
 extern int sky_loaded_frame;
-extern int qbn_opcode_arg_counts;
+extern iptr qbn_opcode_arg_counts;
 extern signed char current_region;
 extern unsigned char D_0019626F;
 extern signed char game_mode;
 extern signed char D_00196298;
 extern signed char night_sky_loaded;
-extern int quest_debug_object;
+extern iptr quest_debug_object;
 extern struct quest *current_quest;
 extern struct record *quest_reward_container;
-extern int quest_debug_data;
+extern iptr quest_debug_data;
 extern struct record *quest_event_object;
 extern struct quest *quest_tick_data;
 extern short quest_event_code;
@@ -56,15 +56,15 @@ extern void *quest_section(struct quest *, int);
 extern void *quest_record(struct quest *, int, int);
 extern int qcond_op57_item_used(struct quest *, struct qbn_op *);
 extern int quest_deliveries_done(struct quest *);
-extern int quest_start(char *);
+extern iptr quest_start(char *);
 extern int sound_play(int, struct record *, int);
-extern int disk_resolve_path(int);
+extern int disk_resolve_path(iptr);
 extern int rand_range(int, int);
 extern int location_contains(int, int);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int mc_memset();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int xn_vid_play();
 extern int xn_mouse_poll_clamped();
 extern void region_flag_set(int, int);
@@ -97,7 +97,7 @@ extern void func_00031658(struct quest *, struct qbn_op *, int);
 extern void qaction_op83_teleport_pc(struct qbn_op *);
 extern void quest_show_message(struct quest *, int);
 extern void quest_op_done(struct quest *, struct qbn_op *);
-extern void qaction_place_foe(struct qbn_op *, int);
+extern void qaction_place_foe(struct qbn_op *, iptr);
 extern void qaction_place_item(struct quest *, struct qbn_op *);
 extern void qaction_place_npc(struct quest *, struct qbn_op *);
 extern void qaction_give_item_to_foe(struct quest *, struct qbn_op *);
@@ -174,8 +174,8 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 8:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0 && ((int)(unsigned char)current_region) != 31) {
-                    mc_set_location(64, (int)D_001707F0);
-                    mc_sprintf((int)D_001911E4, (int)D_001707F7, rand_range(op->args[1].value, op->args[2].value));
+                    mc_set_location(64, (iptr)D_001707F0);
+                    mc_sprintf((iptr)D_001911E4, (iptr)D_001707F7, rand_range(op->args[1].value, op->args[2].value));
                     quest_start(D_001911E4);
                     quest_op_done(quest, op);
                 }
@@ -246,7 +246,7 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 22:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
-                    qaction_place_foe(op, (int)op->args[2].record);
+                    qaction_place_foe(op, (iptr)op->args[2].record);
                     quest_op_done(quest, op);
                 }
                 break;
@@ -344,7 +344,7 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 33:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
-                    qaction_place_foe(op, (int)op->args[2].record);
+                    qaction_place_foe(op, (iptr)op->args[2].record);
                     quest_op_done(quest, op);
                 }
                 break;
@@ -428,12 +428,12 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 50:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
-                    mc_set_location(358, (int)D_001707F0);
-                    mc_sprintf((int)text_buffer, (int)D_00170801, op->args[1].value);
+                    mc_set_location(358, (iptr)D_001707F0);
+                    mc_sprintf((iptr)text_buffer, (iptr)D_00170801, op->args[1].value);
                     while (mouse_buttons != 0) xn_mouse_poll_clamped();
-                    path = disk_resolve_path((int)text_buffer);
+                    path = disk_resolve_path((iptr)text_buffer);
                     xn_vid_play(path, 0, 0, 1);
-                    mc_memset(655360, 0, 64000, (int)D_001707F0, 362, 4);
+                    mc_memset(655360, 0, 64000, (iptr)D_001707F0, 362, 4);
                     palette_restore();
                     sky_loaded_frame = 10000;
                     night_sky_loaded = 0;
@@ -646,10 +646,10 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 75:
                 if (quest_arg_state(op, 0) != 0) {
-                    *(int *)D_00195984 = (int)op->args[1].record;
-                    D_00195988 = (int)op->args[2].record;
-                    D_0019598C = (int)op->args[3].record;
-                    D_00195990 = (int)op->args[4].record;
+                    *(iptr *)D_00195984 = (iptr)op->args[1].record;
+                    D_00195988 = (iptr)op->args[2].record;
+                    D_0019598C = (iptr)op->args[3].record;
+                    D_00195990 = (iptr)op->args[4].record;
                 }
                 break;
             case 76:
@@ -727,7 +727,7 @@ void quest_run_opcodes(struct quest *quest)
                 }
             }
         }
-        *(int *)D_00195984 = (D_00195988 = (D_0019598C = (D_00195990 = 0)));
+        *(iptr *)D_00195984 = (D_00195988 = (D_0019598C = (D_00195990 = 0)));
         if (ended == 0) quest_timers_update(quest);
         if (quest_reward_container == 0 || quest_reward_container->children == 0 || ((int)(unsigned char)game_mode) == 4) {
             return;
@@ -827,25 +827,25 @@ void quest_debug_next(void)
     found_current = 0;
     object = quest_root->children;
     if (object != 0 && quest_debug_object == 0) {
-        quest_debug_object = (int)object;
-        quest_debug_data = (int)&object->data.quest;
+        quest_debug_object = (iptr)object;
+        quest_debug_data = (iptr)&object->data.quest;
         return;
     }
     while (object != 0) {
         if (object->type == 14) {
             if (found_current != 0) {
-                quest_debug_object = (int)object;
-                quest_debug_data = (int)&object->data.quest;
+                quest_debug_object = (iptr)object;
+                quest_debug_data = (iptr)&object->data.quest;
                 return;
             }
-            if ((int)object == quest_debug_object) found_current = 1;
+            if ((iptr)object == quest_debug_object) found_current = 1;
         }
         object = object->next;
     }
     if (found_current == 0) return;
     object = quest_root->children;
-    quest_debug_object = (int)object;
-    quest_debug_data = (int)&object->data.quest;
+    quest_debug_object = (iptr)object;
+    quest_debug_data = (iptr)&object->data.quest;
 }
 
 void quests_unlink_all(struct record *object)
@@ -882,55 +882,55 @@ void quest_relink_after_load(struct quest *quest)
     int i;
     struct qbn_timer *timer;
 
-    op = (struct qbn_op *)((int)quest + quest->section_offsets[8]);
+    op = (struct qbn_op *)((iptr)quest + quest->section_offsets[8]);
     for (i = 0; quest->section_counts[8] > i; i++, op++) {
         arg = op->args;
-        op->arg_count = ((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)&qbn_opcode_arg_counts + op->opcode))) - 48;
+        op->arg_count = ((int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)&qbn_opcode_arg_counts + op->opcode))) - 48;
         for (j = 0; op->arg_count > j; j++, arg++) {
-            if (arg->record != 0) arg->record += (int)quest;
+            if (arg->record != 0) arg->record += (iptr)quest;
             if (arg->object != 0) {
-                arg->object = (struct record *)object_find_by_id(nonworld_root, (int)arg->object);
+                arg->object = (struct record *)object_find_by_id(nonworld_root, (iptr)arg->object);
             }
         }
     }
-    qbn_person = (struct qbn_person *)((int)quest + quest->section_offsets[3]);
+    qbn_person = (struct qbn_person *)((iptr)quest + quest->section_offsets[3]);
     for (i = 0; quest->section_counts[3] > i; i++, qbn_person++) {
         if (qbn_person->object != 0) {
-            qbn_person->object = (struct record *)object_find_by_id(nonworld_root, (int)qbn_person->object);
+            qbn_person->object = (struct record *)object_find_by_id(nonworld_root, (iptr)qbn_person->object);
             if (qbn_person->object != 0 && qbn_person->object->type == 65 && qbn_person->object->faction_id == 0) {
                 qbn_person->object->faction_id = qbn_person->faction_id;
             }
         }
     }
-    qbn_place = (struct qbn_place *)((int)quest + quest->section_offsets[4]);
+    qbn_place = (struct qbn_place *)((iptr)quest + quest->section_offsets[4]);
     for (i = 0; quest->section_counts[4] > i; i++, qbn_place++) {
         if (qbn_place->object != 0) {
-            qbn_place->object = (struct record *)object_find_by_id(nonworld_root, (int)qbn_place->object);
+            qbn_place->object = (struct record *)object_find_by_id(nonworld_root, (iptr)qbn_place->object);
             if (qbn_place->object == 0) fatal_error(D_001708ED);
         }
     }
-    qbn_item = (struct qbn_item *)((int)quest + quest->section_offsets[0]);
+    qbn_item = (struct qbn_item *)((iptr)quest + quest->section_offsets[0]);
     for (i = 0; quest->section_counts[0] > i; i++, qbn_item++) {
         if (qbn_item->object != 0) {
-            qbn_item->object = (struct record *)object_find_by_id(nonworld_root, (int)qbn_item->object);
+            qbn_item->object = (struct record *)object_find_by_id(nonworld_root, (iptr)qbn_item->object);
         }
         if (qbn_item->object == 0) {
-            qbn_item->object = (struct record *)object_find_by_id(location_object, (int)qbn_item->object);
+            qbn_item->object = (struct record *)object_find_by_id(location_object, (iptr)qbn_item->object);
         }
     }
-    foe = (struct qbn_foe *)((int)quest + quest->section_offsets[7]);
+    foe = (struct qbn_foe *)((iptr)quest + quest->section_offsets[7]);
     for (i = 0; quest->section_counts[7] > i; i++, foe++) {
         if (foe->object != 0) {
-            foe->object = (struct record *)object_find_by_id(nonworld_root, (int)foe->object);
+            foe->object = (struct record *)object_find_by_id(nonworld_root, (iptr)foe->object);
         }
     }
-    timer = (struct qbn_timer *)((int)quest + quest->section_offsets[6]);
+    timer = (struct qbn_timer *)((iptr)quest + quest->section_offsets[6]);
     for (i = 0; quest->section_counts[6] > i; i++, timer++) {
-        if (timer->link1 != 0) timer->link1 = object_find_by_id(nonworld_root, (int)timer->link1);
-        if (timer->link2 != 0) timer->link2 = object_find_by_id(nonworld_root, (int)timer->link2);
+        if (timer->link1 != 0) timer->link1 = object_find_by_id(nonworld_root, (iptr)timer->link1);
+        if (timer->link2 != 0) timer->link2 = object_find_by_id(nonworld_root, (iptr)timer->link2);
     }
     if (quest->text_offset == 0) return;
-    text_var = (struct qbn_text_var *)((int)quest + quest->text_offset);
+    text_var = (struct qbn_text_var *)((iptr)quest + quest->text_offset);
     while (text_var->name[0] != 0) {
         text_var->record = quest_record(quest, (int)(short)((unsigned short)text_var->section), text_var->index);
         text_var++;
@@ -951,7 +951,7 @@ int quest_event_clicked_faction(unsigned short faction_id)
         next = object->next;
         if (object->type == 14) {
             quest_tick_object = object;
-            current_quest = (struct quest *)((*(int *)&quest_tick_data = (int)&object->data.quest));
+            current_quest = (struct quest *)((*(iptr *)&quest_tick_data = (iptr)&object->data.quest));
             op = quest_section(current_quest, 8);
             op_index = 0;
             for (; current_quest->section_counts[8] > op_index; op_index++, op++) {
@@ -966,10 +966,10 @@ int quest_event_clicked_faction(unsigned short faction_id)
     return found;
 }
 
-int quest_place_or_person_object(struct quest *quest, int record_index, short is_person)
+iptr quest_place_or_person_object(struct quest *quest, int record_index, short is_person)
 {
-    if (is_person == 0) return (int)((struct qbn_place *)quest_record(quest, 4, (int)(short)*(short *)&record_index))->object;
-    return (int)((struct qbn_person *)quest_record(quest, 3, (int)(short)*(short *)&record_index))->object;
+    if (is_person == 0) return (iptr)((struct qbn_place *)quest_record(quest, 4, (int)(short)*(short *)&record_index))->object;
+    return (iptr)((struct qbn_person *)quest_record(quest, 3, (int)(short)*(short *)&record_index))->object;
 }
 
 void quest_timer_expire(struct quest *quest, struct qbn_timer *timer)

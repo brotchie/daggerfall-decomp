@@ -15,7 +15,7 @@ int building_distance(char *building)
 }
 
 /* between the talk.c and faction.c runs: unit not certain */
-int faction_find(short id)
+iptr faction_find(short id)
 {
     int found;
     found = faction_find_r(factions, id);

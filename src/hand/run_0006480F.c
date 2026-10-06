@@ -6,12 +6,12 @@ extern struct link *active_links[];
 extern int link_count;
 extern int active_link_count;
 extern void link_start(struct link *);
-extern int xn_str_find_u32(struct link **, struct link *, int);
+extern iptr xn_str_find_u32(struct link **, struct link *, int);
 extern char D_00175962[];
 extern int link_step(struct link *);
 extern int mc_memcpy();
-extern int screen_buffer;
-extern int D_00147954;
+extern iptr screen_buffer;
+extern iptr D_00147954;
 extern char D_0017596A[];
 extern signed char D_001940DA;
 extern signed char quest_global_states[];
@@ -35,20 +35,20 @@ extern int damage_apply(struct record *, int, struct record *);
 extern void msgbox_show_rsc(int, int);
 extern int cast_creature_spell(struct record *, struct record *, int);
 extern void link_show_text(int);
-extern int link_answer_matches(int, int);
+extern int link_answer_matches(int, iptr);
 extern void link_hurt_player(int, int);
 extern void links_set_reverse(short, int);
 extern struct spell *link_find_spell(int);
 extern void disease_infect(struct record *, unsigned char *, int, int);
 extern void poison_apply(struct record *, int, int);
-extern int sound_play(int, int, int);
-extern int hud_message_add(char *);
+extern int sound_play(int, iptr, int);
+extern iptr hud_message_add(char *);
 extern void hud_messages_draw(void);
 extern int rand_range(int, int);
-extern void inpstr_begin_text(int, short);
+extern void inpstr_begin_text(iptr, short);
 extern int inpstr_update(void);
 extern void object_set_position(struct record *, int, int, int, int, int, int);
-extern int door_start_swing(int, int);
+extern int door_start_swing(iptr, int);
 extern int xn_gfx_present_inclusive();
 extern int xn_kbd_flush();
 
@@ -120,7 +120,7 @@ int link_step(struct link *link)
     int bits;
     int pos;
     int damage;
-    int message;
+    iptr message;
     struct record *child;
 
     if (((int)(unsigned char)(link->flags & 1)) != 0) return 0;
@@ -135,7 +135,7 @@ int link_step(struct link *link)
         links_set_reverse((int)(short)link->object_id, link->flags);
     }
     if (((int)(unsigned char)(link->flags & 4)) == 0) {
-        if (link->param != 0 && link->object != 0) sound_play(link->param, (int)link->object, 110);
+        if (link->param != 0 && link->object != 0) sound_play(link->param, (iptr)link->object, 110);
         link->flags |= 4;
     }
     if (link->object != 0 && link->object->type != 32) link->object->move_frame = *(int *)frame_counter;
@@ -185,7 +185,7 @@ int link_step(struct link *link)
                     child = link->object->twin->children;
                     if (child != 0) {
                         if (child->twin != 0) {
-                            mc_memcpy(&child->twin->x, &link->object->x, 12, (int)D_00175962, 264, 4);
+                            mc_memcpy(&child->twin->x, &link->object->x, 12, (iptr)D_00175962, 264, 4);
                         }
                     }
                 }
@@ -242,7 +242,7 @@ int link_step(struct link *link)
             msgbox_show_rsc((int)(short)(((unsigned short)link->param) + 8600), 1);
             break;
         case 12:
-            mc_memcpy(D_00147954, 655360, 64000, (int)D_00175962, 315, 4);
+            mc_memcpy(D_00147954, 655360, 64000, (iptr)D_00175962, 315, 4);
             D_001940DA |= 1;
             link_show_text(link->param + 5400);
             message = hud_message_add(D_0017596A);
@@ -250,7 +250,7 @@ int link_step(struct link *link)
             xn_kbd_flush();
             inpstr_begin_text(message + 2, 16);
             while (inpstr_update() == 0) {
-                mc_memcpy(screen_buffer, D_00147954, 64000, (int)D_00175962, 324, 4);
+                mc_memcpy(screen_buffer, D_00147954, 64000, (iptr)D_00175962, 324, 4);
                 hud_messages_draw();
                 xn_gfx_present_inclusive(1);
             }
@@ -266,7 +266,7 @@ int link_step(struct link *link)
             link->object->lock_level = (unsigned short)link->axis;
             break;
         case 16:
-            if (((int)(unsigned short)(link->object->flags & 64)) != 0 && door_start_swing((int)link->object, 0) != 0) {
+            if (((int)(unsigned short)(link->object->flags & 64)) != 0 && door_start_swing((iptr)link->object, 0) != 0) {
                 link->object->flags |= 0x100;
             }
             break;
@@ -274,15 +274,15 @@ int link_step(struct link *link)
             link->object->flags |= 64;
             break;
         case 18:
-            if (door_start_swing((int)link->object, 0) != 0) link->object->flags |= 320;
+            if (door_start_swing((iptr)link->object, 0) != 0) link->object->flags |= 320;
             break;
         case 19:
-            if (((int)(unsigned short)(link->object->flags & 256)) != 0 && door_start_swing((int)link->object, 1) != 0) {
+            if (((int)(unsigned short)(link->object->flags & 256)) != 0 && door_start_swing((iptr)link->object, 1) != 0) {
                 link->object->flags &= ~0x100;
             }
             break;
         case 20:
-            if (((int)(unsigned short)(link->object->flags & 256)) != 0 && door_start_swing((int)link->object, 1) != 0) {
+            if (((int)(unsigned short)(link->object->flags & 256)) != 0 && door_start_swing((iptr)link->object, 1) != 0) {
                 link->object->flags &= ~0x100;
             }
             link->object->flags &= ~0x40;
@@ -312,7 +312,7 @@ int link_step(struct link *link)
             D_00195798 -= frame_ticks;
             if (D_00195798 <= 0) {
                 D_00195798 = 1000;
-                poison_apply(player_entity, (int)&*(signed char *)((char *)rand_range(0, 11) + 128), 0);
+                poison_apply(player_entity, (int)(iptr)&*(signed char *)((char *)(iptr)rand_range(0, 11) + 128), 0);
             }
             break;
         case 27:
@@ -332,7 +332,7 @@ int link_step(struct link *link)
         case 29:
             break;
         case 30:
-            if (link->param != 0) sound_play(link->param, (int)link->object, 110);
+            if (link->param != 0) sound_play(link->param, (iptr)link->object, 110);
             break;
         case 31:
             quest_global_states[link->axis] = 1;

@@ -12,17 +12,23 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
+#include "ptrint.h"
+
 #ifndef RECORD_SIZE
 #define RECORD_SIZE(tag, n) typedef char tag##_size_check[(sizeof(struct tag) == (n)) ? 1 : -1]
-#define RECORD_OFFSET(tag, m, n) \
-    typedef char tag##_##m##_offset_check[((unsigned)&((struct tag *)0)->m == (n)) ? 1 : -1]
-/* The same for a struct holding pointers: exact where pointers are 4 bytes (Watcom); in the
-   native build (docs/port.md) pointers are 8 bytes and the struct may only grow */
+/* RECORD_OFFSET checks a member's offset (natively with offsetof: the Watcom form casts a
+   pointer to an int). The _P forms are for a struct holding pointers: exact where pointers are
+   4 bytes (Watcom); in the native build (docs/port.md) pointers are 8 bytes and the struct may
+   only grow */
 #if defined(DAGGER_PORT)
+#define RECORD_OFFSET(tag, m, n) \
+    typedef char tag##_##m##_offset_check[(__builtin_offsetof(struct tag, m) == (n)) ? 1 : -1]
 #define RECORD_SIZE_P(tag, n) typedef char tag##_size_check[(sizeof(struct tag) >= (n)) ? 1 : -1]
 #define RECORD_OFFSET_P(tag, m, n) \
     typedef char tag##_##m##_offset_check[(__builtin_offsetof(struct tag, m) >= (n)) ? 1 : -1]
 #else
+#define RECORD_OFFSET(tag, m, n) \
+    typedef char tag##_##m##_offset_check[((unsigned)&((struct tag *)0)->m == (n)) ? 1 : -1]
 #define RECORD_SIZE_P(tag, n) RECORD_SIZE(tag, n)
 #define RECORD_OFFSET_P(tag, m, n) RECORD_OFFSET(tag, m, n)
 #endif

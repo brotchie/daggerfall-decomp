@@ -18,7 +18,7 @@ extern struct rdb_file *rdb_loaded_file;
 extern struct dungeon_block *rdb_dungeon_block;
 extern int rdb_object_id_count;
 extern int archive_find_record(int, char *, int);
-extern int archive_read_record(int, int, char *);
+extern iptr archive_read_record(int, int, char *);
 extern void rdb_create_objects(struct record *, struct rdb_object *, int);
 extern void rdb_link_actions(struct record *, struct rdb_object *, int);
 extern struct record *object_create_in_block(struct record *, int, int, int, int);

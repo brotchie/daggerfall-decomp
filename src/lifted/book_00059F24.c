@@ -1,6 +1,7 @@
 /* book.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
 extern signed char D_0012B508;
 extern short font_height;
@@ -10,7 +11,7 @@ extern signed char text_buffer[];
 extern char scratch_190d64[];
 extern char scratch_190d66[];
 extern char scratch_buffer[];
-extern int book_page_offsets;
+extern iptr book_page_offsets;
 extern short book_file;
 
 extern int lseek();
@@ -26,7 +27,7 @@ void book_draw_page(int page)
         char *text;
 
         xn_font_select(4);
-        lseek((int)(short)book_file, *(int *)((char *)(int)(*(char **)&book_page_offsets + (((int)(short)*(short *)&page) << 2))), 0);
+        lseek((int)(short)book_file, *(int *)((char *)(iptr)(*(char **)&book_page_offsets + (((int)(short)*(short *)&page) << 2))), 0);
         read((int)(short)book_file, *(int *)scratch_buffer, 16000);
         text = *(char **)scratch_buffer;
         D_0012B508 = 145;

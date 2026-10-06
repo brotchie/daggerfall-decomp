@@ -54,25 +54,25 @@ extern signed char model_cache_flush_count;
 
 extern int archive_find_record(int, char *, int);
 extern int archive_record_size(int, int);
-extern int archive_read_record(int, int, int);
+extern iptr archive_read_record(int, int, iptr);
 extern int collide_floor_height(struct record *);
-extern int flats_cfg_find(int);
+extern iptr flats_cfg_find(int);
 extern int sound_play_at_point(int, int, int, int, int);
-extern int mem_pool_alloc(int, int);
-extern int mem_pool_release(int);
+extern iptr mem_pool_alloc(iptr, int);
+extern int mem_pool_release(iptr);
 extern int rand_range(int, int);
-extern int model_get(int, int, int);
-extern int flat_table_pick(int);
+extern iptr model_get(int, int, int);
+extern int flat_table_pick(iptr);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern int dpmi_lock_region(int, int);
-extern int dpmi_unlock_region(int, int);
+extern int dpmi_lock_region(iptr, int);
+extern int dpmi_unlock_region(iptr, int);
 extern int rand();
 extern int srand();
 extern int mc_free();
 extern int mc_memset();
-extern int mc_malloc();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern iptr mc_malloc();
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
 extern int xn_rand_noise_2d();
 extern int xn_math_approx_dist2d();
@@ -82,17 +82,17 @@ extern int xn_light_add();
 extern int xn_model_prepare();
 extern int xn_flat_add();
 extern void arch3d_apply_climate_textures(struct arch3d_header *);
-extern void fatal_error(int);
-extern void mem_pool_init(int, int);
-extern void mem_pool_free(int);
+extern void fatal_error(iptr);
+extern void mem_pool_init(iptr, int);
+extern void mem_pool_free(iptr);
 extern void rotate_xz(int *, int *, int);
-extern void rmb_add_doors(struct record *, int);
-extern void rmb_add_people(struct record *, int);
+extern void rmb_add_doors(struct record *, iptr);
+extern void rmb_add_people(struct record *, iptr);
 extern void rmb_add_editor_marker(struct record *, struct block_flat *);
 extern void object_foreach(struct record *, void (*)());
 struct record *rmb_add_subrecord(struct record *);
-int model_load(int, int);
-int model_cache_add(int);
+iptr model_load(int, int);
+iptr model_cache_add(int);
 int flat_random_clutter(int, int);
 void rmb_set_building_factions(struct record *);
 void model_cache_purge_old(struct model_node *);
@@ -101,7 +101,7 @@ void model_cache_purge_unused(struct model_node *, int, struct model_node *);
 void model_cache_remove_node(struct model_node *, struct model_node *);
 void sound_cache_trim(void);
 void model_unlink_object_cb(struct record *);
-void model_unlink_objects(int);
+void model_unlink_objects(iptr);
 #pragma aux mc_set_location parm routine [];
 
 struct record *rmb_add_subrecord(struct record *parent)
@@ -110,9 +110,9 @@ struct record *rmb_add_subrecord(struct record *parent)
     struct block *block;
     struct block_model *model;
     struct block_flat *flat;
-    int people;
+    iptr people;
     struct block_section3 *entry;
-    int doors;
+    iptr doors;
     struct flat_cfg *flat_cfg;
     int i;
     int unused;
@@ -134,12 +134,12 @@ struct record *rmb_add_subrecord(struct record *parent)
     object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     D_001A9438 = object->id;
     block = &object->data.block;
-    mc_memcpy((int)block, (int)rmb_record_ptr, size, (int)D_00176C20, 803, 4);
-    block->models = (struct block_model *)((int)block + 17);
+    mc_memcpy((iptr)block, (iptr)rmb_record_ptr, size, (iptr)D_00176C20, 803, 4);
+    block->models = (struct block_model *)((iptr)block + 17);
     model = block->models;
-    block->flats = (struct block_flat *)((int)model + (block->model_count * 66));
+    block->flats = (struct block_flat *)((iptr)model + (block->model_count * 66));
     flat = block->flats;
-    block->section3 = (struct block_section3 *)((int)flat + (block->flat_count * 17));
+    block->section3 = (struct block_section3 *)((iptr)flat + (block->flat_count * 17));
     entry = block->section3;
     for (i = 0; block->model_count > i; i++, model++) {
         rotate_xz(&model->x, &model->z, *(int *)rmb_origin_yaw);
@@ -148,7 +148,7 @@ struct record *rmb_add_subrecord(struct record *parent)
         model->model = 0;
         if (model->y > 0 && model->id > 10) {
             model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-            model->y = (-model->y) - (xn_model_max_y((int)model->model) >> 8);
+            model->y = (-model->y) - (xn_model_max_y((iptr)model->model) >> 8);
         }
         model->y += rmb_origin_y;
         model->yaw += *(int *)rmb_origin_yaw;
@@ -173,7 +173,7 @@ struct record *rmb_add_subrecord(struct record *parent)
         entry->z += rmb_origin_z;
         entry->y += rmb_origin_y;
     }
-    people = (int)((char *)rmb_record_ptr + size);
+    people = (iptr)((char *)rmb_record_ptr + size);
     doors = people + (rmb_record_ptr->people_count * 17);
     rmb_add_people(parent, people);
     rmb_add_doors(parent, doors);
@@ -251,7 +251,7 @@ struct record *rmb_add_building(struct record *parent, int building_index)
 
 void model_heap_init(int size)
 {
-    mem_pool_init((int)model_heap, size);
+    mem_pool_init((iptr)model_heap, size);
     model_heap_free = size;
     (model_cache_root = model_cache_nodes)->key = 50000;
     model_cache_root->last_frame = 0;
@@ -259,10 +259,10 @@ void model_heap_init(int size)
 
 void model_heap_free_all(void)
 {
-    mem_pool_free((int)model_heap);
+    mem_pool_free((iptr)model_heap);
 }
 
-int model_cache_find(int key)
+iptr model_cache_find(int key)
 {
     struct model_node *node;
     struct model_node *added;
@@ -271,7 +271,7 @@ int model_cache_find(int key)
     while (1) {
         if (key == node->key) {
             node->last_frame = *(int *)frame_counter;
-            return (int)node->model;
+            return (iptr)node->model;
         }
         if (((unsigned)key) < node->key) {
             if (node->left != 0) {
@@ -291,10 +291,10 @@ int model_cache_find(int key)
     }
     if (added == 0) return 0;
     added->last_frame = *(int *)frame_counter;
-    return (int)added->model;
+    return (iptr)added->model;
 }
 
-int model_load(int slot, int key)
+iptr model_load(int slot, int key)
 {
     int record;
     int size;
@@ -303,30 +303,30 @@ int model_load(int slot, int key)
     model_id = key & 131071;
     record = archive_find_record(arch3d_bsa, text_buffer, model_id);
     size = archive_record_size(arch3d_bsa, record);
-    if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((int)model_heap, size)) == 0) {
+    if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((iptr)model_heap, size)) == 0) {
         if (model_cache_flush_count == 0) {
             model_cache_purge_old(model_cache_root);
-            if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((int)model_heap, size)) == 0) {
+            if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((iptr)model_heap, size)) == 0) {
                 model_cache_flush(model_cache_root);
                 return 0;
             }
         } else {
             model_cache_purge_old(model_cache_root);
-            if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((int)model_heap, size)) == 0) {
-                fatal_error((int)D_00176C29);
+            if ((model_cache_nodes[slot].model = (char *)mem_pool_alloc((iptr)model_heap, size)) == 0) {
+                fatal_error((iptr)D_00176C29);
             }
         }
     }
-    if (archive_read_record(arch3d_bsa, record, (int)model_cache_nodes[slot].model) == 0) {
-        mc_set_location(1104, (int)D_00176C20);
-        mc_sprintf(*(int *)scratch_buffer, (int)D_00176C4F, record);
+    if (archive_read_record(arch3d_bsa, record, (iptr)model_cache_nodes[slot].model) == 0) {
+        mc_set_location(1104, (iptr)D_00176C20);
+        mc_sprintf(*(int *)scratch_buffer, (iptr)D_00176C4F, record);
         fatal_error(*(int *)scratch_buffer);
     }
     model_heap_free -= (size + 1) & -2;
-    return (int)model_cache_nodes[slot].model;
+    return (iptr)model_cache_nodes[slot].model;
 }
 
-int model_cache_add(int key)
+iptr model_cache_add(int key)
 {
     int slot;
     int saved_seed;
@@ -337,7 +337,7 @@ int model_cache_add(int key)
 
         slot = 0;
         for (;;) {
-            if (model_cache_nodes[slot].key != 0 || (int)model_cache_nodes[slot].left != 0 || (int)model_cache_nodes[slot].right != 0) {
+            if (model_cache_nodes[slot].key != 0 || (iptr)model_cache_nodes[slot].left != 0 || (iptr)model_cache_nodes[slot].right != 0) {
                 in_use = 1;
             } else {
                 in_use = 0;
@@ -349,7 +349,7 @@ int model_cache_add(int key)
             model_cache_purge_old(model_cache_root);
             slot = 0;
             for (;;) {
-                if (model_cache_nodes[slot].key != 0 || (int)model_cache_nodes[slot].left != 0 || (int)model_cache_nodes[slot].right != 0) {
+                if (model_cache_nodes[slot].key != 0 || (iptr)model_cache_nodes[slot].left != 0 || (iptr)model_cache_nodes[slot].right != 0) {
                     in_use2 = 1;
                 } else {
                     in_use2 = 0;
@@ -361,7 +361,7 @@ int model_cache_add(int key)
                 model_cache_flush(model_cache_root);
                 slot = 0;
                 for (;;) {
-                    if (model_cache_nodes[slot].key != 0 || (int)model_cache_nodes[slot].left != 0 || (int)model_cache_nodes[slot].right != 0) {
+                    if (model_cache_nodes[slot].key != 0 || (iptr)model_cache_nodes[slot].left != 0 || (iptr)model_cache_nodes[slot].right != 0) {
                         in_use3 = 1;
                     } else {
                         in_use3 = 0;
@@ -369,19 +369,19 @@ int model_cache_add(int key)
                     if (in_use3 == 0 || slot >= 512) break;
                     slot++;
                 }
-                if (slot == 512) fatal_error((int)D_00176C6B);
+                if (slot == 512) fatal_error((iptr)D_00176C6B);
             }
         }
         model_cache_nodes[slot].key = key;
         model_cache_nodes[slot].last_frame = *(int *)frame_counter;
         model_cache_nodes[slot].left = (model_cache_nodes[slot].right = 0);
         if (model_load(slot, key) == 0) return 0;
-        xn_model_prepare((int)model_cache_nodes[slot].model);
+        xn_model_prepare((iptr)model_cache_nodes[slot].model);
         saved_seed = rand();
         srand(*(int *)(model_cache_nodes[slot].model + 12));
         arch3d_apply_climate_textures((struct arch3d_header *)model_cache_nodes[slot].model);
         srand(saved_seed);
-        return (int)&model_cache_nodes[slot];
+        return (iptr)&model_cache_nodes[slot];
     }
 }
 
@@ -403,14 +403,14 @@ void model_cache_flush(struct model_node *root)
 
     model_cache_flush_count++;
     for (i = 1; i < 512; i++) {
-        if (model_cache_nodes[i].key != 0 && (int)model_cache_nodes[i].model != 0) {
-            model_unlink_objects((int)model_cache_nodes[i].model);
-            model_heap_free += mem_pool_release((int)model_cache_nodes[i].model);
+        if (model_cache_nodes[i].key != 0 && (iptr)model_cache_nodes[i].model != 0) {
+            model_unlink_objects((iptr)model_cache_nodes[i].model);
+            model_heap_free += mem_pool_release((iptr)model_cache_nodes[i].model);
         }
     }
     root->left = 0;
     root->right = root->left;
-    mc_memset((int)&model_cache_nodes[1], 0, 10220, (int)D_00176C20, 1189, 4);
+    mc_memset((iptr)&model_cache_nodes[1], 0, 10220, (iptr)D_00176C20, 1189, 4);
 }
 
 void model_cache_purge_unused(struct model_node *parent, int age, struct model_node *node)
@@ -421,7 +421,7 @@ void model_cache_purge_unused(struct model_node *parent, int age, struct model_n
     if (node->right != 0) model_cache_purge_unused(node, age, node->right);
     if (((unsigned)(*(int *)frame_counter - node->last_frame)) >= age) model_cache_remove_node(parent, node);
     if (parent->left != parent->right || parent->left == 0) return;
-    fatal_error((int)D_00176C80);
+    fatal_error((iptr)D_00176C80);
 }
 
 void model_cache_remove_node(struct model_node *parent, struct model_node *node)
@@ -443,8 +443,8 @@ void model_cache_remove_node(struct model_node *parent, struct model_node *node)
         } else {
             parent->left = node->right;
         }
-        model_unlink_objects((int)node->model);
-        model_heap_free += mem_pool_release((int)node->model);
+        model_unlink_objects((iptr)node->model);
+        model_heap_free += mem_pool_release((iptr)node->model);
         node->model = 0;
         node->key = 0;
         return;
@@ -455,8 +455,8 @@ void model_cache_remove_node(struct model_node *parent, struct model_node *node)
         } else {
             parent->left = node->left;
         }
-        model_unlink_objects((int)node->model);
-        model_heap_free += mem_pool_release((int)node->model);
+        model_unlink_objects((iptr)node->model);
+        model_heap_free += mem_pool_release((iptr)node->model);
         node->model = 0;
         node->key = 0;
         return;
@@ -506,7 +506,7 @@ void marker_make_loot_pile(struct record *marker, struct building *building)
     floor_y++;
 }
 
-int sound_cache_load(int id)
+iptr sound_cache_load(int id)
 {
     int unused;
     int slot;
@@ -517,7 +517,7 @@ int sound_cache_load(int id)
     for (slot = 0; slot < 256; slot++) {
         if (sound_cache[slot].id == id) {
             sound_last_size = sound_cache[slot].size;
-            return (int)sound_cache[slot].data;
+            return (iptr)sound_cache[slot].data;
         }
     }
     slot = 0;
@@ -527,13 +527,13 @@ int sound_cache_load(int id)
     sound_cache[slot].last_frame = *(int *)frame_counter;
     sound_cache[slot].id = id;
     sound_cache[slot].size = size;
-    sound_cache[slot].data = (char *)mc_malloc(size, (int)D_00176C20, 1338);
-    dpmi_lock_region((int)sound_cache[slot].data, size + 4096);
-    archive_read_record(dagger_snd, record, (int)sound_cache[slot].data);
+    sound_cache[slot].data = (char *)mc_malloc(size, (iptr)D_00176C20, 1338);
+    dpmi_lock_region((iptr)sound_cache[slot].data, size + 4096);
+    archive_read_record(dagger_snd, record, (iptr)sound_cache[slot].data);
     sound_cache_bytes += size;
     sound_cache_trim();
     sound_last_size = size;
-    return (int)sound_cache[slot].data;
+    return (iptr)sound_cache[slot].data;
 }
 
 void sound_cache_trim(void)
@@ -554,10 +554,10 @@ void sound_cache_trim(void)
             }
         }
         if (oldest == (-1)) return;
-        dpmi_unlock_region((int)sound_cache[oldest].data, sound_cache[oldest].size + 4096);
-        if (sound_cache[oldest].data != 0 && (int)sound_cache[oldest].data != (-1751672937)) {
-            mc_free((int)sound_cache[oldest].data, (int)D_00176C20, 1375);
-            sound_cache[oldest].data = (char *)-1751672937;
+        dpmi_unlock_region((iptr)sound_cache[oldest].data, sound_cache[oldest].size + 4096);
+        if (sound_cache[oldest].data != 0 && (iptr)sound_cache[oldest].data != (-1751672937)) {
+            mc_free((iptr)sound_cache[oldest].data, (iptr)D_00176C20, 1375);
+            sound_cache[oldest].data = (char *)(iptr)-1751672937;
         }
         sound_cache[oldest].data = 0;
         sound_cache[oldest].id = -1;
@@ -570,11 +570,11 @@ void sound_cache_free_all(void)
     int i;
 
     for (i = 0; i < 256; i++) {
-        if ((int)sound_cache[i].data != 0) {
-            dpmi_unlock_region((int)sound_cache[i].data, sound_cache[i].size + 1024);
-            if ((int)sound_cache[i].data != 0 && (int)sound_cache[i].data != (-1751672937)) {
-                mc_free((int)sound_cache[i].data, (int)D_00176C20, 1392);
-                sound_cache[i].data = (char *)-1751672937;
+        if ((iptr)sound_cache[i].data != 0) {
+            dpmi_unlock_region((iptr)sound_cache[i].data, sound_cache[i].size + 1024);
+            if ((iptr)sound_cache[i].data != 0 && (iptr)sound_cache[i].data != (-1751672937)) {
+                mc_free((iptr)sound_cache[i].data, (iptr)D_00176C20, 1392);
+                sound_cache[i].data = (char *)(iptr)-1751672937;
             }
             sound_cache[i].data = (char *)0;
             sound_cache[i].id = -1;
@@ -622,13 +622,13 @@ void model_unlink_object_cb(struct record *object)
     switch (object->type) {
     case 6:
     case 32:
-        if ((int)object->data.instance.model == *(int *)scratch_190de4) object->data.instance.model = 0;
+        if ((iptr)object->data.instance.model == *(int *)scratch_190de4) object->data.instance.model = 0;
         return;
     case 43:
         block = &object->data.block;
         model = block->models;
         for (i = 0; block->model_count > i; i++, model++) {
-            if ((int)model->model == *(int *)scratch_190de4) {
+            if ((iptr)model->model == *(int *)scratch_190de4) {
                 model->model = 0;
             }
         }
@@ -636,7 +636,7 @@ void model_unlink_object_cb(struct record *object)
     case 56:
         model = (struct block_model *)RECORD_DATA(object);
         for (i = 0; object->model_count > i; i++, model++) {
-            if ((int)model->model == *(int *)scratch_190de4) {
+            if ((iptr)model->model == *(int *)scratch_190de4) {
                 model->model = 0;
             }
         }
@@ -644,16 +644,16 @@ void model_unlink_object_cb(struct record *object)
     }
 }
 
-void model_unlink_objects(int model)
+void model_unlink_objects(iptr model)
 {
-    *(int *)scratch_190de4 = model;
+    *(iptr *)scratch_190de4 = model;
     object_foreach(location_object, model_unlink_object_cb);
 }
 
 int flat_random_clutter(int environment, int building_type)
 {
-    if (environment == 3) return flat_table_pick((int)D_00187EC8);
-    return flat_table_pick(((int)D_00187DE8) + (rand_range(0, 7) * 28));
+    if (environment == 3) return flat_table_pick((iptr)D_00187EC8);
+    return flat_table_pick(((iptr)D_00187DE8) + (rand_range(0, 7) * 28));
 }
 
 void player_light_draw(void)
@@ -676,7 +676,7 @@ void player_light_draw(void)
     jitter_y >>= 3;
     jitter_z = xn_rand_noise_2d(player_object->x - player_object->z, (xn_anim_ticks / 40) << 6);
     jitter_z >>= 3;
-    xn_math_yaw_offset_xz((player_object->yaw + view_look_yaw) & 2047, 192, (int)&dx, (int)&dz);
+    xn_math_yaw_offset_xz((player_object->yaw + view_look_yaw) & 2047, 192, (iptr)&dx, (iptr)&dz);
     xn_light_add((player_object->x + dx) + (jitter_x - 16), (player_object->y - 50) + (jitter_y - 16), (player_object->z + dz) + (jitter_z - 16), 50, intensity, 0);
     xn_flat_add((player_object->x + dx) + (jitter_x - 16), (player_object->y - 50) + (jitter_y - 16), (player_object->z + dz) + (jitter_z - 16), 26883, -1, 1, 400);
 }

@@ -7,7 +7,7 @@ extern int link_count;
 extern char D_001A3A80;
 extern char D_001A3A81;
 extern void fatal_error(char *);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 
 void links_resolve(void)
 {

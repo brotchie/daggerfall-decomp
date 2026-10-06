@@ -4,7 +4,7 @@
 #include "records.h"
 
 extern signed char D_001861AA[];
-extern int D_0018642F[];
+extern iptr D_0018642F[];
 extern struct record *player_object;
 extern struct record *location_object;
 extern struct character *player_character;

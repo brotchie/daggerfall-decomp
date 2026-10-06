@@ -4,9 +4,9 @@
 extern int text_blank;
 extern struct location *current_location;
 extern int rand_range(int, int);
-extern int building_name(struct building *);
+extern iptr building_name(struct building *);
 
-int parse_town_building_name(short building_type)
+iptr parse_town_building_name(short building_type)
 {
     struct building *building;
     short i;

@@ -40,7 +40,7 @@ void rdb_create_objects(struct record *quarter, struct rdb_object *rdb_object, i
     int height;
 
     do {
-        offset = (char *)rdb_object - rdb_data;
+        offset = (int)((char *)rdb_object - rdb_data);
         switch (rdb_object->type) {
         case 1:
             rdb_model_resource = (struct rdb_model *)(rdb_data + rdb_object->resource_offset);

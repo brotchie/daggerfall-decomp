@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007EF86 */
+#include "ptrint.h"
 #include <i86.h>
 extern char D_00176A10[];
 extern char D_00195E6C[];
@@ -28,7 +29,7 @@ int func_0007EF86(int ax_value, int bx_value)
     regs.w.ax = 0x300;
     regs.w.bx = 0x33;
     sregs.es = FP_SEG(D_001A5A1E);
-    regs.x.edi = (unsigned)D_001A5A1E;
+    regs.x.edi = (uptr)D_001A5A1E;
     int386x(0x31, &regs, &regs, &sregs);
     func_000A2EC5(D_00195E6C, MK_FP((unsigned short)D_001A5A54, 0), 14, D_00176A10, 1094, 4);
     return D_001A5A3A;

@@ -21,26 +21,26 @@ extern char archive_names[];
 extern int sound_play(int, struct record *, int);
 extern int disk_open_data(char *);
 extern int disk_open_rw(char *);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern int close();
 extern int mc_free();
 extern int lseek();
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int read();
 extern int mc_strncpy();
 extern int write();
 extern int strnicmp();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern void skill_add_uses(int, int);
-extern void fatal_error(int);
+extern void fatal_error(iptr);
 extern void links_trigger(struct record *, int);
 extern void guild_count_crime(int, int);
 int lockpick_door(struct record *);
 #pragma aux mc_set_location parm routine [];
 
-int archive_open(char *name, int directory, int writable)
+int archive_open(char *name, iptr directory, int writable)
 {
     short record_count;
     short handle;
@@ -55,17 +55,17 @@ int archive_open(char *name, int directory, int writable)
         *(int *)&handle = disk_open_data(name);
     }
     if (*(int *)&handle < 1) return *(int *)&handle;
-    mc_strncpy(((int)archive_names) + (*(int *)&handle * 13), name, 13, (int)D_00170150, 32);
-    read(*(int *)&handle, (int)&record_count, 2);
-    read(*(int *)&handle, (int)&type, 2);
+    mc_strncpy(((iptr)archive_names) + (*(int *)&handle * 13), name, 13, (iptr)D_00170150, 32);
+    read(*(int *)&handle, (iptr)&record_count, 2);
+    read(*(int *)&handle, (iptr)&type, 2);
     if (((int)(short)type) == 256) {
         *(int *)&dir_size = ((int)(short)record_count) * 18;
     } else {
         *(int *)&dir_size = ((int)(short)record_count) << 3;
     }
-    if (directory == 0) directory = mc_malloc(*(int *)&dir_size, (int)D_00170150, 42);
+    if (directory == 0) directory = mc_malloc(*(int *)&dir_size, (iptr)D_00170150, 42);
     *(short *)(archive_record_counts + (*(int *)&handle * 2)) = *(int *)&record_count;
-    *(int *)(archive_directories + (*(int *)&handle << 2)) = directory;
+    *(iptr *)(archive_directories + (*(int *)&handle << 2)) = directory;
     *(short *)(archive_types + (*(int *)&handle * 2)) = *(int *)&type;
     lseek(*(int *)&handle, -*(int *)&dir_size, 2);
     read(*(int *)&handle, directory, *(int *)&dir_size);
@@ -77,7 +77,7 @@ void archive_close(int handle)
     if (handle == 0) return;
     *(short *)(archive_record_counts + (handle * 2)) = 0;
     if (*(int *)(archive_directories + (handle << 2)) != 0 && *(int *)(archive_directories + (handle << 2)) != (-1751672937)) {
-        mc_free(*(int *)(archive_directories + (handle << 2)), (int)D_00170150, 67);
+        mc_free(*(int *)(archive_directories + (handle << 2)), (iptr)D_00170150, 67);
         *(int *)(archive_directories + (handle << 2)) = -1751672937;
     }
     *(int *)(archive_directories + (handle << 2)) = 0;
@@ -103,11 +103,11 @@ int archive_find_record(int handle, char *name, int key)
         }
     }
     if (((int)(short)*(short *)(archive_types + (handle * 2))) == 256) {
-        mc_set_location(105, (int)D_00170150);
-        mc_sprintf(*(int *)scratch_buffer, (int)D_0017015A, name, ((int)archive_names) + (handle * 13));
+        mc_set_location(105, (iptr)D_00170150);
+        mc_sprintf(*(int *)scratch_buffer, (iptr)D_0017015A, name, ((iptr)archive_names) + (handle * 13));
     } else {
-        mc_set_location(107, (int)D_00170150);
-        mc_sprintf(*(int *)scratch_buffer, (int)D_00170172, key, ((int)archive_names) + (handle * 13));
+        mc_set_location(107, (iptr)D_00170150);
+        mc_sprintf(*(int *)scratch_buffer, (iptr)D_00170172, key, ((iptr)archive_names) + (handle * 13));
     }
     fatal_error(*(int *)scratch_buffer);
     return 0;
@@ -150,7 +150,7 @@ int archive_record_offset(int handle, int record)
     return offset;
 }
 
-int archive_read_record(int handle, int record, int buffer)
+iptr archive_read_record(int handle, int record, iptr buffer)
 {
     struct bsa_name_entry *named_entry;
     struct bsa_id_entry *entry;
@@ -172,7 +172,7 @@ int archive_read_record(int handle, int record, int buffer)
         }
         size = entry->size;
     }
-    if (buffer == 0) buffer = mc_malloc(size, (int)D_00170150, 205);
+    if (buffer == 0) buffer = mc_malloc(size, (iptr)D_00170150, 205);
     lseek(handle, offset, 0);
     read(handle, buffer, size);
     return buffer;

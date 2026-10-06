@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003B0B4 */
+#include "ptrint.h"
 extern char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -18,7 +19,7 @@ extern unsigned char D_00196271;
 extern void msgbox_show_rsc(int, int);
 extern void msgbox_update(void);
 extern void keys_world_actions(void);
-extern int disk_read_file(char *, char *);
+extern iptr disk_read_file(char *, char *);
 extern int mc_memcpy();
 extern int xn_mouse_poll_clamped();
 extern int xn_mouse_cursor_move();

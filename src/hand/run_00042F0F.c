@@ -73,7 +73,7 @@ extern void magic_items_open(void);
 extern void rest_open(void);
 extern void cheat_return_to_last_position(void);
 extern void saveload_menu(int);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern int key_pressed_once(unsigned char);
 extern struct record *object_delete(struct record *);
 extern void object_set_position(struct record *, int, int, int, int, int, int);

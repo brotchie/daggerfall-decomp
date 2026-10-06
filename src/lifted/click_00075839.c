@@ -8,7 +8,7 @@ extern char D_001762B5[];
 extern struct record *player_entity;
 
 extern int object_weight(struct record *);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern int carry_capacity(void);
 extern void quest_raise_event(short, struct record *, struct record *);
 extern void inventory_open_container(struct record *, int, int);

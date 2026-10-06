@@ -36,7 +36,7 @@ extern void court_close(void);
 extern void court_restore_vitals(void);
 extern void msgbox_show_rsc(int, int);
 extern void music_play(int);
-extern char *disk_read_file(char *, int);
+extern char *disk_read_file(char *, iptr);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern void msgbox_choice_rsc(short, short, short, short, unsigned char, unsigned char, unsigned char);
 extern int rand_range(int, int);

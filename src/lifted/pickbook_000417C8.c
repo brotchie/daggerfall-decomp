@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00170DE4[];
 extern char D_00170DF7[];
 extern char D_00170E04[];
@@ -12,20 +12,20 @@ extern signed char D_00187CA8;
 extern signed char D_001940D4;
 extern signed char D_001940D8;
 extern struct record *player_object;
-extern int magic_window_image;
-extern int window_image;
+extern iptr magic_window_image;
+extern iptr window_image;
 extern int spell_cast_busy;
 extern int player_death_timer;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
-extern int spellbook_saved_screen;
+extern iptr spellbook_saved_screen;
 
 extern int spellbook_build_list(void);
 extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
-extern int mc_malloc();
+extern iptr disk_read_file(char *, iptr);
+extern iptr mc_malloc();
 extern int mc_memcpy();
 extern int xn_font_select();
 extern void hud_status_set(int);
@@ -49,8 +49,8 @@ int spellbook_open(short force)
         D_001940D4 |= 128;
         D_00187CA8 = 0;
         D_001940D8 |= 2;
-        spellbook_saved_screen = mc_malloc(64000, (int)D_00170DE4, 101);
-        mc_memcpy(spellbook_saved_screen, screen_buffer, 64000, (int)D_00170DE4, 102, 4);
+        spellbook_saved_screen = mc_malloc(64000, (iptr)D_00170DE4, 101);
+        mc_memcpy(spellbook_saved_screen, screen_buffer, 64000, (iptr)D_00170DE4, 102, 4);
         game_mode = 5;
         window_image = disk_read_file(D_00170DF7, 0);
         magic_window_image = disk_read_file(D_00170E04, 0);

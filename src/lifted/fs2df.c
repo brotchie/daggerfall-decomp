@@ -8,8 +8,8 @@ extern char D_00170AEC[];
 extern char D_00170AF9[];
 extern char D_00170B06[];
 extern signed char D_001940D8;
-extern int magic_window_image;
-extern int window_image;
+extern iptr magic_window_image;
+extern iptr window_image;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
@@ -24,12 +24,12 @@ extern struct rdb_file *rdb_loaded_file;
 extern struct rdb_model *rdb_model_resource;
 extern int rdb_object_id_count;
 extern short rdb_link_object_id;
-extern int spellmaker_settings_image;
+extern iptr spellmaker_settings_image;
 extern struct link links[];
 extern int link_count;
 
 extern int spellmaker_new(void);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int mc_memset();
 short rdb_object_id_by_offset(int);
 void func_000361B7(struct rdb_model *);
@@ -60,7 +60,7 @@ void rdb_link_actions(struct record *quarter, struct rdb_object *rdb_object, int
     int offset;
 
     do {
-        offset = (char *)rdb_object - rdb_data;
+        offset = (int)((char *)rdb_object - rdb_data);
         switch (rdb_object->type) {
         case 1:
             if ((rdb_model_resource = (struct rdb_model *)(rdb_data + rdb_object->resource_offset))->action_offset < 0) {
@@ -141,7 +141,7 @@ void rdb_build_action_chain(int resource_type)
 void action_record_add(struct rdb_model *model, struct rdb_action *model_action, struct rdb_flat *flat, unsigned char action)
 {
     D_001995EC = (D_001995E4 = &links[link_count++]);
-    mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 447, 4);
+    mc_memset((iptr)D_001995EC, 0, 39, (iptr)D_00170AB4, 447, 4);
     D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
         D_001995EC->trigger = model->trigger_flag_starting_lock;
@@ -166,7 +166,7 @@ void action_record_add_chained(struct rdb_model *model, struct rdb_action *model
 {
     D_001995E4->chain_count++;
     D_001995EC = &links[link_count++];
-    mc_memset((int)D_001995EC, 0, 39, (int)D_00170AB4, 490, 4);
+    mc_memset((iptr)D_001995EC, 0, 39, (iptr)D_00170AB4, 490, 4);
     D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
         D_001995EC->trigger = model->trigger_flag_starting_lock;

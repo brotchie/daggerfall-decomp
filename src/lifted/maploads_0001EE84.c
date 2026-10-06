@@ -11,9 +11,9 @@ extern char tavern_building[];
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
-extern int tavern_menu_image;
+extern iptr tavern_menu_image;
 
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int xn_mouse_poll_clamped();
 
 int tavern_open(short opening)
@@ -29,7 +29,7 @@ int tavern_open(short opening)
         tavern_menu_image = disk_read_file(D_0017055C, 0);
         game_mode = 20;
         D_00196272 = 1;
-        *(int *)tavern_building = (int)current_building;
+        *(iptr *)tavern_building = (iptr)current_building;
     }
     if (((int)(unsigned char)game_mode) == 20) {
         result = 1;

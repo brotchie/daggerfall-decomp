@@ -13,7 +13,7 @@ extern void quest_timer_clear_state(struct qbn_timer *);
 extern unsigned int quest_travel_minutes(struct quest *, struct record *, struct record *);
 extern struct qbn_timer *quest_section(struct quest *, int);
 extern int rand_range(int, int);
-extern int memchr(char *, int, int);
+extern iptr memchr(char *, int, int);
 
 void quest_timers_update(struct quest *quest)
 {

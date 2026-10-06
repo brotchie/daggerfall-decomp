@@ -6,7 +6,7 @@
 extern int enchant_side_effect_params[];
 extern signed char scratch_190ce4[];
 extern char scratch_190d64[];
-extern int list_popup_callback;
+extern iptr list_popup_callback;
 extern struct enchantment itemmaker_slots[];
 
 extern int itemmaker_pick_param_list(int);
@@ -14,7 +14,7 @@ extern int itemmaker_free_slot(void);
 extern void msgbox_show_rsc(int, int);
 extern void itemmaker_set_side_effect_param_cb(short);
 extern void func_00057147(short, short, short, short, short, short, short);
-extern void itemmaker_show_param_list(int, short);
+extern void itemmaker_show_param_list(iptr, short);
 
 void itemmaker_add_side_effect_cb(int side_effect)
 {
@@ -37,7 +37,7 @@ void itemmaker_add_side_effect_cb(int side_effect)
         } else {
             itemmaker_show_param_list(enchant_side_effect_params[((int)(short)*(short *)&side_effect)], (int)(short)(side_effect + 15));
         }
-        list_popup_callback = (int)itemmaker_set_side_effect_param_cb;
+        list_popup_callback = (iptr)itemmaker_set_side_effect_param_cb;
         return;
     }
     if (((int)(short)*(short *)&side_effect) == 8) func_00057147((int)(short)slot, 11, -1, 23, -1, -1, -1);

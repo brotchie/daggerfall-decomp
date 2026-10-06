@@ -18,7 +18,7 @@ extern char monster_spells_vampire_ancient[];
 extern char monster_spells_daedra_lord[];
 extern char monster_spells_lich[];
 extern char monster_spells_ancient_lich[];
-extern int monster_class_spell_lists[];
+extern iptr monster_class_spell_lists[];
 extern signed char monster_class_map_chance[];
 extern signed char wabbajack_creatures[];
 extern signed char monster_map_chance[];
@@ -56,7 +56,7 @@ void monster_reload_anims(void)
     for (slot = 0; slot < 128; slot++) {
         if (*(int *)(D_00190704 + (slot << 2)) != 0) {
             if (*(int *)(D_00190704 + (slot << 2)) != 0 && *(int *)(D_00190704 + (slot << 2)) != (-1751672937)) {
-                mc_free(*(int *)(D_00190704 + (slot << 2)), (int)D_00176844, 211);
+                mc_free(*(int *)(D_00190704 + (slot << 2)), (iptr)D_00176844, 211);
                 *(int *)(D_00190704 + (slot << 2)) = -1751672937;
             }
         }
@@ -191,7 +191,7 @@ void monster_give_spells(struct record *monster, char *spell_ids)
         spell->type = 9;
         spell->flags = 1;
         spell->id = object_new_id(((unsigned)monster->id) >> 16);
-        mc_memcpy(&spell->data.spell, &spell_records[spell_index], 89, (int)D_00176844, 370, 4);
+        mc_memcpy(&spell->data.spell, &spell_records[spell_index], 89, (iptr)D_00176844, 370, 4);
         i++;
     }
 }
@@ -201,7 +201,7 @@ void monster_give_equipment(struct record *monster, struct character *monster_ch
     int poison_chance;
     int i;
 
-    mc_memset(monster_char->equipped, 0, 108, (int)D_00176844, 400, 108);
+    mc_memset(monster_char->equipped, 0, 108, (iptr)D_00176844, 400, 108);
     switch ((unsigned)tier) {
     case 0:
         monster_char->equipped[19] = monster_make_item(monster, 3, 5, 7, -1, 100);
@@ -262,7 +262,7 @@ void monster_poison_weapon(struct record *object)
 {
     object = object_create_child(object, 0, 47);
     object->id = object_new_id(((unsigned)object->parent->id) >> 16);
-    poison_init_record(&object->data.disease, (int)&*(signed char *)((char *)rand_range(0, 7) + 128));
+    poison_init_record(&object->data.disease, (int)(iptr)&*(signed char *)((char *)(iptr)rand_range(0, 7) + 128));
 }
 
 void monster_wabbajack(struct record *item, struct record *target)
@@ -301,7 +301,7 @@ int savetree_read_chunk(struct record *buffer)
 {
     int size;
 
-    read(save_file_handle, (int)&size, 4);
+    read(save_file_handle, (iptr)&size, 4);
     read(save_file_handle, buffer, size);
     return size;
 }

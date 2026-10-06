@@ -30,7 +30,7 @@ extern void quest_raise_event(short, struct record *, struct record *);
 extern int item_artifact_equipped(int);
 extern int sound_play(int, struct record *, int);
 extern void guild_count_crime(int, int);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern int rand_range(int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern void object_foreach(struct record *, void (*)());

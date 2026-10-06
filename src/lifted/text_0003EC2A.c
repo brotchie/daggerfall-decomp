@@ -1,9 +1,10 @@
 /* text.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
 extern signed char mouse_buttons;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00170D55[];
 extern short msgbox_wrap_width;
 extern signed char msgbox_kind;
@@ -22,7 +23,7 @@ extern int strlen();
 extern int mc_memcpy();
 extern int xn_mouse_poll_clamped();
 extern int xn_font_select();
-extern void msgbox_render(char *, int);
+extern void msgbox_render(char *, iptr);
 extern void msgbox_wait(void);
 extern void mode_push(void);
 
@@ -50,7 +51,7 @@ void msgbox_show_string(char *text, short kind)
         flags = 0;
     }
     copy = text_expand_wrap((int)(unsigned short)(flags | 32770), (int)(short)msgbox_wrap_width, copy, wrap_buf, expand_buf);
-    msgbox_render(copy, (int)msgbox_image);
+    msgbox_render(copy, (iptr)msgbox_image);
     if (copy != 0 && copy != (char *)0x97979797) {
         mc_free(copy, D_00170D55, 717);
         copy = (char *)0x97979797;

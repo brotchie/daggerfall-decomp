@@ -12,14 +12,14 @@ extern signed char D_00178EB0[];
 extern struct region regions[];
 extern signed char text_buffer[];
 extern int marquee_x;
-extern int marquee_text;
+extern iptr marquee_text;
 
 extern struct faction *faction_random_of_type(unsigned char);
 extern int font_char_width(unsigned char);
 extern int rand_range(int, int);
 extern int mc_free();
 extern int mc_memcpy();
-extern void text_draw(int, int, int);
+extern void text_draw(iptr, int, int);
 void marquee_stop(void);
 
 void marquee_update(void)
@@ -31,9 +31,9 @@ void marquee_update(void)
     D_0012B508 = 146;
     count = (320 - marquee_x) / 4;
     if (count > 80) count = 80;
-    mc_memcpy((int)text_buffer, marquee_text, count, (int)D_001702CC, 35, 160);
+    mc_memcpy((iptr)text_buffer, marquee_text, count, (iptr)D_001702CC, 35, 160);
     text_buffer[count] = 0;
-    text_draw((int)text_buffer, marquee_x, 140);
+    text_draw((iptr)text_buffer, marquee_x, 140);
     marquee_x -= 2;
     char_width = font_char_width((int)(unsigned char)*(signed char *)(*(char **)&marquee_text));
     if ((-marquee_x) > char_width) {
@@ -47,7 +47,7 @@ void marquee_update(void)
 void marquee_stop(void)
 {
     if (marquee_owned_text != 0 && marquee_owned_text != (-1751672937)) {
-        mc_free(marquee_owned_text, (int)D_001702CC, 62);
+        mc_free(marquee_owned_text, (iptr)D_001702CC, 62);
         marquee_owned_text = -1751672937;
     }
     marquee_owned_text = 0;

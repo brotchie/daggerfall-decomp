@@ -4,9 +4,9 @@
 #pragma pack(1)
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 #pragma pack()
-extern int xn_paperdoll_background;
-extern int screen_buffer;
-extern int D_00147954;
+extern iptr xn_paperdoll_background;
+extern iptr screen_buffer;
+extern iptr D_00147954;
 extern char D_0017573C[];
 extern char D_00175743[];
 extern char D_00175750[];
@@ -21,7 +21,7 @@ extern struct record *player_entity;
 extern int D_00195B64;
 extern char *paperdoll_mask;
 extern char *hud_portrait;
-extern int D_00195B80;
+extern iptr D_00195B80;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern char *scratch_buffer;
@@ -33,7 +33,7 @@ extern void character_update_armor_values(struct record *);
 extern void paperdoll_add_item(struct item *, int);
 extern void paperdoll_draw_items(int, int);
 extern void func_0005E7FC(char *);
-extern struct image *disk_read_file(char *, int);
+extern struct image *disk_read_file(char *, iptr);
 extern void mc_free(void *, char *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
 extern void mc_strncpy(char *, char *, int, char *, int);
@@ -56,7 +56,7 @@ void paperdoll_draw(int x, int y)
     int cnt;
     int found;
     struct item *it;
-    int saved;
+    iptr saved;
 
     found = 0;
     if (!D_001940D8.b3) return;

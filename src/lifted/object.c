@@ -16,7 +16,7 @@ extern struct record *found_object;
 extern struct location *current_location;
 extern char object_heap[];
 extern int loaded_location_door_count;
-extern int object_found_last;
+extern iptr object_found_last;
 extern int D_001A3F94;
 extern int object_move_new;
 extern int D_001A9AF8;
@@ -24,10 +24,10 @@ extern int D_001A9AFC;
 extern int D_001A9B00;
 extern int D_001A9B04;
 extern int D_001A9B08;
-extern int object_debug_watch;
+extern iptr object_debug_watch;
 extern int object_delete_block_id;
 extern struct record *object_search_result;
-extern int object_search_id;
+extern iptr object_search_id;
 extern int object_move_old_angles;
 extern int D_001A9B20;
 extern int D_001A9B24;
@@ -44,19 +44,19 @@ extern char potion_ingredient_scroll[];
 extern char potion_ingredient_count[];
 
 extern struct location_door *location_find_door(int);
-extern int mem_pool_alloc(int, int);
-extern int mem_pool_release(int);
+extern iptr mem_pool_alloc(iptr, int);
+extern int mem_pool_release(iptr);
 extern int object_count_type(struct record *, short);
 extern int rand();
 extern int mc_memset();
-extern int mc_set_location(int, int);
+extern int mc_set_location(int, iptr);
 extern int mc_memcpy();
-extern int func_000A148C(int, ...);
+extern int func_000A148C(iptr, ...);
 extern int xn_math_approx_dist2d();
 extern void unequip_object(struct record *);
 extern void fatal_error(char *);
-extern void mem_pool_init(int, int);
-extern void mem_pool_free(int);
+extern void mem_pool_init(iptr, int);
+extern void mem_pool_free(iptr);
 extern void object_follow_move_cb(struct record *);
 struct record *object_free_single(struct record *);
 struct record *object_delete(struct record *);
@@ -64,11 +64,11 @@ struct record *object_alloc(struct record *, struct record *, int);
 struct record *object_create_child(struct record *, struct record *, int);
 int object_find(struct record *, int (*)());
 int object_find_type_cb(struct record *);
-int object_find_by_id_cb(struct record *);
-struct record *object_find_by_id(struct record *, int);
+iptr object_find_by_id_cb(struct record *);
+struct record *object_find_by_id(struct record *, iptr);
 int object_random_type_cb(struct record *);
 int object_new_id(int);
-int object_find_quest_cb(struct record *);
+iptr object_find_quest_cb(struct record *);
 void object_free_node(struct record *);
 void object_free_children(struct record *);
 void object_heap_release(struct record *);
@@ -96,9 +96,9 @@ void object_heap_init(void)
         }
     }
     object_heap_free = object_heap_size;
-    mc_set_location(55, (int)D_00176E44);
-    func_000A148C((int)D_00176E4D, object_heap_size);
-    mem_pool_init((int)object_heap, object_heap_size);
+    mc_set_location(55, (iptr)D_00176E44);
+    func_000A148C((iptr)D_00176E4D, object_heap_size);
+    mem_pool_init((iptr)object_heap, object_heap_size);
     (location_object = object_alloc(0, 0, 48))->type = 1;
     location_object->image = 65535;
     location_object->id = -65535;
@@ -109,7 +109,7 @@ void object_heap_init(void)
 
 void object_heap_shutdown(void)
 {
-    mem_pool_free((int)object_heap);
+    mem_pool_free((iptr)object_heap);
 }
 
 void object_free_node(struct record *object)
@@ -163,14 +163,14 @@ struct record *object_alloc(struct record *after, struct record *source, int dat
 
     size = data_size + 71;
     object_heap_free -= size + 18;
-    object = (struct record *)mem_pool_alloc((int)object_heap, size);
+    object = (struct record *)mem_pool_alloc((iptr)object_heap, size);
     if (object == 0) fatal_error(D_00176E70);
     if (source != 0) {
-        mc_memcpy(object, source, 55, (int)D_00176E44, 163, 4);
-        mc_memcpy(&object->data, &source->data, size - 71, (int)D_00176E44, 164, 4);
-        mc_memset(&object->next, 0, 16, (int)D_00176E44, 165, 4);
+        mc_memcpy(object, source, 55, (iptr)D_00176E44, 163, 4);
+        mc_memcpy(&object->data, &source->data, size - 71, (iptr)D_00176E44, 164, 4);
+        mc_memset(&object->next, 0, 16, (iptr)D_00176E44, 165, 4);
     } else {
-        mc_memset(object, 0, size, (int)D_00176E44, 169, 4);
+        mc_memset(object, 0, size, (iptr)D_00176E44, 169, 4);
         object->id = object_new_id(1);
     }
     if (after != 0) object_insert_after(after, object);
@@ -183,7 +183,7 @@ void object_heap_release(struct record *object)
 
     block = (struct mem_block *)((char *)object - 18);
     object_heap_free += block->size + 18;
-    mem_pool_release((int)object);
+    mem_pool_release((iptr)object);
 }
 
 struct record *object_clone(struct record *object)
@@ -195,8 +195,8 @@ struct record *object_clone(struct record *object)
     block = (struct mem_block *)((char *)object - 18);
     size = block->size;
     clone = object_create_child(object->parent, 0, size - 71);
-    mc_memcpy(clone, object, 55, (int)D_00176E44, 203, 4);
-    mc_memcpy(&clone->data, &object->data, size - 71, (int)D_00176E44, 204, 4);
+    mc_memcpy(clone, object, 55, (iptr)D_00176E44, 203, 4);
+    mc_memcpy(&clone->data, &object->data, size - 71, (iptr)D_00176E44, 204, 4);
     return clone;
 }
 
@@ -465,28 +465,28 @@ struct record *object_create_in_block(struct record *parent, int type, int data_
     object->pad13 = pad13;
     object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     if (object->id == (-1016397758)) {
-        mc_memcpy((int)object_debug_watch_copy, object, 71, (int)D_00176E44, 634, 4);
-        object_debug_watch = (int)object;
+        mc_memcpy((iptr)object_debug_watch_copy, object, 71, (iptr)D_00176E44, 634, 4);
+        object_debug_watch = (iptr)object;
     }
     return object;
 }
 
-int object_find_by_id_cb(struct record *object)
+iptr object_find_by_id_cb(struct record *object)
 {
     if (object->id == object_search_id) object_search_result = object;
-    return (int)object_search_result;
+    return (iptr)object_search_result;
 }
 
-struct record *object_find_by_id(struct record *root, int id)
+struct record *object_find_by_id(struct record *root, iptr id)
 {
     object_search_id = id;
     object_search_result = 0;
     if (root == 0) {
         object_foreach(location_object, (void (*)())object_find_by_id_cb);
-        object_found_last = (int)object_search_result;
-        if ((int)object_search_result != 0) return object_search_result;
+        object_found_last = (iptr)object_search_result;
+        if ((iptr)object_search_result != 0) return object_search_result;
         object_foreach(nonworld_root, (void (*)())object_find_by_id_cb);
-        object_found_last = (int)object_search_result;
+        object_found_last = (iptr)object_search_result;
         return object_search_result;
     }
     object_find(root, object_find_by_id_cb);
@@ -604,9 +604,9 @@ void object_delete_type(struct record *root, unsigned char type)
     object_foreach_post(root, object_delete_type_cb);
 }
 
-int object_find_quest_cb(struct record *object)
+iptr object_find_quest_cb(struct record *object)
 {
-    if (object->quest_id == scratch_190ce4[0]) return (int)(found_object = object);
+    if (object->quest_id == scratch_190ce4[0]) return (iptr)(found_object = object);
     return 0;
 }
 

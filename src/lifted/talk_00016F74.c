@@ -1,11 +1,12 @@
 /* talk.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
 extern char *talk_question_lines;
 extern int talk_question_line_count;
 
-extern void text_draw_coloured(int, int, int, int, unsigned char);
+extern void text_draw_coloured(iptr, int, int, int, unsigned char);
 
 void talk_draw_question(int left, int top, int right, int bottom)
 {
@@ -22,7 +23,7 @@ void talk_draw_question(int left, int top, int right, int bottom)
         line = talk_question_line_count - max_lines;
     }
     while (line < talk_question_line_count) {
-        text_draw_coloured(*(int *)((char *)(int)(talk_question_lines + (line++ << 2))), (int)(short)*(short *)&left, (int)(short)((row * 7) + top), 145, 156);
+        text_draw_coloured(*(int *)((char *)(iptr)(talk_question_lines + (line++ << 2))), (int)(short)*(short *)&left, (int)(short)((row * 7) + top), 145, 156);
         row++;
     }
 }

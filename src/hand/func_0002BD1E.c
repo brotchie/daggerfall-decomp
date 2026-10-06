@@ -7,9 +7,9 @@ extern char D_0017089B[];
 extern char D_001708B7[];
 extern char D_001708D1[];
 extern struct record *nonworld_root;
-extern int qbn_opcode_arg_counts;
+extern iptr qbn_opcode_arg_counts;
 extern void fatal_error(char *);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 
 /* a resource's object pointer back to the object's id, checking it belongs to this quest */
 #define FIX(o, msg) \
@@ -39,7 +39,7 @@ void quest_unlink_for_save(struct quest *quest)
         arg = op->args;
         op->arg_count = (*(unsigned char **)&qbn_opcode_arg_counts)[op->opcode] - '0';
         for (j = 0; j < op->arg_count; j++, arg++) {
-            if (arg->record) arg->record -= (int)quest;
+            if (arg->record) arg->record -= (iptr)quest;
             if (arg->object) arg->object = (struct record *)arg->object->id;
         }
     }
@@ -52,11 +52,11 @@ void quest_unlink_for_save(struct quest *quest)
         if (qbn_place->object) {
             if ((short)qbn_place->object->quest_id != quest->id) fatal_error(D_0017088A);
             qbn_place->object = (struct record *)qbn_place->object->id;
-            if (object_find_by_id(nonworld_root, (int)qbn_place->object) == 0) fatal_error(D_0017089B);
+            if (object_find_by_id(nonworld_root, (iptr)qbn_place->object) == 0) fatal_error(D_0017089B);
             if (qbn_place->object == 0) fatal_error(D_001708B7);
             /* +0x03 the place's type (10: a fixed object), +0x04/+0x06 the object id's halves */
             if (qbn_place->scope == 10) {
-                if ((((unsigned short)qbn_place->p2 & 0xffff) | (qbn_place->p1 << 16)) != (int)qbn_place->object)
+                if ((((unsigned short)qbn_place->p2 & 0xffff) | (qbn_place->p1 << 16)) != (iptr)qbn_place->object)
                     fatal_error(D_001708D1);
             }
         }

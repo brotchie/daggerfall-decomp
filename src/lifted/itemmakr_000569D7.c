@@ -8,7 +8,7 @@ extern char enchant_power_params[];
 extern signed char scratch_190ce4[];
 extern char scratch_190d64[];
 extern char scratch_190d66[];
-extern int list_popup_callback;
+extern iptr list_popup_callback;
 extern struct enchantment itemmaker_slots[];
 
 extern int itemmaker_pick_param_list(int);
@@ -16,7 +16,7 @@ extern int itemmaker_free_slot(void);
 extern void msgbox_show_rsc(int, int);
 extern void itemmaker_set_power_param_cb(int);
 extern void func_00057147(short, short, short, short, short, short, short);
-extern void itemmaker_show_param_list(int, short);
+extern void itemmaker_show_param_list(iptr, short);
 
 void itemmaker_add_power_cb(int power)
 {
@@ -40,7 +40,7 @@ void itemmaker_add_power_cb(int power)
         } else {
             itemmaker_show_param_list(*(int *)(enchant_power_params + (((int)(short)*(short *)&power) << 2)), (int)(short)*(short *)&power);
         }
-        list_popup_callback = (int)itemmaker_set_power_param_cb;
+        list_popup_callback = (iptr)itemmaker_set_power_param_cb;
     } else {
         if (((int)(short)*(short *)&power) == 11) {
             func_00057147((int)(short)slot, 23, -1, 11, -1, -1, -1);

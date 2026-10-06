@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern struct location *current_location;
-extern int D_00196DA4;
+extern iptr D_00196DA4;
 
 int town_map_area_clear(int x, int y)
 {

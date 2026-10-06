@@ -16,9 +16,9 @@ extern char talk_selected_row[];
 extern signed char talk_topic_tab;
 extern signed char talk_news_asked;
 extern int talk_find_regional(int);
-extern void town_map_note_building(struct record *, int);
+extern void town_map_note_building(struct record *, iptr);
 extern int rand_range(int, int);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int xn_math_approx_dist2d();
 
 
@@ -46,7 +46,7 @@ int talk_hint_text_id(int variant)
             D_00195A90 = building_object->x;
             D_00195A94 = building_object->z;
             if (player_environment == 1 && (xn_math_approx_dist2d(building_object->x, building_object->z, player_object->x, player_object->z) < 2048 || rand_range(1, 100) <= 25)) {
-                town_map_note_building(building_object, (int)D_00195D28->building);
+                town_map_note_building(building_object, (iptr)D_00195D28->building);
                 return 7332;
             }
             return 7333;

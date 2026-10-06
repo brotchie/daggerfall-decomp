@@ -7,8 +7,8 @@ extern char disk_last_file_size[];
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
-extern int screen_buffer;
-extern int D_00147954;
+extern iptr screen_buffer;
+extern iptr D_00147954;
 extern signed char xn_mouse_cursor_drawn;
 extern char D_00170738[];
 extern char D_00170741[];
@@ -30,41 +30,41 @@ extern short scratch_190d6a;
 extern char scratch_190de4[];
 extern struct record *player_object;
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern char *scratch_buffer;
 extern signed char text_macro_imperial;
 extern signed char mouse_buttons_prev;
 extern int D_00196D68;
-extern int career_bio_text;
-extern int D_00196D70;
+extern iptr career_bio_text;
+extern iptr D_00196D70;
 extern int career_bio_lines;
-extern int career_bio_page;
+extern iptr career_bio_page;
 extern short reputation_baseline;
 extern signed char career_bio_ask;
 
 extern unsigned char *career_answer_effect(unsigned char *);
 extern int career_nearest_class(void);
 extern int place_marker_in_range(struct record *, int);
-extern int text_rsc_load(int, int, int);
+extern iptr text_rsc_load(int, int, int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
-extern int disk_write_arena2_file(char *, int, int);
+extern iptr disk_read_file(char *, iptr);
+extern int disk_write_arena2_file(char *, iptr, iptr);
 extern int rand_range(int, int);
 extern int rand();
 extern int mc_free();
 extern int mc_memset();
 extern int atoi();
 extern int strlen();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
-extern int memchr();
+extern iptr memchr();
 extern int xn_gfx_present_inclusive();
-extern int xn_str_find_byte_pair();
+extern iptr xn_str_find_byte_pair();
 extern int xn_mouse_poll_clamped();
 extern int xn_mouse_cursor_move();
 extern void msgbox_show_rsc(int, int);
-extern void text_draw_coloured(int, int, int, int, unsigned char);
+extern void text_draw_coloured(iptr, int, int, int, unsigned char);
 extern void object_free_later(struct record *);
 extern void cursor_draw_arrow(void);
 unsigned char *career_skip_word(unsigned char *);
@@ -81,27 +81,27 @@ void career_bio_draw(void);
 void career_background_summary(int class_id, int ask)
 {
     int question;
-    int text;
+    iptr text;
     unsigned char *cursor;
-    int start;
+    iptr start;
 
     career_bio_ask = *(signed char *)&ask;
-    mc_memcpy((int)&reputation_baseline, (int)(signed char *)&player_character->reputation[0], 10, (int)D_00170738, 48, 10);
+    mc_memcpy((iptr)&reputation_baseline, (iptr)(signed char *)&player_character->reputation[0], 10, (iptr)D_00170738, 48, 10);
     text_macro_imperial = rand() % 6;
     scratch_190d68 = (unsigned short)(unsigned char)D_00179FF8[rand_range(0, 9)];
     scratch_190d6a = 1;
     D_00190C74 = rand();
     *(int *)D_00190C78 = rand();
     if (class_id == 18) class_id = career_nearest_class();
-    mc_set_location(59, (int)D_00170738);
-    mc_sprintf((int)text_buffer, (int)D_00170741, class_id);
-    mc_memset((int)scratch_buffer, 0, 64000, (int)D_00170738, 60, 4);
-    disk_read_file(text_buffer, (int)scratch_buffer + 1);
+    mc_set_location(59, (iptr)D_00170738);
+    mc_sprintf((iptr)text_buffer, (iptr)D_00170741, class_id);
+    mc_memset((int)(iptr)scratch_buffer, 0, 64000, (iptr)D_00170738, 60, 4);
+    disk_read_file(text_buffer, (int)(iptr)scratch_buffer + 1);
     *scratch_buffer = 10;
     if (ask != 0) disk_read_file(D_00170750, D_00147954);
     for (question = 0; question < 12; question++) {
         if (ask != 0) {
-            mc_memcpy(screen_buffer, D_00147954, 64000, (int)D_00170738, 69, 4);
+            mc_memcpy(screen_buffer, D_00147954, 64000, (iptr)D_00170738, 69, 4);
             xn_mouse_cursor_drawn &= 254;
         }
         career_find_question(question + 1);
@@ -114,7 +114,7 @@ void career_background_summary(int class_id, int ask)
     }
     text = text_rsc_load((int)(short)(class_id + 4116), 0, 0);
     cursor = (unsigned char *)text;
-    start = (int)cursor;
+    start = (iptr)cursor;
     while (*cursor != 0) {
         if (*cursor == 253 || *cursor == 252) {
             *cursor = 0;
@@ -123,9 +123,9 @@ void career_background_summary(int class_id, int ask)
         }
         cursor++;
     }
-    disk_write_arena2_file(D_0017075D, start, (int)cursor - start + 1);
+    disk_write_arena2_file(D_0017075D, start, (iptr)cursor - start + 1);
     if (start != 0 && start != (-1751672937)) {
-        mc_free(start, (int)D_00170738, 94);
+        mc_free(start, (iptr)D_00170738, 94);
         start = -1751672937;
     }
     msgbox_show_rsc(35, 1);
@@ -184,7 +184,7 @@ unsigned char *career_draw_lines(unsigned char *text, int one_line)
         line_end = (unsigned char *)memchr(text, 13, 2000);
         *line_end = 0;
         if (career_bio_ask != 0) {
-            text_draw_coloured((int)text, (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 141);
+            text_draw_coloured((iptr)text, (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 141);
         }
         y += 10;
         *line_end = 13;
@@ -279,7 +279,7 @@ void career_show_biography(void)
     window_image = disk_read_file(D_0017077B, 0);
     career_bio_page = (career_bio_text = disk_read_file(D_0017075D, 0));
     sound_play(237, player_object, 100);
-    D_00196D70 = (int)(*(char **)&career_bio_text + *(int *)disk_last_file_size);
+    D_00196D70 = (iptr)(*(char **)&career_bio_text + *(int *)disk_last_file_size);
     career_bio_lines = career_bio_count_lines();
     D_00196D68 = 0;
     while (done == 0) {
@@ -297,22 +297,22 @@ void career_show_biography(void)
         }
     }
     if (career_bio_text != 0 && career_bio_text != (-1751672937)) {
-        mc_free(career_bio_text, (int)D_00170738, 506);
+        mc_free(career_bio_text, (iptr)D_00170738, 506);
         career_bio_text = -1751672937;
     }
     if (window_image == 0 || window_image == (-1751672937)) return;
-    mc_free(window_image, (int)D_00170738, 507);
+    mc_free(window_image, (iptr)D_00170738, 507);
     window_image = -1751672937;
 }
 
 void career_bio_draw(void)
 {
     int row;
-    int line;
+    iptr line;
 
     row = 0;
     line = career_bio_page;
-    mc_memcpy(screen_buffer, window_image, 64000, (int)D_00170738, 515, 4);
+    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_00170738, 515, 4);
     while (((unsigned)line) < D_00196D70 && row < 21) {
         text_draw_coloured(line, 10, (int)(short)((row * 7) + 25), 145, 156);
         line += strlen(line) + 1;
@@ -326,7 +326,7 @@ void career_bio_draw(void)
 
 int career_bio_count_lines(void)
 {
-    int line;
+    iptr line;
     int count;
 
     line = career_bio_text;

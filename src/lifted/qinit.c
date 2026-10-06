@@ -17,7 +17,7 @@ extern struct record *location_object;
 extern struct character *player_character;
 extern int game_minutes;
 extern struct record *quest_tick_object;
-extern int qbn_opcode_arg_counts;
+extern iptr qbn_opcode_arg_counts;
 extern signed char current_region;
 extern signed char D_00196299;
 extern signed char D_001962A3;
@@ -31,8 +31,8 @@ extern struct membership *guild_membership;
 
 extern struct faction *faction_find(short);
 extern int faction_player_related(struct faction *);
-extern int quest_section(struct quest *, int);
-extern int quest_record(struct quest *, int, int);
+extern iptr quest_section(struct quest *, int);
+extern iptr quest_record(struct quest *, int, int);
 extern struct record *func_000310E1(struct record *, struct record *);
 extern int quest_init_person(struct qbn_person *);
 extern int quest_init_place(struct qbn_place *);
@@ -42,7 +42,7 @@ extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_reparent(struct record *, struct record *);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int object_new_id(int);
 extern int rand();
 extern int mc_strncpy();
@@ -87,7 +87,7 @@ struct record *quest_init_item(struct qbn_item *qbn_item)
             } else {
                 power = 50;
             }
-            gold_amount = ((power + 50) * ((((int)&*(signed char *)((char *)(regions[(unsigned char)current_region].price_adjustment / 2) + 500)) * rand_range(level * 150, level * 200)) / 1000)) / 100;
+            gold_amount = ((power + 50) * ((((int)(iptr)&*(signed char *)((char *)(iptr)(regions[(unsigned char)current_region].price_adjustment / 2) + 500)) * rand_range(level * 150, level * 200)) / 1000)) / 100;
         } else {
             gold_amount = rand_range(qbn_item->index, qbn_item->group);
         }
@@ -127,7 +127,7 @@ struct record *quest_init_item(struct qbn_item *qbn_item)
         item->image = item_data->dropped_image;
         if (item_data->group == 9 && item_data->index == 5 && qbn_item->messages[1] != 0) {
             item_data->message = qbn_item->messages[1];
-            mc_strncpy(&item_data->name[10], (int)(signed char *)&current_quest->name[0], 4, (int)D_00170A64, 572);
+            mc_strncpy(&item_data->name[10], (iptr)(signed char *)&current_quest->name[0], 4, (iptr)D_00170A64, 572);
         }
     }
     return item;
@@ -196,7 +196,7 @@ int quest_init_resources(struct quest *quest)
     qbn_item = (struct qbn_item *)((char *)quest + quest->section_offsets[0]);
     for (i = 0; quest->section_counts[0] > i; i++, qbn_item++) {
         if ((qbn_item->flags & 2) == 0 && qbn_item->group == 100) {
-            mc_memcpy(qbn_item, *(int *)(D_00195984 + (qbn_item->index << 2)), 19, (int)D_00170A64, 660, 4);
+            mc_memcpy(qbn_item, *(int *)(D_00195984 + (qbn_item->index << 2)), 19, (iptr)D_00170A64, 660, 4);
         } else {
             qbn_item->object = 0;
             if (quest_init_item(qbn_item) == 0) return 0;
@@ -211,13 +211,13 @@ int quest_init_resources(struct quest *quest)
     for (i = 0; quest->section_counts[8] > i; i++, op++) {
         arg = op->args;
         op->last_minutes = game_minutes;
-        op->arg_count = ((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)&qbn_opcode_arg_counts + op->opcode))) - 48;
+        op->arg_count = ((int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)&qbn_opcode_arg_counts + op->opcode))) - 48;
         *(int *)&arg_index = 0;
         for (; op->arg_count > *(int *)&arg_index; (*(int *)&arg_index)++, arg++) {
-            if ((int)arg->record != 305419896) {
+            if ((iptr)arg->record != 305419896) {
                 if (arg->value != (-1) && arg->value != (-2)) {
-                    record_index = (int)arg->record & 255;
-                    section = (int)arg->record >> 8;
+                    record_index = (int)((iptr)arg->record & 255);
+                    section = (int)((iptr)arg->record >> 8);
                     record = (char *)quest + quest->section_offsets[section];
                     record += ((int)(short)qbn_record_sizes[section]) * record_index;
                     arg->record = record;
@@ -233,7 +233,7 @@ int quest_init_resources(struct quest *quest)
         }
     }
     if (quest->text_offset != 0) {
-        text_var = (struct qbn_text_var *)((int)quest + quest->text_offset);
+        text_var = (struct qbn_text_var *)((iptr)quest + quest->text_offset);
         while (text_var->name[0] != 0) {
             text_var->record = (char *)quest_record(quest, (int)(short)((unsigned short)text_var->section), text_var->index);
             text_var++;
@@ -321,7 +321,7 @@ int quest_place_object(struct record *object, struct qbn_place *place)
     }
     if (object->type != 2 && object->type != 18) {
         saved_faction_id = object->data.building.faction_id;
-        mc_memcpy(&object->data, &place->object->data, 26, (int)D_00170A64, 924, 4);
+        mc_memcpy(&object->data, &place->object->data, 26, (iptr)D_00170A64, 924, 4);
         object->data.building.faction_id = *(int *)&saved_faction_id;
     }
     if ((((unsigned)object->id) >> 16) == (((unsigned)location_object->id) >> 16)) object = func_000310E1(object, 0);
@@ -387,7 +387,7 @@ void qaction_give_item_to_foe(struct quest *quest, struct qbn_op *op)
         item_twin->quest_id = (signed char)quest->id;
         item_twin->twin = item;
         item->twin = item_twin;
-        mc_memcpy(&item_twin->data, &item->data, 107, (int)D_00170A64, 1008, 4);
+        mc_memcpy(&item_twin->data, &item->data, 107, (iptr)D_00170A64, 1008, 4);
     }
     foe_object = op->args[2].object;
     item->id = object_new_id(((unsigned)foe_object->id) >> 16);
@@ -409,7 +409,7 @@ struct record *quest_find_site_for_building(struct building *building)
         next = quest_object->next;
         if (quest_object->type == 14) {
             quest_tick_object = quest_object;
-            quest_tick_data = (struct quest *)((int)&quest_object->data.quest);
+            quest_tick_data = (struct quest *)((iptr)&quest_object->data.quest);
             qbn_place = (struct qbn_place *)quest_section(quest_tick_data, 4);
             for (i = 0; quest_tick_data->section_counts[4] > i; i++, qbn_place++) {
                 site = qbn_place->object;

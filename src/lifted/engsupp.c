@@ -17,14 +17,14 @@ extern struct record *location_object;
 extern struct image *hud_bar_image;
 extern struct settings *game_settings;
 extern struct xn_pick_hit *pick_hit;
-extern int grid_visit_func;
+extern iptr grid_visit_func;
 extern struct block_model *D_00195D3C;
 extern char picked_model_index[];
 extern struct arch3d_plane *click_face_texture;
 extern char D_00196120[];
 extern signed char D_0019629F;
-extern int D_00196478;
-extern int D_0019647C;
+extern iptr D_00196478;
+extern iptr D_0019647C;
 extern struct pick_result *pick_result;
 extern int climate_index;
 
@@ -32,21 +32,21 @@ extern int pick_sprite_cb(struct record *);
 extern short texture_archive_for_climate(int, int);
 extern int climate_category(void);
 extern int rand_range(int, int);
-extern int object_find(struct record *, int);
+extern int object_find(struct record *, iptr);
 extern int rand();
 extern int srand();
 extern int mc_memset();
 extern int mc_memcpy();
-extern int xn_render_pick();
-extern void shop_generate_stock(int, int, int, int, int);
-extern void func_0007E815(struct record *, int);
-extern void town_grid_visit_near(struct record *, int);
+extern iptr xn_render_pick();
+extern void shop_generate_stock(iptr, int, int, int, int);
+extern void func_0007E815(struct record *, iptr);
+extern void town_grid_visit_near(struct record *, iptr);
 extern void object_foreach_open(struct record *, void (*)());
-struct arch3d_plane *arch3d_plane_at(int, short);
+struct arch3d_plane *arch3d_plane_at(iptr, short);
 int pick_model_cb(struct record *);
-int arch3d_plane_index(int, struct arch3d_plane *);
+int arch3d_plane_index(iptr, struct arch3d_plane *);
 int furniture_is_container(int);
-void world_for_each_object(int);
+void world_for_each_object(iptr);
 
 int engine_pick_object(int x, int y, struct pick_result *result)
 {
@@ -54,16 +54,16 @@ int engine_pick_object(int x, int y, struct pick_result *result)
 
     view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     if (y > view_bottom) return 0;
-    mc_memset((int)result, 0, 18, (int)D_001702D4, 38, 4);
+    mc_memset((iptr)result, 0, 18, (iptr)D_001702D4, 38, 4);
     pick_result = result;
     if ((pick_hit = (struct xn_pick_hit *)xn_render_pick(x, y))->model == 1) return 0;
     if (pick_hit->model != 0) {
         D_0019647C = pick_hit->model;
         click_face_texture = pick_hit->plane;
-        world_for_each_object((int)pick_model_cb);
+        world_for_each_object((iptr)pick_model_cb);
     } else {
-        D_00196478 = (int)pick_hit;
-        world_for_each_object((int)pick_sprite_cb);
+        D_00196478 = (iptr)pick_hit;
+        world_for_each_object((iptr)pick_sprite_cb);
     }
     return pick_result->flags & 1;
 }
@@ -72,13 +72,13 @@ int arch3d_plane_point_at(struct arch3d_plane *plane, short i)
 {
     short point;
 
-    *(int *)&point = (int)plane->points;
+    *(iptr *)&point = (iptr)plane->points;
     if ((short)plane->point_count <= i) return 0;
     *(int *)&point += ((int)(short)i) << 3;
     return *(int *)&point;
 }
 
-struct arch3d_plane *arch3d_plane_at(int model, short plane_index)
+struct arch3d_plane *arch3d_plane_at(iptr model, short plane_index)
 {
     struct arch3d_header *arch3d;
     struct arch3d_plane *plane;
@@ -97,7 +97,7 @@ struct arch3d_plane *arch3d_plane_at(int model, short plane_index)
 
 int pick_model_cb(struct record *object)
 {
-    int model;
+    iptr model;
     struct block *block;
     struct block_model *block_model;
     int i;
@@ -108,7 +108,7 @@ int pick_model_cb(struct record *object)
         block = &object->data.block;
         block_model = block->models;
         for (i = 0; block->model_count > i; i++, block_model++) {
-            if ((int)&block_model->model == D_0019647C) {
+            if ((iptr)&block_model->model == D_0019647C) {
                 *(int *)picked_model_index = i;
                 D_00195D3C = block_model;
                 pick_result->flags |= 13;
@@ -122,7 +122,7 @@ int pick_model_cb(struct record *object)
     case 56:
         block_model = (struct block_model *)RECORD_DATA(object);
         for (i = 0; object->model_count > i; i++, block_model++) {
-            if ((int)&block_model->model == D_0019647C) {
+            if ((iptr)&block_model->model == D_0019647C) {
                 pick_result->flags |= 5;
                 pick_result->object = object;
                 pick_result->plane = arch3d_plane_index(D_0019647C, click_face_texture);
@@ -134,7 +134,7 @@ int pick_model_cb(struct record *object)
         return 0;
     case 6:
     case 32:
-        model = (int)&object->data.instance;
+        model = (iptr)&object->data.instance;
         if (D_0019647C == model) {
             pick_result->flags |= 5;
             pick_result->object = object;
@@ -145,7 +145,7 @@ int pick_model_cb(struct record *object)
     return 0;
 }
 
-int arch3d_plane_index(int model, struct arch3d_plane *plane)
+int arch3d_plane_index(iptr model, struct arch3d_plane *plane)
 {
     struct arch3d_plane *candidate;
     int i;
@@ -184,7 +184,7 @@ void dungeon_choose_textures(void)
     srand(((unsigned)location_object->id) >> 16);
     texture_set = (int)(unsigned char)climate_texture_sets[climate_category()];
     if (texture_set == 1) return;
-    mc_memcpy((int)D_00179966, (int)D_0017995C, 10, (int)D_001702D4, 279, 10);
+    mc_memcpy((iptr)D_00179966, (iptr)D_0017995C, 10, (iptr)D_001702D4, 279, 10);
     for (i = 0; i < 5; i++) {
         archive = rand_range(0, 4);
         if (archive == 2) archive += 2;
@@ -204,7 +204,7 @@ void interior_stock_shelves(struct record *interior, struct building *building)
     model = block->models;
     for (i = 0; block->model_count > i; i++, model++) {
         if (model->id == 418 || (model->id == 410 && furniture_is_container(model->variant) != 0)) {
-            shop_generate_stock((int)D_00196120, model->variant, building->quality, building->type, i);
+            shop_generate_stock((iptr)D_00196120, model->variant, building->quality, building->type, i);
         }
     }
 }
@@ -223,14 +223,14 @@ int furniture_is_container(int variant)
     }
 }
 
-void world_for_each_object(int callback)
+void world_for_each_object(iptr callback)
 {
     struct record *object;
     struct record *next;
     struct record *children;
     unsigned short flags;
 
-    grid_visit_func = (int)object_find;
+    grid_visit_func = (iptr)object_find;
     if (((int)player_environment) < 3) {
         if (player_object->parent->type != 1) {
             object_find(player_object->parent->children, callback);
@@ -266,5 +266,5 @@ void world_for_each_object(int callback)
             object = next;
         }
     }
-    grid_visit_func = (int)object_foreach_open;
+    grid_visit_func = (iptr)object_foreach_open;
 }

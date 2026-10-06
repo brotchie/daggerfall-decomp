@@ -9,7 +9,7 @@ extern short mouse_x;
 extern short mouse_y;
 extern signed char D_0012B508;
 extern signed char key_down_esc;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00170DE4[];
 extern char D_00170DEF[];
 extern char D_00170E11[];
@@ -35,9 +35,9 @@ extern struct record *player_object;
 extern int creature_count;
 extern struct record *spell_ready_missile;
 extern struct record *spell_ready_touch;
-extern int magic_window_image;
+extern iptr magic_window_image;
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern int game_minutes;
 extern int trade_mode;
 extern short spell_effect_slot;
@@ -47,7 +47,7 @@ extern signed char D_00196272;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern signed char inv_right_icon;
-extern int spellbook_saved_screen;
+extern iptr spellbook_saved_screen;
 extern struct picklist shared_picklist;
 
 extern int spell_effect_text_index(short);
@@ -56,7 +56,7 @@ extern int sheet_open(short);
 extern int spellbook_open(short);
 extern int cast_player_spell(struct record *);
 extern int sound_play(int, struct record *, int);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int picklist_frame(struct picklist *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
@@ -66,8 +66,8 @@ extern int inventory_open(int, int, int);
 extern int mc_free();
 extern int mc_strncpy();
 extern int strlen();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
 extern int xn_draw_spell_icon();
 extern int xn_draw_copy_rect_stride_bytes();
@@ -76,8 +76,8 @@ extern int xn_font_select();
 extern int xn_draw_image_transparent();
 extern void spell_add_skill_uses(struct spell *, int);
 extern void msgbox_show_rsc(int, int);
-extern void text_draw_coloured(int, int, int, int, unsigned char);
-extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+extern void text_draw_coloured(iptr, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern void picklist_init(struct picklist *, short, short, short, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void picklist_add(struct picklist *, char *, short);
 extern void picklist_free(struct picklist *);
@@ -102,18 +102,18 @@ void spellbook_add_spell_cb(struct record *object)
         cost = spell_cost(spell, player_character);
         if (((int)(unsigned char)spell->name[strlen(spell->name) + 1]) == 36) {
             cost >>= 2;
-            mc_set_location(62, (int)D_00170DE4);
-            mc_sprintf((int)text_buffer, (int)D_00170DEF, cost, spell->name);
+            mc_set_location(62, (iptr)D_00170DE4);
+            mc_sprintf((iptr)text_buffer, (iptr)D_00170DEF, cost, spell->name);
         } else {
-            mc_set_location(65, (int)D_00170DE4);
-            mc_sprintf((int)text_buffer, (int)D_00170DEF, cost, &spell->name[1]);
+            mc_set_location(65, (iptr)D_00170DE4);
+            mc_sprintf((iptr)text_buffer, (iptr)D_00170DEF, cost, &spell->name[1]);
         }
     } else {
-        mc_set_location(68, (int)D_00170DE4);
-        mc_sprintf((int)text_buffer, (int)D_00170DEF, spell_cost(spell, player_character), spell->name);
+        mc_set_location(68, (iptr)D_00170DE4);
+        mc_sprintf((iptr)text_buffer, (iptr)D_00170DEF, spell_cost(spell, player_character), spell->name);
     }
     picklist_add(&shared_picklist, text_buffer, 0);
-    *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)object;
+    *(iptr *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (iptr)object;
 }
 
 void spellbook_frame(void)
@@ -127,16 +127,16 @@ void spellbook_frame(void)
     short button;
 
     if (spellbook_open(0) == 0) return;
-    mc_memcpy(screen_buffer, spellbook_saved_screen, 64000, (int)D_00170DE4, 123, 4);
+    mc_memcpy(screen_buffer, spellbook_saved_screen, 64000, (iptr)D_00170DE4, 123, 4);
     image = (short *)window_image;
     xn_draw_image_transparent((unsigned short)image[0], (unsigned short)image[1], (unsigned short)image[2], (unsigned short)image[3], (char *)image + 12);
-    mc_set_location(129, (int)D_00170DE4);
-    mc_sprintf((int)text_buffer, (int)D_00170E11, player_character->magicka, player_character->max_magicka);
-    text_draw_coloured((int)text_buffer, 238, 20, 145, 141);
+    mc_set_location(129, (iptr)D_00170DE4);
+    mc_sprintf((iptr)text_buffer, (iptr)D_00170E11, player_character->magicka, player_character->max_magicka);
+    text_draw_coloured((iptr)text_buffer, 238, 20, 145, 141);
     xn_font_select(4);
     *(int *)&picked = picklist_frame(&shared_picklist);
     if (((int)(short)picked) > (-1)) {
-        spell_object = (struct record *)*(int *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2));
+        spell_object = (struct record *)*(iptr *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2));
         spellbook_close();
         if ((player_character->conditions & 0x100) != 0) {
             hud_message_add(D_00184634);
@@ -147,7 +147,7 @@ void spellbook_frame(void)
                 cost >>= 2;
             }
             if ((player_character->magicka + spell_points_bonus) < cost) {
-                hud_message_add((int)D_00170E17);
+                hud_message_add((iptr)D_00170E17);
                 return;
             }
             spell_ready_cost = cost;
@@ -166,14 +166,14 @@ void spellbook_frame(void)
             new_spell = object_create_child(player_object->parent, 0, 89);
             new_spell->type = 9;
             new_spell->id = object_new_id(100);
-            mc_memcpy(&new_spell->data.spell, &spell_object->data.spell, 89, (int)D_00170DE4, 181, 4);
+            mc_memcpy(&new_spell->data.spell, &spell_object->data.spell, 89, (iptr)D_00170DE4, 181, 4);
             if (cast_player_spell(new_spell) != 0) object_delete(new_spell);
         }
         return;
     }
-    spellbook_draw_spell((selected_spell = (struct spell *)(*(int *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2)) + 71)));
+    spellbook_draw_spell((selected_spell = (struct spell *)(*(iptr *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2)) + 71)));
     if (((int)(unsigned char)msgbox_kind) == 2) {
-        mc_strncpy(shared_picklist.entries[shared_picklist.selected].text, selected_spell->name, 40, (int)D_00170DE4, 193);
+        mc_strncpy(shared_picklist.entries[shared_picklist.selected].text, selected_spell->name, 40, (iptr)D_00170DE4, 193);
     }
     if (key_down_esc != 0 || ((int)(short)picked) == (-2)) spellbook_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
@@ -199,15 +199,15 @@ int spellbook_close(void)
     D_001940D8 &= 253;
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (int)D_00170DE4, 222);
+        mc_free(window_image, (iptr)D_00170DE4, 222);
         window_image = -1751672937;
     }
     if (magic_window_image != 0 && magic_window_image != (-1751672937)) {
-        mc_free(magic_window_image, (int)D_00170DE4, 223);
+        mc_free(magic_window_image, (iptr)D_00170DE4, 223);
         magic_window_image = -1751672937;
     }
     if (spellbook_saved_screen != 0 && spellbook_saved_screen != (-1751672937)) {
-        mc_free(spellbook_saved_screen, (int)D_00170DE4, 224);
+        mc_free(spellbook_saved_screen, (iptr)D_00170DE4, 224);
         spellbook_saved_screen = -1751672937;
     }
     D_00196272 = 0;
@@ -229,9 +229,9 @@ void spellbook_draw_spell(struct spell *spell)
 
     D_0012B508 = 145;
     xn_draw_spell_icon(172, 32, spell->icon);
-    xn_draw_copy_rect_stride_bytes((int)(*(char **)&magic_window_image + (spell->element * 640)) + 24, (int)(*(char **)&screen_buffer + 10486), 16, 16, 40);
-    xn_draw_copy_rect_stride_bytes((int)(*(char **)&magic_window_image + (spell->target * 640)), (int)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
-    text_draw_coloured((int)spell->name, 148, 20, 145, 141);
+    xn_draw_copy_rect_stride_bytes((iptr)(*(char **)&magic_window_image + (spell->element * 640)) + 24, (iptr)(*(char **)&screen_buffer + 10486), 16, 16, 40);
+    xn_draw_copy_rect_stride_bytes((iptr)(*(char **)&magic_window_image + (spell->target * 640)), (iptr)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
+    text_draw_coloured((iptr)spell->name, 148, 20, 145, 141);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 3; (*(int *)&i)++) {
         if ((spell->effects[(int)(short)i].type) == 255) continue;
@@ -301,7 +301,7 @@ int spellbook_build_list(void)
 
 void spellbook_delete_button(void)
 {
-    object_delete((struct record *)((int)selected_spell - 71));
+    object_delete((struct record *)((iptr)selected_spell - 71));
     picklist_free(&shared_picklist);
     if (spellbook_build_list() != 0) return;
     spellbook_close();
@@ -311,7 +311,7 @@ void spellbook_up_button(void)
 {
     struct record *object;
 
-    object = (struct record *)((int)selected_spell - 71);
+    object = (struct record *)((iptr)selected_spell - 71);
     if (object->prev == 0) return;
     object_swap_siblings(object, object->prev);
     picklist_free(&shared_picklist);
@@ -322,7 +322,7 @@ void spellbook_down_button(void)
 {
     struct record *object;
 
-    object = (struct record *)((int)selected_spell - 71);
+    object = (struct record *)((iptr)selected_spell - 71);
     if (object->next == 0) return;
     object_swap_siblings(object, object->next);
     picklist_free(&shared_picklist);

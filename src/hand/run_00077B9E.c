@@ -231,14 +231,14 @@ void music_choose_song(void)
                 music_play(music_uses_fm == 0 ? D_00176823 : D_0017682A);
             } else {
                 p = memchr(D_001789E8, current_building->faction_id, 8);
-                idx = p - D_001789E8;
+                idx = (int)(p - D_001789E8);
                 if (p == 0) {
                     p = memchr(D_001789F0, current_building->faction_id, 8);
                     if (p == 0) {
                         music_play(music_uses_fm == 0 ? D_00176823 : D_0017682A);
                         break;
                     }
-                    idx = p - D_001789F0;
+                    idx = (int)(p - D_001789F0);
                 }
                 music_play(D_001A4FA4[idx]);
             }

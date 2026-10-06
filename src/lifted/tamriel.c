@@ -51,7 +51,7 @@ extern signed char D_001962B0;
 extern int faction_count;
 extern struct faction *factions;
 extern struct quest *current_quest;
-extern int quest_debug_data;
+extern iptr quest_debug_data;
 extern struct record *quest_event_object;
 extern struct quest *quest_tick_data;
 extern int quest_ended_id;
@@ -79,9 +79,9 @@ extern struct building *object_building(struct record *);
 extern int location_here_contains(int, int);
 extern int spfx_disease_daily(struct disease *);
 extern int spfx_disease_recover(struct disease *);
-extern struct record *object_find_by_id(struct record *, int);
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern struct record *object_find_by_id(struct record *, iptr);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern void region_flag_set(int, int);
 extern void region_flag_clear(int, int);
 extern void faction_politics_update(int);
@@ -118,12 +118,12 @@ void loan_due_penalty(void);
 void quests_run_all(void);
 #pragma aux mc_set_location parm routine [];
 
-int calendar_format_date(int minutes, int buffer)
+iptr calendar_format_date(int minutes, iptr buffer)
 {
     short day;
 
     *(int *)&day = ((unsigned)(((unsigned)(((unsigned)minutes) % 518400)) / 1440)) % 30;
-    mc_set_location(79, (int)D_001711AC);
+    mc_set_location(79, (iptr)D_001711AC);
     mc_sprintf(buffer, D_001830E2, ((int)(short)day) + 1, ordinal_suffixes[((((int)(short)day) > 3) ? 3 : (int)(short)day)], month_names[(((unsigned)(((unsigned)minutes) % 518400)) / 43200)]);
     return buffer;
 }
@@ -240,7 +240,7 @@ void time_pass_minutes(int minutes)
             loan_due_penalty();
             if (player_death_timer < 0) return;
             for (n = 0; n < creature_count; n++) {
-                if ((int)creature_list[n] == (-1768515946)) continue;
+                if ((iptr)creature_list[n] == (-1768515946)) continue;
                 spell_tick(creature_list[n]);
                 scratch_current_object = creature_list[n];
                 spfx_walk_effect_records(scratch_current_object->children, poison_tick);
@@ -514,8 +514,8 @@ void quests_run_all(void)
         next = object->next;
         if (object->type == 14) {
             quest_tick_object = object;
-            quest_tick_data = (struct quest *)((int)&object->data.quest);
-            if (quest_debug_data == 0) quest_debug_data = (int)quest_tick_data;
+            quest_tick_data = (struct quest *)((iptr)&object->data.quest);
+            if (quest_debug_data == 0) quest_debug_data = (iptr)quest_tick_data;
             quest_run_opcodes(quest_tick_data);
         }
         object = next;

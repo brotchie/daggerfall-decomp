@@ -5,7 +5,7 @@
 
 extern struct region regions[];
 extern char region_legal_reputation[];  /* court_frame: regions[].legal_reputation evaluates in another order */
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_001706E1[];
 extern char D_00179EA8[];
 extern signed char D_00187CA8;
@@ -20,7 +20,7 @@ extern struct record *player_entity;
 extern struct record *location_object;
 extern int creature_count;
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern int player_death_timer;
 extern short D_00195F34;
 extern signed char current_region;
@@ -62,7 +62,7 @@ void court_frame(void)
     int unused;
 
     if (court_open(0) == 0) return;
-    mc_memcpy(screen_buffer, window_image, 64000, (int)D_001706E1, 172, 4);
+    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_001706E1, 172, 4);
     if (((int)(unsigned char)game_mode) == 8) return;
     D_001940D5 |= 64;
     D_00195F34 = 194;
@@ -203,7 +203,7 @@ void court_close(void)
     game_mode = 0;
     D_00196272 = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (int)D_001706E1, 350);
+        mc_free(window_image, (iptr)D_001706E1, 350);
         window_image = -1751672937;
     }
     court_remove_creatures();
@@ -215,7 +215,7 @@ void court_remove_creatures(void)
     int i;
 
     for (i = 0; i < creature_count; i++) {
-        if ((int)creature_list[i] == (int)player_entity) continue;
+        if ((iptr)creature_list[i] == (iptr)player_entity) continue;
         object_delete(creature_list[i]);
     }
 }

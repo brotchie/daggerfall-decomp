@@ -24,7 +24,7 @@ extern signed char key_down_left;
 extern signed char key_down_right;
 extern signed char key_down_down;
 extern short xn_gfx_clip_bottom;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00170794[];
 extern char D_001707A1[];
 extern char D_001707AE[];
@@ -48,7 +48,7 @@ extern short scratch_190d68;
 extern short scratch_190d6a;
 extern char scratch_190de4[];
 extern char *scratch_190de8;
-extern int D_00190E18;
+extern iptr D_00190E18;
 extern signed char player_motion_flags;
 extern struct record *location_grid[];
 extern struct record *player_entity;
@@ -68,7 +68,7 @@ extern int town_map_view_x;
 extern int town_map_view_y;
 extern int D_00196D94;
 extern struct record *D_00196DA0;
-extern int D_00196DA4;
+extern iptr D_00196DA4;
 extern int town_map_size;
 extern char *D_00196DAC;
 extern struct record *D_00196DB0;
@@ -81,8 +81,8 @@ extern signed char cfg_show_markers;
 extern int engine_pick_object(int, int, struct pick_result *);
 extern int town_note_at(int, int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
-extern int disk_write_arena2_file(char *, int, int);
+extern iptr disk_read_file(char *, iptr);
+extern int disk_write_arena2_file(char *, iptr, iptr);
 extern int disk_open_data(char *);
 extern int disk_file_exists(char *);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
@@ -94,7 +94,7 @@ extern int inpstr_edit(char *, short, short, short, short, short);
 extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int object_new_id(int);
 extern struct record *marker_find_first(struct record *, int);
 extern struct record *location_cell_at(int, int);
@@ -102,14 +102,14 @@ extern int rand();
 extern int close();
 extern int mc_free();
 extern int mc_memset();
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int read();
 extern int mc_strncpy();
 extern int strlen();
 extern int mc_memmove();
 extern int stricmp();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
 extern int xn_model_set_angles();
 extern int xn_gfx_present_inclusive();
@@ -197,7 +197,7 @@ void automap_open(void)
     D_0019629F = 1;
     saved_screen_active = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
-    *(int *)scratch_190de4 = disk_read_file(D_00170794, 0);
+    *(iptr *)scratch_190de4 = disk_read_file(D_00170794, 0);
     D_00190E18 = disk_read_file(D_001707A1, 0);
     *(int *)scratch_190be4 = player_object->x;
     scratch_190be8 = player_object->y;
@@ -207,7 +207,7 @@ void automap_open(void)
     automap_find_record();
     scratch_190de8 = 0;
     player_marker = 0;
-    if (((int)D_00195CB8 != 0 && ((int)player_environment) == 3) || ((int)player_environment) == 2) {
+    if (((int)(iptr)D_00195CB8 != 0 && ((int)player_environment) == 3) || ((int)player_environment) == 2) {
         if (((int)player_environment) == 3) {
             parent = D_00195CB8;
             while (parent != 0 && parent->type != 47 && parent->type != 1) parent = parent->parent;
@@ -218,9 +218,9 @@ void automap_open(void)
             player_marker = object_create_child(parent, 0, 62);
             player_marker->image2 = 999;
             player_marker->image = 0;
-            mc_memcpy(&player_marker->angle_x, &player_object->angle_x, 18, (int)D_001707AE, 130, 4);
+            mc_memcpy(&player_marker->angle_x, &player_object->angle_x, 18, (iptr)D_001707AE, 130, 4);
             player_marker->yaw = 2047 - player_marker->yaw;
-            xn_model_set_angles(player_marker->angle_x, player_marker->yaw, player_marker->angle_z, (int)RECORD_DATA(player_marker) + 12);
+            xn_model_set_angles(player_marker->angle_x, player_marker->yaw, player_marker->angle_z, (iptr)RECORD_DATA(player_marker) + 12);
             player_marker->type = 6;
             player_marker->flags = 128;
             player_marker->y -= 40;
@@ -253,11 +253,11 @@ void automap_open(void)
     }
     while (key_down_esc != 0);
     if (*(int *)scratch_190de4 != 0 && *(int *)scratch_190de4 != (-1751672937)) {
-        mc_free(*(int *)scratch_190de4, (int)D_001707AE, 168);
+        mc_free(*(int *)scratch_190de4, (iptr)D_001707AE, 168);
         *(int *)scratch_190de4 = -1751672937;
     }
     if (D_00190E18 != 0 && D_00190E18 != (-1751672937)) {
-        mc_free(D_00190E18, (int)D_001707AE, 169);
+        mc_free(D_00190E18, (iptr)D_001707AE, 169);
         D_00190E18 = -1751672937;
     }
     if (player_marker != 0) object_free_single(player_marker);
@@ -279,7 +279,7 @@ void automap_draw(void)
 
     xn_shade_set_fog(-1);
     xn_mouse_cursor_erase();
-    mc_memcpy(screen_buffer, *(int *)scratch_190de4, 64000, (int)D_001707AE, 192, 4);
+    mc_memcpy(screen_buffer, *(int *)scratch_190de4, 64000, (iptr)D_001707AE, 192, 4);
     image = (struct image *)D_00190E18;
     if (automap_top_down == 0) {
         xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
@@ -298,11 +298,11 @@ void automap_draw(void)
 
 int automap_button_note_line(void)
 {
-    if ((int)D_00196DB0 == 0) return 0;
+    if ((iptr)D_00196DB0 == 0) return 0;
     if (D_00196DAC != 0) {
-        mc_strncpy((int)text_buffer, D_00196DAC, 160, (int)D_001707AE, 213);
+        mc_strncpy((iptr)text_buffer, D_00196DAC, 160, (iptr)D_001707AE, 213);
     } else {
-        mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 215, 160);
+        mc_memset((iptr)text_buffer, 0, 80, (iptr)D_001707AE, 215, 160);
     }
     inpstr_edit(text_buffer, 2, 191, 300, 9, 50);
     if (D_00196DAC != 0 && scratch_190de8 != 0) automap_delete_note();
@@ -341,11 +341,11 @@ void automap_render(void)
     int overflow;
 
     saved_ambient = xn_light_ambient;
-    xn_mat_from_angles(0, automap_yaw, 0, (int)xn_cam_rotation);
+    xn_mat_from_angles(0, automap_yaw, 0, (iptr)xn_cam_rotation);
     xn_cam_x = D_00190BFC;
     xn_cam_y = D_00190C00;
     xn_cam_z = D_00190C04;
-    xn_mat_transform_ptr((int)&xn_cam_x, (int)&xn_cam_y, (int)&xn_cam_z, (int)xn_cam_rotation);
+    xn_mat_transform_ptr((iptr)&xn_cam_x, (iptr)&xn_cam_y, (iptr)&xn_cam_z, (iptr)xn_cam_rotation);
     xn_cam_x += *(int *)scratch_190be4;
     xn_cam_y += scratch_190be8;
     xn_cam_z += scratch_190bec;
@@ -356,13 +356,13 @@ void automap_render(void)
     xn_tex_cache_begin_frame();
     xn_render_begin_frame();
     xn_light_reset();
-    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
-    xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
+    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (iptr)xn_cam_rotation);
+    xn_cam_scale_matrix((iptr)xn_cam_rotation, (iptr)xn_cam_view_matrix);
     player_motion_flags |= 1;
     light_x = 0;
     light_y = 0;
     light_z = 65535;
-    xn_mat_transform_transposed_ptr((int)&light_x, (int)&light_y, (int)&light_z, (int)xn_cam_rotation);
+    xn_mat_transform_transposed_ptr((iptr)&light_x, (iptr)&light_y, (iptr)&light_z, (iptr)xn_cam_rotation);
     xn_light_add(light_x, light_y, light_z, 28, 0, 8);
     if (((int)player_environment) == 3) {
         object_foreach(location_object, automap_draw_object_cb);
@@ -388,11 +388,11 @@ int automap_move_forward(int direction)
         town_map_scroll(direction);
         return 0;
     }
-    xn_mat_from_angles(0, automap_yaw, 0, (int)xn_cam_rotation);
+    xn_mat_from_angles(0, automap_yaw, 0, (iptr)xn_cam_rotation);
     step_z = -16;
     step_x = 0;
     step_y = step_x;
-    xn_mat_transform_ptr((int)&step_x, (int)&step_y, (int)&step_z, (int)xn_cam_rotation);
+    xn_mat_transform_ptr((iptr)&step_x, (iptr)&step_y, (iptr)&step_z, (iptr)xn_cam_rotation);
     *(int *)scratch_190be4 += step_x;
     scratch_190bec += step_z;
     return 0;
@@ -408,11 +408,11 @@ int automap_move_back(int direction)
         town_map_scroll(direction);
         return 0;
     }
-    xn_mat_from_angles(0, automap_yaw, 0, (int)xn_cam_rotation);
+    xn_mat_from_angles(0, automap_yaw, 0, (iptr)xn_cam_rotation);
     step_z = 16;
     step_x = 0;
     step_y = step_x;
-    xn_mat_transform_ptr((int)&step_x, (int)&step_y, (int)&step_z, (int)xn_cam_rotation);
+    xn_mat_transform_ptr((iptr)&step_x, (iptr)&step_y, (iptr)&step_z, (iptr)xn_cam_rotation);
     *(int *)scratch_190be4 += step_x;
     scratch_190bec += step_z;
     return 0;
@@ -428,11 +428,11 @@ int automap_move_left(int direction)
         town_map_scroll(direction);
         return 0;
     }
-    xn_mat_from_angles(0, automap_yaw, 0, (int)xn_cam_rotation);
+    xn_mat_from_angles(0, automap_yaw, 0, (iptr)xn_cam_rotation);
     step_x = 16;
     step_z = 0;
     step_y = step_z;
-    xn_mat_transform_ptr((int)&step_x, (int)&step_y, (int)&step_z, (int)xn_cam_rotation);
+    xn_mat_transform_ptr((iptr)&step_x, (iptr)&step_y, (iptr)&step_z, (iptr)xn_cam_rotation);
     *(int *)scratch_190be4 += step_x;
     scratch_190bec += step_z;
     return 0;
@@ -448,11 +448,11 @@ int automap_move_right(int direction)
         town_map_scroll(direction);
         return 0;
     }
-    xn_mat_from_angles(0, automap_yaw, 0, (int)xn_cam_rotation);
+    xn_mat_from_angles(0, automap_yaw, 0, (iptr)xn_cam_rotation);
     step_x = -16;
     step_z = 0;
     step_y = step_z;
-    xn_mat_transform_ptr((int)&step_x, (int)&step_y, (int)&step_z, (int)xn_cam_rotation);
+    xn_mat_transform_ptr((iptr)&step_x, (iptr)&step_y, (iptr)&step_z, (iptr)xn_cam_rotation);
     *(int *)scratch_190be4 += step_x;
     scratch_190bec += step_z;
     return 0;
@@ -495,7 +495,7 @@ void automap_find_record(void)
 {
     struct record *object;
 
-    found_object = (struct record *)((*(int *)&D_00196DA0 = 0));
+    found_object = (struct record *)((*(iptr *)&D_00196DA0 = 0));
     if (player_entity == 0) return;
     object_foreach(player_entity->children, automap_match_record);
     if (found_object == 0) {
@@ -539,7 +539,7 @@ void automap_delete_note(void)
     int length;
 
     length = strlen(scratch_190de8 + 2) + 3;
-    mc_memmove(scratch_190de8, scratch_190de8 + length, ((automap_notes + 2048) - scratch_190de8) - length, (int)D_001707AE, 494, 4);
+    mc_memmove(scratch_190de8, scratch_190de8 + length, ((automap_notes + 2048) - scratch_190de8) - length, (iptr)D_001707AE, 494, 4);
 }
 
 void automap_init_view(void)
@@ -615,15 +615,15 @@ void automap_expire_records(void)
 void automap_alloc_town_map(void)
 {
     town_map_size = (current_location->width * current_location->height) << 12;
-    D_00196DA4 = mc_malloc(town_map_size, (int)D_001707AE, 582);
-    mc_memset(D_00196DA4, 0, town_map_size, (int)D_001707AE, 583, 4);
+    D_00196DA4 = mc_malloc(town_map_size, (iptr)D_001707AE, 582);
+    mc_memset(D_00196DA4, 0, town_map_size, (iptr)D_001707AE, 583, 4);
 }
 
 void automap_free_town_map(void)
 {
     town_map_size = 0;
     if (D_00196DA4 == 0 || D_00196DA4 == (-1751672937)) return;
-    mc_free(D_00196DA4, (int)D_001707AE, 598);
+    mc_free(D_00196DA4, (iptr)D_001707AE, 598);
     D_00196DA4 = -1751672937;
 }
 
@@ -648,9 +648,9 @@ void func_00028210(char *text)
 {
     D_0012B508 = 146;
     if (text != 0) {
-        mc_strncpy((int)text_buffer, text, 160, (int)D_001707AE, 809);
+        mc_strncpy((iptr)text_buffer, text, 160, (iptr)D_001707AE, 809);
     } else {
-        mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 811, 160);
+        mc_memset((iptr)text_buffer, 0, 80, (iptr)D_001707AE, 811, 160);
     }
     inpstr_edit(text_buffer, 2, 191, 300, 9, 50);
 }
@@ -668,7 +668,7 @@ void town_note_delete(int index)
         index--;
     }
     next = (strlen(note + 4) + note) + 5;
-    mc_memcpy(note, next, (scratch_buffer + 49999) - next, (int)D_001707AE, 839, 4);
+    mc_memcpy(note, next, (scratch_buffer + 49999) - next, (iptr)D_001707AE, 839, 4);
 }
 
 char *town_note_get(int index)
@@ -726,13 +726,13 @@ void func_00028547(void)
         entry = note;
         scratch_190d68 = *(short *)entry;
         scratch_190d6a = *(short *)(entry + 2);
-        mc_strncpy((int)text_buffer, note + 4, 160, (int)D_001707AE, 921);
+        mc_strncpy((iptr)text_buffer, note + 4, 160, (iptr)D_001707AE, 921);
         town_note_delete(note_index - 1);
         func_00028210((char *)text_buffer);
         if (text_buffer[0] != 0) town_note_add((char *)text_buffer);
         return;
     }
-    mc_memset((int)text_buffer, 0, 80, (int)D_001707AE, 928, 160);
+    mc_memset((iptr)text_buffer, 0, 80, (iptr)D_001707AE, 928, 160);
     func_00028210((char *)text_buffer);
     if (text_buffer[0] == 0) return;
     town_note_add((char *)text_buffer);
@@ -772,13 +772,13 @@ void town_map_note_building(struct record *object, struct building *building)
     char *name;
 
     name = building_name(building);
-    mc_memset((int)scratch_buffer, 0, 50000, (int)D_001707AE, 963, 4);
-    mc_set_location(964, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
+    mc_memset((int)(iptr)scratch_buffer, 0, 50000, (iptr)D_001707AE, 963, 4);
+    mc_set_location(964, (iptr)D_001707AE);
+    mc_sprintf((iptr)text_buffer, (iptr)D_001707B8, location_object->id >> 16);
     if (disk_file_exists(text_buffer) != 0) {
-        disk_read_file(text_buffer, (int)scratch_buffer);
+        disk_read_file(text_buffer, (int)(iptr)scratch_buffer);
         *(int *)scratch_buffer = game_minutes;
-        mc_memcpy((int)scratch_buffer, (int)scratch_buffer, 50000, (int)D_001707AE, 970, 4);
+        mc_memcpy((int)(iptr)scratch_buffer, (int)(iptr)scratch_buffer, 50000, (iptr)D_001707AE, 970, 4);
         if (town_note_exists(name) != 0) return;
     } else {
         *(int *)scratch_buffer = game_minutes;
@@ -791,9 +791,9 @@ void town_map_note_building(struct record *object, struct building *building)
     scratch_190d68 = x;
     scratch_190d6a = y;
     town_note_add(name);
-    mc_set_location(986, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    disk_write_arena2_file(text_buffer, (int)scratch_buffer, town_notes_size());
+    mc_set_location(986, (iptr)D_001707AE);
+    mc_sprintf((iptr)text_buffer, (iptr)D_001707B8, location_object->id >> 16);
+    disk_write_arena2_file(text_buffer, (int)(iptr)scratch_buffer, town_notes_size());
 }
 
 void automap_draw_block_overview(void)
@@ -828,14 +828,14 @@ void automap_draw_block_overview(void)
 
 void automap_save(void)
 {
-    if (((int)player_environment) != 3 || (int)D_00196DA0 == 0) {
+    if (((int)player_environment) != 3 || (iptr)D_00196DA0 == 0) {
         return;
     }
     *(int *)scratch_buffer = game_minutes;
-    mc_memcpy((int)(scratch_buffer + 4), (int)D_00196DA0, 10240, (int)D_001707AE, 1055, 4);
-    mc_set_location(1056, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707E4, location_object->id >> 16);
-    disk_write_arena2_file(text_buffer, (int)scratch_buffer, 10244);
+    mc_memcpy((int)(iptr)(scratch_buffer + 4), (iptr)D_00196DA0, 10240, (iptr)D_001707AE, 1055, 4);
+    mc_set_location(1056, (iptr)D_001707AE);
+    mc_sprintf((iptr)text_buffer, (iptr)D_001707E4, location_object->id >> 16);
+    disk_write_arena2_file(text_buffer, (int)(iptr)scratch_buffer, 10244);
 }
 
 void automap_load(void)
@@ -843,12 +843,12 @@ void automap_load(void)
     int handle;
 
     if (((int)player_environment) != 3) return;
-    mc_memset((int)scratch_buffer, 0, 50000, (int)D_001707AE, 1066, 4);
-    mc_set_location(1067, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707E4, location_object->id >> 16);
+    mc_memset((int)(iptr)scratch_buffer, 0, 50000, (iptr)D_001707AE, 1066, 4);
+    mc_set_location(1067, (iptr)D_001707AE);
+    mc_sprintf((iptr)text_buffer, (iptr)D_001707E4, location_object->id >> 16);
     handle = disk_open_data(text_buffer);
     if (handle == (-1)) return;
-    read(handle, (int)scratch_buffer, 50000);
+    read(handle, (int)(iptr)scratch_buffer, 50000);
     close(handle);
     automap_restore_seen();
 }
@@ -901,7 +901,7 @@ void func_00028ED1(struct record *object)
 
 void automap_restore_seen(void)
 {
-    if ((int)D_00196DA0 == 0) automap_find_record();
+    if ((iptr)D_00196DA0 == 0) automap_find_record();
     object_foreach(location_object, func_00028ED1);
 }
 
@@ -929,7 +929,7 @@ int qcond_op05_item_dropped_at_place(struct quest *quest, struct qbn_op *op)
         player_place = player_place->parent;
     }
     if (player_place->type != 43) return 0;
-    if ((int)quest_event_object->twin == (int)op->args[1].object && item_place == player_place) {
+    if ((iptr)quest_event_object->twin == (iptr)op->args[1].object && item_place == player_place) {
         quest_set_state(quest, op, 1);
         return 1;
     }
@@ -995,7 +995,7 @@ int qcond_op01_item_given_to_npc(struct quest *quest, struct qbn_op *op)
     object = object->twin;
     while (object != 0 && object != player_entity) object = object->parent;
     if (object != player_entity) return 0;
-    if ((op->args[2].object->type == 65 && (short)quest_event_object2->data.person.faction_id == op->args[2].object->faction_id) || (int)quest_event_object2->twin == (int)op->args[2].object) {
+    if ((op->args[2].object->type == 65 && (short)quest_event_object2->data.person.faction_id == op->args[2].object->faction_id) || (iptr)quest_event_object2->twin == (iptr)op->args[2].object) {
         quest_set_state(quest, op, 1);
         unequip_object(op->args[1].object->twin);
         object_delete(op->args[1].object->twin);
@@ -1008,7 +1008,7 @@ int qcond_op01_item_given_to_npc(struct quest *quest, struct qbn_op *op)
 
 int qcond_op03_item_found(struct quest *quest, struct qbn_op *op)
 {
-    if ((int)quest_event_object->twin == (int)op->args[1].object) {
+    if ((iptr)quest_event_object->twin == (iptr)op->args[1].object) {
         quest_set_state(quest, op, 1);
         return 1;
     }
@@ -1070,7 +1070,7 @@ void qaction_op87_respawn(struct quest *quest, struct qbn_op *op)
 
 int qcond_op28_npc_clicked(struct quest *quest, struct qbn_op *op)
 {
-    if ((op->args[1].object->type == 65 && op->args[1].object->faction_id == (short)quest_event_object->data.person.faction_id) || ((int)quest_event_object->twin == (int)op->args[1].object && op->args[0].value != (-1))) {
+    if ((op->args[1].object->type == 65 && op->args[1].object->faction_id == (short)quest_event_object->data.person.faction_id) || ((iptr)quest_event_object->twin == (iptr)op->args[1].object && op->args[0].value != (-1))) {
         quest_set_state(quest, op, 1);
         return 1;
     }
@@ -1090,12 +1090,12 @@ int qcond_op70_player_has_items(struct quest *quest, struct qbn_op *op)
             quest_set_arg_state(quest, op, 1, 0);
             return 0;
         }
-        if ((int)object == (-1768515946)) {
+        if ((iptr)object == (-1768515946)) {
             quest_set_arg_state(quest, op, 1, 0);
             return 0;
         }
         object = object->twin;
-        if ((int)object == (-1768515946)) {
+        if ((iptr)object == (-1768515946)) {
             quest_set_arg_state(quest, op, 1, 0);
             return 0;
         }

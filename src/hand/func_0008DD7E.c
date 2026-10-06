@@ -21,7 +21,7 @@ void object_follow_move_cb(struct record *object)
     int dx;
     int dz;
 
-    if ((int)object->parent == 3 || (int)object->parent == 18)
+    if ((iptr)object->parent == 3 || (iptr)object->parent == 18)
         return;
     if (object->type == 52 || object->parent->type == 52 || object->parent->type == 22)
         return;

@@ -28,7 +28,7 @@ extern void func_000252C7(int);
 extern void func_000252E2(int);
 extern void parse_expand(char *, struct character *);
 extern void item_make(unsigned short, int, struct item *);
-extern int disk_read_file(char *, char *);
+extern iptr disk_read_file(char *, char *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern void inv_store_item(struct record *);
 extern void inv_merge_arrows(struct record *, struct record *, int);

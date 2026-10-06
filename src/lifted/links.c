@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern int D_00147954;
+extern iptr D_00147954;
 extern char D_00175962[];
 extern signed char text_rsc_buffer[];
 extern signed char D_00190FE5[];
@@ -13,16 +13,16 @@ extern struct spell *spell_records;
 extern struct character *player_character;
 extern char scratch_buffer[];
 extern struct link links[];
-extern int active_links[];
+extern iptr active_links[];
 extern int link_count;
 extern int active_link_count;
 
 extern int func_000658CA(int, int);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern int spfx_damage(struct record *, int, struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int read();
 extern int write();
 extern int strlen();
@@ -39,19 +39,19 @@ void links_save(int handle)
     int *indexes;
 
     if (active_link_count < 0) active_link_count = 0;
-    mc_memcpy(D_00147954, (int)links, link_count * 39, (int)D_00175962, 78, 4);
+    mc_memcpy(D_00147954, (iptr)links, link_count * 39, (iptr)D_00175962, 78, 4);
     copy = (struct link *)D_00147954;
     for (i = 0; i < link_count; i++) {
         if (copy[i].object != 0) {
             copy[i].object = (struct record *)copy[i].object->id;
         }
     }
-    write(handle, (int)&link_count, 4);
+    write(handle, (iptr)&link_count, 4);
     write(handle, copy, link_count * 39);
-    write(handle, (int)&active_link_count, 4);
+    write(handle, (iptr)&active_link_count, 4);
     indexes = (int *)D_00147954;
     for (i = 0; i < active_link_count; i++) {
-        indexes[i] = ((unsigned)(active_links[i] - ((int)links))) / 39;
+        indexes[i] = ((unsigned)(active_links[i] - ((iptr)links))) / 39;
     }
     write(handle, indexes, active_link_count << 2);
 }
@@ -60,21 +60,21 @@ void links_load(int handle)
 {
     int i;
 
-    read(handle, (int)&link_count, 4);
-    read(handle, (int)links, link_count * 39);
+    read(handle, (iptr)&link_count, 4);
+    read(handle, (iptr)links, link_count * 39);
     for (i = 0; i < link_count; i++) {
         if (links[i].param == 108) {
             links[i].param = 100;
         }
         if (links[i].object != 0) {
-            links[i].object = object_find_by_id(location_object, (int)links[i].object);
+            links[i].object = object_find_by_id(location_object, (iptr)links[i].object);
         }
     }
-    read(handle, (int)&active_link_count, 4);
+    read(handle, (iptr)&active_link_count, 4);
     if (active_link_count < 0) active_link_count = 0;
-    read(handle, (int)active_links, active_link_count << 2);
+    read(handle, (iptr)active_links, active_link_count << 2);
     for (i = 0; i < active_link_count; i++) {
-        active_links[i] = ((int)links) + (active_links[i] * 39);
+        active_links[i] = ((iptr)links) + (active_links[i] * 39);
     }
 }
 
@@ -96,13 +96,13 @@ void link_show_text(int text_id)
     }
 }
 
-int link_answer_matches(int text_id, int answer)
+int link_answer_matches(int text_id, iptr answer)
 {
     int i;
     int length;
 
     parse_rsc_text(text_id, 0, 0);
-    length = strlen((int)text_rsc_buffer);
+    length = strlen((iptr)text_rsc_buffer);
     for (i = 1; i < length; i++) {
         if (((int)(unsigned char)text_rsc_buffer[i]) == 44 || ((int)(unsigned char)text_rsc_buffer[i]) == 34) {
             text_rsc_buffer[i] = 0;
@@ -111,8 +111,8 @@ int link_answer_matches(int text_id, int answer)
     D_00190FE5[i] = 0;
     i = 1;
     while (text_rsc_buffer[i] != 0) {
-        if (stricmp(((int)text_rsc_buffer) + i, answer) == 0) return 1;
-        i += strlen(((int)text_rsc_buffer) + i) + 1;
+        if (stricmp(((iptr)text_rsc_buffer) + i, answer) == 0) return 1;
+        i += strlen(((iptr)text_rsc_buffer) + i) + 1;
     }
     return 0;
 }
@@ -213,7 +213,7 @@ void links_set_reverse(short object_id, int flags)
     }
 }
 
-int links_object_motion(int object)
+iptr links_object_motion(iptr object)
 {
     int i;
     int n;
@@ -224,8 +224,8 @@ int links_object_motion(int object)
         link = (struct link *)active_links[i];
         n = link->chain_count + 1;
         for (j = 0; j < n; j++, link++) {
-            if ((int)link->object == object && xn_str_count_nonzero(link->delta, 6) != 0) {
-                return (int)link->delta;
+            if ((iptr)link->object == object && xn_str_count_nonzero(link->delta, 6) != 0) {
+                return (iptr)link->delta;
             }
         }
     }

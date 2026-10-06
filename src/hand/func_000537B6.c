@@ -2,11 +2,11 @@
 #include "records.h"
 
 extern char D_0012B508;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00175420[];
 extern struct rect classmaker_reputation_buttons[];
 extern signed char text_buffer[];
-extern int scratch_190df4;
+extern iptr scratch_190df4;
 extern char *scratch_190df8;
 extern struct character *player_character;
 extern void msgbox_update(void);

@@ -7,7 +7,7 @@ extern char D_00170129[];
 extern char D_00170133[];
 extern char D_00170137[];
 extern char D_0017013B[];
-extern int D_00178848[];
+extern iptr D_00178848[];
 
 extern int profile_find_section(struct profile *, ...);
 extern int profile_find_item(struct profile *, ...);
@@ -57,8 +57,8 @@ int profile_get_yes(struct profile *profile, char *item)
     char value[32];
 
     if ((short)profile_find_item(profile, item) == 0) return 0;
-    if ((short)profile_get_string(profile, (int)value, 32) == 0) return 0;
-    if (stricmp((int)value, (int)D_00170133) == 0) return 1;
+    if ((short)profile_get_string(profile, (iptr)value, 32) == 0) return 0;
+    if (stricmp((iptr)value, (iptr)D_00170133) == 0) return 1;
     return 0;
 }
 
@@ -73,8 +73,8 @@ int profile_set_yes_no(struct profile *profile, char *item, short yes)
 {
     if ((short)profile_find_item(profile, item) == 0) return 0;
     if (yes != 0) {
-        if ((short)profile_set_string(profile, (int)D_00170137) == 0) return 0;
-    } else if ((short)profile_set_string(profile, (int)D_0017013B) == 0) {
+        if ((short)profile_set_string(profile, (iptr)D_00170137) == 0) return 0;
+    } else if ((short)profile_set_string(profile, (iptr)D_0017013B) == 0) {
         return 0;
     }
     return 1;
@@ -93,7 +93,7 @@ int profile_delete_section(struct profile *profile, char *section)
     while (start[length] != 91 && start + length < end) {
         length++;
     }
-    mc_memmove(start, start + length, end - (start + length), (int)D_00170129, 1179, 4);
+    mc_memmove(start, start + length, end - (start + length), (iptr)D_00170129, 1179, 4);
     profile->length -= length;
     profile->flags |= 128;
     return 1;
@@ -136,7 +136,7 @@ int profile_hex_to_int(char *text)
     digits = strlen(text);
     i = 0;
     do {
-        value += profile_hex_digit((signed char)text[i++]) * D_00178848[digits];
+        value += (int)(profile_hex_digit((signed char)text[i++]) * D_00178848[digits]);
         digits--;
     } while (((unsigned)digits) > 0);
     return value;

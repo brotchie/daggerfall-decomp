@@ -48,7 +48,7 @@ extern struct image *hud_bar_image;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern struct record *D_00195C48;
-extern int spell_cast_anim_fire[];
+extern iptr spell_cast_anim_fire[];
 extern char D_00195F28[];
 extern short spell_effect_slot;
 extern short spell_ready_cost;
@@ -59,7 +59,7 @@ extern int D_00199D6C;
 extern signed char D_00199D71;
 
 extern int collide_line_of_sight(struct record *, struct record *);
-extern int collide_creature_within(struct record *, int, int);
+extern int collide_creature_within(struct record *, iptr, int);
 extern int spell_cost(struct spell *, struct character *);
 extern int player_in_daylight(void);
 extern int cast_player_spell(struct record *);
@@ -67,7 +67,7 @@ extern int cast_item_spell_at(struct record *, struct record *);
 extern int cast_creature_spell_at(struct record *, struct record *, struct record *);
 extern int spell_missile_update(struct record *, int);
 extern int sound_play(int, struct record *, int);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern int spfx_resist_roll(int, int, struct character *, struct career *, int, int);
 extern int spell_extend_duration(struct record *, struct spell *, int);
@@ -117,7 +117,7 @@ int cast_item_strike_spell(int spell_id, struct record *target)
     while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
     spell->type = 9;
     spell->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (int)D_001757F4, 121, 4);
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (iptr)D_001757F4, 121, 4);
     spell->data.spell.icon = 250;
     i = spell_cost(&spell->data.spell, player_character);
     if (cast_item_spell_at(spell, target) != 0) object_delete(spell);
@@ -135,7 +135,7 @@ int cast_creature_spell(struct record *caster, struct record *target, int spell_
     spell->type = 9;
     spell->id = object_new_id(((unsigned)location_object->id) >> 16);
     spell->caster = caster;
-    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (int)D_001757F4, 144, 4);
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (iptr)D_001757F4, 144, 4);
     if (D_00196292 != 0) spell->data.spell.icon = 250;
     i = spell_cost((struct spell *)((char *)spell + 89), &caster->data.character);
     if (cast_creature_spell_at(spell, caster, target) != 0) object_delete(spell);
@@ -213,14 +213,14 @@ int cast_recast_last(void)
     struct spell *spell_data;
     int cost;
 
-    if ((int)spell_ready_missile != 0 || (int)spell_ready_touch != 0) {
-        hud_message_add((int)D_001757FF);
+    if ((iptr)spell_ready_missile != 0 || (iptr)spell_ready_touch != 0) {
+        hud_message_add((iptr)D_001757FF);
         return 0;
     }
     if (((int)(short)spell_last_cast_id) == (-1)) return 0;
     found = object_find_item(player_entity->children, 27, 0);
     if (found == 0) {
-        hud_message_add((int)D_00175820);
+        hud_message_add((iptr)D_00175820);
         return 0;
     }
     scratch_object = 0;
@@ -229,7 +229,7 @@ int cast_recast_last(void)
     spell_data = &found->data.spell;
     cost = (int)(short)spell_ready_cost;
     if ((player_character->magicka + spell_points_bonus) < cost) {
-        hud_message_add((int)D_00175837);
+        hud_message_add((iptr)D_00175837);
         return 0;
     }
     spell_add_skill_uses(spell_data, 1);
@@ -246,7 +246,7 @@ int cast_recast_last(void)
     cast = object_create_child(player_object->parent, 0, 89);
     cast->type = 9;
     cast->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&cast->data.spell, &found->data.spell, 89, (int)D_001757F4, 443, 4);
+    mc_memcpy(&cast->data.spell, &found->data.spell, 89, (iptr)D_001757F4, 443, 4);
     if (cast_player_spell(cast) != 0) object_delete(cast);
     return 1;
 }
@@ -278,7 +278,7 @@ int spell_resist_check(struct record *spell, struct record **target)
             cost = spell_cost(spell_data, target_char);
             if ((cost + target_char->magicka) <= target_char->max_magicka) {
                 target_char->magicka += cost;
-                hud_message_add((int)D_00175858);
+                hud_message_add((iptr)D_00175858);
                 return 0;
             }
         }
@@ -290,13 +290,13 @@ L5B5A7:;
             *target = spell->caster;
             target_char = &(*target)->data.character;
             target_class = &target_char->career;
-            hud_message_add((int)D_0017586C);
+            hud_message_add((iptr)D_0017586C);
         }
     }
     if ((target_char->conditions & 0x800) != 0) {
         spell_find_active_effect(*target, 22, &chance, 0);
         if (rand_range(1, 100) <= chance) {
-            hud_message_add((int)D_00175881);
+            hud_message_add((iptr)D_00175881);
             return 0;
         }
     }
@@ -430,14 +430,14 @@ void cast_fire_missile(struct record *missile)
             missile->yaw = ((camera_object->yaw + ((((((int)(short)mouse_x) + 6) - ((int)(short)xn_cam_centre_x)) * 160) / 100)) + view_look_yaw) & 2047;
         }
         step.light->angle_z = (missile->angle_z = 0);
-        mc_memset((int)aim, 0, 12, (int)D_001757F4, 711, 4);
-        xn_math_advance_pitch_yaw(missile->angle_x, missile->yaw, 1024, (int)aim);
+        mc_memset((iptr)aim, 0, 12, (iptr)D_001757F4, 711, 4);
+        xn_math_advance_pitch_yaw(missile->angle_x, missile->yaw, 1024, (iptr)aim);
         aim[0] += missile->x;
         aim[1] += missile->y;
         aim[2] += missile->z;
-        mc_memset((int)&step, 0, 12, (int)D_001757F4, 717, 4);
-        xn_vec_unit_direction(&missile->x, (int)aim, missile->data.spell.missile_direction);
-        xn_vec_advance(missile->data.spell.missile_direction, 110, (int)&step);
+        mc_memset((iptr)&step, 0, 12, (iptr)D_001757F4, 717, 4);
+        xn_vec_unit_direction(&missile->x, (iptr)aim, missile->data.spell.missile_direction);
+        xn_vec_advance(missile->data.spell.missile_direction, 110, (iptr)&step);
         missile->x += step.x;
         missile->y += step.y;
         missile->z += step.z;
@@ -451,7 +451,7 @@ void cast_fire_missile(struct record *missile)
         step.x = (player_object->x + missile->x) / 2;
         step.y = (player_object->y + missile->y) / 2;
         step.z = (player_object->z + missile->z) / 2;
-        if (collide_creature_within(player_object, (int)&step, 65) != 0) {
+        if (collide_creature_within(player_object, (iptr)&step, 65) != 0) {
             sound_play((int)(short)*(short *)(spell_impact_sounds + (missile->data.spell.element * 2)), missile, 110);
             missile->missile_texture |= 1;
             missile->image2 = 32768;
@@ -519,7 +519,7 @@ void cast_creature_missile(struct record *missile, struct record *caster, struct
     midpoint[0] = (caster->x + missile->x) / 2;
     midpoint[1] = (caster->y + missile->y) / 2;
     midpoint[2] = (caster->z + missile->z) / 2;
-    if (collide_creature_within(caster, (int)midpoint, 65) != 0) {
+    if (collide_creature_within(caster, (iptr)midpoint, 65) != 0) {
         sound_play((int)(short)*(short *)(spell_impact_sounds + (missile->data.spell.element * 2)), missile, 110);
         missile->missile_texture |= 1;
         missile->image2 = 32768;
@@ -610,7 +610,7 @@ void func_0005CA28(struct record *object)
 {
     if (object->type != 9) return;
     if ((signed char)D_00199D64->id != (signed char)object->data.spell.id) return;
-    mc_strncpy((int)D_00199D64 + 47, object->data.spell.name, 25, (int)D_001757F4, 958);
+    mc_strncpy((iptr)D_00199D64 + 47, object->data.spell.name, 25, (iptr)D_001757F4, 958);
 }
 
 void spell_lookup_name(struct spell *spell)
@@ -628,7 +628,7 @@ void spell_lookup_name(struct spell *spell)
         object_foreach(spellbook->children, func_0005CA28);
         return;
     }
-    mc_strncpy(spell->name, (int)(signed char *)&spell_records[i].name[0], 25, (int)D_001757F4, 974);
+    mc_strncpy(spell->name, (iptr)(signed char *)&spell_records[i].name[0], 25, (iptr)D_001757F4, 974);
 }
 
 void spell_hud_draw_icons(void)
@@ -653,7 +653,7 @@ void spell_hud_draw_icons(void)
     D_00199D71 = 1;
     while (object != 0) {
         if (object->type == 9) {
-            if ((int)object->caster != (int)player_entity) {
+            if ((iptr)object->caster != (iptr)player_entity) {
                 tmp = 1;
             } else {
                 tmp = 0;

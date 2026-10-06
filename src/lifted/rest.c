@@ -42,7 +42,7 @@ extern int breath_last_tick;
 extern char rest_image[];
 
 extern int tavern_room_rented(void);
-extern int disk_resolve_path(int);
+extern int disk_resolve_path(iptr);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
@@ -55,7 +55,7 @@ extern void tavern_go_to_room(void);
 extern void damage_creature_death(struct record *);
 extern void raise_skills(void);
 extern void skill_add_uses(int, int);
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(iptr, int);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
 extern void time_pass_minutes(int);
@@ -71,7 +71,7 @@ void rest_close(void)
 
     if (((int)(unsigned char)game_mode) != 16) return;
     if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
-        mc_free(*(int *)rest_image, (int)D_001760D6, 271);
+        mc_free(*(int *)rest_image, (iptr)D_001760D6, 271);
         *(int *)rest_image = -1751672937;
     }
     D_00196272 = 0;
@@ -84,20 +84,20 @@ void rest_close(void)
     if (player_character->special_infection_time != 0 && player_character->special_infection != 0 && ((int)(unsigned short)(player_character->flags & 16)) != 0) {
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        path = disk_resolve_path((int)D_00176141);
-        mc_memset(655360, 0, 64000, (int)D_001760D6, 285, 4);
+        path = disk_resolve_path((iptr)D_00176141);
+        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 285, 4);
         xn_vid_play(path, 0, 0, 1);
-        mc_memset(655360, 0, 64000, (int)D_001760D6, 287, 4);
+        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 287, 4);
         palette_restore();
         night_sky_loaded = 0;
         sky_loaded_frame = 10000;
     } else if (player_character->special_infection_time != 0 && player_character->special_infection == 0 && ((int)(unsigned short)(player_character->flags & 16)) != 0) {
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
-        path = disk_resolve_path((int)D_0017614E);
-        mc_memset(655360, 0, 64000, (int)D_001760D6, 297, 4);
+        path = disk_resolve_path((iptr)D_0017614E);
+        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 297, 4);
         xn_vid_play(path, 0, 0, 1);
-        mc_memset(655360, 0, 64000, (int)D_001760D6, 299, 4);
+        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 299, 4);
         palette_restore();
         night_sky_loaded = 0;
         sky_loaded_frame = 10000;

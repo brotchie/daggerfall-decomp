@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern signed char D_0012B508;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00175420[];
 extern char skill_names[];
 extern struct rect classmaker_buttons[];
@@ -10,14 +10,14 @@ extern signed char text_buffer[];
 extern char scratch_190d64[];
 extern char scratch_190d66[];
 extern short scratch_190d6a;
-extern int scratch_190de8;
+extern iptr scratch_190de8;
 extern struct image *scratch_190df0;
-extern int scratch_190df4;
+extern iptr scratch_190df4;
 extern struct career *player_class;
 extern void msgbox_update(void);
 extern void classmaker_draw_dagger(void);
-extern void text_draw_coloured(int, int, int, int, unsigned char);
-extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+extern void text_draw_coloured(iptr, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern int itoa();
 extern int mc_memcpy();
 extern int xn_mouse_cursor_erase();
@@ -33,7 +33,7 @@ int classmaker_draw(short show_name)
     short y_offset;
 
     xn_mouse_cursor_erase();
-    mc_memcpy(screen_buffer, scratch_190df4, 64000, (int)D_00175420, 235, 4);
+    mc_memcpy(screen_buffer, scratch_190df4, 64000, (iptr)D_00175420, 235, 4);
     classmaker_draw_dagger();
     if (*(short *)scratch_190d66 & 2) {
         xn_draw_put_rect(44, (int)(short)scratch_190d6a, scratch_190df0->width, scratch_190df0->height, scratch_190de8, 0);
@@ -41,11 +41,11 @@ int classmaker_draw(short show_name)
     }
     xn_draw_get_rect(44, (int)(short)scratch_190d6a, scratch_190df0->width, scratch_190df0->height, scratch_190de8, 0);
     *(signed char *)scratch_190d66 |= 2;
-    xn_draw_image_transparent(44, (int)(short)scratch_190d6a, scratch_190df0->width, scratch_190df0->height, (int)scratch_190df0->pixels);
-    text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (int)text_buffer, 10), (int)(short)(((scratch_190df0->width + 1) >> 1) + 43), (int)(short)((((int)(short)scratch_190d6a) + (scratch_190df0->height >> 1)) - 3), 145, 141);
+    xn_draw_image_transparent(44, (int)(short)scratch_190d6a, scratch_190df0->width, scratch_190df0->height, (iptr)scratch_190df0->pixels);
+    text_draw_centred_coloured(itoa((int)(short)*(short *)scratch_190d64, (iptr)text_buffer, 10), (int)(short)(((scratch_190df0->width + 1) >> 1) + 43), (int)(short)((((int)(short)scratch_190d6a) + (scratch_190df0->height >> 1)) - 3), 145, 141);
     if (show_name != 0)
-        text_draw_coloured((int)player_class->name, 110, 5, 145, 141);
-    text_draw_centred_coloured(itoa(player_class->hp_per_level, (int)text_buffer, 10), 287, 55, 145, 141);
+        text_draw_coloured((iptr)player_class->name, 110, 5, 145, 141);
+    text_draw_centred_coloured(itoa(player_class->hp_per_level, (iptr)text_buffer, 10), 287, 55, 145, 141);
     D_0012B508 = 145;
     for (i = 0; i < 12; i++) {
         if (player_class->skills[i] < 35)
@@ -54,7 +54,7 @@ int classmaker_draw(short show_name)
     x = (classmaker_buttons[18].x0 + classmaker_buttons[18].x1) >> 1;
     y_offset = ((classmaker_buttons[18].y1 + classmaker_buttons[18].y0) >> 1) - classmaker_buttons[18].y0 + 3;
     for (i = 0; i < 8; i++) {
-        text_draw_centred_coloured(itoa(player_class->attributes[i], (int)text_buffer, 10), x, (short)(classmaker_buttons[i + 18].y0 + y_offset), 145, 141);
+        text_draw_centred_coloured(itoa(player_class->attributes[i], (iptr)text_buffer, 10), x, (short)(classmaker_buttons[i + 18].y0 + y_offset), 145, 141);
     }
     msgbox_update();
     xn_mouse_cursor_draw();

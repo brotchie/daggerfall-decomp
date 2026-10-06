@@ -12,7 +12,7 @@ extern int read(int, void *, int);
 extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);
 
-int text_rsc_load_variant(short id, unsigned short flags, short width, int variant)
+iptr text_rsc_load_variant(short id, unsigned short flags, short width, int variant)
 {
     short n;
     short i;
@@ -34,7 +34,7 @@ int text_rsc_load_variant(short id, unsigned short flags, short width, int varia
         text = mc_malloc(1024, D_00170D55, 121);
         mc_set_location(122, D_00170D55);
         mc_sprintf((char *)text, D_00170D7F, id);
-        return (int)text;
+        return (iptr)text;
     }
     size = scratch_buffer[i + 1].offset - scratch_buffer[i].offset;
     lseek(text_rsc_file, scratch_buffer[i].offset, 0);

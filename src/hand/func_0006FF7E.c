@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006FF7E */
 #include "records.h"
 
-extern int guild_skill_lists[];
+extern iptr guild_skill_lists[];
 extern struct faction *D_0019671C;
-extern int guild_best_skill(int *, int, int);
+extern int guild_best_skill(int *, iptr, int);
 
 int guild_join_check(int guild)
 {

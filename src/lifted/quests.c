@@ -30,12 +30,12 @@ extern struct character *player_character;
 extern int game_minutes;
 extern char scratch_buffer[];
 extern struct record *quest_tick_object;
-extern int quest_potential_questor;
+extern iptr quest_potential_questor;
 extern short D_00195F68;
 extern char D_001961F5[];
 extern signed char D_00196282;
 extern struct quest *current_quest;
-extern int quest_debug_data;
+extern iptr quest_debug_data;
 extern signed char D_001997AE;
 extern char D_001A5BE4[];
 
@@ -45,12 +45,12 @@ extern struct record *func_000310E1(struct record *, struct record *);
 extern int quest_init_resources(struct quest *);
 extern int quest_offer_prompt(struct quest *);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_find(struct record *, int (*)());
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int rand();
 extern int srand();
 extern int open(int, ...);
@@ -62,8 +62,8 @@ extern int strlen();
 extern int stricmp();
 extern int toupper();
 extern int strnicmp();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
 extern int tolower();
 extern int func_000A14E8();
@@ -76,7 +76,7 @@ extern void fatal_error(char *);
 extern void logbook_prune_quests(void);
 extern void object_foreach(struct record *, void (*)());
 extern void object_foreach_open(struct record *, void (*)());
-int quest_start(char *);
+iptr quest_start(char *);
 int quest_match_person_cb(struct record *);
 int quest_free_id(void);
 int quest_is_active(char *);
@@ -89,23 +89,23 @@ void quest_pick_for_npc(struct record *);
 void quest_count_givers_cb(struct record *);
 #pragma aux mc_set_location parm routine [];
 
-int quest_start(char *file_name)
+iptr quest_start(char *file_name)
 {
     struct record *quest_object;
     struct quest *quest;
-    int file_data;
+    iptr file_data;
     int handle;
 
     if (file_name[0] == 0) return 0;
-    if (stricmp(file_name, (int)D_00174F5C) == 0) return 0;
+    if (stricmp(file_name, (iptr)D_00174F5C) == 0) return 0;
     if (quest_is_active(file_name) != 0) return 0;
-    mc_set_location(172, (int)D_00174F47);
-    mc_sprintf((int)text_buffer, (int)D_00174F57, (int)arena2_path, file_name);
-    handle = open((int)text_buffer, 512);
+    mc_set_location(172, (iptr)D_00174F47);
+    mc_sprintf((iptr)text_buffer, (iptr)D_00174F57, (iptr)arena2_path, file_name);
+    handle = open((iptr)text_buffer, 512);
     if (handle < 0) {
-        mc_set_location(177, (int)D_00174F47);
-        mc_sprintf((int)text_buffer, (int)D_00174F57, (int)arena2_cd_path, file_name);
-        handle = open((int)text_buffer, 512);
+        mc_set_location(177, (iptr)D_00174F47);
+        mc_sprintf((iptr)text_buffer, (iptr)D_00174F57, (iptr)arena2_cd_path, file_name);
+        handle = open((iptr)text_buffer, 512);
         if (handle < 0) return 0;
     }
     close(handle);
@@ -115,13 +115,13 @@ int quest_start(char *file_name)
     quest_object->type = 14;
     quest_object->flags = 3;
     quest = &quest_object->data.quest;
-    mc_memcpy(quest, file_data, (int)(short)*(short *)disk_last_file_size, (int)D_00174F47, 193, 4);
+    mc_memcpy(quest, file_data, (int)(short)*(short *)disk_last_file_size, (iptr)D_00174F47, 193, 4);
     if (file_data != 0 && file_data != (-1751672937)) {
-        mc_free(file_data, (int)D_00174F47, 194);
+        mc_free(file_data, (iptr)D_00174F47, 194);
         file_data = -1751672937;
     }
     quest_object->quest_id = (quest->id = quest_free_id());
-    func_000A14E8(quest->name, file_name, 8, (int)D_00174F47, 197, 9);
+    func_000A14E8(quest->name, file_name, 8, (iptr)D_00174F47, 197, 9);
     if (((int)(short)D_00195F68) == 240) {
         D_00195F68 = current_building->faction_id;
     }
@@ -144,9 +144,9 @@ int quest_start(char *file_name)
     }
     logbook_prune_quests();
     func_0004C759();
-    quest_debug_data = (int)current_quest;
+    quest_debug_data = (int)(iptr)current_quest;
     rumor_add_quest(current_quest, 1005, 0, 4);
-    return (int)quest;
+    return (iptr)quest;
 }
 
 void quest_start_pending(void)
@@ -166,7 +166,7 @@ int quest_file_list_add(char *file_name, int file_count)
         if (stricmp(entry, file_name) == 0) return file_count;
         entry += strlen(entry) + 1;
     }
-    mc_strncpy(entry, file_name, 4, (int)D_00174F47, 383);
+    mc_strncpy(entry, file_name, 4, (iptr)D_00174F47, 383);
     return file_count + 1;
 }
 
@@ -191,12 +191,12 @@ void func_0004C588(struct record *object)
         object_find(location_object, quest_match_person_cb);
         if (found_object == 0) return;
         if (found_object->twin != 0) {
-            mc_set_location(422, (int)D_00174F47);
-            mc_sprintf((int)text_buffer, (int)D_00174F71, (int)(unsigned short)(short)found_object->image);
+            mc_set_location(422, (iptr)D_00174F47);
+            mc_sprintf((iptr)text_buffer, (iptr)D_00174F71, (int)(unsigned short)(short)found_object->image);
             fatal_error(text_buffer);
         }
         object->id = found_object->id;
-        mc_memcpy(&object->x, &found_object->x, 12, (int)D_00174F47, 427, 4);
+        mc_memcpy(&object->x, &found_object->x, 12, (iptr)D_00174F47, 427, 4);
         found_object->quest_id = object->quest_id;
         object->twin = found_object;
         found_object->twin = object;
@@ -232,7 +232,7 @@ int quest_free_id(void)
 
     quest_object = quest_root->children;
     id_used = *(char **)scratch_buffer;
-    mc_memset(id_used, 0, 256, (int)D_00174F47, 478, 4);
+    mc_memset(id_used, 0, 256, (iptr)D_00174F47, 478, 4);
     while (quest_object != 0) {
         quest = &quest_object->data.quest;
         id_used[quest->id]++;
@@ -357,8 +357,8 @@ int quest_find_potential_questor(void)
     *(int *)D_00195B84 = rand_range(0, (*(int *)D_00195B84 & 32767) - 1) + 1;
     found_object = 0;
     object_foreach(location_object, quest_count_givers_cb);
-    quest_potential_questor = (int)found_object;
-    return (int)found_object;
+    quest_potential_questor = (int)(iptr)found_object;
+    return (int)(iptr)found_object;
 }
 
 int func_0004CD10(struct record *npc)
@@ -371,7 +371,7 @@ int func_0004CD10(struct record *npc)
     quest_pick_for_npc(npc);
     srand(saved_seed);
     if (*(signed char *)D_001961F5 != 0) {
-        quest_potential_questor = (int)npc;
+        quest_potential_questor = (iptr)npc;
         *(signed char *)D_001961F5 = 0;
         return 1;
     }

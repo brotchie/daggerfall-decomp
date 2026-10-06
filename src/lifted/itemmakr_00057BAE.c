@@ -1,6 +1,7 @@
 /* itemmakr.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
 extern char *enchant_spell_lists[];
 extern short enchant_fixed_costs[];
@@ -19,7 +20,7 @@ int enchant_slot_cost(int cost_code, unsigned char param, unsigned char as_point
         return -(cost);
     }
     if (cost_code >= 5 && cost_code <= 7) {
-        return enchant_spell_cost((int)(unsigned char)*(signed char *)((char *)(int)(enchant_spell_lists[power] + ((int)(unsigned char)param))));
+        return enchant_spell_cost((int)(unsigned char)*(signed char *)((char *)(iptr)(enchant_spell_lists[power] + ((int)(unsigned char)param))));
     }
     return (int)(short)enchant_fixed_costs[cost_code];
 }

@@ -39,7 +39,7 @@ extern unsigned char chargen_screen;
 extern int level_skill_sum(void);
 extern void msgbox_update(void);
 extern void classmaker_input_text(struct character *, int, int (*)(void));
-extern void *disk_read_file(char *, int);
+extern void *disk_read_file(char *, iptr);
 extern int rand_range(int, int);
 extern int chargen_draw(void);
 extern void chargen_free_images(void);

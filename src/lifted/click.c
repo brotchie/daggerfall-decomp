@@ -60,15 +60,15 @@ extern struct building *current_building;
 extern struct record *player_object;
 extern struct arch3d_plane *collide_floor_plane;
 extern struct record *location_object;
-extern int inventory_close_callback;
+extern iptr inventory_close_callback;
 extern struct pick_result *click_hit;
-extern int shelf_list_callback;
+extern iptr shelf_list_callback;
 extern struct record *shelf_object;
 extern struct record *spell_ready_touch;
 extern struct record *scratch_object;
 extern struct location *current_location;
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern char scratch_buffer[];
 extern struct record *D_00195CE8;
 extern struct block_model *D_00195D3C;
@@ -79,7 +79,7 @@ extern short shelf_model_index;
 extern short D_00195F68;
 extern char D_00196092[];
 extern char D_001960D9[];
-extern int D_00196118;
+extern iptr D_00196118;
 extern char D_00196120[];
 extern char D_001961F5[];
 extern signed char in_knightly_order_hall;
@@ -100,12 +100,12 @@ extern signed char D_001962B1;
 extern int daylight;
 extern signed char music_uses_fm;
 extern char stocked_shop_ids[];
-extern int service_menu_label;
+extern iptr service_menu_label;
 extern struct record *service_menu_npc;
 extern struct record *coven_menu_npc;
 extern int stocked_shop_count;
 extern struct record *repair_menu_npc;
-extern int service_menu_handler;
+extern iptr service_menu_handler;
 extern signed char shelf_list_active;
 extern signed char repair_menu_kind;
 extern char position_history[];
@@ -137,22 +137,22 @@ extern int building_is_open(struct building *);
 extern int quest_raise_event();
 extern int quest_pick_file();
 extern int func_0004CD80(struct person *);
-extern int npc_talk_record_build(struct record *);
+extern iptr npc_talk_record_build(struct record *);
 extern int func_000612A1(void);
 extern int ai_angle_diff(int, int, int *);
 extern int sound_play(int, struct record *, int);
 extern int sound_play_at_point(int, int, int, int, int);
 extern int bank_open(int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern struct membership *guild_find_membership_by_bits(unsigned char);
 extern int spawn_point_fits(struct record *);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern int location_contains(int, int);
-extern int npc_display_name(struct record *);
-extern int building_name(struct building *);
+extern iptr npc_display_name(struct record *);
+extern iptr building_name(struct building *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_detach(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
@@ -168,9 +168,9 @@ extern int abs();
 extern int mc_free();
 extern int mc_strncpy();
 extern int strlen();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
-extern int strchr();
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
+extern iptr strchr();
 extern int xn_math_approx_dist2d();
 extern int xn_math_approx_hypot();
 extern int xn_math_angle_to_point();
@@ -199,7 +199,7 @@ extern void guild_service_dispatch(struct record *);
 extern void door_try_open(struct record *, int);
 extern void book_read_header(char *, int);
 extern void pick_up_item(struct record *);
-extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern void hud_status_set(int);
 extern void list_popup_open_strings(char *);
 extern void msgbox_yes_no_rsc(int);
@@ -217,7 +217,7 @@ int repair_menu_open(int);
 int coven_menu_open(int);
 int quest_active_for_faction(short);
 int noble_quest_letter(void);
-int service_menu_open(int);
+int service_menu_open(iptr);
 int shelf_shop_stocked(int);
 int spawn_point_visible(struct record *);
 int spawn_point_occupied(struct record *);
@@ -247,25 +247,25 @@ void spawn_point_occupied_cb(struct record *);
 void click_describe_item(struct item *item)
 {
     if (strchr(D_00183248, (int)(unsigned char)item->name[0]) != 0) {
-        mc_set_location(204, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_0018324C, item);
+        mc_set_location(204, (iptr)D_00176198);
+        mc_sprintf((iptr)text_buffer, D_0018324C, item);
     } else {
-        mc_set_location(206, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_00183250, item);
+        mc_set_location(206, (iptr)D_00176198);
+        mc_sprintf((iptr)text_buffer, D_00183250, item);
     }
-    hud_message_add((int)text_buffer);
+    hud_message_add((iptr)text_buffer);
 }
 
 void click_describe_creature(struct character *unused, struct career *creature_class)
 {
     if (strchr(D_00183248, (int)(unsigned char)creature_class->name[0]) != 0) {
-        mc_set_location(215, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_0018324C, creature_class->name);
+        mc_set_location(215, (iptr)D_00176198);
+        mc_sprintf((iptr)text_buffer, D_0018324C, creature_class->name);
     } else {
-        mc_set_location(217, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_00183250, creature_class->name);
+        mc_set_location(217, (iptr)D_00176198);
+        mc_sprintf((iptr)text_buffer, D_00183250, creature_class->name);
     }
-    hud_message_add((int)text_buffer);
+    hud_message_add((iptr)text_buffer);
 }
 
 int click_world_face(struct pick_result *hit)
@@ -288,7 +288,7 @@ int click_world_face(struct pick_result *hit)
             case 56:
             case 331:
                 if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
-                    hud_message_add((int)D_001761A0);
+                    hud_message_add((iptr)D_001761A0);
                     break;
                 }
                 dungeon_load(-1);
@@ -296,11 +296,11 @@ int click_world_face(struct pick_result *hit)
                 break;
             case 74:
                 if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
-                    hud_message_add((int)D_001761C4);
+                    hud_message_add((iptr)D_001761C4);
                     break;
                 }
                 if (player_object->parent->type == 1) {
-                    if (xn_str_find_u16((int)D_00187644, (int)(short)building->faction_id, 21) != 0) {
+                    if (xn_str_find_u16((iptr)D_00187644, (int)(short)building->faction_id, 21) != 0) {
                         knightly = 1;
                     } else {
                         knightly = 0;
@@ -335,14 +335,14 @@ int click_world_face(struct pick_result *hit)
         case 56:
         case 331:
             if (((int)(unsigned short)(player_character->flags & 1536)) != 0) {
-                hud_message_add((int)D_001761E8);
+                hud_message_add((iptr)D_001761E8);
                 break;
             }
             dungeon_load(-1);
             automap_load();
             break;
         case 74:
-            hud_message_add((int)D_0017620C);
+            hud_message_add((iptr)D_0017620C);
             break;
         case 95:
             if (wagon_container != 0) {
@@ -492,21 +492,21 @@ void shelf_open_books(struct record *shelf, struct building *shelf_building, int
         while (object != 0) {
             *(short *)(shelf_book_ids + (i * 2)) = (short)object->data.item.message;
             book_read_header(header, (int)(unsigned short)*(short *)(shelf_book_ids + (i++ * 2)));
-            mc_strncpy(text, header, 4, (int)D_00176198, 479);
+            mc_strncpy(text, header, 4, (iptr)D_00176198, 479);
             text += strlen(text) + 1;
             object = object->next;
         }
         *text = 0;
         list_popup_open_strings(list);
-        shelf_list_callback = (int)shelf_book_chosen;
+        shelf_list_callback = (iptr)shelf_book_chosen;
         D_00196272 = 1;
-        inventory_close_callback = (int)shelf_return_items;
+        inventory_close_callback = (iptr)shelf_return_items;
         shelf_object = shelf;
         shelf_list_active = 1;
         return;
     }
     inventory_open_container((struct record *)D_001960D9, 1, 4);
-    inventory_close_callback = (int)shelf_return_items;
+    inventory_close_callback = (iptr)shelf_return_items;
     shelf_object = shelf;
 }
 
@@ -560,7 +560,7 @@ void shelf_open_stock(struct record *shelf, struct building *shelf_building, int
     } else {
         inventory_open_container((struct record *)D_001960D9, 0, 4);
     }
-    inventory_close_callback = (int)shelf_return_items;
+    inventory_close_callback = (iptr)shelf_return_items;
     shelf_object = shelf;
 }
 
@@ -633,10 +633,10 @@ void npc_click_service(struct record *npc)
                 }
                 break;
             case 3:
-                service_menu_handler = (int)bank_open;
+                service_menu_handler = (iptr)bank_open;
                 service_menu_npc = npc;
                 if (((int)(unsigned char)(person->flags & 8)) != 0) {
-                    service_menu_open((int)D_0017628F);
+                    service_menu_open((iptr)D_0017628F);
                 } else {
                     npc_talk(npc);
                 }
@@ -675,8 +675,8 @@ void npc_click_service(struct record *npc)
             case 12:
                 if (((int)(unsigned char)(person->flags & 8)) != 0) {
                     service_menu_npc = npc;
-                    service_menu_handler = (int)service_menu_sell;
-                    service_menu_open((int)D_00176297);
+                    service_menu_handler = (iptr)service_menu_sell;
+                    service_menu_open((iptr)D_00176297);
                 } else {
                     npc_talk(npc);
                 }
@@ -774,7 +774,7 @@ void repair_menu_close(void)
     while (key_down_esc != 0);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (int)D_00176198, 891);
+        mc_free(window_image, (iptr)D_00176198, 891);
         window_image = -1751672937;
     }
     game_mode = 0;
@@ -837,7 +837,7 @@ void coven_menu_close(void)
     while (key_down_esc != 0);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (int)D_00176198, 957);
+        mc_free(window_image, (iptr)D_00176198, 957);
         window_image = -1751672937;
     }
     game_mode = 0;
@@ -898,9 +898,9 @@ void click_npc(struct pick_result *unused, struct record *npc)
         }
         return;
     case 1:
-        mc_set_location(1021, (int)D_00176198);
-        mc_sprintf((int)text_buffer, D_00183254, npc_display_name(npc));
-        hud_message_add((int)text_buffer);
+        mc_set_location(1021, (iptr)D_00176198);
+        mc_sprintf((iptr)text_buffer, D_00183254, npc_display_name(npc));
+        hud_message_add((iptr)text_buffer);
     default:;
     }
 }
@@ -912,7 +912,7 @@ void click_creature(struct pick_result *unused, struct record *monster)
 
     character = &monster->data.character;
     creature_class = &character->career;
-    if ((int)spell_ready_touch != 0 && pick_distance < 160) {
+    if ((iptr)spell_ready_touch != 0 && pick_distance < 160) {
         cast_spell_on(spell_ready_touch, monster, 0);
         object_delete(spell_ready_touch);
         spell_ready_touch = 0;
@@ -1011,12 +1011,12 @@ void click_corpse(struct pick_result *unused, struct record *corpse)
     case 1:
         character = &corpse->data.character;
         if (character->race < 43) {
-            mc_set_location(1153, (int)D_00176198);
-            mc_sprintf((int)text_buffer, D_00184329, *(int *)(monster_names + (character->race << 2)));
+            mc_set_location(1153, (iptr)D_00176198);
+            mc_sprintf((iptr)text_buffer, D_00184329, *(int *)(monster_names + (character->race << 2)));
         } else {
-            mc_strncpy((int)text_buffer, D_00185093, 160, (int)D_00176198, 1155);
+            mc_strncpy((iptr)text_buffer, D_00185093, 160, (iptr)D_00176198, 1155);
         }
-        hud_message_add((int)text_buffer);
+        hud_message_add((iptr)text_buffer);
         return;
     case 0:
     case 2:
@@ -1108,9 +1108,9 @@ void click_show_building_info(struct pick_result *unused, struct record *object)
     town_map_note_building(object, building);
     hud_message_add(building_name(building));
     if (building->type == 1 || building_is_open(building) != 0 || building->type >= 14) return;
-    mc_set_location(1274, (int)D_00176198);
-    mc_sprintf((int)text_buffer, (int)D_001762F7, (int)(unsigned char)building_open_hours[building->type * 2], (int)(unsigned char)D_0017C5B9[building->type * 2]);
-    hud_message_add((int)text_buffer);
+    mc_set_location(1274, (iptr)D_00176198);
+    mc_sprintf((iptr)text_buffer, (iptr)D_001762F7, (int)(unsigned char)building_open_hours[building->type * 2], (int)(unsigned char)D_0017C5B9[building->type * 2]);
+    hud_message_add((iptr)text_buffer);
 }
 
 int quest_active_for_faction(short faction_id)
@@ -1147,7 +1147,7 @@ int noble_quest_letter(void)
     return 0;
 }
 
-int service_menu_open(int label)
+int service_menu_open(iptr label)
 {
     if (((int)(unsigned char)game_mode) == 28) return 1;
     if (label != 0) {
@@ -1186,7 +1186,7 @@ void service_menu_close(void)
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     while (key_down_esc != 0);
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (int)D_00176198, 1372);
+        mc_free(window_image, (iptr)D_00176198, 1372);
         window_image = -1751672937;
     }
     game_mode = 0;
@@ -1334,17 +1334,17 @@ int spawn_point_wilderness(struct record *object)
 
     i = 0;
     if (i < 20) {
-        yaw = ((rand() % 90) + ((int)(short)*(short *)((char *)*(int *)&player_object + 3))) - 45;
+        yaw = ((rand() % 90) + ((int)(short)*(short *)((char *)*(iptr *)&player_object + 3))) - 45;
         yaw &= 2047;
         distance = (rand_range(1, 512) + xn_cam_far_z) - 256;
-        xn_math_yaw_offset_xz(yaw, distance, (int)&dx, (int)&dz);
+        xn_math_yaw_offset_xz(yaw, distance, (iptr)&dx, (iptr)&dz);
         object->x = player_object->x + dx;
         object->z = player_object->z + dz;
         object->y = xn_terrain_height_at(object->x, object->z);
         return 1;
     }
     for (i = 0; i < 50; i++) {
-        xn_math_yaw_offset_xz(rand() % 2048, rand_range(512, 768), (int)&dx, (int)&dz);
+        xn_math_yaw_offset_xz(rand() % 2048, rand_range(512, 768), (iptr)&dx, (iptr)&dz);
         object->x = player_object->x + dx;
         object->z = player_object->z + dz;
         object->y = xn_terrain_height_at(object->x, object->z);
@@ -1366,7 +1366,7 @@ int spawn_point_town(struct record *object, int min_distance, int max_distance)
         max_distance = 3096;
     }
     for (i = 0; i < 50; i++) {
-        xn_math_yaw_offset_xz(rand() % 2048, rand_range(min_distance, max_distance), (int)&dx, (int)&dz);
+        xn_math_yaw_offset_xz(rand() % 2048, rand_range(min_distance, max_distance), (iptr)&dx, (iptr)&dz);
         object->x = player_object->x + dx;
         object->z = player_object->z + dz;
         object->y = xn_terrain_height_at(object->x, object->z);
@@ -1390,7 +1390,7 @@ void spawn_point_occupied_cb(struct record *object)
 {
     int distance;
 
-    if ((int)scratch_object == 0) return;
+    if ((iptr)scratch_object == 0) return;
     if (object->type != 18) return;
     distance = xn_math_approx_hypot(scratch_object->y - object->y, xn_math_approx_dist2d(scratch_object->x, scratch_object->z, object->x, object->z));
     if (distance >= 64) return;
@@ -1401,7 +1401,7 @@ int spawn_point_occupied(struct record *object)
 {
     scratch_object = object;
     object_foreach(location_object, spawn_point_occupied_cb);
-    return (((int)scratch_object == 0) ? 1 : 0);
+    return (((iptr)scratch_object == 0) ? 1 : 0);
 }
 
 int spawn_point_building(struct record *object)

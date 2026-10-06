@@ -19,10 +19,10 @@ extern struct record *found_object;
 extern struct character *player_character;
 extern signed char crime_current;
 
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern void monster_wake_all(void);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_string(char *, short);
@@ -65,8 +65,8 @@ void pickpocket_attempt(struct record *target)
     D_0012B508 = 145;
     gold = (rand() % 5) + 1;
     player_character->gold += gold;
-    mc_set_location(155, (int)D_0017018C);
-    mc_sprintf((int)text_buffer, D_00183340, gold);
+    mc_set_location(155, (iptr)D_0017018C);
+    mc_sprintf((iptr)text_buffer, D_00183340, gold);
     msgbox_show_string(text_buffer, 1);
     guild_count_crime(5, 1);
 }

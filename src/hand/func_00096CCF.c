@@ -35,7 +35,7 @@ void item_apply_equip_effects(struct record *object, int slot)
             spell_object = object_create_child(location_object, 0, 89);
             spell_object->type = 9;
             spell_object->flags = 3;
-            mc_memcpy(&spell_object->data.spell, &spell_records[j], 89, (int)D_0017704C, 2092, 4);
+            mc_memcpy(&spell_object->data.spell, &spell_records[j], 89, (iptr)D_0017704C, 2092, 4);
             spell = &spell_object->data.spell;
             spell->icon = *(signed char *)&slot + 200;
             for (j = 0; j < 3; j++) {

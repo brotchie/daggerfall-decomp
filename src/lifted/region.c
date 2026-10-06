@@ -15,8 +15,8 @@ extern signed char current_region;
 extern signed char D_00196269;
 extern signed char current_climate;
 extern signed char climate_is_ocean;
-extern int politic_pak;
-extern int climate_pak;
+extern iptr politic_pak;
+extern iptr climate_pak;
 
 extern int mc_free();
 extern int xn_world_cell_at();
@@ -24,17 +24,17 @@ extern void maploads_enter_region(int);
 extern void region_unload(void);
 unsigned char politic_region_at(int, int);
 unsigned char climate_lookup(int, int);
-unsigned char pak_lookup(int, int, int);
+unsigned char pak_lookup(int, int, iptr);
 void region_enter(unsigned char, unsigned char);
 
 void region_free_tables(void)
 {
     if (politic_pak != 0 && politic_pak != (-1751672937)) {
-        mc_free(politic_pak, (int)D_001705F8, 33);
+        mc_free(politic_pak, (iptr)D_001705F8, 33);
         politic_pak = -1751672937;
     }
     if (climate_pak == 0 || climate_pak == (-1751672937)) return;
-    mc_free(climate_pak, (int)D_001705F8, 34);
+    mc_free(climate_pak, (iptr)D_001705F8, 34);
     climate_pak = -1751672937;
 }
 
@@ -109,9 +109,9 @@ unsigned char climate_lookup(int x, int z)
     return climate_categories[(int)(unsigned char)current_climate];
 }
 
-unsigned char pak_lookup(int column, int row, int pak)
+unsigned char pak_lookup(int column, int row, iptr pak)
 {
-    int base;
+    iptr base;
     struct pak_run *run;
 
     base = pak;

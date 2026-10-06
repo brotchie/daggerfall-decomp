@@ -15,7 +15,7 @@ extern void quests_raise_event_all(int, struct record *, int);
 extern void cast_spell_on(struct record *, struct record *, int);
 extern void spell_area_effect(struct record *);
 extern void disease_lycanthrope_shapechange(int);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern void spell_cast_queued_run(void);
 
 int cast_player_spell(struct record *spell_object)

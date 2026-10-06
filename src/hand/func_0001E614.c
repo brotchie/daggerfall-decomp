@@ -15,7 +15,7 @@ extern int blocks_bsa;
 extern char cfg_block_str[];
 extern char cfg_debug;
 extern int archive_find_record(int, char *, int);
-extern int archive_read_record(int, int, int);
+extern iptr archive_read_record(int, int, iptr);
 extern void mc_strncpy(char *, char *, int, char *, int);
 extern char *itoa(int, char *, int);
 #pragma aux mc_set_location parm routine [];
@@ -53,5 +53,5 @@ void town_block_load_rmb(int block_index)
         mc_strncpy(((char *)text_buffer), cfg_block_str, 160, D_001704CC, 478);
     }
     record = archive_find_record(blocks_bsa, ((char *)text_buffer), 8);
-    archive_read_record(blocks_bsa, record, (int)rmb_block);
+    archive_read_record(blocks_bsa, record, (iptr)rmb_block);
 }

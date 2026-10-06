@@ -29,14 +29,14 @@ extern void func_0004C759(void);
 extern void quest_mark_givers(void);
 extern void sound_stop_ambient(void);
 extern void position_history_reset(void);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern int rand_range(int, int);
 extern void town_grid_build(void);
 extern void location_restore_stored(void);
 extern void town_door_roll_unlock(struct record *);
 extern void location_set_discovered(int, int);
 extern void object_foreach(struct record *, void (*)());
-extern void object_delete_block(int, int);
+extern void object_delete_block(iptr, int);
 extern void func_0008EB52(void);
 extern int player_to_nearest_marker(struct record *, int);
 extern void mc_memcpy(void *, void *, int, char *, int, int);
@@ -52,7 +52,7 @@ void town_load(int location_index)
     sound_stop_ambient();
     func_0008EB52();
     if (location_object->image == 65535)
-        object_delete_block((int)location_object->children, location_object->id);
+        object_delete_block((iptr)location_object->children, location_object->id);
     location_load_exterior(loaded_location, location_index);
     mc_memcpy(location_object, loaded_location_object, 55, D_00176C94, 365, 4);
     mc_memcpy(current_location, loaded_location_data, 48, D_00176C94, 366, 4);

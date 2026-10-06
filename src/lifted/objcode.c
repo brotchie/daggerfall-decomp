@@ -35,7 +35,7 @@ extern int creature_count;
 extern char D_00195B5C[];
 extern char D_00195B84[];
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern struct career *player_class;
 extern char scratch_buffer[];
 extern int location_grid_x;
@@ -58,16 +58,16 @@ extern char D_001AA650[];
 extern char D_001AA654[];
 extern char D_001AA658[];
 extern char D_001AA65C[];
-extern int D_001AA660;
+extern iptr D_001AA660;
 extern char D_001AA668[];
-extern int D_001AA66C;
+extern iptr D_001AA66C;
 extern char D_001AA670[];
-extern int D_001AA6A0;
+extern iptr D_001AA6A0;
 extern signed char D_001AA6A4;
 extern signed char D_001AA6A5;
 extern signed char D_001AA6A6;
 
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int gold_can_afford(int);
 extern int object_find_open(struct record *, int (*)());
 extern int travel_trip_cost(void);
@@ -76,7 +76,7 @@ extern int mc_memset();
 extern int mc_memcpy();
 extern int xn_pal_set_all_8bit();
 extern int xn_math_isqrt();
-extern void msgbox_show_string(int, int);
+extern void msgbox_show_string(iptr, int);
 extern void object_foreach_open(struct record *, void (*)());
 int marker_match_cb(struct record *);
 struct record *marker_find_random(struct record *, int);
@@ -96,7 +96,7 @@ int marker_match_cb(struct record *object)
     case 34:
         if ((object->image >> 7) == 199 && ((object->image & 31) - 2) == marker_kind) {
             if (*(int *)D_00195B84 == 0 && marker_best < 0) {
-                mc_memcpy((int)found_marker, object, 55, (int)D_00177358, 191, 4);
+                mc_memcpy((iptr)found_marker, object, 55, (iptr)D_00177358, 191, 4);
                 return 1;
             }
             *(int *)D_00195B84 += marker_best;
@@ -150,7 +150,7 @@ struct record *marker_find_first(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = -1;
-    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 261, 4);
+    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 261, 4);
     object_find_open(root, marker_match_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
@@ -163,7 +163,7 @@ struct record *marker_find_nth(struct record *root, int kind, int n)
     marker_kind = kind;
     *(int *)D_00195B84 = n;
     marker_best = -1;
-    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 287, 4);
+    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 287, 4);
     object_find_open(root, marker_match_cb);
     cell = location_cell_at(D_00195F71, D_00195F79);
     D_00195F81 = n;
@@ -178,7 +178,7 @@ struct record *marker_find_random(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
-    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 317, 4);
+    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 317, 4);
     object_find_open(root, marker_match_cb);
     if (*(int *)D_00195B84 == 0) return 0;
     n = (*(int *)D_00195B84 = rand() % *(int *)D_00195B84);
@@ -206,7 +206,7 @@ void marker_nearest_cb(struct record *object)
         if (dist < marker_best) {
             found_object = object;
             marker_best = dist;
-            mc_memcpy((int)found_marker, object, 55, (int)D_00177358, 363, 4);
+            mc_memcpy((iptr)found_marker, object, 55, (iptr)D_00177358, 363, 4);
         }
         return;
     case 43:
@@ -258,7 +258,7 @@ struct record *marker_find_nearest(struct record *root, int kind)
 {
     marker_kind = kind;
     marker_best = 500000;
-    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 432, 4);
+    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 432, 4);
     object_foreach_open(root, marker_nearest_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
@@ -269,7 +269,7 @@ int marker_count(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
-    mc_memset((int)found_marker, 0, 71, (int)D_00177358, 456, 4);
+    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 456, 4);
     object_find_open(root, marker_match_cb);
     return *(int *)D_00195B84;
 }
@@ -324,7 +324,7 @@ int travel_map_open(int mode)
     if (((int)player_environment) != 1) return 0;
     if (mode != 0) {
         if ((player_character->race == 8 || (player_class->flags & 16) != 0) && is_daytime != 0) {
-            msgbox_show_string((int)D_00177364, 1);
+            msgbox_show_string((iptr)D_00177364, 1);
             return 0;
         }
         if (creature_count != 0) {
@@ -345,14 +345,14 @@ int travel_map_open(int mode)
             D_001AA6A0 = disk_read_file(D_001773AE, 0);
         }
         D_001AA66C = disk_read_file(D_001773BB, 0);
-        *(int *)D_001AA65C = disk_read_file(D_001773C8, 0);
+        *(iptr *)D_001AA65C = disk_read_file(D_001773C8, 0);
         D_001AA660 = disk_read_file(D_001773D5, 0);
-        *(int *)D_001AA670 = disk_read_file(D_001773E2, 0);
-        *(int *)D_001AA64C = disk_read_file(D_001773EF, 0);
-        *(int *)D_001AA650 = disk_read_file(D_001773FC, 0);
-        *(int *)D_001AA654 = disk_read_file(D_00177409, 0);
-        *(int *)D_001AA658 = disk_read_file(D_00177416, 0);
-        *(int *)D_00195B5C = disk_read_file(D_00177423, 0);
+        *(iptr *)D_001AA670 = disk_read_file(D_001773E2, 0);
+        *(iptr *)D_001AA64C = disk_read_file(D_001773EF, 0);
+        *(iptr *)D_001AA650 = disk_read_file(D_001773FC, 0);
+        *(iptr *)D_001AA654 = disk_read_file(D_00177409, 0);
+        *(iptr *)D_001AA658 = disk_read_file(D_00177416, 0);
+        *(iptr *)D_00195B5C = disk_read_file(D_00177423, 0);
         disk_read_file(D_00177430, *(int *)scratch_buffer);
         xn_pal_set_all_8bit(*(int *)scratch_buffer + 8);
         *(int *)&ticks_addr = 1132;

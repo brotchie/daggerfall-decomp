@@ -54,7 +54,7 @@ void itemmaker_add_soul_powers(int soul)
 
     found = memchr(D_00185AC4, soul, 12);
     if (found == 0) return;
-    soul_row = found - D_00185AC4;
+    soul_row = (int)(found - D_00185AC4);
     for (i = 0; i < 4; i += 2) {
         if (D_00185A94[soul_row * 4 + i] == 128) {
             for (j = 0; j < 5; j++) {

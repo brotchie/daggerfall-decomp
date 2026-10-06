@@ -24,7 +24,7 @@ int profile_add_item_string(struct profile *s, char *key, char *val, int width)
     len = width + 4 + strlen(val);
     if (s->length + len > s->capacity)
         return 0;
-    mc_memmove(p + len, p, s->buffer + s->length - p, D_00170129, 1324, 4);
+    mc_memmove(p + len, p, (int)(s->buffer + s->length - p), D_00170129, 1324, 4);
     while (*key != 0) {
         *p++ = *key++;
         width--;

@@ -47,7 +47,7 @@ extern struct record *inv_right_container;
 extern struct record *inv_right_container_base;
 extern int hud_message_expiry[];
 extern struct character *player_character;
-extern int hud_message_ptrs[];
+extern iptr hud_message_ptrs[];
 extern int ceiling_height;
 extern int D_00195CEC;
 extern int head_bob_offset;
@@ -170,7 +170,7 @@ void game_frame(void)
     player_entity->x = player_object->x;
     player_entity->y = player_object->y;
     player_entity->z = player_object->z;
-    if ((int)D_00195A88 != 0 && player_on_ground != 0 && (int)player_object->parent != (int)D_00195A88) {
+    if ((iptr)D_00195A88 != 0 && player_on_ground != 0 && (iptr)player_object->parent != (iptr)D_00195A88) {
         object_reparent(D_00195A88, player_object);
     }
     ticks_addr = (int *)1132;
@@ -334,8 +334,8 @@ L10C1B:;
         xn_tex_cache_begin_frame();
         xn_render_begin_frame();
         xn_light_reset();
-        xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
-        xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
+        xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (iptr)xn_cam_rotation);
+        xn_cam_scale_matrix((iptr)xn_cam_rotation, (iptr)xn_cam_view_matrix);
         frame_checkpoint = 201;
         world_draw_objects();
         frame_checkpoint = 202;

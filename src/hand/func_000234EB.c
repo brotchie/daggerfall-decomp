@@ -10,8 +10,8 @@ extern struct record *player_object;
 extern struct character *player_character;
 extern char D_00195C70[];
 extern char D_00195CB8[];
-extern int D_00195CD4;
-extern int D_00195CD8;
+extern iptr D_00195CD4;
+extern iptr D_00195CD8;
 extern short D_00195F5A;
 extern signed char player_on_ground;
 extern signed char D_00196296;
@@ -20,10 +20,10 @@ extern struct collide_probe *D_00196D4C;
 extern struct collide_hits *D_00196D50;
 extern char collide_flags[];
 extern int collide_step_player(struct record *, int, struct move_request *);
-extern void collide_for_each_nearby(struct record *, int);
+extern void collide_for_each_nearby(struct record *, iptr);
 extern void collide_gather_cb(struct record *);
 extern void automap_mark_seen(int);
-extern int links_object_motion(int);
+extern iptr links_object_motion(iptr);
 extern int abs();
 extern int xn_vec_normalize_ptr();
 
@@ -58,7 +58,7 @@ int collide_move_player(struct record *object, int unused_arg, struct move_reque
     (D_00196D4C = &D_00179F48)->position.x = request->x;
     D_00196D4C->position.y = request->y;
     D_00196D4C->position.z = request->z;
-    collide_for_each_nearby(object, (int)collide_gather_cb);
+    collide_for_each_nearby(object, (iptr)collide_gather_cb);
     if (!((player_character->conditions & 0x8) || collide_candidate_count != 0 || player_environment == 1))
         return FLAGS = 16;
     flags = FLAGS;
@@ -96,7 +96,7 @@ int collide_move_player(struct record *object, int unused_arg, struct move_reque
     direction.x = request->x - object->x;
     direction.y = request->y - object->y;
     direction.z = request->z - object->z;
-    xn_vec_normalize_ptr((int)&direction);
+    xn_vec_normalize_ptr((iptr)&direction);
     if (D_00196D50 == 0)
         return 1;
     if (D_00196D50->count > 1) {

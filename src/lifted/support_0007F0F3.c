@@ -6,7 +6,7 @@
 extern struct record *location_object;
 extern struct location *current_location;
 
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern void town_map_note_building(struct record *, struct building *);
 
 void func_0007F0F3(int faction_id)

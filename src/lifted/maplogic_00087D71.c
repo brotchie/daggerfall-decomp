@@ -7,7 +7,7 @@ extern char D_00176C94[];
 extern int region_location_count;
 extern struct map_location *region_locations;
 
-extern int location_has_service(int, int, int);
+extern int location_has_service(iptr, int, int);
 extern int rand();
 extern int mc_memset();
 extern void location_load_exterior(struct loaded_location *, int);
@@ -22,9 +22,9 @@ void location_pick_random_with_service(struct loaded_location *location, int kin
 
     map_location = region_locations;
     count = 0;
-    mc_memset(location, 0, 20, (int)D_00176C94, 952, 4);
+    mc_memset(location, 0, 20, (iptr)D_00176C94, 952, 4);
     for (i = 0; i < region_location_count; i++, map_location++) {
-        count += location_has_service((int)&map_location->services, kind, sub_kind);
+        count += location_has_service((iptr)&map_location->services, kind, sub_kind);
     }
     if (count == 0) {
         location_free(location);
@@ -33,7 +33,7 @@ void location_pick_random_with_service(struct loaded_location *location, int kin
     map_location = region_locations;
     pick = (rand() % count) + 1;
     for (i = 0; i < region_location_count; i++, map_location++) {
-        pick -= location_has_service((int)&map_location->services, kind, sub_kind);
+        pick -= location_has_service((iptr)&map_location->services, kind, sub_kind);
         if (pick == 0) {
             location_load_exterior(location, i);
             return;

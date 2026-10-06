@@ -26,10 +26,10 @@ extern int rand_range(int, int);
 extern int rand();
 extern int srand();
 extern int mc_strncpy();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int func_000A1054();
-extern int xn_str_skip_fields();
+extern iptr xn_str_skip_fields();
 extern void parse_rsc_text(int, int, int);
 extern void object_free_later(struct record *);
 #pragma aux mc_set_location parm routine [];
@@ -43,12 +43,12 @@ void song_generate(int skip)
     n = rand();
     srand(n);
     parse_rsc_text(850, 0, 0);
-    mc_strncpy((int)text_buffer, (int)text_rsc_buffer, 160, (int)D_001706B6, 42);
+    mc_strncpy((iptr)text_buffer, (iptr)text_rsc_buffer, 160, (iptr)D_001706B6, 42);
     parse_rsc_text(851, 0, 0);
-    func_000A1054((int)text_buffer, (int)text_rsc_buffer, (int)D_001706B6, 44, 160);
-    mc_set_location(45, (int)D_001706B6);
-    mc_sprintf((int)text_rsc_buffer, (int)D_001706BD, (int)text_buffer, n);
-    mc_strncpy(*(int *)scratch_buffer + 50000, (int)text_rsc_buffer, 4, (int)D_001706B6, 46);
+    func_000A1054((iptr)text_buffer, (iptr)text_rsc_buffer, (iptr)D_001706B6, 44, 160);
+    mc_set_location(45, (iptr)D_001706B6);
+    mc_sprintf((iptr)text_rsc_buffer, (iptr)D_001706BD, (iptr)text_buffer, n);
+    mc_strncpy(*(int *)scratch_buffer + 50000, (iptr)text_rsc_buffer, 4, (iptr)D_001706B6, 46);
     for (n = 0; n < 26; n++) {
         *(short *)(scratch_190d64 + (n * 2)) = rand_range(0, 21) + 900;
     }
@@ -56,10 +56,10 @@ void song_generate(int skip)
     pattern = (unsigned char *)xn_str_skip_fields(*(int *)D_00179EA8, 33, n);
     while (*pattern != 33) {
         parse_rsc_text((int)(short)D_00190CA2[*pattern++], 0, 0);
-        func_000A1054(*(int *)scratch_buffer + 50000, (int)text_rsc_buffer, (int)D_001706B6, 56, 4);
-        func_000A1054(*(int *)scratch_buffer + 50000, (int)D_001706CA, (int)D_001706B6, 57, 4);
+        func_000A1054(*(int *)scratch_buffer + 50000, (iptr)text_rsc_buffer, (iptr)D_001706B6, 56, 4);
+        func_000A1054(*(int *)scratch_buffer + 50000, (iptr)D_001706CA, (iptr)D_001706B6, 57, 4);
     }
-    func_000A1054(*(int *)scratch_buffer + 50000, (int)D_001706CD, (int)D_001706B6, 59, 4);
+    func_000A1054(*(int *)scratch_buffer + 50000, (iptr)D_001706CD, (iptr)D_001706B6, 59, 4);
 }
 
 void song_init_heroes(int player_hero)

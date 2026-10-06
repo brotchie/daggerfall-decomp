@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004BCFA */
+#include "ptrint.h"
 #include <dos.h>
 extern char D_00174F47[];        /* __FILE__ */
 extern char D_00174F50[];
@@ -6,7 +7,7 @@ extern char D_00174F57[];
 extern signed char text_buffer[];
 extern char arena2_path[];
 extern char arena2_cd_path[];
-extern int quest_start(char *);
+extern iptr quest_start(char *);
 #pragma aux mc_set_location parm routine [];
 extern void mc_set_location(int, char *);
 extern int mc_sprintf(char *, char *, ...);

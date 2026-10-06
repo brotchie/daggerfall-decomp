@@ -101,7 +101,7 @@ extern char *D_001997F0;
 extern char *D_00199804;
 extern int arch3d_bsa;
 extern int dagger_snd;
-extern int archive_open(char *, int, int);
+extern int archive_open(char *, iptr, int);
 extern void faction_load_file(void);
 extern void region_load_tables(void);
 extern int automap_button_view_mode(void);

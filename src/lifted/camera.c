@@ -1,6 +1,7 @@
 /* camera.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
 extern signed char key_down_backslash;
 extern char D_00170194[];
@@ -15,10 +16,10 @@ extern char D_0019645A[];
 extern int open(char *, ...);
 extern int close();
 extern int mc_free();
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int write();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int unlink();
 extern int xn_pal_read_dac();
 extern int xn_kbd_flush();
@@ -28,19 +29,19 @@ void screenshot_save_bmp(char *);
 void screenshot_poll(void)
 {
     if (key_down_backslash == 0) return;
-    mc_set_location(44, (int)D_00170194);
-    mc_sprintf((int)D_0019645A, (int)D_0017019D, (int)(short)screenshot_number);
+    mc_set_location(44, (iptr)D_00170194);
+    mc_sprintf((iptr)D_0019645A, (iptr)D_0017019D, (int)(short)screenshot_number);
     screenshot_save_bmp(D_0019645A);
     while (key_down_backslash != 0) xn_kbd_flush();
 }
 
 void screenshot_save_bmp(char *filename)
 {
-    int buffer;
+    iptr buffer;
     short i;
     short fd;
 
-    buffer = mc_malloc(768, (int)D_00170194, 67);
+    buffer = mc_malloc(768, (iptr)D_00170194, 67);
     xn_pal_read_dac(buffer);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 256; (*(int *)&i)++) {
@@ -52,9 +53,9 @@ void screenshot_save_bmp(char *filename)
     unlink(filename);
     *(int *)&fd = open(filename, 546, 384);
     if (((int)(short)fd) != (-1) && buffer != 0) {
-        write((int)(short)fd, (int)D_00178A1C, 1078);
+        write((int)(short)fd, (iptr)D_00178A1C, 1078);
         if (buffer != 0 && buffer != (-1751672937)) {
-            mc_free(buffer, (int)D_00170194, 82);
+            mc_free(buffer, (iptr)D_00170194, 82);
             buffer = -1751672937;
         }
         buffer = 655360;
@@ -68,6 +69,6 @@ void screenshot_save_bmp(char *filename)
         return;
     }
     if (buffer == 0 || buffer == (-1751672937)) return;
-    mc_free(buffer, (int)D_00170194, 93);
+    mc_free(buffer, (iptr)D_00170194, 93);
     buffer = -1751672937;
 }

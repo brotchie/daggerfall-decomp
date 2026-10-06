@@ -26,7 +26,7 @@ int cast_item_used_spell(int spell_id)
     while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
     spell->type = 9;
     spell->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (int)D_001757F4, 103, 4);
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (iptr)D_001757F4, 103, 4);
     i = spell_cost(&spell->data.spell, player_character);
     if (cast_player_spell(spell) != 0) object_delete(spell);
     return i;

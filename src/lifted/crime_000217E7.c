@@ -1,8 +1,9 @@
 /* crime.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_001706E1[];
 extern char D_001706E9[];
 extern char D_001706F6[];
@@ -14,11 +15,11 @@ extern signed char D_001962A4;
 extern signed char D_001962A5;
 extern signed char D_001962B0;
 
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int mc_free();
 extern int mc_memset();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
 extern int xn_pal_set_range_8bit();
 extern int xn_gfx_present_inclusive();
@@ -26,37 +27,37 @@ extern void screen_shake_stop(void);
 extern void court_restore_vitals(void);
 extern void time_pass(int);
 extern void palette_restore(void);
-extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 #pragma aux mc_set_location parm routine [];
 
 void prison_serve_sentence(int days)
 {
     int day;
-    int image;
+    iptr image;
 
     D_001962B0 = 1;
     D_001962A4 = 1;
     D_001962A5 = 0;
     D_00196294 = 1;
     image = disk_read_file(D_001706E9, 0);
-    mc_memset(655360, 0, 64000, (int)D_001706E1, 384, 4);
+    mc_memset(655360, 0, 64000, (iptr)D_001706E1, 384, 4);
     for (day = 0; day < 768; day++) {
         *(signed char *)((char *)(image + day) + 64000) <<= 2;
     }
     xn_pal_set_range_8bit(image + 64000, 0, 256);
     for (day = days; day != 0; day--) {
         time_pass(1440);
-        mc_memcpy(screen_buffer, image, 64000, (int)D_001706E1, 391, 4);
-        mc_set_location(392, (int)D_001706E1);
-        mc_sprintf((int)text_buffer, (int)D_001706F6, day);
-        text_draw_centred_coloured((int)text_buffer, 156, 165, 190, 219);
+        mc_memcpy(screen_buffer, image, 64000, (iptr)D_001706E1, 391, 4);
+        mc_set_location(392, (iptr)D_001706E1);
+        mc_sprintf((iptr)text_buffer, (iptr)D_001706F6, day);
+        text_draw_centred_coloured((iptr)text_buffer, 156, 165, 190, 219);
         xn_gfx_present_inclusive(0);
     }
-    mc_memset(655360, 0, 64000, (int)D_001706E1, 397, 4);
-    mc_memset(screen_buffer, 0, 64000, (int)D_001706E1, 398, 4);
+    mc_memset(655360, 0, 64000, (iptr)D_001706E1, 397, 4);
+    mc_memset(screen_buffer, 0, 64000, (iptr)D_001706E1, 398, 4);
     palette_restore();
     if (image != 0 && image != (-1751672937)) {
-        mc_free(image, (int)D_001706E1, 400);
+        mc_free(image, (iptr)D_001706E1, 400);
         image = -1751672937;
     }
     D_00196294 = 0;

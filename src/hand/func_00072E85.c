@@ -15,7 +15,7 @@ extern struct record *player_object;
 extern int frame_ticks;
 extern struct record *spell_ready_missile;
 extern struct image *hud_bar_image;
-extern int D_00195B80;
+extern iptr D_00195B80;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern signed char weapon_active_hand;
@@ -25,7 +25,7 @@ extern int D_001A4A38[];
 extern int D_001A4A48[];
 extern int D_001A4A50[];
 extern int D_001A4A54;
-extern int weapon_hand_cif[];
+extern iptr weapon_hand_cif[];
 extern int D_001A4A60[];
 extern char D_001A4A68[];
 extern int D_001A4A70[];
@@ -43,18 +43,18 @@ extern int xn_draw_img_masked_remap();
 void weapon_player_update(void)
 {
     int bar_height;
-    int cif;
+    iptr cif;
     int unused;
 
     if (D_0019597C[((int)(unsigned char)weapon_active_hand)] != 0) return;
     if ((player_character->conditions & 0x1) != 0) return;
-    if (cast_anim_state >= 0 || (int)spell_ready_missile != 0 || D_00196272 != 0 || ((struct bf8_6_1 *)&D_001940DA)->f != 0) {
+    if (cast_anim_state >= 0 || (iptr)spell_ready_missile != 0 || D_00196272 != 0 || ((struct bf8_6_1 *)&D_001940DA)->f != 0) {
         return;
     }
     if (weapon_hand_cif[((int)(unsigned char)weapon_active_hand)] == 0) return;
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) return;
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
-    if (((int)D_001875B7) == *(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2))) {
+    if (((iptr)D_001875B7) == *(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2))) {
         if (inv_take_arrow(0) == 0) {
             hud_status_set(D_00176184);
             D_001940D6 &= 191;
@@ -64,7 +64,7 @@ void weapon_player_update(void)
         return;
     }
     if (*(int *)(D_001A4A30 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0) {
-        D_00195B80 = (int)(*(char **)color_remap_tables + (((int)(unsigned char)*(signed char *)(*(char **)(D_001A4A30 + (((int)(unsigned char)weapon_active_hand) << 2)) + 127)) << 8));
+        D_00195B80 = (iptr)(*(char **)color_remap_tables + (((int)(unsigned char)*(signed char *)(*(char **)(D_001A4A30 + (((int)(unsigned char)weapon_active_hand) << 2)) + 127)) << 8));
     }
     if (((struct bf8_6_1 *)&D_001940D6)->f != 0 && D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 0) {
         cif = weapon_hand_cif[((int)(unsigned char)weapon_active_hand)];
@@ -87,7 +87,7 @@ void weapon_player_update(void)
     if (D_001A4A50[0] > 0) D_001A4A50[0] -= frame_ticks;
     if (D_001A4A54 > 0) D_001A4A54 -= frame_ticks;
     if (*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0) {
-        xn_draw_cif_rle_frame(xn_img_cif_group(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), (int)(unsigned char)*(signed char *)((char *)(*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
+        xn_draw_cif_rle_frame(xn_img_cif_group(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), (int)(unsigned char)*(signed char *)((char *)(*(iptr *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)])), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
     } else {
         xn_draw_cif_rle_frame(xn_img_cif_group(weapon_hand_cif[((int)(unsigned char)weapon_active_hand)], D_001A4A38[((int)(unsigned char)weapon_active_hand)]), 5 - D_001A4A70[((int)(unsigned char)weapon_active_hand)], ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 0 : -hud_bar_image->height), (int)(unsigned char)weapon_active_hand);
     }
@@ -97,13 +97,13 @@ void weapon_player_update(void)
         (D_001A4A70[((int)(unsigned char)weapon_active_hand)])--;
         (D_001A4A60[((int)(unsigned char)weapon_active_hand)])++;
         if (*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0) {
-            if (((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 255) {
+            if (((int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 255) {
                 D_001A4A70[((int)(unsigned char)weapon_active_hand)] = 0;
             } else {
                 D_001A4A70[((int)(unsigned char)weapon_active_hand)] = 2;
             }
         }
-        if ((*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0 && ((int)(unsigned char)*(signed char *)((char *)(int)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 4) || (*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) == 0 && D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 3)) {
+        if ((*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) != 0 && ((int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) + D_001A4A60[((int)(unsigned char)weapon_active_hand)]))) == 4) || (*(int *)(D_001A4A68 + (((int)(unsigned char)weapon_active_hand) << 2)) == 0 && D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 3)) {
             player_entity->x = player_object->x;
             player_entity->y = player_object->y;
             player_entity->z = player_object->z;

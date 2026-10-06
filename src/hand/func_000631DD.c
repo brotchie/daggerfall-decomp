@@ -2,10 +2,10 @@
 #include "records.h"
 
 extern struct character *player_character;
-extern int monster_sees_invisible(int);
+extern iptr monster_sees_invisible(int);
 extern int rand_range(int, int);
 
-int ai_sees_through_illusion(int monster_type)
+iptr ai_sees_through_illusion(int monster_type)
 {
     int chance;
 

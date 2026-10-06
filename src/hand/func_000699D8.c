@@ -11,12 +11,12 @@ struct msg {
 extern int sound_last_size;
 extern struct sound_channel sound_channels[];
 extern char sound_enabled;
-extern int sound_play_sample(int, int, struct msg *, int);
-extern int sound_cache_load(int);
+extern int sound_play_sample(iptr, int, struct msg *, int);
+extern iptr sound_cache_load(int);
 
 int sound_play_at_point(int id, int x, int y, int z, int priority)
 {
-    int sample;
+    iptr sample;
     struct msg point;
     int channel;
 

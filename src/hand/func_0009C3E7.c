@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern unsigned char mouse_buttons;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_0017743D[];
 extern short travel_options;
 extern unsigned char D_00187CA8;
@@ -27,7 +27,7 @@ extern struct map_location *region_locations;
 extern int D_001AA678;
 extern int D_001AA67C;
 extern int D_001AA698;
-extern int health_status_text(void);
+extern iptr health_status_text(void);
 extern void raise_skills(void);
 extern void time_pass(int);
 extern int sound_play(int, struct record *, int);
@@ -40,12 +40,12 @@ extern void travel_button_exit(int);
 extern void func_0009BE38(void);
 extern int travel_route(int, int, int, int, int);
 extern int travel_trip_cost(void);
-extern void mc_memset(int, int, int, char *, int, int);
+extern void mc_memset(iptr, int, int, char *, int, int);
 extern int xn_math_angle_to_point(int, int, int, int);
 
 void travel_begin_trip(void)
 {
-    int r;
+    iptr r;
     int t;
     unsigned saved;
     int dir;

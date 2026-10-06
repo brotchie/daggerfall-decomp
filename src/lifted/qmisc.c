@@ -30,8 +30,8 @@ extern struct record *inv_right_container;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern int quest_face_images[];
-extern int D_00195D14;
+extern iptr quest_face_images[];
+extern iptr D_00195D14;
 extern char D_001960D9[];
 extern signed char current_region;
 extern signed char game_mode;
@@ -50,20 +50,20 @@ extern void *quest_section(struct quest *, int);
 extern void *quest_record(struct quest *, int, int);
 extern struct location_door *location_find_door(int);
 extern struct flat_cfg *flats_cfg_find(int);
-extern int hud_message_add(char *);
+extern iptr hud_message_add(char *);
 extern int rand_range(int, int);
 extern int location_contains(int, int);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_reparent(struct record *, struct record *);
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int object_new_id(int);
 extern struct record *object_find_quest(struct record *, unsigned char);
 extern int strnicmp();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
-extern int func_000A148C(int, ...);
+extern int func_000A148C(iptr, ...);
 extern int xn_draw_image_transparent();
 extern void maploads_load_region(int);
 extern void tavern_close(void);
@@ -76,7 +76,7 @@ extern void guild_join_dark_brotherhood(void);
 extern void guild_join_thieves_guild(void);
 extern void dungeon_load(int);
 extern void map_goto_location(int, int, int, int);
-extern void object_free_children(int);
+extern void object_free_children(iptr);
 extern void object_foreach(struct record *, void (*)());
 extern void inv_store_item(struct record *);
 struct record *func_000310E1(struct record *, struct record *);
@@ -93,18 +93,18 @@ void qaction_op04_give_reward(struct quest *quest, struct qbn_op *op)
     int i;
     int j;
 
-    if (strnicmp(quest->name, (int)D_00170A08, 8) == 0) {
+    if (strnicmp(quest->name, (iptr)D_00170A08, 8) == 0) {
         guild_join_dark_brotherhood();
         return;
     }
-    if (strnicmp(quest->name, (int)D_00170A11, 8) == 0) {
+    if (strnicmp(quest->name, (iptr)D_00170A11, 8) == 0) {
         guild_join_thieves_guild();
         return;
     }
     if (tavern_open(0) != 0) tavern_close();
     quest_reward_faction(quest);
     if (((int)(unsigned char)game_mode) != 4) {
-        object_free_children((*(int *)&quest_reward_container = (int)D_001960D9));
+        object_free_children((*(iptr *)&quest_reward_container = (iptr)D_001960D9));
     } else {
         quest_reward_container = inv_right_container;
     }
@@ -126,8 +126,8 @@ void qaction_op04_give_reward(struct quest *quest, struct qbn_op *op)
                 item->y = player_object->y;
                 item->z = player_object->z;
             } else {
-                mc_set_location(332, (int)D_00170A1A);
-                mc_sprintf((int)text_buffer, (int)D_00170A22, (int)quest->name, qbn_item->symbol);
+                mc_set_location(332, (iptr)D_00170A1A);
+                mc_sprintf((iptr)text_buffer, (iptr)D_00170A22, (iptr)quest->name, qbn_item->symbol);
                 hud_message_add(text_buffer);
             }
         }
@@ -345,7 +345,7 @@ void qaction_op69_cast_spell_on_foe(struct quest *quest, struct qbn_op *op)
     spell_object->type = 9;
     spell_object->caster = player_entity;
     spell_object->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&spell_object->data.spell, &spell_records[spell_index], 89, (int)D_00170A1A, 679, 4);
+    mc_memcpy(&spell_object->data.spell, &spell_records[spell_index], 89, (iptr)D_00170A1A, 679, 4);
     object_foreach(location_object, quest_cast_spell_on_foe_cb);
     object_delete(spell_object);
 }
@@ -377,7 +377,7 @@ struct record *func_000310E1(struct record *object, struct record *target)
         twin->x = target->x;
         twin->y = target->y;
         twin->z = target->z;
-        mc_memcpy(&twin->data, &object->data, data_size, (int)D_00170A1A, 734, 4);
+        mc_memcpy(&twin->data, &object->data, data_size, (iptr)D_00170A1A, 734, 4);
         twin->type = object->type;
         twin->flags = object->flags;
         twin->image = object->image;
@@ -394,7 +394,7 @@ struct record *func_000310E1(struct record *object, struct record *target)
             child_twin->x = target->x;
             child_twin->y = target->y;
             child_twin->z = target->z;
-            mc_memcpy(&child_twin->data, &object->data, 107, (int)D_00170A1A, 754, 4);
+            mc_memcpy(&child_twin->data, &object->data, 107, (iptr)D_00170A1A, 754, 4);
             child_twin->type = object->type;
             child_twin->flags = object->flags;
             child_twin->image = object->image;
@@ -444,8 +444,8 @@ struct record *func_000310E1(struct record *object, struct record *target)
             person->faction_id = object->data.building.faction_id;
         }
         if (person->faction_id == 0) {
-            mc_set_location(819, (int)D_00170A1A);
-            func_000A148C((int)D_00170A4F, 819);
+            mc_set_location(819, (iptr)D_00170A1A);
+            func_000A148C((iptr)D_00170A4F, 819);
             person->faction_id = 510;
         }
         if (object->image != 0) {

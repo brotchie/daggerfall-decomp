@@ -3,7 +3,7 @@
 
 extern char key_down_alt;
 extern int frame_counter;
-extern int D_00196478;
+extern iptr D_00196478;
 extern struct pick_result *pick_result;
 
 int pick_sprite_cb(struct record *object)
@@ -22,7 +22,7 @@ int pick_sprite_cb(struct record *object)
     case 34:
     case 44:
     case 53:
-        if ((int)object->caster == D_00196478 && (frame_counter & 0xffff) == (object->angle_x & 0xffff)) {
+        if ((iptr)object->caster == D_00196478 && (frame_counter & 0xffff) == (object->angle_x & 0xffff)) {
             if (key_down_alt && object->type != 34)
                 return 0;
             pick_result->flags |= 3;

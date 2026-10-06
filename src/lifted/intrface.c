@@ -42,15 +42,15 @@ extern int frame_ticks;
 extern int vertical_velocity;
 extern struct record *spell_ready_missile;
 extern struct character *player_character;
-extern int cursor_arrow_image;
+extern iptr cursor_arrow_image;
 extern struct career *player_class;
 extern int game_minutes;
 extern char scratch_buffer[];
 extern struct record *D_00195C70;
 extern int ceiling_height;
 extern struct record *D_00195CB8;
-extern int D_00195CD4;
-extern int D_00195CD8;
+extern iptr D_00195CD4;
+extern iptr D_00195CD8;
 extern int D_00195DB8;
 extern char D_00195E30[];
 extern char D_00195E4E[];
@@ -86,7 +86,7 @@ extern int move_angle_offset;
 extern int D_001A5B0C;
 extern int D_001A5B10;
 extern int cursor_saved_x;
-extern int cursor_region_images;
+extern iptr cursor_region_images;
 extern short steer_row_y1;
 extern short steer_row_y2;
 extern short steer_col_x1;
@@ -108,12 +108,12 @@ extern int key_action_held(int);
 extern int key_action_pressed(int);
 extern int object_weight(struct record *);
 extern int hud_update(void);
-extern int links_object_motion(int);
+extern iptr links_object_motion(iptr);
 extern int sound_channel_done(int);
 extern int sound_play(int, struct record *, int);
 extern int sound_play_loop(int, struct record *, int);
-extern int disk_read_file(char *, int);
-extern int hud_message_add(int);
+extern iptr disk_read_file(char *, iptr);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern int intrface_region_at(int, int, int *, int *);
 extern int player_try_move(int);
@@ -161,10 +161,10 @@ void intrface_init(void)
 
     cursor_region_images = disk_read_file(D_00176A68, 0);
     cursor_arrow_image = disk_read_file(D_00176A72, 0);
-    mc_memset(*(int *)scratch_buffer, 0, 256, (int)D_00176A7C, 44, 4);
+    mc_memset(*(int *)scratch_buffer, 0, 256, (iptr)D_00176A7C, 44, 4);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 10; (*(int *)&i)++) {
-        mc_memcpy((int)(*(char **)scratch_buffer + (((int)(short)i) << 4)), (int)(((char *)cursor_arrow_image) + (((int)(short)i) * 10)), 10, (int)D_00176A7C, 46, 4);
+        mc_memcpy((iptr)(*(char **)scratch_buffer + (((int)(short)i) << 4)), (iptr)(((char *)cursor_arrow_image) + (((int)(short)i) * 10)), 10, (iptr)D_00176A7C, 46, 4);
     }
     xn_mouse_set_cursor_image(*(int *)scratch_buffer, 0, 0);
     intrface_set_regions();
@@ -184,27 +184,27 @@ void intrface_set_regions(void)
 void intrface_free(void)
 {
     if (cursor_region_images != 0 && cursor_region_images != (-1751672937)) {
-        mc_free(cursor_region_images, (int)D_00176A7C, 67);
+        mc_free(cursor_region_images, (iptr)D_00176A7C, 67);
         cursor_region_images = -1751672937;
     }
     if (cursor_arrow_image == 0 || cursor_arrow_image == (-1751672937)) return;
-    mc_free(cursor_arrow_image, (int)D_00176A7C, 68);
+    mc_free(cursor_arrow_image, (iptr)D_00176A7C, 68);
     cursor_arrow_image = -1751672937;
 }
 
 void cursor_draw_arrow(void)
 {
-    xn_draw_get_rect((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, (int)cursor_saved_background, 0);
+    xn_draw_get_rect((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, (iptr)cursor_saved_background, 0);
     cursor_saved_x = (int)(short)mouse_x;
     cursor_saved_y = (int)(short)mouse_y;
     xn_draw_image_transparent((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, cursor_arrow_image);
-    xn_mouse_read_motion((int)&mouse_motion_x, (int)&mouse_motion_y);
+    xn_mouse_read_motion((iptr)&mouse_motion_x, (iptr)&mouse_motion_y);
     mouse_motion_x = (mouse_motion_y = 0);
 }
 
 void cursor_restore_background(void)
 {
-    xn_draw_image_transparent(cursor_saved_x, cursor_saved_y, 10, 10, (int)cursor_saved_background);
+    xn_draw_image_transparent(cursor_saved_x, cursor_saved_y, 10, 10, (iptr)cursor_saved_background);
 }
 
 void func_0008066F(int distance)
@@ -316,7 +316,7 @@ void click_activate(int at_view_centre)
             if (((int)(unsigned char)mouse_control_mode) == 1 && view_cursor_active != 0) {
                 engine_pick_object((int)(short)mouse_x, (int)(short)mouse_y, &pick);
             } else {
-                engine_pick_object(((int)(short)mouse_x) + 6, (int)&*(signed char *)((char *)((int)(short)mouse_y) + 6), &pick);
+                engine_pick_object(((int)(short)mouse_x) + 6, (int)(iptr)&*(signed char *)((char *)(iptr)((int)(short)mouse_y) + 6), &pick);
             }
         } else {
             mouse_x = xn_cam_centre_x;
@@ -328,7 +328,7 @@ void click_activate(int at_view_centre)
             click_world_object(&pick, pick.object);
             return;
         }
-        if ((int)spell_ready_missile == 0) return;
+        if ((iptr)spell_ready_missile == 0) return;
         cast_fire_missile(spell_ready_missile);
         spell_ready_missile = 0;
     }
@@ -552,7 +552,7 @@ void player_movement_update(void)
         if (((int)(short)(*(short *)collide_flags & 2)) != 0) links_trigger(D_00195C70, 3);
     }
     if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
-    if (distance == 0 && (int)D_00195CB8 != 0 && links_object_motion((int)D_00195CB8) != 0) {
+    if (distance == 0 && (int)(iptr)D_00195CB8 != 0 && links_object_motion((int)(iptr)D_00195CB8) != 0) {
         player_try_move(0);
     }
     dy = 0;
@@ -597,7 +597,7 @@ void player_movement_update(void)
             jump_impulse = jump_velocity;
         }
         if (((int)(unsigned short)(player_class->flags & 2)) != 0) {
-            jump_impulse = (int)(((char *)jump_velocity) + (jump_velocity >> 1));
+            jump_impulse = (int)(iptr)(((char *)(iptr)jump_velocity) + (jump_velocity >> 1));
         }
         dy = -1;
         vertical_velocity += jump_impulse;
@@ -645,12 +645,12 @@ void player_movement_update(void)
     if (D_00195CD8 != 0) {
         D_001A5B30 = 0;
         if (player_on_ground != 0) vertical_velocity = 0;
-        mc_memcpy((int)D_00195E30, D_00195CD8, 30, (int)D_00176A7C, 695, 4);
-        D_00195CD8 = (int)D_00195E30;
+        mc_memcpy((iptr)D_00195E30, D_00195CD8, 30, (iptr)D_00176A7C, 695, 4);
+        D_00195CD8 = (iptr)D_00195E30;
     }
     if (D_00195CD4 != 0) {
-        mc_memcpy((int)D_00195E4E, D_00195CD4, 30, (int)D_00176A7C, 701, 4);
-        D_00195CD4 = (int)D_00195E4E;
+        mc_memcpy((iptr)D_00195E4E, D_00195CD4, 30, (iptr)D_00176A7C, 701, 4);
+        D_00195CD4 = (iptr)D_00195E4E;
     }
     if (vertical_velocity == 0 && prev_velocity != 0) {
         fall_damage = ((prev_velocity / 256) / 40) - 7;
@@ -710,7 +710,7 @@ void player_horse_sounds_stop(void)
 
 int player_climb_probe(void)
 {
-    int shape;
+    iptr shape;
     int result;
     int x;
     int z;
@@ -729,9 +729,9 @@ int player_climb_probe(void)
     D_00187C86.yaw = player_object->yaw;
     D_00187C86.angle_z = player_object->angle_z;
     if (((struct bf8_2_1 *)&player_motion_flags)->f != 0) {
-        shape = (int)&D_00187C12;
+        shape = (iptr)&D_00187C12;
     } else {
-        shape = (int)&D_00187B6E;
+        shape = (iptr)&D_00187B6E;
     }
     D_00187C86.probe = (struct collide_probe *)shape;
     if (((struct bf8_5_1 *)&player_motion_flags)->f != 0) D_00187C86.probe = &D_00187BB8;

@@ -5,7 +5,7 @@ extern int D_0018DD60;
 extern struct record *player_object;
 extern struct career *player_class;
 extern struct sound_channel sound_channels[];
-extern int nearest_fire;
+extern iptr nearest_fire;
 extern int D_001A3F2C;
 extern int D_001A3F34;
 extern int D_001A3F38;

@@ -14,7 +14,7 @@ extern short func_000A2460(int, int);
 extern int func_000A2504(int, struct sos_sample *);
 extern void func_000A2687(int, int);
 
-int sound_play_sample(int sample, int length, struct record *object, int priority)
+int sound_play_sample(iptr sample, int length, struct record *object, int priority)
 {
     int i;
     int volume;

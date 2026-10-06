@@ -34,7 +34,7 @@ void npc_load_face(struct record *npc, char *face)
         else
             offset = (D_0017B69D[D_0017B667[climate_category()] * 8 + (rand() & 3) + ((text_macro_npc->flags & 1) != 0 ? 4 : 0)] + rand() % 10) << 12;
     } else {
-        offset = (D_0017B69D[((int)found_sprite - (int)D_0017B66D) / 2] + rand() % 24) << 12;
+        offset = (D_0017B69D[((iptr)found_sprite - (iptr)D_0017B66D) / 2] + rand() % 24) << 12;
     }
     file = disk_open_data(D_00170DC9);
     lseek(file, offset, 0);

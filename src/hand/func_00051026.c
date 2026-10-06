@@ -42,7 +42,7 @@ extern void class_question_scroll(struct anims *, int);
 extern void class_question_answer_anim(short);
 extern int class_question_get_answer(void);
 extern int class_question_pick_class(void);
-extern char *disk_read_file(char *, int);
+extern char *disk_read_file(char *, iptr);
 extern void mc_free(char *, char *, int);
 extern void mc_memset(void *, int, int, char *, int, int);
 #pragma aux mc_set_location parm routine [];
@@ -71,7 +71,7 @@ int class_questions_run(void)
     mc_memset(class_answer_counts, 0, 3, D_0017539B, 82, 3);
     rgb[0] = rgb[1] = rgb[2] = 0;
     xn_mouse_cursor_drawn.b0 = 0;
-    disk_read_file(D_001753A6, (int)scratch_buffer);
+    disk_read_file(D_001753A6, (int)(iptr)scratch_buffer);
     for (sel = 0; sel < 768; sel++)
         (sel + scratch_buffer)[64000] <<= 2;
     xn_pal_set_all_8bit(scratch_buffer + 64000);
@@ -114,7 +114,7 @@ int class_questions_run(void)
     if (sel != -1) {
         mc_set_location(134, D_0017539B);
         mc_sprintf(((char *)text_buffer), D_001753CD, sel);
-        disk_read_file(((char *)text_buffer), (int)player_class);
+        disk_read_file(((char *)text_buffer), (iptr)player_class);
     }
     if (h.a != 0 && h.a != (char *)0x97979797) {
         mc_free(h.a, D_0017539B, 138);

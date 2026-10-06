@@ -11,7 +11,7 @@ extern int dungeon_water_level;
 extern int xn_light_ambient;
 extern char xn_cam_rotation[];
 extern char xn_cam_view_matrix[];
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00170A86[];
 extern unsigned char player_environment;
 extern signed char D_00187CA8;
@@ -24,7 +24,7 @@ extern int frame_ticks;
 extern struct image *hud_bar_image;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern int D_00195CF4;
+extern iptr D_00195CF4;
 extern signed char climate_weathers[];
 extern signed char current_region;
 extern signed char D_001962A1;
@@ -131,10 +131,10 @@ void sky_update(void)
     xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;
     xn_cam_yaw = 0;
     xn_cam_roll = 0;
-    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
-    xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
-    xn_mat_transform_ptr((int)&point_x, (int)&point_y, (int)&point_z, (int)xn_cam_rotation);
-    xn_cam_project_ptr(point_x, point_y, 3000, (int)&screen_x, (int)&screen_y);
+    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (iptr)xn_cam_rotation);
+    xn_cam_scale_matrix((iptr)xn_cam_rotation, (iptr)xn_cam_view_matrix);
+    xn_mat_transform_ptr((iptr)&point_x, (iptr)&point_y, (iptr)&point_z, (iptr)xn_cam_rotation);
+    xn_cam_project_ptr(point_x, point_y, 3000, (iptr)&screen_x, (iptr)&screen_y);
     horizon_row = screen_y + 75;
     if (horizon_row < 0) horizon_row = 0;
     if (horizon_row > 199) horizon_row = 199;
@@ -158,8 +158,8 @@ void sky_update(void)
     xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;
     xn_cam_yaw = (camera_object->yaw + view_look_yaw) & 2047;
     xn_cam_roll = 0;
-    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
-    xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
+    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (iptr)xn_cam_rotation);
+    xn_cam_scale_matrix((iptr)xn_cam_rotation, (iptr)xn_cam_view_matrix);
     sun_placed = 1;
     sky_sun_direction(&sun_direction, 0, minutes);
     sun_light = light;
@@ -171,29 +171,29 @@ void sky_update(void)
             sky_draw_day(screen_y, horizon_y, daylight, climate);
             return;
         }
-        mc_memset(screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y) * 320, (int)D_00170A86, 251, 4);
+        mc_memset(screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y) * 320, (iptr)D_00170A86, 251, 4);
     } else {
         sky_draw_night(screen_y, horizon_y);
     }
     if (horizon_row == 0) return;
     if (daylight == 0 && ((int)(unsigned char)weather) > 1) {
-        mc_memset(screen_buffer, 223, 64000, (int)D_00170A86, 262, 4);
+        mc_memset(screen_buffer, 223, 64000, (iptr)D_00170A86, 262, 4);
         sun_light = 0;
         return;
     }
     moons_visible = 0;
-    mc_memcpy((int)&moon_x, (int)moon0_direction, 12, (int)D_00170A86, 271, 4);
-    xn_mat_transform_ptr((int)&moon_x, (int)&moon_y, (int)&moon_z, (int)xn_cam_rotation);
+    mc_memcpy((iptr)&moon_x, (iptr)moon0_direction, 12, (iptr)D_00170A86, 271, 4);
+    xn_mat_transform_ptr((iptr)&moon_x, (iptr)&moon_y, (iptr)&moon_z, (iptr)xn_cam_rotation);
     if (moon_z > 100) {
-        xn_cam_project_ptr(moon_x, moon_y, moon_z, (int)&screen_x, (int)&screen_y);
+        xn_cam_project_ptr(moon_x, moon_y, moon_z, (iptr)&screen_x, (iptr)&screen_y);
         moon0_image->x = (screen_x + xn_cam_centre_x) - (moon0_image->width >> 1);
         moon0_image->y = (((int)(short)xn_cam_centre_y) + screen_y) - (moon0_image->height >> 1);
         moons_visible |= 1;
     }
-    mc_memcpy((int)&moon_x, (int)moon1_direction, 12, (int)D_00170A86, 281, 4);
-    xn_mat_transform_ptr((int)&moon_x, (int)&moon_y, (int)&moon_z, (int)xn_cam_rotation);
+    mc_memcpy((iptr)&moon_x, (iptr)moon1_direction, 12, (iptr)D_00170A86, 281, 4);
+    xn_mat_transform_ptr((iptr)&moon_x, (iptr)&moon_y, (iptr)&moon_z, (iptr)xn_cam_rotation);
     if (moon_z > 100) {
-        xn_cam_project_ptr(moon_x, moon_y, moon_z, (int)&screen_x, (int)&screen_y);
+        xn_cam_project_ptr(moon_x, moon_y, moon_z, (iptr)&screen_x, (iptr)&screen_y);
         moon1_image->x = (screen_x + xn_cam_centre_x) - (moon1_image->width >> 1);
         moon1_image->y = (((int)(short)xn_cam_centre_y) + screen_y) - (moon1_image->height >> 1);
         moons_visible |= 2;
@@ -201,8 +201,8 @@ void sky_update(void)
     xn_cam_pitch = (camera_object->angle_x + view_look_pitch) & 2047;
     xn_cam_yaw = (((((unsigned)((((unsigned)game_minutes) % 518400) * 2047)) / 518400) + (((unsigned)((((unsigned)game_minutes) % 1440) * 2047)) / 1440)) + (camera_object->yaw + view_look_yaw)) & 2047;
     xn_cam_roll = 0;
-    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (int)xn_cam_rotation);
-    xn_cam_scale_matrix((int)xn_cam_rotation, (int)xn_cam_view_matrix);
+    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (iptr)xn_cam_rotation);
+    xn_cam_scale_matrix((iptr)xn_cam_rotation, (iptr)xn_cam_view_matrix);
     if (daylight != 0) if (light == 63) {}
     if (daylight != 0) return;
     sun_light = 0;

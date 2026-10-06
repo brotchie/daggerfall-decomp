@@ -20,18 +20,18 @@ int profile_close(struct profile *profile)
     if (((struct bf8_7_1 *)&profile->flags)->f != 0) {
         handle = open(profile->path, 610, 0);
         if (handle == (-1)) {
-            if (profile->buffer != 0 && (int)profile->buffer != (-1751672937)) {
-                mc_free((int)profile->buffer, (int)D_00170129, 171);
-                profile->buffer = (char *)-1751672937;
+            if (profile->buffer != 0 && (iptr)profile->buffer != (-1751672937)) {
+                mc_free((iptr)profile->buffer, (iptr)D_00170129, 171);
+                profile->buffer = (char *)(iptr)-1751672937;
             }
             return 0;
         }
-        write(handle, (int)profile->buffer, profile->length);
+        write(handle, (iptr)profile->buffer, profile->length);
         close(handle);
     }
-    if (profile->buffer != 0 && (int)profile->buffer != (-1751672937)) {
-        mc_free((int)profile->buffer, (int)D_00170129, 185);
-        profile->buffer = (char *)-1751672937;
+    if (profile->buffer != 0 && (iptr)profile->buffer != (-1751672937)) {
+        mc_free((iptr)profile->buffer, (iptr)D_00170129, 185);
+        profile->buffer = (char *)(iptr)-1751672937;
     }
     return 1;
 }

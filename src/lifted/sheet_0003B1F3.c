@@ -17,7 +17,7 @@ extern signed char D_001940D9;
 extern struct record *player_object;
 extern struct image *D_00195B5C;
 extern struct character *player_character;
-extern int window_image;
+extern iptr window_image;
 extern struct career *player_class;
 extern int player_death_timer;
 extern short D_00195F3C;
@@ -32,7 +32,7 @@ extern struct image *D_00199638;
 
 extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int rand_range(int, int);
 extern int mc_memcpy();
 extern void sheet_place_spinner(int);
@@ -70,7 +70,7 @@ int sheet_open(short opening)
             *(short *)scratch_190d64 = rand_range(4, 6);
         }
         *(int *)scratch_190be4 = 0;
-        mc_memcpy((int)D_00190D8C, (int)(signed char *)&player_character->base_attributes[0], 16, (int)D_00170C67, 97, 4);
+        mc_memcpy((iptr)D_00190D8C, (iptr)(signed char *)&player_character->base_attributes[0], 16, (iptr)D_00170C67, 97, 4);
         sheet_place_spinner(13);
         D_0019626C = 0;
         D_00187CA8 = 0;

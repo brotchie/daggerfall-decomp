@@ -8,7 +8,7 @@ extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
 extern signed char key_down_esc;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00175898[];
 extern char D_001758A0[];
 extern char D_001758A4[];
@@ -27,7 +27,7 @@ extern struct record *house_container;
 extern struct item *text_macro_item;
 extern struct record *player_entity;
 extern struct record *player_object;
-extern int D_00195ACC;
+extern iptr D_00195ACC;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern struct image *magic_items_image;
@@ -36,7 +36,7 @@ extern signed char view_cursor_active;
 extern signed char D_00196272;
 extern signed char mouse_buttons_prev;
 extern signed char player_ailment_flags;
-extern int magic_items_saved_screen;
+extern iptr magic_items_saved_screen;
 extern signed char hud_pressed_button;
 extern signed char D_00199D71;
 extern short steer_key_region;
@@ -47,14 +47,14 @@ extern int sheet_open(short);
 extern int spellbook_open(short);
 extern int options_open(short);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int picklist_poll(struct picklist *);
 extern int inventory_open(int, int, int);
 extern int travel_map_open(int);
 extern int mc_free();
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int mc_memcpy();
-extern int xn_str_find_u32();
+extern iptr xn_str_find_u32();
 extern int xn_mouse_poll_clamped();
 extern int xn_draw_image();
 extern void automap_open(void);
@@ -125,7 +125,7 @@ void hud_toggle_weapon(void)
     D_001940D6 ^= 64;
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
     if (player_character->equipped[19] == 0) return;
-    *(int *)&item_data = (int)player_character->equipped[19] + 71;
+    *(iptr *)&item_data = (iptr)player_character->equipped[19] + 71;
     sound_play((int)(short)D_00188208[((int)(unsigned short)*(short *)(*(char **)&item_data + 34))], player_object, 100);
 }
 
@@ -167,7 +167,7 @@ void magic_items_add_cb(struct record *object)
 
     if (object->type != 2) return;
     parent = object->parent;
-    while (parent != 0 && xn_str_find_u32((int)((char *)&house_container), parent, 4) == 0) {
+    while (parent != 0 && xn_str_find_u32((iptr)((char *)&house_container), parent, 4) == 0) {
         parent = parent->parent;
     }
     if (parent != 0) return;
@@ -190,13 +190,13 @@ void magic_items_add_cb(struct record *object)
     if (kind == 0) return;
     text_macro_item = item;
     if (kind == 2) {
-        D_00195ACC = (int)&object->children->data.potion_recipe;
+        D_00195ACC = (iptr)&object->children->data.potion_recipe;
         parse_expand(D_001758A0, D_00190B44);
     } else {
         parse_expand(D_001758A4, D_00190B44);
     }
     picklist_add(&shared_picklist, D_00190B44, 0);
-    *(int *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (int)object;
+    *(iptr *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (iptr)object;
 }
 
 void magic_items_open(void)
@@ -215,8 +215,8 @@ void magic_items_open(void)
     D_001940D4 |= 32;
     magic_items_image = (struct image *)disk_read_file(D_001758A8, 0);
     D_00196272 = 1;
-    magic_items_saved_screen = mc_malloc(64000, (int)D_00175898, 358);
-    mc_memcpy(magic_items_saved_screen, screen_buffer, 64000, (int)D_00175898, 359, 4);
+    magic_items_saved_screen = mc_malloc(64000, (iptr)D_00175898, 358);
+    mc_memcpy(magic_items_saved_screen, screen_buffer, 64000, (iptr)D_00175898, 359, 4);
 }
 
 void magic_items_frame(void)
@@ -224,8 +224,8 @@ void magic_items_frame(void)
     short picked;
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
-    mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (int)D_00175898, 368, 4);
-    xn_draw_image(magic_items_image->x, magic_items_image->y, magic_items_image->width, magic_items_image->height, (int)magic_items_image->pixels);
+    mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (iptr)D_00175898, 368, 4);
+    xn_draw_image(magic_items_image->x, magic_items_image->y, magic_items_image->width, magic_items_image->height, (iptr)magic_items_image->pixels);
     if (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
         while (key_down_esc != 0);
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -235,7 +235,7 @@ void magic_items_frame(void)
     *(int *)&picked = picklist_poll(&shared_picklist) - 1;
     if (((int)(short)picked) > (-1)) {
         magic_items_close();
-        inv_selected_item = (struct record *)(*(int *)(scratch_190de4 + (((int)(short)picked) << 2)));
+        inv_selected_item = (struct record *)(*(iptr *)(scratch_190de4 + (((int)(short)picked) << 2)));
         inv_use_item();
         return;
     }
@@ -245,9 +245,9 @@ void magic_items_frame(void)
 void magic_items_close(void)
 {
     D_001940D4 &= 223;
-    if ((int)magic_items_image != 0 && (int)magic_items_image != (-1751672937)) {
-        mc_free((int)magic_items_image, (int)D_00175898, 396);
-        magic_items_image = (struct image *)-1751672937;
+    if ((iptr)magic_items_image != 0 && (iptr)magic_items_image != (-1751672937)) {
+        mc_free((iptr)magic_items_image, (iptr)D_00175898, 396);
+        magic_items_image = (struct image *)(iptr)-1751672937;
     }
     picklist_free(&shared_picklist);
     D_00196272 = 0;
@@ -255,7 +255,7 @@ void magic_items_close(void)
     if (magic_items_saved_screen == 0 || magic_items_saved_screen == (-1751672937)) {
         return;
     }
-    mc_free(magic_items_saved_screen, (int)D_00175898, 400);
+    mc_free(magic_items_saved_screen, (iptr)D_00175898, 400);
     magic_items_saved_screen = -1751672937;
 }
 

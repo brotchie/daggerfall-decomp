@@ -15,15 +15,15 @@ extern struct record *player_object;
 extern struct record *location_object;
 extern struct location *current_location;
 extern int game_minutes;
-extern int D_001AA5FC;
+extern iptr D_001AA5FC;
 extern unsigned char *color_remap_tables;    /* 32 tables of 256 */
 extern struct record *doors_moving[];
 
 extern int sound_play(int, struct record *, int);
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int mc_memcpy();
 extern int xn_str_fill_ascending();
-extern int xn_mem_align_up();
+extern iptr xn_mem_align_up();
 extern int xn_collide_spheres_model();
 extern void object_foreach_post(struct record *, void (*)());
 int door_blocked_by_player(struct record *);
@@ -34,7 +34,7 @@ void color_init_remap_tables(void)
     int table;
     int colour;
 
-    D_001AA5FC = mc_malloc(8448, (int)D_00177350, 59);
+    D_001AA5FC = mc_malloc(8448, (iptr)D_00177350, 59);
     color_remap_tables = (unsigned char *)xn_mem_align_up(D_001AA5FC, 256);
     for (table = 0; table < 32; table++) {
         for (colour = 0; colour < 256; colour++) {
@@ -42,22 +42,22 @@ void color_init_remap_tables(void)
         }
     }
     for (table = 1; table < 16; table++) {
-        xn_str_fill_ascending((int)(color_remap_tables + (table << 8)) + ((int)(unsigned char)D_001886A8[table * 2]), (int)(unsigned char)D_001886A9[table * 2], 16);
+        xn_str_fill_ascending((int)(iptr)(color_remap_tables + (table << 8)) + ((int)(unsigned char)D_001886A8[table * 2]), (int)(unsigned char)D_001886A9[table * 2], 16);
     }
-    xn_str_fill_ascending((int)color_remap_tables + 6689, 161, 15);
-    xn_str_fill_ascending((int)color_remap_tables + 6721, 193, 15);
-    xn_str_fill_ascending((int)color_remap_tables + 6945, 97, 15);
-    xn_str_fill_ascending((int)color_remap_tables + 6977, 129, 15);
-    xn_str_fill_ascending((int)color_remap_tables + 7201, 161, 15);
-    xn_str_fill_ascending((int)color_remap_tables + 7220, 84, 2);
-    xn_str_fill_ascending((int)color_remap_tables + 7233, 193, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 6689, 161, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 6721, 193, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 6945, 97, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 6977, 129, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 7201, 161, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 7220, 84, 2);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 7233, 193, 15);
     color_remap_tables[7421] = 216;
-    xn_str_fill_ascending((int)color_remap_tables + 7457, 97, 15);
-    xn_str_fill_ascending((int)color_remap_tables + 7476, 84, 2);
-    xn_str_fill_ascending((int)color_remap_tables + 7489, 129, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 7457, 97, 15);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 7476, 84, 2);
+    xn_str_fill_ascending((int)(iptr)color_remap_tables + 7489, 129, 15);
     color_remap_tables[7677] = 216;
     for (table = 0; table < 10; table++) {
-        mc_memcpy((int)(color_remap_tables + ((table << 8) + 4096)) + 112, ((int)D_001886D2) + (table << 4), 16, (int)D_00177350, 87, 4);
+        mc_memcpy((int)(iptr)(color_remap_tables + ((table << 8) + 4096)) + 112, ((iptr)D_001886D2) + (table << 4), 16, (iptr)D_00177350, 87, 4);
     }
 }
 
@@ -120,7 +120,7 @@ int door_blocked_by_player(struct record *door)
     D_00187B6E.position.z = player_object->z;
     model = (int *)RECORD_DATA(door);
     if (*model != 0) {
-        hit = xn_collide_spheres_model(model, (int)&D_00187B6E, 0);
+        hit = xn_collide_spheres_model(model, (iptr)&D_00187B6E, 0);
         return (((hit != 0) && (hit != (-1))) ? 1 : 0);
     }
     return 0;

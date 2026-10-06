@@ -98,7 +98,7 @@ void dungeon_grid_build(void)
     block = location_object->children;
     min_x = 10000;
     min_z = 10000;
-    mc_memset((int)location_grid, 0, 4096, (int)D_00176A10, 849, 4096);
+    mc_memset((iptr)location_grid, 0, 4096, (iptr)D_00176A10, 849, 4096);
     while (block != 0) {
         if (block->type == 47) {
             if ((block->x - location_object->x) < min_x) min_x = block->x - location_object->x;
@@ -121,7 +121,7 @@ void dungeon_grid_build(void)
     block = location_object->children;
     while (block != 0) {
         if (block->type == 47) {
-            location_grid[(((int)(((char *)location_grid_x) + (block->x - location_object->x)) / 1024) + (((int)(((char *)location_grid_z) + (block->z - location_object->z)) / 1024) << 5))] = block;
+            location_grid[(((int)(iptr)(((char *)(iptr)location_grid_x) + (block->x - location_object->x)) / 1024) + (((int)(iptr)(((char *)(iptr)location_grid_z) + (block->z - location_object->z)) / 1024) << 5))] = block;
         }
         block = block->next;
     }
@@ -136,7 +136,7 @@ void town_grid_build(void)
     block = location_object->children;
     min_x = 10000;
     min_z = 10000;
-    mc_memset((int)location_grid, 0, 4096, (int)D_00176A10, 880, 4096);
+    mc_memset((iptr)location_grid, 0, 4096, (iptr)D_00176A10, 880, 4096);
     block = location_object->children;
     while (block != 0) {
         if (block->type == 38) {

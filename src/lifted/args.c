@@ -104,19 +104,19 @@ extern int weapon_arrow_update(struct record *);
 extern int object_draw_cb(struct record *);
 extern struct record *rmb_make_door(struct record *, short, short, int);
 extern struct record *rmb_make_flat(struct record *, short, short, int);
-extern int model_get(int, int, int);
+extern iptr model_get(int, int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern int func_0009DA1C(int, int);
-extern int printf(int, ...);
+extern int func_0009DA1C(int, iptr);
+extern int printf(iptr, ...);
 extern int exit();
 extern int abs();
 extern int mc_strncpy();
 extern int atoi();
 extern int strlen();
 extern int stricmp();
-extern int mc_set_location(int, int);
+extern int mc_set_location(int, iptr);
 extern int func_000A1054();
-extern int func_000A148C(int, ...);
+extern int func_000A148C(iptr, ...);
 extern int fopen();
 extern int fprintf_2(int, ...);
 extern int fclose();
@@ -149,104 +149,104 @@ void config_read(char *path)
         char value[32];
 
         missing = 0;
-        func_0009DA1C(62, (int)D_00176A88);
-        file = fopen(path, (int)D_00176A8F);
+        func_0009DA1C(62, (iptr)D_00176A88);
+        file = fopen(path, (iptr)D_00176A8F);
         if (file != 0) {
-            while (fprintf_2(file, (int)D_00176A91, (int)key, (int)value) != (-1)) {
-                if (stricmp((int)key, (int)D_00176A97) == 0) {
-                    mc_strncpy((int)arena2_path, (int)value, 80, (int)D_00176A88, 70);
-                    if (((int)(unsigned char)D_001917E3[strlen((int)arena2_path)]) != 92) {
-                        func_000A1054((int)arena2_path, (int)D_00176A9C, (int)D_00176A88, 72, 80);
+            while (fprintf_2(file, (iptr)D_00176A91, (iptr)key, (iptr)value) != (-1)) {
+                if (stricmp((iptr)key, (iptr)D_00176A97) == 0) {
+                    mc_strncpy((iptr)arena2_path, (iptr)value, 80, (iptr)D_00176A88, 70);
+                    if (((int)(unsigned char)D_001917E3[strlen((iptr)arena2_path)]) != 92) {
+                        func_000A1054((iptr)arena2_path, (iptr)D_00176A9C, (iptr)D_00176A88, 72, 80);
                     }
-                    mc_strncpy((int)cfg_last_path, (int)value, 80, (int)D_00176A88, 73);
+                    mc_strncpy((iptr)cfg_last_path, (iptr)value, 80, (iptr)D_00176A88, 73);
                     cfg_flags |= 1;
-                } else if (stricmp((int)key, (int)D_00176A9E) == 0) {
-                    mc_strncpy((int)arena2_cd_path, (int)value, 80, (int)D_00176A88, 78);
-                    if (((int)(unsigned char)D_00191833[strlen((int)arena2_cd_path)]) != 92) {
-                        func_000A1054((int)arena2_cd_path, (int)D_00176A9C, (int)D_00176A88, 80, 80);
+                } else if (stricmp((iptr)key, (iptr)D_00176A9E) == 0) {
+                    mc_strncpy((iptr)arena2_cd_path, (iptr)value, 80, (iptr)D_00176A88, 78);
+                    if (((int)(unsigned char)D_00191833[strlen((iptr)arena2_cd_path)]) != 92) {
+                        func_000A1054((iptr)arena2_cd_path, (iptr)D_00176A9C, (iptr)D_00176A88, 80, 80);
                     }
-                    mc_strncpy((int)cfg_last_path, (int)value, 80, (int)D_00176A88, 81);
+                    mc_strncpy((iptr)cfg_last_path, (iptr)value, 80, (iptr)D_00176A88, 81);
                     cfg_flags |= 1;
-                } else if (stricmp((int)key, (int)D_00176AA5) == 0) {
-                    mc_strncpy(controls_file, (int)value, 4, (int)D_00176A88, 86);
-                } else if (stricmp((int)key, (int)D_00176AAE) == 0) {
-                    cfg_fade_colour = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176AB8) == 0) {
-                    mc_strncpy((int)&cfg_map_file, (int)value, 12, (int)D_00176A88, 94);
+                } else if (stricmp((iptr)key, (iptr)D_00176AA5) == 0) {
+                    mc_strncpy(controls_file, (iptr)value, 4, (iptr)D_00176A88, 86);
+                } else if (stricmp((iptr)key, (iptr)D_00176AAE) == 0) {
+                    cfg_fade_colour = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176AB8) == 0) {
+                    mc_strncpy((iptr)&cfg_map_file, (iptr)value, 12, (iptr)D_00176A88, 94);
                     cfg_flags |= 4;
-                } else if (stricmp((int)key, (int)D_00176AC0) == 0) {
-                    cfg_faction = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176AC8) == 0) {
-                    cfg_fpu = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176ACC) == 0) {
-                    cfg_start_map = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176AD5) == 0) {
-                    cfg_artifact = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176ADE) == 0) {
-                    cfg_facloop = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176AE6) == 0) {
-                    mc_strncpy((int)classmaker_file, (int)value, 20, (int)D_00176A88, 119);
-                } else if (stricmp((int)key, (int)D_00176AED) == 0) {
-                    mc_strncpy((int)cfg_item_file, (int)value, 20, (int)D_00176A88, 123);
-                } else if (stricmp((int)key, (int)D_00176AF2) == 0) {
-                    cfg_gender = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176AF9) == 0) {
-                    cfg_ps2fix = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B00) == 0) {
-                    cfg_user = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B05) == 0) {
-                    cfg_region = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B0C) == 0) {
-                    cfg_debug = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B12) == 0) {
-                    mc_strncpy((int)cfg_block_str, (int)value, 80, (int)D_00176A88, 147);
-                } else if (stricmp((int)key, (int)D_00176B1B) == 0) {
-                    cfg_helmet = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B22) == 0) {
-                    mc_strncpy((int)cfg_mapsave_file, (int)value, 80, (int)D_00176A88, 155);
-                } else if (stricmp((int)key, (int)D_00176B27) == 0) {
-                    cfg_show_markers = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B2E) == 0) {
-                    cfg_seed = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B33) == 0) {
-                    cfg_stereo = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B3A) == 0) {
-                    object_heap_size = atoi((int)value) << 10;
-                } else if (stricmp((int)key, (int)D_00176B45) == 0) {
-                    cfg_texture_memory = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B53) == 0) {
-                    cfg_magic_repair = atoi((int)value);
-                } else if (stricmp((int)key, (int)D_00176B5F) == 0) {
-                    cheat_mode = atoi((int)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176AC0) == 0) {
+                    cfg_faction = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176AC8) == 0) {
+                    cfg_fpu = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176ACC) == 0) {
+                    cfg_start_map = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176AD5) == 0) {
+                    cfg_artifact = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176ADE) == 0) {
+                    cfg_facloop = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176AE6) == 0) {
+                    mc_strncpy((iptr)classmaker_file, (iptr)value, 20, (iptr)D_00176A88, 119);
+                } else if (stricmp((iptr)key, (iptr)D_00176AED) == 0) {
+                    mc_strncpy((iptr)cfg_item_file, (iptr)value, 20, (iptr)D_00176A88, 123);
+                } else if (stricmp((iptr)key, (iptr)D_00176AF2) == 0) {
+                    cfg_gender = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176AF9) == 0) {
+                    cfg_ps2fix = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B00) == 0) {
+                    cfg_user = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B05) == 0) {
+                    cfg_region = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B0C) == 0) {
+                    cfg_debug = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B12) == 0) {
+                    mc_strncpy((iptr)cfg_block_str, (iptr)value, 80, (iptr)D_00176A88, 147);
+                } else if (stricmp((iptr)key, (iptr)D_00176B1B) == 0) {
+                    cfg_helmet = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B22) == 0) {
+                    mc_strncpy((iptr)cfg_mapsave_file, (iptr)value, 80, (iptr)D_00176A88, 155);
+                } else if (stricmp((iptr)key, (iptr)D_00176B27) == 0) {
+                    cfg_show_markers = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B2E) == 0) {
+                    cfg_seed = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B33) == 0) {
+                    cfg_stereo = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B3A) == 0) {
+                    object_heap_size = atoi((iptr)value) << 10;
+                } else if (stricmp((iptr)key, (iptr)D_00176B45) == 0) {
+                    cfg_texture_memory = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B53) == 0) {
+                    cfg_magic_repair = atoi((iptr)value);
+                } else if (stricmp((iptr)key, (iptr)D_00176B5F) == 0) {
+                    cheat_mode = atoi((iptr)value);
                 }
             }
-            func_0009DA1C(196, (int)D_00176A88);
+            func_0009DA1C(196, (iptr)D_00176A88);
             fclose(file);
         }
         if (((int)(unsigned char)(cfg_flags & 1)) == 0) {
-            func_0009DA1C(201, (int)D_00176A88);
-            printf((int)D_00176B69);
+            func_0009DA1C(201, (iptr)D_00176A88);
+            printf((iptr)D_00176B69);
             missing = 1;
         }
         if (((int)(unsigned char)(cfg_flags & 4)) == 0) {
-            func_0009DA1C(207, (int)D_00176A88);
-            printf((int)D_00176B82);
+            func_0009DA1C(207, (iptr)D_00176A88);
+            printf((iptr)D_00176B82);
             missing = 1;
         } else if (((int)(unsigned char)cfg_map_file) == 100) {
             player_environment = 3;
         }
         if (missing != 0) {
-            func_0009DA1C(216, (int)D_00176A88);
-            printf((int)D_00176B9F);
+            func_0009DA1C(216, (iptr)D_00176A88);
+            printf((iptr)D_00176B9F);
             exit(5);
         }
         if (mem_check_level != 0) {
-            mc_set_location(221, (int)D_00176A88);
-            func_000A148C((int)D_00176BC1);
+            mc_set_location(221, (iptr)D_00176A88);
+            func_000A148C((iptr)D_00176BC1);
             return;
         }
-        mc_set_location(223, (int)D_00176A88);
-        func_000A148C((int)D_00176BED);
+        mc_set_location(223, (iptr)D_00176A88);
+        func_000A148C((iptr)D_00176BED);
     }
 }
 
@@ -353,7 +353,7 @@ int automap_draw_object_cb(struct record *object)
             if ((object->flags & 128) == 0 && ((struct bf8_4_1 *)&cheat_flags)->f == 0) return 0;
             if (object->type != 6 && object->type != 32) return 0;
             *(int *)&ticks_addr = 1132;
-            if ((int)D_00196DB0 == (int)object && ((struct bf8_3_1 *)(*(char **)&ticks_addr))->f == 0) {
+            if ((iptr)D_00196DB0 == (iptr)object && ((struct bf8_3_1 *)(*(char **)&ticks_addr))->f == 0) {
                 return 0;
             }
         }
@@ -433,7 +433,7 @@ void rmb_add_doors(struct record *parent, struct block_door *door)
     if (rmb_record_ptr->door_count == 0) return;
     for (i = 0; rmb_record_ptr->door_count > i; i++, door++) {
         object = rmb_make_door(parent, door->image2, (int)(short)((unsigned short)door->image), 1);
-        xn_model_set_angles(0, (door->yaw + *(int *)rmb_origin_yaw) % 2048, 0, (int)object->data.instance.angles);
+        xn_model_set_angles(0, (door->yaw + *(int *)rmb_origin_yaw) % 2048, 0, (iptr)object->data.instance.angles);
         object->lock_level = (unsigned short)door->lock_level;
         rotate_xz(&door->x, &door->z, *(int *)rmb_origin_yaw);
         door->x += rmb_origin_x;

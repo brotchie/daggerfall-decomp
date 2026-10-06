@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008C5C9 */
+#include "ptrint.h"
 extern unsigned char D_0012B508;
 extern short font_height;
 extern short D_00142928;
@@ -6,15 +7,15 @@ extern short D_0014292C;
 extern char D_00176E2C[];
 extern char D_00190B44[];
 extern int inpstr_result;
-extern int inpstr_text;
+extern iptr inpstr_text;
 extern short text_cursor_x;
 extern short text_cursor_y;
 extern short inpstr_cursor;
-extern void text_draw(int, unsigned short, unsigned short);
+extern void text_draw(iptr, unsigned short, unsigned short);
 extern int inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
-extern short inpstr_text_width(int, short);
-extern void mc_strncpy(int, char *, int, char *, int);
+extern short inpstr_text_width(iptr, short);
+extern void mc_strncpy(iptr, char *, int, char *, int);
 extern void xn_draw_line(int, int, int, int);
 
 int inpstr_update(void)

@@ -13,7 +13,7 @@ extern short D_001AA588;
 extern void inv_draw_item_cell(struct record *, short, int);
 extern int xn_math_approx_dist2d(int, int, int, int);
 extern int xn_math_approx_hypot(int, int);
-extern int xn_str_find_u32(char *, struct record *, int);
+extern iptr xn_str_find_u32(char *, struct record *, int);
 
 void inv_list_right_item(struct record *object, int rects)
 {

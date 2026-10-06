@@ -13,8 +13,8 @@ extern int xn_anim_ticks;
 extern short D_001343C2;
 extern signed char key_down[];
 extern signed char key_down_esc;
-extern int screen_buffer;
-extern int D_00147954;
+extern iptr screen_buffer;
+extern iptr D_00147954;
 extern char D_00176A10[];
 extern char D_00176A1A[];
 extern char D_00176A27[];
@@ -57,8 +57,8 @@ extern int hud_status_expiry;
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern int hud_message_ptrs[];
-extern int D_00195C3C;
+extern iptr hud_message_ptrs[];
+extern iptr D_00195C3C;
 extern char scratch_buffer[];
 extern void (*grid_visit_func)();
 extern int D_00195CF0;
@@ -115,26 +115,26 @@ extern int place_spawn_from_marker(struct record *);
 extern struct record *item_add_to_container(struct record *, int, int, int);
 extern int object_weight(struct record *);
 extern int spell_missile_update(struct record *, int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int location_contains(int, int);
-extern int building_name(struct building *);
+extern iptr building_name(struct building *);
 extern int picklist_poll(struct picklist *);
 extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_reparent(struct record *, struct record *);
 extern int object_find(struct record *, int (*)());
-extern struct record *object_find_by_id(struct record *, int);
+extern struct record *object_find_by_id(struct record *, iptr);
 extern int object_new_id(int);
 extern int rand();
 extern int mc_memset();
 extern int mc_strncpy();
 extern int strlen();
 extern int toupper();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern int mc_memcpy();
-extern int memchr();
+extern iptr memchr();
 extern int xn_math_approx_dist2d();
 extern int xn_math_approx_hypot();
 extern int xn_math_angle_to_point();
@@ -142,7 +142,7 @@ extern int xn_timer_read_pit();
 extern int xn_mouse_poll_clamped();
 extern int xn_mouse_cursor_move();
 extern int xn_font_select();
-extern int xn_tex_cache_lookup_image();
+extern iptr xn_tex_cache_lookup_image();
 extern int xn_tex_cache_flush();
 extern int xn_kbd_read_key();
 extern int xn_draw_image();
@@ -151,16 +151,16 @@ extern void msgbox_show_quest_text(struct quest *, short, int);
 extern void msgbox_show_rsc(int, int);
 extern void holiday_announce(void);
 extern void cast_spell_on(int, int, int);
-extern void text_draw_coloured(int, int, int, int, unsigned char);
-extern void text_draw_centred_coloured(int, int, int, int, unsigned char);
+extern void text_draw_coloured(iptr, int, int, int, unsigned char);
+extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern void detect_consider_creature(struct record *, int);
 extern void func_0007E815(struct record *, void (*)());
 extern void func_0007F0F3(int);
 extern void marker_make_clutter(struct record *, struct building *);
-extern void marker_make_loot_pile(struct record *, int);
+extern void marker_make_loot_pile(struct record *, iptr);
 extern void inpstr_begin_number(int);
-extern void picklist_init(int, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void picklist_add(int, int, int);
+extern void picklist_init(iptr, short, short, int, short, short, short, short, short, short, short, short, short, short, short, short, short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern void picklist_add(iptr, iptr, int);
 extern void picklist_free(struct picklist *);
 extern void picklist_draw(struct picklist *, int);
 extern void object_free_children(struct record *);
@@ -168,7 +168,7 @@ extern void object_foreach_pre(struct record *, void (*)());
 extern void object_foreach(struct record *, void (*)());
 extern void object_foreach_skip_player(struct record *, void (*)());
 extern void object_foreach_open(struct record *, void (*)());
-int hud_message_add(char *);
+iptr hud_message_add(char *);
 int picklist_frame(struct picklist *);
 struct building *object_building(struct record *);
 int gold_total(void);
@@ -202,10 +202,10 @@ void hud_status_set(char *text)
     mc_strncpy(hud_status_text, text, 1440, D_00176A10, 97);
     bios_ticks = (int *)1132;
     hud_status_expiry = *bios_ticks + 36;
-    D_00195C3C = (int)hud_status_text;
+    D_00195C3C = (iptr)hud_status_text;
 }
 
-int hud_message_add(char *text)
+iptr hud_message_add(char *text)
 {
     char *message_text;
     char *slot_text;
@@ -226,7 +226,7 @@ int hud_message_add(char *text)
     mc_strncpy(message_text, text, 4, D_00176A10, 117);
     *(int *)&bios_ticks_addr = 1132;
     hud_message_expiry[free_slot] = *(int *)(*(char **)&bios_ticks_addr) + 36;
-    hud_message_ptrs[free_slot] = (int)message_text;
+    hud_message_ptrs[free_slot] = (iptr)message_text;
     return hud_message_ptrs[slot];
 }
 
@@ -287,7 +287,7 @@ int wait_key_from_list(signed char *keys, short key_count)
                 }
             }
         }
-        mc_memcpy(655360, screen_buffer, 64000, (int)D_00176A10, 234, 4);
+        mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00176A10, 234, 4);
     }
     return -2;
 }
@@ -342,14 +342,14 @@ void size_fit(short *width, short *height, short max_width, short max_height)
 
 void list_popup_open_strings(char *strings)
 {
-    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file(D_00176A1A, 0);
+    if ((iptr)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file(D_00176A1A, 0);
     D_00195F40 = 160 - (list_popup_image->width >> 1);
     D_00195F3E = 100 - (list_popup_image->height >> 1);
     D_00195F42 = list_popup_image->width;
     D_00195F3C = list_popup_image->height;
-    picklist_init((int)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
+    picklist_init((iptr)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
     while (*strings != 0) {
-        picklist_add((int)list_popup_picklist, (int)strings, 0);
+        picklist_add((iptr)list_popup_picklist, (iptr)strings, 0);
         strings += strlen(strings) + 1;
     }
     D_001940D4 |= 4;
@@ -357,14 +357,14 @@ void list_popup_open_strings(char *strings)
 
 void list_popup_open(char **strings)
 {
-    if ((int)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file(D_00176A1A, 0);
+    if ((iptr)list_popup_image == 0) list_popup_image = (struct image *)disk_read_file(D_00176A1A, 0);
     D_00195F40 = 160 - (list_popup_image->width >> 1);
     D_00195F3E = 100 - (list_popup_image->height >> 1);
     D_00195F42 = list_popup_image->width;
     D_00195F3C = list_popup_image->height;
-    picklist_init((int)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
+    picklist_init((iptr)list_popup_picklist, (int)(short)(D_00195F40 + 25), (int)(short)(D_00195F3E + 26), 140, 73, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 11), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 109), 8, 9, (int)(short)(D_00195F40 + 179), (int)(short)(D_00195F3E + 22), 9, 83, 146, 146, 244, 114, 0);
     while (*strings != 0) {
-        picklist_add((int)list_popup_picklist, (int)*strings++, 0);
+        picklist_add((iptr)list_popup_picklist, (iptr)*strings++, 0);
     }
     D_001940D4 |= 4;
 }
@@ -390,7 +390,7 @@ int picklist_frame(struct picklist *picklist)
 
 int list_popup_update(void)
 {
-    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, (int)list_popup_image->pixels);
+    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, (iptr)list_popup_image->pixels);
     return picklist_frame((struct picklist *)list_popup_picklist);
 }
 
@@ -402,7 +402,7 @@ int rand_range(int low, int high)
 void object_free_later(struct record *object)
 {
     if (object == 0) return;
-    *(int *)(free_later_list + (free_later_count++ << 2)) = (int)object;
+    *(iptr *)(free_later_list + (free_later_count++ << 2)) = (iptr)object;
 }
 
 void object_free_pending(void)
@@ -410,15 +410,15 @@ void object_free_pending(void)
     int i;
 
     for (i = 0; i < free_later_count; i++) {
-        object_delete((struct record *)*(int *)(free_later_list + (i << 2)));
+        object_delete((struct record *)*(iptr *)(free_later_list + (i << 2)));
     }
     free_later_count = 0;
 }
 
 void spell_cast_queue(struct record *spell, struct record *target)
 {
-    *(int *)(spell_cast_queue_list + (spell_cast_queue_count << 3)) = (int)spell;
-    *(int *)(D_001A4FEC + (spell_cast_queue_count++ << 3)) = (int)target;
+    *(iptr *)(spell_cast_queue_list + (spell_cast_queue_count << 3)) = (iptr)spell;
+    *(iptr *)(D_001A4FEC + (spell_cast_queue_count++ << 3)) = (iptr)target;
 }
 
 void spell_cast_queued_run(void)
@@ -441,7 +441,7 @@ void world_collect_object(struct record *object)
         if (((struct bf8_4_1 *)&D_001940D6)->f != 0 && player_character->detect_kind == 2) {
             if ((object->image >> 7) == 216 || object->image == 26112) detect_consider(object);
         }
-        if ((object->image >> 7) == 210 && memchr((int)fire_flat_records, (int)(unsigned short)(object->image & 127), 8) != 0) {
+        if ((object->image >> 7) == 210 && memchr((iptr)fire_flat_records, (int)(unsigned short)(object->image & 127), 8) != 0) {
             distance = xn_math_approx_hypot(player_object->y - object->y, xn_math_approx_dist2d(player_object->x, player_object->z, object->x, object->z));
             if (distance < nearest_fire_distance) {
                 nearest_fire_distance = distance;
@@ -483,7 +483,7 @@ void world_collect_object(struct record *object)
             }
             break;
         case 17:
-            marker_make_loot_pile(object, ((((int)player_environment) == 2) ? (int)object_building(player_object->parent) : 0));
+            marker_make_loot_pile(object, ((((int)player_environment) == 2) ? (iptr)object_building(player_object->parent) : 0));
         }
         return;
     case 53:
@@ -570,8 +570,8 @@ void msgbox_prompt_number(int number, char *prompt)
 
     D_0012B508 = 146;
     text = *(char **)scratch_buffer + 55000;
-    mc_set_location(610, (int)D_00176A10);
-    mc_sprintf((int)text, (int)D_00176A27, prompt);
+    mc_set_location(610, (iptr)D_00176A10);
+    mc_sprintf((iptr)text, (iptr)D_00176A27, prompt);
     text[strlen(text) + 1] = 0;
     inpstr_begin_number(number);
     msgbox_show_string(text, 2);
@@ -594,7 +594,7 @@ struct building *object_building(struct record *object)
     int unused_4;
 
     unused_1 = 1;
-    if (object == 0 || (int)object == (-1768515946)) return 0;
+    if (object == 0 || (iptr)object == (-1768515946)) return 0;
     while (object != 0 && object->type != 1) {
         if (object->type == 43 && ((int)(unsigned short)(object->flags & 1)) != 0) break;
         object = object->parent;
@@ -709,7 +709,7 @@ void buttons_draw_hover_label(int x, int y, int button_count, struct rect *butto
 
     for (i = 0; i < button_count; i++) {
         if (mouse_x > buttons[i].x0 && mouse_x < buttons[i].x1 && mouse_y > buttons[i].y0 && mouse_y < buttons[i].y1) {
-            text_draw_coloured((int)labels[i], (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 156);
+            text_draw_coloured((iptr)labels[i], (int)(short)*(short *)&x, (int)(short)*(short *)&y, 145, 156);
         }
     }
 }
@@ -750,7 +750,7 @@ void save_thumbnail_capture(void)
     out = 24000;
     for (y = 0; y < 200; y += 4) {
         for (x = 0; x < 320; x += 4) {
-            *(signed char *)((char *)(int)(*(char **)&D_00147954 + out++)) = *(signed char *)((char *)(int)(*(char **)&screen_buffer + ((y * 320) + x)));
+            *(signed char *)((char *)(iptr)(*(char **)&D_00147954 + out++)) = *(signed char *)((char *)(iptr)(*(char **)&screen_buffer + ((y * 320) + x)));
         }
     }
 }
@@ -779,7 +779,7 @@ void func_0007EF20(void)
     struct SREGS sregs;
 
     if (D_00196281 == 0) return;
-    mc_memset(&sregs, 0, 12, (int)D_00176A10, 1064, 4);
+    mc_memset(&sregs, 0, 12, (iptr)D_00176A10, 1064, 4);
     regs.w.ax = 257;
     regs.w.dx = D_001A5A54;
     int386x(49, &regs, &regs, &sregs);
@@ -951,7 +951,7 @@ void func_0007F6A4(void)
     } else {
         pit_elapsed = ((65535 - D_001A59CC) + D_001A59E0) + (((D_001A59DC - D_001A59E4) - 1) * 65535);
     }
-    if (((unsigned)pit_elapsed) < 10000) pit_elapsed = (int)(((char *)D_001A59E0) + (65535 - D_001A59CC));
+    if (((unsigned)pit_elapsed) < 10000) pit_elapsed = (int)(iptr)(((char *)(iptr)D_001A59E0) + (65535 - D_001A59CC));
     D_001A5408[D_001A59D8] = ((unsigned)(((unsigned)(pit_elapsed * 1000)) / 1193180)) >> 1;
     if (((unsigned)D_001A5408[D_001A59D8]) > 100) {
         D_001A5408[D_001A59D8] = 100;
@@ -992,7 +992,7 @@ void location_restore_stored(void)
             if (stored->type == 64 && ((unsigned)stored->building_id) < game_minutes) {
                 object_delete(stored);
             } else if (stored->type == 64 && object_find_by_id(location_object, stored->building_id) != 0) {
-                mc_memcpy(&current_location->buildings[stored->image], RECORD_DATA(stored), 26, (int)D_00176A10, 1350, 4);
+                mc_memcpy(&current_location->buildings[stored->image], RECORD_DATA(stored), 26, (iptr)D_00176A10, 1350, 4);
             }
             stored = next_stored;
         }
@@ -1025,14 +1025,14 @@ void location_store_objects(void)
                 stored_room->type = 64;
                 stored_room->image = building_index;
                 stored_room->building_id = building->id;
-                mc_memcpy(RECORD_DATA(stored_room), building, 26, (int)D_00176A10, 1392, 4);
+                mc_memcpy(RECORD_DATA(stored_room), building, 26, (iptr)D_00176A10, 1392, 4);
             }
         }
     }
     if (player_character->house != 0 && (((unsigned)player_character->house) >> 16) == (((unsigned)location_object->id) >> 16)) {
         object_free_children(house_container);
-        if ((*(int *)&scratch_object = (int)house_container) == 0) {
-            scratch_object = (struct record *)((int)(house_container = object_create_child(player_entity, 0, 0)));
+        if ((*(iptr *)&scratch_object = (iptr)house_container) == 0) {
+            scratch_object = (struct record *)((iptr)(house_container = object_create_child(player_entity, 0, 0)));
             house_container->type = 52;
             house_container->flags = 3;
             house_container->container_index = 5;
@@ -1040,8 +1040,8 @@ void location_store_objects(void)
         object_foreach_skip_player(object_find_by_id(location_object, player_character->house)->children, func_0007FDEA);
     } else if (player_character->ship_owned != 0 && ((unsigned)(((unsigned)location_object->id) >> 16)) < 1000) {
         object_free_children(ship_container);
-        if ((*(int *)&scratch_object = (int)ship_container) == 0) {
-            scratch_object = (struct record *)((int)(ship_container = object_create_child(player_entity, 0, 0)));
+        if ((*(iptr *)&scratch_object = (iptr)ship_container) == 0) {
+            scratch_object = (struct record *)((iptr)(ship_container = object_create_child(player_entity, 0, 0)));
             ship_container->type = 52;
             ship_container->flags = 3;
             ship_container->container_index = 6;
@@ -1169,8 +1169,8 @@ L800F0:;
         if (building->type == 15) {
             tavern_building = building;
             if (tavern_room_rented() != 0) {
-                mc_set_location(1570, (int)D_00176A10);
-                mc_sprintf((int)text_buffer, (int)D_00176A42, building_name(building), (((unsigned)(building->rent_expires - game_minutes)) / 60) + 1);
+                mc_set_location(1570, (iptr)D_00176A10);
+                mc_sprintf((iptr)text_buffer, (iptr)D_00176A42, building_name(building), (((unsigned)(building->rent_expires - game_minutes)) / 60) + 1);
                 hud_message_add(text_buffer);
             }
         }

@@ -1,6 +1,7 @@
 /* question.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
+#include "ptrint.h"
 
 extern signed char mouse_buttons;
 extern short mouse_y;
@@ -8,7 +9,7 @@ extern short font_height;
 extern signed char key_down_a;
 extern signed char key_down_c;
 extern signed char key_down_b;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_0017539B[];
 extern char D_001753DB[];
 extern char D_001753E7[];
@@ -30,25 +31,25 @@ extern signed char D_0019981A;
 extern signed char D_0019981B;
 
 extern char *text_rsc_load(short, unsigned short, short);
-extern int pflc_play(int, int);
+extern int pflc_play(int, iptr);
 extern int sound_play_ui(int);
-extern int disk_read_file(char *, int);
+extern iptr disk_read_file(char *, iptr);
 extern int rand();
 extern int mc_free();
 extern int mc_memset();
-extern int mc_malloc();
+extern iptr mc_malloc();
 extern int atoi();
 extern int strlen();
 extern int mc_memcpy();
-extern int memchr();
-extern int strchr();
+extern iptr memchr();
+extern iptr strchr();
 extern int func_000A1944();
 extern int xn_draw_cel_frame();
 extern int xn_str_copy_until();
 extern int xn_str_append_char();
 extern void fatal_error(char *);
 extern void class_question_scroll(int *, short);
-extern void text_draw(int, int, int);
+extern void text_draw(iptr, int, int);
 int class_question_answer_span(short, short, short *, short *);
 
 void class_question_show(int *scroll_cels)
@@ -87,20 +88,20 @@ void class_question_show(int *scroll_cels)
         if (paren != 0) {
             class_question_answer_row[(unsigned char)paren[-1]] = *(signed char *)&line;
         }
-        text_draw((int)text_buffer, 20, font_height * (short)line);
+        text_draw((iptr)text_buffer, 20, font_height * (short)line);
         (*(short *)&line)++;
     }
     mc_memcpy(*(int *)scratch_buffer, screen_buffer, 64000, D_0017539B, 193, 4);
     mc_memcpy(screen_buffer, saved_screen, 64000, D_0017539B, 194, 4);
-    if (saved_screen != 0 && saved_screen != (char *)-1751672937) {
+    if (saved_screen != 0 && saved_screen != (char *)(iptr)-1751672937) {
         mc_free(saved_screen, D_0017539B, 195);
-        saved_screen = (char *)-1751672937;
+        saved_screen = (char *)(iptr)-1751672937;
     }
     *(short *)scratch_190d66 = (font_height * line) - 52;
     class_question_scroll(scroll_cels, 0);
-    if (rsc_text == 0 || rsc_text == (char *)-1751672937) return;
+    if (rsc_text == 0 || rsc_text == (char *)(iptr)-1751672937) return;
     mc_free(rsc_text, D_0017539B, 199);
-    rsc_text = (char *)-1751672937;
+    rsc_text = (char *)(iptr)-1751672937;
 }
 
 void class_question_scroll_step(int *scroll_cels, short delta)
@@ -119,10 +120,10 @@ void class_question_answer_anim(short kind)
 {
     char flc[44];
 
-    func_000A1944((int)flc, 0, 44);
+    func_000A1944((iptr)flc, 0, 44);
     *(short *)flc = 16;
     sound_play_ui(18);
-    pflc_play(class_answer_cels[((int)(short)kind)], (int)flc);
+    pflc_play(class_answer_cels[((int)(short)kind)], (iptr)flc);
 }
 }
 

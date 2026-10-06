@@ -9,7 +9,7 @@ extern signed char key_down_up;
 extern signed char key_down_left;
 extern signed char key_down_right;
 extern signed char key_down_down;
-extern int screen_buffer;
+extern iptr screen_buffer;
 extern char D_00170794[];
 extern char D_001707AE[];
 extern char D_001707B8[];
@@ -34,7 +34,7 @@ extern int D_00196D90;
 extern int D_00196D94;
 extern int D_00196D98;
 extern struct image *D_00196D9C;
-extern int D_00196DA4;
+extern iptr D_00196DA4;
 extern void screenshot_poll(void);
 extern int automap_move_forward(int);
 extern int automap_move_back(int);
@@ -43,10 +43,10 @@ extern int automap_move_right(int);
 extern void town_map_draw(void);
 extern int town_notes_size(void);
 extern int sound_play(int, struct record *, int);
-extern int disk_read_file(char *, int);
-extern int disk_write_arena2_file(char *, int, int);
+extern iptr disk_read_file(char *, iptr);
+extern int disk_write_arena2_file(char *, iptr, iptr);
 extern int disk_open_rw(char *);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int location_contains(int, int);
 extern int close();
 extern int mc_free();
@@ -60,8 +60,8 @@ extern int xn_mouse_cursor_move();
 extern int xn_mouse_cursor_erase();
 extern int xn_mouse_cursor_draw();
 extern int xn_draw_image();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern void town_map_draw_notes(void);
 extern int mc_memcpy();
 extern void func_000A134C(short, short, int);
@@ -93,26 +93,26 @@ void town_map_open(void)
     D_00196D98 = (D_00196D90 = 0);
     D_00196D94 = 0;
     scratch_190ce5 = 0;
-    mc_memset((int)scratch_buffer, 0, 50000, (int)D_001707AE, 624, 4);
-    mc_set_location(625, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
+    mc_memset((int)(iptr)scratch_buffer, 0, 50000, (iptr)D_001707AE, 624, 4);
+    mc_set_location(625, (iptr)D_001707AE);
+    mc_sprintf((iptr)text_buffer, (iptr)D_001707B8, location_object->id >> 16);
     handle = disk_open_rw(text_buffer);
     if (handle != (-1)) {
-        read(handle, (int)scratch_buffer, 50000);
+        read(handle, (int)(iptr)scratch_buffer, 50000);
         *(int *)scratch_buffer = game_minutes;   /* the notes file starts with the time it was saved */
         lseek(handle, 0, 0);
-        write(handle, (int)scratch_buffer, 4);
+        write(handle, (int)(iptr)scratch_buffer, 4);
         close(handle);
     }
     mouse_buttons = (mouse_buttons_prev = 0);
     saved_screen_active = (int)(unsigned char)D_00196272;
     D_00196272 = 1;
-    *(int *)scratch_190de4 = disk_read_file(D_00170794, 0);
+    *(iptr *)scratch_190de4 = disk_read_file(D_00170794, 0);
     D_00196D9C = (struct image *)disk_read_file(D_001707C3, 0);
     while (done == 0) {
         xn_mouse_cursor_erase();
         town_map_draw();
-        xn_draw_image(D_00196D9C->x, D_00196D9C->y, D_00196D9C->width, D_00196D9C->height, (int)D_00196D9C->pixels);
+        xn_draw_image(D_00196D9C->x, D_00196D9C->y, D_00196D9C->width, D_00196D9C->height, (iptr)D_00196D9C->pixels);
         xn_mouse_cursor_draw();
         mouse_buttons_prev = mouse_buttons;
         xn_mouse_poll_clamped();
@@ -142,18 +142,18 @@ void town_map_open(void)
     }
     while (key_down_esc != 0);
     if (*(int *)scratch_190de4 != 0 && *(int *)scratch_190de4 != (-1751672937)) {
-        mc_free(*(int *)scratch_190de4, (int)D_001707AE, 679);
+        mc_free(*(int *)scratch_190de4, (iptr)D_001707AE, 679);
         *(int *)scratch_190de4 = -1751672937;
     }
-    if ((int)D_00196D9C != 0 && (int)D_00196D9C != (-1751672937)) {
-        mc_free((int)D_00196D9C, (int)D_001707AE, 680);
-        D_00196D9C = (struct image *)-1751672937;
+    if ((iptr)D_00196D9C != 0 && (iptr)D_00196D9C != (-1751672937)) {
+        mc_free((iptr)D_00196D9C, (iptr)D_001707AE, 680);
+        D_00196D9C = (struct image *)(iptr)-1751672937;
     }
     D_00196272 = *(signed char *)&saved_screen_active;
     if (scratch_190ce5 == 0) return;
-    mc_set_location(686, (int)D_001707AE);
-    mc_sprintf((int)text_buffer, (int)D_001707B8, location_object->id >> 16);
-    disk_write_arena2_file(text_buffer, (int)scratch_buffer, town_notes_size());
+    mc_set_location(686, (iptr)D_001707AE);
+    mc_sprintf((iptr)text_buffer, (iptr)D_001707B8, location_object->id >> 16);
+    disk_write_arena2_file(text_buffer, (int)(iptr)scratch_buffer, town_notes_size());
 }
 
 void town_map_draw(void)

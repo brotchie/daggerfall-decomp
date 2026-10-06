@@ -4,7 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 
-extern int D_00147954;
+extern iptr D_00147954;
 extern char D_001708F0[];
 extern char D_001708F7[];
 extern char D_00170909[];
@@ -67,19 +67,19 @@ extern int guards_are_present(void);
 extern struct flat_cfg *flats_cfg_find(int);
 extern int sound_play(int, struct record *, int);
 extern int disk_open_data(char *);
-extern int hud_message_add(int);
+extern iptr hud_message_add(iptr);
 extern int rand_range(int, int);
 extern int spfx_resist_roll(int, int, struct character *, struct career *, int, int);
-extern int name_generate_seeded(unsigned char, unsigned char, int);
-extern int building_name(struct building *);
+extern iptr name_generate_seeded(unsigned char, unsigned char, int);
+extern iptr building_name(struct building *);
 extern struct record *object_free_single(struct record *);
 extern int rand();
 extern int close();
 extern int read();
 extern int mc_strncpy();
 extern int itoa();
-extern int mc_set_location(int, int);
-extern int mc_sprintf(int, ...);
+extern int mc_set_location(int, iptr);
+extern int mc_sprintf(iptr, ...);
 extern void crime_reputation_penalty(void);
 extern void damage_weapon_strike_effects(struct item *, struct record *, struct record *, int);
 extern void damage_creature_death(struct record *);
@@ -104,7 +104,7 @@ int damage_bonus_vs_target(struct item *, struct character *, struct character *
 int damage_apply(struct record *, int, struct record *);
 #pragma aux mc_set_location parm routine [];
 
-int quest_symbol_text(int symbol, int form, int second_symbol)
+iptr quest_symbol_text(int symbol, int form, int second_symbol)
 {
     struct faction *faction;
     struct qbn_foe *foe;
@@ -135,20 +135,20 @@ int quest_symbol_text(int symbol, int form, int second_symbol)
                 object = qbn_item->object;
                 if (object != 0) {
                     if ((text_macro_item = &object->data.item)->group == 28 && text_macro_item->index == 0) {
-                        return itoa(text_macro_item->value, (int)text_rsc_buffer, 10);
+                        return itoa(text_macro_item->value, (iptr)text_rsc_buffer, 10);
                     }
                     if (text_macro_item->group == 7) {
                         book_header = *(char **)&D_00147954 + 90000;
-                        mc_set_location(115, (int)D_001708F0);
-                        mc_sprintf((int)text_buffer, (int)D_001708F7, (int)(unsigned short)(short)text_macro_item->message);
+                        mc_set_location(115, (iptr)D_001708F0);
+                        mc_sprintf((iptr)text_buffer, (iptr)D_001708F7, (int)(unsigned short)(short)text_macro_item->message);
                         book_file = disk_open_data(text_buffer);
                         read(book_file, book_header, 234);
                         close(book_file);
-                        mc_strncpy((int)text_rsc_buffer, book_header, 2048, (int)D_001708F0, 119);
-                        return (int)text_rsc_buffer;
+                        mc_strncpy((iptr)text_rsc_buffer, book_header, 2048, (iptr)D_001708F0, 119);
+                        return (iptr)text_rsc_buffer;
                     }
                     parse_expand(D_00170909, D_00190B44);
-                    return (int)D_00190B44;
+                    return (iptr)D_00190B44;
                 }
             }
             qbn_place = quest_section(current_quest, 4);
@@ -167,7 +167,7 @@ int quest_symbol_text(int symbol, int form, int second_symbol)
                         building = &object->data.building;
                         return building_name(building);
                     }
-                    if ((form & 240) <= 32) return (int)object->data.quest_npc.location_name;
+                    if ((form & 240) <= 32) return (iptr)object->data.quest_npc.location_name;
                     if ((form & 240) != 0) {
                         return *(int *)(region_names + (((int)(unsigned short)object->region) << 2));
                     }
@@ -181,36 +181,36 @@ int quest_symbol_text(int symbol, int form, int second_symbol)
             qbn_person->flags &= ~0x8000;
             object = qbn_person->object;
             if (object == 0) goto L2D3DB;
-            if (object->type == 65) return (int)faction_find(object->faction_id)->name;
+            if (object->type == 65) return (iptr)faction_find(object->faction_id)->name;
             if (((int)(unsigned short)(object->flags & 4)) != 0) {
                 is_female = 1;
             } else {
                 is_female = 0;
             }
             text_macro_gender = *(signed char *)&is_female;
-            if ((form & 15) == 1) return (int)flats_cfg_find(object->image)->name;
+            if ((form & 15) == 1) return (iptr)flats_cfg_find(object->image)->name;
             if ((form & 15) > 1) {
-                if (object->faction_id != 0) return (int)faction_find(object->faction_id)->name;
-                return (int)D_0017090D;
+                if (object->faction_id != 0) return (iptr)faction_find(object->faction_id)->name;
+                return (iptr)D_0017090D;
             }
             switch (form & 240) {
             case 0:
                 faction = faction_find((int)(short)object->data.building.faction_id);
-                if (faction != 0 && faction->type == 4) return (int)faction->name;
+                if (faction != 0 && faction->type == 4) return (iptr)faction->name;
                 if (qbn_person->kind == (-1)) {
                     faction = faction_find(qbn_person->faction_id);
-                    if (faction->type == 4) return (int)faction->name;
+                    if (faction->type == 4) return (iptr)faction->name;
                 }
                 return name_generate_seeded((int)(unsigned char)D_001841E3[object->home_region], (int)(unsigned char)((signed char)object->flags & 4), object->name_seed);
             case 16:
-                if ((object->id >> 16) == 50015) return (int)D_00170918;
-                if ((object->id >> 16) == 50027) return (int)D_00170928;
-                if ((object->id >> 16) == 50029) return (int)D_0017093A;
-                if ((object->id >> 16) == 50033) return (int)D_00170949;
-                if ((object->id >> 16) == 50041) return (int)D_00170959;
+                if ((object->id >> 16) == 50015) return (iptr)D_00170918;
+                if ((object->id >> 16) == 50027) return (iptr)D_00170928;
+                if ((object->id >> 16) == 50029) return (iptr)D_0017093A;
+                if ((object->id >> 16) == 50033) return (iptr)D_00170949;
+                if ((object->id >> 16) == 50041) return (iptr)D_00170959;
                 return building_name(&object->data.building);
             case 32:
-                return (int)object->data.quest_npc.location_name;
+                return (iptr)object->data.quest_npc.location_name;
             case 48:
                 return *(int *)(region_names + (object->home_region << 2));
             default:
@@ -250,9 +250,9 @@ L2D3DB:;
             }
             if (current_quest->section_counts[6] > i) {
                 if ((form & 15) != 0) {
-                    return itoa((minutes + 1439) / 1440, (int)text_rsc_buffer, 10);
+                    return itoa((minutes + 1439) / 1440, (iptr)text_rsc_buffer, 10);
                 }
-                return itoa(minutes, (int)text_rsc_buffer, 10);
+                return itoa(minutes, (iptr)text_rsc_buffer, 10);
             }
         }
         return text_blank;
@@ -325,7 +325,7 @@ void damage_resolve_attack(struct record *attacker, struct record *target, int h
     if (skill_index == 30) {
         if (attacker == player_entity) {
             if (damage_roll_to_hit(attacker_character, target_character, body_part, chance, -1, 0) != 0) {
-                damage = rand_range((player_character->skills[SKILL_HAND_TO_HAND].value / 10) + 1, (int)&*(signed char *)((char *)(player_character->skills[SKILL_HAND_TO_HAND].value / 5) + 1));
+                damage = rand_range((player_character->skills[SKILL_HAND_TO_HAND].value / 10) + 1, (int)(iptr)&*(signed char *)((char *)(iptr)(player_character->skills[SKILL_HAND_TO_HAND].value / 5) + 1));
                 if (backstab_chance != 0) {
                     if (rand_range(1, 100) <= backstab_chance) {
                         damage = damage * 3;
@@ -371,7 +371,7 @@ void damage_resolve_attack(struct record *attacker, struct record *target, int h
         return;
     }
     if (target_character->min_metal_to_hit > weapon->material && attacker == player_entity) {
-        hud_message_add((int)D_00170968);
+        hud_message_add((iptr)D_00170968);
     }
     if (target_character->min_metal_to_hit <= weapon->material && damage_roll_to_hit(attacker_character, target_character, body_part, chance, weapon->index, (int)(short)*(short *)(material_to_hit + (weapon->material * 2))) != 0) {
         damage = rand_range((int)(short)*(short *)(weapon_damage_min + (weapon->index << 2)), (int)(short)*(short *)(weapon_damage_max + (weapon->index << 2)));
@@ -393,7 +393,7 @@ void damage_resolve_attack(struct record *attacker, struct record *target, int h
             if (((int)(unsigned short)(weapon->item_flags & 16)) == 0) damage >>= 1;
         }
         damage += ((int)(short)*(short *)(material_to_hit + (weapon->material * 2))) / 10;
-        damage += ((int)&*(signed char *)((char *)(attacker_character->attributes[ATTR_STR] + *(int *)D_00195A08) - 50)) / 5;
+        damage += ((int)(iptr)&*(signed char *)((char *)(iptr)(attacker_character->attributes[ATTR_STR] + *(int *)D_00195A08) - 50)) / 5;
         if (damage < 1) damage = 0;
         damage += damage_bonus_vs_target(weapon, attacker_character, target_character);
         if (backstab_chance != 0) {
@@ -511,7 +511,7 @@ int damage_bonus_vs_target(struct item *weapon, struct character *attacker, stru
             bonus -= attacker->level;
         }
         if (weapon->enchantments[i].type == 21 && weapon->enchantments[i].param == 0) {
-            damage_apply((struct record *)((char *)attacker - 71), (int)&*(signed char *)((char *)(attacker->level >> 2) + 1), 0);
+            damage_apply((struct record *)((char *)attacker - 71), (int)(iptr)&*(signed char *)((char *)(iptr)(attacker->level >> 2) + 1), 0);
         }
     }
     return bonus;
@@ -579,7 +579,7 @@ int damage_apply(struct record *target, int damage, struct record *weapon)
         } else if (weapon_item->enchantments[0].type == 26 && weapon_item->enchantments[0].param == 1) {
             if (spfx_resist_roll(4, 2, character, &character->career, 2, 0) != 100) {
                 damage_creature_death(target);
-                item_damage(weapon, (int)&*(signed char *)((char *)(character->health / 8) + 1));
+                item_damage(weapon, (int)(iptr)&*(signed char *)((char *)(iptr)(character->health / 8) + 1));
                 quest_raise_event(21, target, 0);
                 return character->health;
             }
