@@ -1091,12 +1091,43 @@ def rows_csv(path=BOUNDARY_CSV):
     return _rows[1]
 
 
+def dropped_private(rows):
+    """Dropped memory (config/xngine_dropped.csv and the files in XN_DROPPED) that the map does
+    not class visible, as linear ranges: scratch that canonical C keeps in locals. It is not
+    game-readable: no object-1 reference reaches it (else the map would class it visible),
+    and where its address is taken in object 2 the pointer goes only to engine functions
+    (`xn_rc.py check_dropped` lists those uses for review). So the boundary comparison masks it
+    like the private rows."""
+    vis = [(int(r["start"], 16), int(r["end"], 16)) for r in rows
+           if r["kind"] == "memory" and r["space"] == "obj" and r["class"] == "visible" and r["end"]]
+    paths = [os.path.join(ROOT, "config", "xngine_dropped.csv")] + \
+        [q for q in os.environ.get("XN_DROPPED", "").split(os.pathsep) if q]
+    out = []
+    for q in paths:
+        if not os.path.exists(q):
+            continue
+        with open(q, newline="") as f:
+            for d in csv.DictReader(f):
+                if d["kind"].strip() != "memory":
+                    continue
+                try:
+                    lo, hi = int(d["start"], 16), int(d["end"], 16)
+                except ValueError:
+                    continue            # allocation-relative rows: by their function's records
+                if not any(a < hi and b > lo for a, b in vis):
+                    out.append((LOAD + lo, LOAD + hi))
+    return out
+
+
 def load_masks(path=BOUNDARY_CSV):
-    """The masks a test applies, or None when there is no boundary map yet."""
+    """The masks a test applies, or None when there is no boundary map yet: the map's private
+    rows and the dropped memory it does not class visible (dropped_private)."""
     rows = rows_csv(path)
     if not rows:
         return None
-    return Masks(rows)
+    m = Masks(rows)
+    m.static += dropped_private(rows)
+    return m
 
 
 def entries(path=BOUNDARY_CSV):
@@ -1147,6 +1178,39 @@ def masks_cmd(snap):
     print("%d private ranges, %d bytes" % (len(p.ranges), tot))
 
 
+def dropped_review():
+    """The dropped memory rows whose address the asm takes (`offset D_X`, `lea r, [D_X]` in
+    src/xngine/): each such pointer must go only to engine functions (or be used as a base in
+    place), never to the game, for the row to be masked as private. Prints the sites."""
+    import glob
+    uses = collections.defaultdict(list)
+    pat = re.compile(r"offset\s+D_([0-9A-F]{8})|lea\s+\w+,\s*(?:\w+\s+ptr\s+)?\[\s*D_([0-9A-F]{8})", re.I)
+    for p in sorted(glob.glob(os.path.join(ROOT, "src", "xngine", "*.asm"))):
+        for ln, line in enumerate(open(p, encoding="latin-1"), 1):
+            for m in pat.finditer(line.split(";", 1)[0]):
+                uses[int(m.group(1) or m.group(2), 16)].append("%s:%d" % (os.path.basename(p), ln))
+    paths = [os.path.join(ROOT, "config", "xngine_dropped.csv")] + \
+        [q for q in os.environ.get("XN_DROPPED", "").split(os.pathsep) if q]
+    n = 0
+    for q in paths:
+        if not os.path.exists(q):
+            continue
+        for d in csv.DictReader(open(q, newline="")):
+            if d["kind"].strip() != "memory":
+                continue
+            try:
+                lo, hi = int(d["start"], 16), int(d["end"], 16)
+            except ValueError:
+                continue
+            hit = sorted(a for a in uses if lo <= a < hi)
+            if hit:
+                n += 1
+                print("%-34s %06X-%06X  %s" % (d["name"][:34], lo, hi, "  ".join(
+                    "%06X@%s" % (a, s) for a in hit for s in uses[a])))
+    print("%d dropped rows have their address taken: check that each pointer reaches only "
+          "engine functions" % n)
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1163,6 +1227,7 @@ def main():
     mk.add_argument("snap")
     sh = sub.add_parser("show")
     sh.add_argument("what")
+    sub.add_parser("dropped")
     a = ap.parse_args()
     if a.cmd == "static":
         static()
@@ -1179,6 +1244,8 @@ def main():
         masks_cmd(a.snap)
     elif a.cmd == "show":
         show(a.what)
+    elif a.cmd == "dropped":
+        dropped_review()
     return 0
 
 

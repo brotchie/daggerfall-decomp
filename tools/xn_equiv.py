@@ -30,7 +30,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "build", "xn_canon", "equiv")
+OUT = os.environ.get("XN_EQUIV_OUT") or os.path.join(ROOT, "build", "xn_canon", "equiv")
 LOAD = 0x01000000
 HBASE = 0x12000000
 HSIZE = 0x01000000
@@ -169,9 +169,12 @@ def vec_vals(rng, kind):
 
 # Specs: inputs (registers -> generator name or an exhaustive range), memory inputs, outputs.
 # "x" generators: fn(rng, i) -> {reg: value}; exhaustive specs give a count and fn(i).
-def S(regs=None, n=1_000_000, exhaustive=None, mem=None, outs=None, cf=False, note=""):
+def S(regs=None, n=1_000_000, exhaustive=None, mem=None, outs=None, cf=False, note="",
+      poke=None):
+    """poke: [(preferred address, bytes)] written into the machine for this spec's batches (and
+    put back after): a state the helper reads (the clip window)."""
     return {"regs": regs, "n": n, "exhaustive": exhaustive, "mem": mem, "outs": outs, "cf": cf,
-            "note": note}
+            "note": note, "poke": poke}
 
 
 def r_regs(**gens):
@@ -253,6 +256,68 @@ def specs():
     out["xn_math_yaw_offset_xz"] = S(None, n=500_000, mem=("yaw_out", "world"))
     out["xn_mat_from_angles"] = S(None, exhaustive=None, n=500_000, mem=("angles_mat", None))
     out["xn_math_advance_pitch_yaw"] = S(None, n=500_000, mem=("pitch_yaw_vec", "world"))
+    out.update(specs_screen())
+    return out
+
+
+# ---- group B (screen and 2D) -----------------------------------------------------------------
+CLIP = 0x142940                 # xn_gfx_clip_left, _top, _right, _bottom
+
+
+def clip_poke(l, t, r, b):
+    return [(CLIP, struct.pack("<4i", l, t, r, b))]
+
+
+def screen_coord(rng):
+    """a coordinate around a 320 x 200 screen, now and then far off or anything"""
+    r = rng.random()
+    if r < 0.8:
+        return rng.randrange(-400, 720) & 0xFFFFFFFF
+    if r < 0.95:
+        return rng.randrange(-100000, 100000) & 0xFFFFFFFF
+    return mixed(rng)
+
+
+def low8(gen_hi=None):
+    """a register whose low byte is i's and whose other bytes are noise"""
+    def f(i, b):
+        return ((i * 0x9E3779B1) & 0xFFFFFF00) | (b & 0xFF)
+    return f
+
+
+def specs_screen():
+    out = {}
+    noise = low8()
+    out["xn_pal_rgb_to_hsv"] = S(None, exhaustive=(1 << 24, lambda i: {
+        "ebx": noise(i, i), "ecx": noise(i + 1, i >> 8), "edx": noise(i + 2, i >> 16)}), n=0,
+        note="every colour of 8-bit components (BL CL DL), the other bytes noise")
+    out["xn_pal_hsv_to_rgb"] = S(None, exhaustive=(256 * 63 * 64, lambda i: {
+        "ebx": ((i * 0x9E3779B1) & 0xFFFF0000) | (0x140 + i % 256),
+        "ecx": ((i * 0x85EBCA6B) & 0xFFFF0000) | (1 + (i // 256) % 63),
+        "edx": ((i * 0xC2B2AE35) & 0xFFFF0000) | (i // (256 * 63))}), n=0,
+        note="hue 140h-23Fh (sectors 5 and up: for the others and a grey the asm returns astray, "
+             "Q-PAL-05), every saturation 1-63 and value 0-63")
+    out["xn_pal_find_nearest"] = S(lambda rng, i: {
+        "ebx": rng.getrandbits(32), "ecx": rng.getrandbits(32), "edx": rng.getrandbits(32)},
+        n=200_000, note="random colours against the save's palette (BL CL DL)")
+    out["xn_font_glyph_width"] = S(None, exhaustive=(4096, lambda i: {"eax": (i - 2048) & 0xFFFFFFFF}),
+                                   n=0, note="characters -2048..2047 in the save's font")
+    lines = lambda rng, i: {"eax": screen_coord(rng), "edx": screen_coord(rng),   # noqa: E731
+                            "ebx": screen_coord(rng), "ecx": screen_coord(rng)}
+    for name, win in (("", (0, 0, 320, 200)), ("@window", (40, 30, 280, 170))):
+        out["xn_draw_line_clip" + name] = S(lines, n=1_000_000, poke=clip_poke(*win), cf=True,
+                                            note="lines around the clip window %r" % (win,))
+        out["xn_draw_clip_rect_xyxy" + name] = S(lambda rng, i: dict(zip(
+            ("eax", "ebx"), sorted([screen_coord(rng), screen_coord(rng)], key=lambda v: v - (1 << 32) if v >> 31 else v))) | dict(zip(
+            ("edx", "ecx"), sorted([screen_coord(rng), screen_coord(rng)], key=lambda v: v - (1 << 32) if v >> 31 else v))),
+            n=1_000_000, poke=clip_poke(*win), cf=True)
+        for f in ("xn_draw_clip_rect", "xn_draw_clip_image_rect"):
+            out[f + name] = S(lambda rng, i: {
+                "eax": screen_coord(rng), "edx": screen_coord(rng),
+                "ebx": rng.choice([rng.randrange(-20, 400), screen_coord(rng)]) & 0xFFFFFFFF,
+                "ecx": rng.choice([rng.randrange(-20, 260), screen_coord(rng)]) & 0xFFFFFFFF,
+                "ebp": rng.randrange(-64, 400) & 0xFFFFFFFF, "esi": rng.getrandbits(32)},
+                n=1_000_000, poke=clip_poke(*win), cf=True)
     return out
 
 
@@ -304,6 +369,21 @@ def compare_func(name, spec, bench, scale=1.0, seed=1, verbose=False):
     bad = 0
     first = []
     t0 = time.time()
+    saved = []
+    for a, data in spec.get("poke") or ():
+        saved.append((a, bytes(bench.emu.uc.mem_read(LOAD + a, len(data)))))
+        bench.emu.uc.mem_write(LOAD + a, data)
+    try:
+        return _compare(name, spec, bench, va, route, outs, masks, cf, rng, scale, verbose, t0)
+    finally:
+        for a, data in saved:
+            bench.emu.uc.mem_write(LOAD + a, data)
+
+
+def _compare(name, spec, bench, va, route, outs, masks, cf, rng, scale, verbose, t0):
+    total = 0
+    bad = 0
+    first = []
     ex = spec["exhaustive"]
     nrand = int(spec["n"] * scale)
     nex = ex[0] if ex else 0

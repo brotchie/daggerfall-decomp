@@ -747,14 +747,19 @@ def replay_run(rec, patch=None, entry=None, top=None):
     # services (DOS, BIOS, the mouse) answer as they did in the recording
     emu.bios_as_service = rec.get("io_version", 1) >= 2
     emu.int_replay = [(e[1], e[2]) for e in rec["io"] if e[0] == "int-ret"]
+    # the services' (vector, EAX), as each int-ret's call: fallemu's replay_service answers
+    # DPMI page locking out of order (D-VID-01)
+    emu.int_replay_keys = [(e[1], e[2]) for e in rec["io"] if e[0] == "int"]
+    if len(emu.int_replay_keys) != len(emu.int_replay):
+        emu.int_replay_keys = None
     emu.int_replay_regs = xn_services.replay_regs   # only what each service defines
     emu.in_replay = [e[2] for e in rec["io"] if e[0] == "in"]   # and ports read as they were
     try:
         got = call_once(emu, footprint=False, top=top or rec.get("top"))
     except (IndexError, fallemu.Stop) as e:   # asked for more services than recorded; a fault
-        emu.int_replay = emu.in_replay = emu.int_replay_regs = None
+        emu.int_replay = emu.in_replay = emu.int_replay_regs = emu.int_replay_keys = None
         return {"stopped": "stopped: %r" % e}
-    emu.int_replay = emu.in_replay = emu.int_replay_regs = None
+    emu.int_replay = emu.in_replay = emu.int_replay_regs = emu.int_replay_keys = None
     return got
 
 

@@ -155,6 +155,20 @@ SCENARIOS += [
     {"name": "mainmenu", "sync": MODAL, "snap": "build/xngine/bases/newgame_1.snap",
      "covers": "the main menu (after boot)", "script": "", "ticks": 20, "frames": 30, "irqs": 2,
      "input": "0 mouse 100,60,0; 6 mouse 160,100,0; 12 mouse 200,140,0; 18 mouse 60,180,0"},
+    # coverage of paths no record can reach (the interrupt handlers, busy waits on the tick)
+    {"name": "joystick", "snap": "save_blades",
+     "covers": "the joystick on (int 1Ch handler, polls; port 201h reads FFh: every axis 800h)",
+     "poke": [["152A02", "00"], ["152A0C", "0A000000"]], "script": "5 mouse 160,100,0",
+     "ticks": 20, "frames": 30, "irqs": 2, "input": WALK},
+    {"name": "modifiers", "snap": "save_blades",
+     "covers": "Shift, Ctrl and Alt through the int 9 handler (make and break)",
+     "script": "5 mouse 160,100,0", "ticks": 20, "frames": 20, "irqs": 2,
+     "input": "2 key lshift; 6 key rshift; 10 key ctrl; 14 key alt"},
+    {"name": "mouse_edges", "snap": "save_blades",
+     "covers": "the software cursor at the screen's edges, and a double click (inventory)",
+     "script": "5 mouse 160,100,0; 10 down f6; 30 up f6", "ticks": 300, "frames": 20,
+     "irqs": 1, "input": "2 mouse 2,2,0; 6 mouse 318,198,0; 10 click 318,198; "
+                         "14 click 318,198"},
     {"name": "vid", "snap": "save_blades", "covers": "a VID movie (the logo, a direct call)",
      "script": "5 mouse 160,100,0", "ticks": 10, "frames": 600, "irqs": 4,
      "call": [0x3A325, [0, 0, 0, 0]], "sync": "fn:xn_gfx_present", "continuous": True,
@@ -253,6 +267,14 @@ class Side:
         self.start_eip = emu.r("eip") if emu is not None else None
         self.cov = None
 
+    def routed(self, va):
+        """Whether this machine sends the asm entry va to its C (the asm machine: never). A
+        scenario's C machine is always routed as the game is (route_game: the boundary
+        entries); the image's mode is back to "test" by the time a frame runs."""
+        if self.img is None:
+            return False
+        return va in self.img.game_funcs
+
     def start_coverage(self):
         import xn_record
         lib = xn_record.coverage_lib()
@@ -296,8 +318,12 @@ class Side:
         # reaches that call's C entry next: the same call, not the next frame (the input
         # delivered there may already have moved EIP along the route: where the frame began
         # is what counts)
+        # Only where that asm entry is routed in this machine: a canonical function the game
+        # does not call (an internal one, as xn_mouse_poll) has no route, so the resumed call
+        # runs the asm and the next C entry is the next frame's.
         skip = set()
-        if self.start_eip in self.alias and emu.r("eip") != self.alias[self.start_eip]:
+        if self.start_eip in self.alias and emu.r("eip") != self.alias[self.start_eip] and \
+                self.routed(self.start_eip - LOAD):
             skip.add(self.alias[self.start_eip])     # (at the C entry itself: stepped over)
 
         def stop(uc, address, size, _):
@@ -501,9 +527,10 @@ def io_view(log, boundary):
     if not boundary:
         return log
     import xn_services
+    import xn_rc
     out = []
     last = None
-    for e in log:
+    for e in xn_rc.drop_page_locks(log):     # (D-VID-01)
         if e[0] == "exc":
             continue
         if e[0] == "int":
@@ -526,11 +553,131 @@ def io_view(log, boundary):
     return out
 
 
+# ---- writer-private memory -------------------------------------------------------------------
+# In a buffer the engine shares between functions (the work block), a byte can be game-visible
+# after one function writes it and dead after another: the game reads the work block only after
+# collision has written it, never what the scaled image's row compiler left there. A
+# `writer-private` row of config/xngine_boundary.csv (or of a file in XN_BOUNDARY_EXTRA) names an
+# allocation's range and its writers:
+#   memory,alloc,8,438,xn_mem_work_block,writer-private,ptr=147958 size=19020 writers=C094A C0700,..
+# At a frame's boundary compare, the bytes of that range whose last writer in the asm machine
+# was one of those functions (by EIP, within the function's code) are masked. Sound only when
+# the game never reads what those writers wrote (the evidence column: a survey by writer); the
+# rule never masks bytes another function wrote last.
+def writer_private_rows():
+    import csv
+    import xn_boundary
+    rows = [r for r in xn_boundary.rows_csv() if r.get("class") == "writer-private"]
+    for path in [q for q in os.environ.get("XN_BOUNDARY_EXTRA", "").split(os.pathsep) if q]:
+        if os.path.exists(path):
+            with open(path, newline="") as f:
+                rows += [r for r in csv.DictReader(f) if r.get("class") == "writer-private"]
+    return rows
+
+
+def writer_private_rules(resolve_code=True):
+    """[{"alloc", "ptr", "lo", "hi", "writers": [function va], "code": [(lo, hi)]}]: the code
+    extents run from each writer's entry to the next function's (config/xngine_abi.csv)."""
+    import re
+    out = []
+    starts = None
+    for r in writer_private_rows():
+        m = re.match(r"ptr=([0-9A-Fa-f]+)", r["rule"])
+        w = re.search(r"writers=([0-9A-Fa-f ]+)", r["rule"])
+        if not m or not w:
+            continue
+        writers = [int(x, 16) for x in w.group(1).split()]
+        rule = {"alloc": r["name"], "ptr": int(m.group(1), 16), "lo": int(r["start"], 16),
+                "hi": int(r["end"], 16), "writers": writers, "code": []}
+        if resolve_code:
+            if starts is None:
+                import bisect
+                import xn_abi
+                starts = sorted(xn_abi.read_abi())
+            for f in writers:
+                k = bisect.bisect_right(starts, f)
+                rule["code"].append((f, starts[k] if k < len(starts) else OBJ2[1]))
+        out.append(rule)
+    return out
+
+
+class WriterTrack:
+    """The last writer of each byte of the writer-private ranges in a machine: a write hook on
+    those ranges only (and on the services' writes from Python, which are never a rule's)."""
+
+    def __init__(self, emu, rules):
+        from unicorn import UC_HOOK_MEM_WRITE
+        self.emu = emu
+        self.ranges = []
+        self.hooks = []
+        eip_id = fallemu.R["eip"]
+        for ru in rules:
+            p = struct.unpack("<I", emu.read(LOAD + ru["ptr"], 4))[0]
+            if not p:
+                continue
+            lo, hi = p + ru["lo"], p + ru["hi"]
+            flags = bytearray(hi - lo)
+            code = [(LOAD + a, LOAD + b) for a, b in ru["code"]]
+            self.ranges.append((lo, hi, flags))
+
+            def on_write(uc, acc, addr, size, val, _u, lo=lo, hi=hi, flags=flags, code=code):
+                e = uc.reg_read(eip_id)
+                mark = 1 if any(a <= e < b for a, b in code) else 0
+                for j in range(max(addr, lo), min(addr + size, hi)):
+                    flags[j - lo] = mark
+            self.hooks.append(emu.uc.hook_add(UC_HOOK_MEM_WRITE, on_write, None, lo, hi - 1))
+        self._orig = emu.write
+        self.resume()
+        fallemu.flush_caches(emu.uc)
+
+    def _write(self, lin, data):
+        self._orig(lin, data)
+        for lo, hi, flags in self.ranges:
+            for j in range(max(lin, lo), min(lin + len(data), hi)):
+                flags[j - lo] = 0
+
+    def suspend(self):
+        """Off the machine's write (a machine with it cannot be saved)."""
+        if "write" in self.emu.__dict__:
+            del self.emu.__dict__["write"]
+
+    def resume(self):
+        if self.ranges:
+            self.emu.write = self._write
+
+    def contains(self, a):
+        for lo, hi, flags in self.ranges:
+            if lo <= a < hi:
+                return flags[a - lo] == 1
+        return False
+
+    def masked(self):
+        return sum(sum(f) for _lo, _hi, f in self.ranges)
+
+    def remove(self):
+        for h in self.hooks:
+            self.emu.uc.hook_del(h)
+        self.hooks = []
+        if "write" in self.emu.__dict__:
+            del self.emu.__dict__["write"]
+
+
 class Compare:
     """A frame's comparison of the asm machine and the C machine."""
 
-    def __init__(self, masks=None):
+    def __init__(self, masks=None, code_pointers=None):
         self.masks = masks
+        self.writer = None              # a WriterTrack of the asm machine
+        # {C address: asm entry address} of the boundary's entries (xn_rc.code_pointers): a
+        # dword holding the one in the C machine and the other in the asm machine is equal
+        self.cps = code_pointers or {}
+
+    def same_code_pointer(self, asm, c, x):
+        for base in range(x - 3, x + 1):
+            vc = struct.unpack("<I", c.read(base, 4))[0]
+            if vc in self.cps and struct.unpack("<I", asm.read(base, 4))[0] == self.cps[vc]:
+                return True
+        return False
 
     def frame(self, asm, c, io_a, io_c):
         esp = asm.r("esp")
@@ -541,6 +688,10 @@ class Compare:
         if self.masks is not None and diffs:
             priv = self.masks.resolve(asm)
             visible = [x for x in diffs if not priv.contains(x)]
+            if self.writer is not None and visible:
+                visible = [x for x in visible if not self.writer.contains(x)]
+            if self.cps and visible:
+                visible = [x for x in visible if not self.same_code_pointer(asm, c, x)]
         io_full = io_a == io_c
         io_b = io_view(io_a, True) == io_view(io_c, True)
         return {"screen": screen, "full": not diffs and screen, "io_full": io_full,
@@ -584,7 +735,11 @@ def run(spec, img=None, masks=None, continuous=None, asm_only=False, on_asm=None
             start_call(asm, va, args)
         if on_asm:
             on_asm(asm, "frames")
-        cmp = Compare(masks)
+        cps = None
+        if masks is not None and img is not None:
+            import xn_rc
+            cps = xn_rc.code_pointers(img)
+        cmp = Compare(masks, cps)
         events = parse_input(spec.get("input", ""))
         irqs = spec.get("irqs", 1)
         trap = LOAD + TRAP if spec.get("call") else None
@@ -598,6 +753,10 @@ def run(spec, img=None, masks=None, continuous=None, asm_only=False, on_asm=None
             asm.save(state)
             c = fallemu.Emu.load(state, overlay=ov + "_c")
             route(c)
+        if masks is not None and not asm_only:
+            wr = writer_private_rules()
+            if wr:
+                cmp.writer = WriterTrack(asm, wr)
         for k in range(nframes):
             ev = events.get(k, [])
             for act, arg in ev:
@@ -605,7 +764,11 @@ def run(spec, img=None, masks=None, continuous=None, asm_only=False, on_asm=None
                     irqs = arg
             ev = [e for e in ev if e[0] != "irqs"]
             if not asm_only and not cont:
+                if cmp.writer is not None:
+                    cmp.writer.suspend()
                 asm.save(state)
+                if cmp.writer is not None:
+                    cmp.writer.resume()
                 c = fallemu.Emu.load(state, overlay=ov + "_c")
                 route(c)
             C = Side(c, sc, img, alias) if c is not None else None
@@ -650,6 +813,9 @@ def run(spec, img=None, masks=None, continuous=None, asm_only=False, on_asm=None
             res["frames"].append(fr)
             if how_a == "trap":
                 break
+        if cmp.writer is not None:
+            res["writer_masked"] = cmp.writer.masked()
+            cmp.writer.remove()
         if on_asm:
             on_asm(asm, "end")
         if coverage:

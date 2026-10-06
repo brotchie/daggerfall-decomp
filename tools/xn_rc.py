@@ -471,6 +471,10 @@ def build(flags=None):
             b += b"\xC2" + struct.pack("<H", gr["ret_pop"]) if gr["ret_pop"] else b"\xC3"
             stubs.extend(b + b"\x90" * (-len(b) % 16))
             game_routes[va] = {"to": a, "kind": "boundary-keep", "c": r["c"], "keep": regs}
+            if gr.get("evidence"):
+                game_routes[va]["evidence"] = gr["evidence"]
+                print("  %s (%06X): boundary-keep %s; EAX: %s" % (name, va, " ".join(regs),
+                                                                 gr["evidence"]))
         else:
             game_routes[va] = {"to": r["c"], "kind": "boundary", "c": r["c"]}
     data = bytes(img) + b"\0" * (pos - RBASE - len(img)) + bytes(stubs)
@@ -506,8 +510,25 @@ def check_dropped():
     except (ImportError, OSError):
         return []
     out = []
+    wp = None
     for d in load_dropped()[3]:
         if d["kind"].strip() != "memory":
+            continue
+        a = alloc_ref(d["start"])
+        if a is not None:
+            # relative to an allocation: the bytes must be writer-private there for this
+            # function (tools/xn_scenarios.py writer_private_rules: the game never reads what
+            # it wrote), whatever class their chunks have
+            import xn_scenarios
+            if wp is None:
+                wp = xn_scenarios.writer_private_rules(resolve_code=False)
+            b = alloc_ref(d["end"])
+            f = func_va(d["function"].strip())
+            if not any(w["alloc"] == a[0] and w["lo"] <= a[1] and b is not None and
+                       b[1] <= w["hi"] and f in w["writers"] for w in wp):
+                out.append("dropped %s (%s..%s, %s): not writer-private for %s in the boundary "
+                           "map (class writer-private, writers=...)" % (
+                               d["name"], d["start"], d["end"], d["function"], d["function"]))
             continue
         lo, hi = int(d["start"], 16), int(d["end"], 16)
         for r in rows:
@@ -559,12 +580,21 @@ def boundary_route(va, name, e, row, protos, c):
     need = reads & may & ~result
     keep = [r for r in ("eax", "ebx", "ecx", "edx", "esi", "edi", "ebp") if need & xn_abi.RMASK[r]]
     out = {"ret_pop": ret_pop, "keep": keep}
-    if row is not None and need & row["out"]:
+    row_out, row_clob = (row["out"], row["clob"]) if row is not None else (0, 0)
+    if row is not None and need & xn_abi.RMASK["eax"] & (row_out | row_clob):
+        # the parts of EAX the asm gives back as they came (push ax/pop ax, pushad/popad): an
+        # "output" there is the caller's value passing through, which push eax/pop eax keeps
+        kept, ev = eax_preserved(va)
+        if kept & need & xn_abi.RMASK["eax"]:
+            row_out &= ~kept
+            row_clob &= ~kept
+            out["evidence"] = ev
+    if row is not None and need & row_out:
         out["problem"] = "%s (%06X): the game reads %s after the call, which the asm sets (an " \
             "output the prototype does not return): a boundary adapter is needed" % (
-                name, va, xn_abi.names_of(need & row["out"]))
+                name, va, xn_abi.names_of(need & row_out))
     elif "eax" in keep and (row is None or
-                            need & xn_abi.RMASK["eax"] & (row["out"] | row["clob"])):
+                            need & xn_abi.RMASK["eax"] & (row_out | row_clob)):
         # the game reads a part of EAX the asm changes, and the prototype returns nothing.
         # (A part the asm keeps, the stub keeps too: push eax; call; pop eax.)
         out["problem"] = "%s (%06X): the game reads EAX after the call and the prototype " \
@@ -572,6 +602,95 @@ def boundary_route(va, name, e, row, protos, c):
     elif keep and n > 4:
         out["problem"] = "%s (%06X): stack arguments and registers to keep" % (name, va)
     return out
+
+
+# What the asm keeps of EAX: tools/xn_abi.py's analysis (maydef: the register parts some path
+# may leave changed; push/pop pairs, 16-bit ones too, and pushad/popad leave a part as it came),
+# cross-checked on the records (exit EAX = entry EAX in every record of the function). Cached
+# by the analysis' source and inputs (XN_MAYDEF: another cache file).
+MAYDEF = os.environ.get("XN_MAYDEF") or os.path.join(ROOT, "build", "xn_canon", "boundary",
+                                                     "maydef.json")
+
+
+def _maydef_key():
+    import hashlib
+    import xn_abi
+    h = hashlib.sha1(open(xn_abi.__file__, "rb").read())
+    for p in (xn_abi.INDIRECT, os.path.join(ROOT, "config", "functions.csv")):
+        if os.path.exists(p):
+            h.update(open(p, "rb").read())
+    return h.hexdigest()
+
+
+_maydef = None
+
+
+def maydef_table():
+    """{va: (maydef mask, mustdef mask)} of every analysed function (cached)."""
+    global _maydef
+    if _maydef is not None:
+        return _maydef
+    key = _maydef_key()
+    if os.path.exists(MAYDEF):
+        with open(MAYDEF) as f:
+            d = json.load(f)
+        if d.get("key") == key:
+            _maydef = {int(k, 16): tuple(v) for k, v in d["maydef"].items()}
+            return _maydef
+    import xn_abi
+    print("tools/xn_abi.py analysis for the boundary routes' EAX (30 s, cached in %s)" %
+          os.path.relpath(MAYDEF, ROOT), flush=True)
+    an = xn_abi.Analysis()
+    an.run()
+    _maydef = {va: (s.maydef, s.mustdef) for va, s in an.summ.items()}
+    os.makedirs(os.path.dirname(MAYDEF), exist_ok=True)
+    with open(MAYDEF + ".tmp", "w") as f:
+        json.dump({"key": key, "maydef": {"%06X" % va: list(v) for va, v in _maydef.items()},
+                   "records": {}}, f)
+    os.replace(MAYDEF + ".tmp", MAYDEF)
+    return _maydef
+
+
+def eax_preserved(va):
+    """(the parts of EAX the asm leaves as its caller had them, evidence): every part outside
+    the analysis' maydef that also held its entry value at the exit of every record of the
+    function. (0, why) when the analysis says a part may change or a record shows it did."""
+    import xn_abi
+    md = maydef_table().get(va)
+    if md is None:
+        return 0, "not analysed"
+    kept = xn_abi.RMASK["eax"] & ~md[0]
+    if not kept:
+        return 0, "the analysis: EAX may change (maydef %s)" % xn_abi.names_of(md[0])
+    with open(MAYDEF) as f:
+        d = json.load(f)
+    files = files_with([va])
+    ck = "%06X" % va
+    got = d.get("records", {}).get(ck)
+    if got is None or got[0] != len(files):
+        import xn_cload
+        import xn_record
+        n, bad = 0, 0
+        for path in files:
+            for rec in xn_cload.read_records(xn_record, path):
+                if rec["func"] != va or not rec.get("exit"):
+                    continue
+                n += 1
+                x = (rec["entry"]["eax"] ^ rec["exit"]["eax"]) & 0xFFFFFFFF
+                for part, m in (("eaxL", 0xFF), ("eaxH", 0xFF00), ("eaxU", 0xFFFF0000)):
+                    if x & m:
+                        bad |= xn_abi.BIT[part]
+        got = [len(files), n, bad]
+        d.setdefault("records", {})[ck] = got
+        with open(MAYDEF + ".tmp", "w") as f:
+            json.dump(d, f)
+        os.replace(MAYDEF + ".tmp", MAYDEF)
+    _nf, n, bad = got
+    kept &= ~bad
+    if bad & xn_abi.RMASK["eax"] & ~md[0]:
+        return kept, "the analysis keeps %s, but a record changed %s" % (
+            xn_abi.names_of(xn_abi.RMASK["eax"] & ~md[0]), xn_abi.names_of(bad))
+    return kept, "the analysis keeps %s; %d records agree" % (xn_abi.names_of(kept), n)
 
 
 # --------------------------------------------------------------------------------------------
@@ -769,9 +888,12 @@ def load_dropped(path=DROPPED_CSV):
                 rows += list(csv.DictReader(f))
     for r in rows:
         kind = r["kind"].strip()
+        if kind == "memory-own":
+            continue                # excused only in their function's records (own_drops)
         if kind == "memory":
-            mem.append((LOAD + int(r["start"], 16), LOAD + int(r["end"], 16)))
-            continue
+            if alloc_ref(r["start"]) is None:
+                mem.append((LOAD + int(r["start"], 16), LOAD + int(r["end"], 16)))
+            continue                # (ALLOC+0xOFF: relative to an allocation, alloc_drops)
         if kind == "exceptions":
             # CPU exceptions the engine's own handler took (a divide error and the return
             # from its handler): flags[None] lists the vectors excused everywhere
@@ -783,13 +905,183 @@ def load_dropped(path=DROPPED_CSV):
             regs[va] = regs.get(va, 0) | m
         elif kind == "flags":
             flags[va] = flags.get(va, 0) | m
-    return sorted(mem), regs, flags, rows
+    return merge_ranges(mem), regs, flags, rows
+
+
+def merge_ranges(ranges):
+    """Sorted, with overlapping and touching (lo, hi) ranges merged, so that _in_ranges'
+    search by start finds every address (the rows' order and overlaps do not matter)."""
+    out = []
+    for lo, hi in sorted(ranges):
+        if out and lo <= out[-1][1]:
+            out[-1] = (out[-1][0], max(out[-1][1], hi))
+        else:
+            out.append((lo, hi))
+    return out
+
+
+# A dropped row's start and end can be relative to an engine allocation: ALLOC+0xOFF, ALLOC
+# named as config/xngine_boundary.csv names it (the global that holds its pointer, e.g.
+# xn_mem_work_block+0x8). Such rows are excused only in the records of their own function (a
+# shared buffer: the excuse must not hide another function's writes there).
+ALLOC_REF = re.compile(r"^\s*([A-Za-z_]\w*)\s*\+\s*(0x[0-9A-Fa-f]+|[0-9]+)\s*$")
+
+
+def alloc_ref(text):
+    """'ALLOC+0xOFF' -> (ALLOC, offset), or None (a plain object-2 address)."""
+    m = ALLOC_REF.match(text or "")
+    return (m.group(1), int(m.group(2), 0)) if m else None
+
+
+def alloc_pointer(name):
+    """The object-2 global holding the pointer of the allocation `name` (its boundary row's
+    rule ptr=VA), or the global of that name."""
+    import xn_boundary
+    for r in xn_boundary.rows_csv():
+        if r["kind"] == "memory" and r["space"] == "alloc" and r["name"] == name:
+            m = re.match(r"ptr=([0-9A-Fa-f]+)", r["rule"])
+            if m:
+                return int(m.group(1), 16)
+    e = names()[0].get(name)
+    if e is not None and e[0] == "global":
+        return e[1]
+    raise SystemExit("dropped row: no allocation or global named %s" % name)
+
+
+def alloc_drops(rows=None):
+    """{function va: [(pointer global va, lo, hi)]} of the allocation-relative dropped rows."""
+    out = {}
+    for r in (rows if rows is not None else load_dropped()[3]):
+        if r["kind"].strip() != "memory":
+            continue
+        a, b = alloc_ref(r["start"]), alloc_ref(r["end"])
+        if a is None:
+            continue
+        if b is None or b[0] != a[0]:
+            raise SystemExit("dropped row %s: start %s and end %s must name the same allocation" % (
+                r["name"], r["start"], r["end"]))
+        out.setdefault(func_va(r["function"].strip()), []).append((alloc_pointer(a[0]), a[1], b[1]))
+    return out
+
+
+def own_drops(rows=None):
+    """{function va: [(lo, hi)]} of the `memory-own` dropped rows: preferred addresses (any
+    object's) excused only in the records of their function: what a deviation's own calls
+    change in memory nobody reads (D-VID-01: MemCheck's last-call record)."""
+    out = {}
+    for r in (rows if rows is not None else load_dropped()[3]):
+        if r["kind"].strip() == "memory-own":
+            out.setdefault(func_va(r["function"].strip()), []).append(
+                (LOAD + int(r["start"], 16), LOAD + int(r["end"], 16)))
+    return out
+
+
+def code_pointers(img):
+    """{the C address of a boundary entry: its asm entry's linear address}: the code pointers
+    canonical C hands the game (a callback) count as the asm's when they name the same entry.
+    Only the boundary's entries (config/xngine_boundary.csv kind entry)."""
+    out = {}
+    ents = boundary_entries()
+    for va, r in getattr(img, "routes", {}).items():
+        if va in ents and r.get("c"):
+            out[r["c"]] = LOAD + va
+    return out
+
+
+def rec_byte(rec, lin, _cache={}):
+    """A byte of a record's memory before the call (its pages, else its base machine)."""
+    import xn_record
+    if _cache.get("rec") is not rec:        # the record itself, held (an id can be reused)
+        _cache.clear()
+        _cache["rec"] = rec
+        _cache["pages"] = pickle.loads(__import__("zlib").decompress(rec["pages"]))
+    pages = _cache["pages"]
+    pg = lin & ~0xFFF
+    if pg in pages:
+        return pages[pg][lin - pg]
+    _emu, (low, mem) = xn_record.base_machine(rec["base"])
+    return mem[lin - LOAD] if lin >= LOAD else low[lin]
+
+
+def translate_code_pointers(rec, gw, cps):
+    """The C's writes gw with each code pointer of cps (a dword written whole, any alignment)
+    put back as the asm entry's address it stands for, where the record shows the asm leaving
+    that entry's asm address there (so data that merely equals a C address, as WOODS.WLD's
+    cell bytes can, is not taken for a pointer); a byte that then holds what memory held
+    before the call is no write (the record lists only bytes that changed)."""
+    if not cps:
+        return gw
+    rw = rec.get("writes", {})
+    out = dict(gw)
+    for a in sorted(gw):
+        if a not in out or any((a + k) not in gw for k in range(4)):
+            continue
+        v = gw[a] | gw[a + 1] << 8 | gw[a + 2] << 16 | gw[a + 3] << 24
+        if v not in cps:
+            continue
+        want = struct.pack("<I", cps[v])
+        if any(rw.get(a + k, rec_byte(rec, a + k)) != want[k] for k in range(4)):
+            continue                # the asm did not leave the entry's address here: data
+        for k, byte in enumerate(struct.pack("<I", cps[v])):
+            if byte == rec_byte(rec, a + k):
+                out.pop(a + k, None)
+            else:
+                out[a + k] = byte
+    return out
+
+
+def rec_dword(rec, lin, _cache={}):
+    """A dword of a record's entry memory: from its own pages, else its base machine's."""
+    import xn_record
+    if _cache.get("rec") is not rec:        # the record itself, held (an id can be reused)
+        _cache.clear()
+        _cache["rec"] = rec
+    key = lin
+    if key in _cache:
+        return _cache[key]
+    pages = pickle.loads(__import__("zlib").decompress(rec["pages"]))
+    pg = lin & ~0xFFF
+    if pg in pages and lin - pg <= 0xFFC:
+        v = struct.unpack_from("<I", pages[pg], lin - pg)[0]
+    else:
+        _emu, (low, mem) = xn_record.base_machine(rec["base"])
+        v = struct.unpack_from("<I", mem, lin - LOAD)[0] if lin >= LOAD else \
+            struct.unpack_from("<I", low, lin)[0]
+    if len(_cache) > 64:
+        _cache.clear()
+        _cache["rec"] = rec
+    _cache[key] = v
+    return v
+
+
+def rec_alloc_ranges(rec, drops):
+    """The linear ranges of a record's function's allocation-relative dropped rows."""
+    return [(rec_dword(rec, LOAD + ptr) + lo, rec_dword(rec, LOAD + ptr) + hi)
+            for ptr, lo, hi in drops.get(rec["func"], ())]
 
 
 def _in_ranges(ranges, starts, a):
     import bisect
     k = bisect.bisect_right(starts, a) - 1
     return k >= 0 and a < ranges[k][1]
+
+
+def drop_page_locks(log):
+    """The I/O log without DPMI page locking (int 31h 0600h/0601h and their returns): it has
+    no effect the game or the machine can see (D-VID-01: the asm VID player left its locks in
+    place, the canonical C unlocks them)."""
+    import fallemu
+    out, skip = [], False
+    for e in log:
+        if skip and e[0] == "int-ret":
+            skip = False
+            continue
+        skip = False
+        if e[0] == "int" and fallemu.is_page_lock(e[1], e[2]):
+            skip = True
+            continue
+        out.append(e)
+    return out
 
 
 def service_ax(e):
@@ -804,7 +1096,7 @@ def service_ax(e):
     return (e[0], e[1], e[2] & xn_services.eax_mask(e[1], e[2]))   # AH alone when AL is no input
 
 
-def comparer(abi, dropped=None):
+def comparer(abi, dropped=None, img=None):
     """compare(rec, got) per function: tools/xn_abi.py's abi_compare by the record's function's
     row, with config/xngine_dropped.csv's excuses (memory everywhere; registers and flags in
     their function's records)."""
@@ -812,12 +1104,16 @@ def comparer(abi, dropped=None):
     mem, regs, flags, _rows = dropped if dropped is not None else load_dropped()
     starts = [lo for lo, _hi in mem]
     excs = flags.get(None, set())
+    adrops = alloc_drops(_rows)
+    odrops = own_drops(_rows)
+    cps = code_pointers(img) if img is not None else {}
 
     def drop(writes):
         return {a: v for a, v in writes.items() if not _in_ranges(mem, starts, a)}
 
     def io(log):
-        return [service_ax(e) for e in log if not (e[0] == "exc" and e[1] in excs)]
+        return [service_ax(e) for e in drop_page_locks(log)
+                if not (e[0] == "exc" and e[1] in excs)]
 
     def for_func(va):
         row = abi.get(va)
@@ -830,6 +1126,22 @@ def comparer(abi, dropped=None):
             if mem and "writes" in got:
                 rec = dict(rec, writes=drop(rec["writes"]))
                 got = dict(got, writes=drop(got["writes"]))
+            if cps and "writes" in got:
+                got = dict(got, writes=translate_code_pointers(rec, got["writes"], cps))
+            if rec["func"] in odrops and "writes" in got:
+                own = odrops[rec["func"]]
+
+                def odrop(ws, own=own):
+                    return {a: v for a, v in ws.items() if not any(lo <= a < hi for lo, hi in own)}
+                rec = dict(rec, writes=odrop(rec["writes"]))
+                got = dict(got, writes=odrop(got["writes"]))
+            if rec["func"] in adrops and "writes" in got:
+                ar = rec_alloc_ranges(rec, adrops)
+
+                def adrop(ws, ar=ar):
+                    return {a: v for a, v in ws.items() if not any(lo <= a < hi for lo, hi in ar)}
+                rec = dict(rec, writes=adrop(rec["writes"]))
+                got = dict(got, writes=adrop(got["writes"]))
             if "io" in got:
                 rec = dict(rec, io=io(rec["io"]))
                 got = dict(got, io=io(got["io"]))
@@ -930,8 +1242,9 @@ def boundary_compare(rec, got, entry, priv, row, ref_io=None):
         first = min(extra | set(wrong))
         diffs.append("game-visible writes: %d addresses differ in the set, %d in value (first %#x)"
                      % (len(extra), len(wrong), first))
-    io_g = [service_ax(e) for e in got["io"] if e[0] != "exc"]
-    io_r = [service_ax(e) for e in (ref_io if ref_io is not None else rec["io"]) if e[0] != "exc"]
+    io_g = [service_ax(e) for e in drop_page_locks(got["io"]) if e[0] != "exc"]
+    io_r = [service_ax(e) for e in drop_page_locks(ref_io if ref_io is not None else rec["io"])
+            if e[0] != "exc"]
     if io_g != io_r:
         diffs.append("port or DOS I/O differs")
     return diffs
@@ -954,6 +1267,9 @@ def _rc_boundary_task(files, sp):
     want = set(sp["funcs"]) if sp.get("funcs") else None
     every = img.game_routes()
     stats, callers = {}, collections.Counter()
+    adrops = alloc_drops()
+    odrops = own_drops()
+    cps = code_pointers(img)
     for path in files:
         for rec in xn_cload.read_records(xn_record, path):
             va = rec["func"]
@@ -982,6 +1298,13 @@ def _rc_boundary_task(files, sp):
                 got = xn_record.replay_run(rec, patch=patch)
                 emu = xn_cload.machine_of(xn_record, rec["base"])
                 priv = masks.resolve(emu) if masks is not None and emu is not None else None
+                if va in adrops or va in odrops:
+                    # the dropped bytes of this function's own rows (allocation-relative,
+                    # memory-own)
+                    priv = xn_boundary.Private((list(priv.ranges) if priv is not None else []) +
+                                               rec_alloc_ranges(rec, adrops) + odrops.get(va, []))
+                if cps and "writes" in got:
+                    got = dict(got, writes=translate_code_pointers(rec, got["writes"], cps))
                 diffs = [got["stopped"]] if "stopped" in got else                     boundary_compare(rec, got, ents[va], priv, abi.get(va), ref_io)
             except Exception as e:      # noqa: BLE001
                 diffs = ["error: %r" % e]
@@ -1013,7 +1336,7 @@ def _rc_test_task(files, sp):
     want = set(sp["funcs"]) if sp.get("funcs") else None
     every = sorted(img.funcs)
     stats, seen = {}, collections.Counter()
-    cmp = comparer(abi)
+    cmp = comparer(abi, img=img)
     for path in files:
         for rec in xn_cload.read_records(xn_record, path):
             va = rec["func"]
@@ -1039,9 +1362,10 @@ def _rc_test_task(files, sp):
 
 def files_with(funcs):
     """The record files holding records of these functions (the job summaries list them)."""
+    import xn_cload
     want = {"%X" % f for f in funcs}
     out = []
-    for sp in sorted(glob.glob(os.path.join(ROOT, "build", "xngine", "records", "*.json"))):
+    for sp in sorted(p for d in xn_cload.record_dirs() for p in glob.glob(os.path.join(d, "*.json"))):
         try:
             sm = json.load(open(sp))
         except (OSError, ValueError):

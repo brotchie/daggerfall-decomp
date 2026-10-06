@@ -40,8 +40,10 @@ import zlib
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "build", "xn_canon", "coverage")
-CFG = os.path.join(OUT, "cfg.json")
+# XN_COVER_OUT: another folder for the coverage results (an agent's), the CFG staying shared
+COVER = os.path.join(ROOT, "build", "xn_canon", "coverage")
+OUT = os.environ.get("XN_COVER_OUT") or COVER
+CFG = os.path.join(COVER, "cfg.json")
 LOAD = 0x01000000
 OBJ2 = (0xC0000, 0x161568)
 NOT_CODE = {0x157B02, 0x157E02, 0x160F00, 0x160F04, 0x160F11}

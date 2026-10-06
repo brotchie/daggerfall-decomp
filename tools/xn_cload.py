@@ -466,8 +466,15 @@ class CImage:
 # --------------------------------------------------------------------------------------------
 # Test
 
+def record_dirs():
+    """The record corpus (build/xngine/records) and the folders in XN_RECORDS=dir[:dir] (an
+    agent's own records, in tools/xn_record.py's job format: .pkl with its .json summary)."""
+    return [os.path.join(ROOT, "build", "xngine", "records")] + \
+        [d for d in os.environ.get("XN_RECORDS", "").split(os.pathsep) if d]
+
+
 def record_files(dirs=None):
-    dirs = dirs or [os.path.join(ROOT, "build", "xngine", "records")]
+    dirs = dirs or record_dirs()
     out = []
     for d in dirs:
         if d.endswith(".pkl"):
