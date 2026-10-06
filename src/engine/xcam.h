@@ -36,7 +36,10 @@
 
 extern s32 xn_cam_dir_x_table[1024];    /* (k << 18) / focal_x for k = -512..511 */
 extern s32 xn_cam_dir_y_table[768];     /* (k << 18) / focal_y for k = -384..383 */
-extern s32 xn_cam_forward_x, xn_cam_forward_y, xn_cam_forward_z;    /* xn_cam_rotation's row 2 */
+/* the view's forward direction: xn_cam_rotation's row 2 (one storage) */
+#define xn_cam_forward_x (xn_cam_rotation.m[2][0])
+#define xn_cam_forward_y (xn_cam_rotation.m[2][1])
+#define xn_cam_forward_z (xn_cam_rotation.m[2][2])
 
 /* ---- the view ----------------------------------------------------------------------------- */
 

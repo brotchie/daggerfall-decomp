@@ -15,6 +15,8 @@
             -> build/xn_canon/coverage/corpus.bin
   scenarios run the scenarios (tools/xn_scenarios.py) on the asm alone with the coverage map.
             -> build/xn_canon/coverage/scen_NAME.bin
+            (tools/xn_equiv.py --cover adds the asm side of the pure helpers' equivalence
+            runs: build/xn_canon/coverage/equiv.bin. Every .bin there is a source.)
   report    blocks executed / reachable, overall, per subsystem and per function; the blocks
             never executed, grouped by a likely reason: a dead function (no caller per the
             ABI), a reason known by analysis (JUSTIFIED below: the conversion groups' block
@@ -349,6 +351,22 @@ ERROR_SERVICES = {"int 0x21/09", "int 0x21/4C"}
 # table) and why. A conversion group adds its own here; report.md lists them with their counts.
 UNREACHABLE = "unreachable (by analysis)"
 JUSTIFIED = [
+    # the pilot (vec, mat, math): corners tools/xn_equiv.py runs millions of samples through
+    # (its asm side is the equiv.bin source) without reaching these
+    (0x1372AF, 0x1372B1, UNREACHABLE,
+     "xn_math_asin's `neg ebx`: the bracket's upper end below the input, which needs a falling "
+     "stretch of the sine; the input is clamped to +-1.0 and the walk starts from the coarse "
+     "table's angle within +-90 degrees, where the sine rises (xn_equiv: 2 million samples, "
+     "+-1.1 and the edges)"),
+    (0x1373D2, 0x1373D4, UNREACHABLE,
+     "xn_math_acos's `neg ebx`: the same on the cosine's rising stretch (the coarse angle less "
+     "90 degrees: 1024..2047) (xn_equiv: 2 million samples)"),
+    (0x0C21B6, 0x0C21B8, UNREACHABLE,
+     "xn_mat_to_angles's `neg esi` for a negative cos(pitch): the pitch is xn_math_asin's, "
+     "within +-90 degrees, where the cosine table is not negative (xn_equiv: 1 million "
+     "matrices, rotations, the pitch at 90 degrees, any entries)"),
+    (0x0C21FE, 0x0C2200, UNREACHABLE,
+     "xn_mat_to_angles's second `neg ebx` of cos(pitch): as at 0C21B6"),
     # group A (system and input)
     (0x0C0CB0, 0x0C0CBD, "error or fatal path",
      "xn_dos_open: DOS refused the open: the 'DOS: File not found' fatal tail (Q-DOS-01)"),
@@ -373,6 +391,42 @@ JUSTIFIED = [
     (0x14781C, 0x14781D, UNREACHABLE,
      "xn_draw_transparent_row's own ret, after its 640 unrolled pixels: every row ends at the "
      "ret planted after its width (smc DRAW-TRANSPARENT), at most 320"),
+    # group C (the rasteriser and the frame)
+    (0x136A72, 0x136A98, "error or fatal path",
+     "xn_light_init: no memory for the shade and falloff tables: the shutdown and the "
+     "'ENGINE: Out of memory for shaders.' exit"),
+    (0x15C235, 0x15C260, "error or fatal path",
+     "xn_tmap_pool_alloc: no memory for the texture mapper's pool: the shutdown and the "
+     "'XnGine: Out of memory for Shaders.' exit"),
+    (0x1577F8, 0x1577F9, UNREACHABLE,
+     "xn_span_flat_transparent_tail's own ret, after its eighth pixel: a tail runs count & 7 "
+     "(1..7) pixels and stops at the ret its span plants after the last (smc "
+     "SPAN-FLAT-TRANSPARENT; none for 0)"),
+    (0x157A08, 0x157A09, UNREACHABLE,
+     "xn_span_flat_transparent_shaded_tail's own ret, after its eighth pixel: a tail runs 1..7 "
+     "pixels, stopped by the ret its span plants (smc SPAN-FLAT-SHADED)"),
+    (0x157D58, 0x157D59, UNREACHABLE,
+     "xn_span_flat_lit_fogged_tail's own ret, after its eighth pixel: a tail runs 1..7 pixels, "
+     "stopped by the ret its span plants (smc SPAN-FLAT-FOGGED)"),
+    # group D (the 3D objects). The cache's heap paths, xn_model_prepare's checks and the
+    # model frames (xn_model_set_frame, _regs: no caller in the game) run in the crafted
+    # records (tools/xn_mkrec.py d); what is left are the fatal exits.
+    (0x1360A3, 0x1360CC, "error or fatal path",
+     "xn_tex_cache_init: no memory for the texture heap: the shutdown and the 'SET: Out of "
+     "memory.' exit"),
+    (0x13611D, 0x136145, UNREACHABLE,
+     "xn_tex_heap_alloc's 'SET: Out of memory in find_memory.' exit: the eviction never reports "
+     "failure (Q-TEX-01; record group_d_tex load_no_room: nothing to evict, the cache is "
+     "marked full instead)"),
+    (0x1363B1, 0x1363D9, "error or fatal path",
+     "xn_tex_unpack_alloc: the unpack table (256 entries) or its buffer (C0000h bytes) full: "
+     "the 'SET: Out of unpackmemory.' exit"),
+    (0x13FEC3, 0x13FEEB, "error or fatal path",
+     "xn_model_prepare: a face's vertex offset not a multiple of 12 or beyond the points: the "
+     "'XnGine: Object is corrupted' exit (the shipped models are sound)"),
+    (0x13FEEB, 0x13FF0E, "error or fatal path",
+     "xn_model_prepare: a model before \"v2.6\" with 1024 or more vertices: the 'XnGine: "
+     "Object has too many vertices.' exit (Q-MODEL-06)"),
     # group E (world and collision)
     (0x14AEF2, 0x14AEF4, UNREACHABLE,
      "xn_collide_spheres_model's mode-1 exit (Q-COLL-06): the game passes modes 0 and 2 only, "

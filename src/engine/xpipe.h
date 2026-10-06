@@ -84,10 +84,19 @@ extern s32 xn_cam_flat_scale_x, xn_cam_flat_scale_y;       /* unaligned (0xCEA99
 extern xn_mat3 xn_cam_rotation;         /* the eye's rotation, 2.28 */
 extern xn_mat3 xn_cam_view_matrix;      /* the rotation with rows 0 and 1 scaled */
 extern s32 xn_cam_x, xn_cam_y, xn_cam_z;        /* the eye, world units */
-/* the shared scratch vector a (0x120288): the pick's view-space point; pick_distance (its z)
-   is game-visible, and so is xn_pick_view_x */
-extern s32 xn_pick_view_x, xn_pick_view_y;
-extern s32 pick_distance;
+extern s32 xn_cam_pitch;                /* the eye's pitch, 2048ths of a turn (the flats') */
+/* the shared scratch vectors (struct xn_scratch, 0x120288), and the names their fields have
+   as the pick's results: one storage (the model code's edges share it, Q-MODEL-03). a: the
+   pick's view-space point (pick_distance, its z, is game-visible, and so is xn_pick_view_x);
+   b: the flat pick's screen point; flat: the flat pick's point */
+extern struct xn_scratch xn_scratch_vecs;
+#define xn_pick_view_x      (xn_scratch_vecs.a.x)
+#define xn_pick_view_y      (xn_scratch_vecs.a.y)
+#define pick_distance       (xn_scratch_vecs.a.z)
+#define xn_scratch_vec_b    (xn_scratch_vecs.b)
+#define xn_pick_flat_x      (xn_scratch_vecs.flat.x)
+#define xn_pick_flat_y      (xn_scratch_vecs.flat.y)
+#define xn_pick_flat_z      (xn_scratch_vecs.flat.z)
 
 /* ---- the frame's pools and the S-buffer (xn_render_begin_frame resets them) ---------------- */
 extern struct xn_poly xn_render_poly_pool[1000];

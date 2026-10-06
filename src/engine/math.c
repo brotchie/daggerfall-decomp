@@ -287,9 +287,6 @@ s32 xn_math_angle_xy(s32 x, s32 y)
     return (xn_math_acos(xn_s64_div_or0(&n, len)) + quadrant) & XN_ANGLE_MASK;
 }
 
-/* the collision tests' plane normal (xcollide.h): xn_math_plane_y_at leaves its normal there */
-extern xn_vec3 xn_collide_normal;
-
 s32 xn_math_plane_y_at(const xn_vec3 *n, const xn_vec3 *c, s32 x, s32 z)
 {
     xn_s64 d;

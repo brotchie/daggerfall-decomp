@@ -15,20 +15,12 @@
 #include "xgfx.h"
 #include "xmem.h"
 
-extern s32 xn_model_angle_or_bits;
-extern xn_mat3 xn_model_base_matrix, xn_model_object_matrix, xn_model_combined_matrix;
-extern xn_mat3 xn_model_rot_matrix;             /* the model being drawn */
 extern u8 *player_object;                       /* x, y, z ints at +7, +0Bh, +0Fh */
-extern struct xn_scratch xn_scratch_vecs;       /* the shared scratch vectors (a: the pick) */
-extern s32 xn_model_drawn_count;
-extern s32 xn_model_queue_count;
-extern struct xn_sort_pair *xn_model_queue_ptr;
 extern struct xn_vert_cam xn_vert_cam[1024];   /* indexed by byte offset (index * 12) */
 extern struct xn_vert_screen xn_vert_screen[1024];
 extern struct xn_vert_flags xn_vert_flags[1024];
 extern s32 xn_span_dzdx;                        /* the S-buffer's 1/z step of the polygon */
 extern struct xn_light xn_light_table[33];
-extern char xn_model_msg_too_many_verts[], xn_model_msg_corrupted[];
 
 #define VERT_FLAGS_MAX  1024            /* the vertex arrays' entries */
 

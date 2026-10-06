@@ -40,6 +40,7 @@
 
 #include "xngine.h"
 #include "xpc.h"
+#include "xpipe.h"                      /* the pick's scratch point: xn_pick_view_x... */
 
 extern s32 xn_helmet_port;                  /* the COM port (the game passes 1) */
 extern s32 cfg_helmet;                      /* the driver: 0 A, 4 B, 8 C; -1 after a failure */
@@ -48,7 +49,6 @@ extern s32 xn_helmet_smoothing;             /* samples averaged, at most 7 (the 
 extern s32 xn_helmet_pitch, xn_helmet_yaw, xn_helmet_roll;
 extern u32 xn_helmet_ring_pos;              /* byte offset of the next sample */
 extern xn_vec3 xn_helmet_ring[7];           /* the last samples */
-extern s32 xn_pick_view_x, xn_pick_view_y, pick_distance;  /* (group D's scratch point) */
 
 extern s32 xn_helmet_a_port;
 extern char xn_helmet_a_record[24];         /* the last record read */

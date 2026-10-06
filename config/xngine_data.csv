@@ -1,0 +1,490 @@
+symbol,owner,kind,address,size,ctype,init,filled_by,refs,declared,boundary,evidence
+xn_anim_rand_state,engine,zero,0C0030,2,u16 xn_anim_rand_state,bss,,anim.c,xanim.h:35,private,all zero in the image
+xn_sys_old_int24_sel,engine,zero,0C0400,2,u16 xn_sys_old_int24_sel,bss,,sys.c,xsys.h:48,private,all zero in the image
+xn_sys_old_int24_offset,engine,zero,0C0402,4,u32 xn_sys_old_int24_offset,bss,,sys.c,xsys.h:49,private,all zero in the image
+xn_sys_int24_installed,engine,zero,0C0406,1,u8 xn_sys_int24_installed,bss,,sys.c,xsys.h:50,private,all zero in the image
+xn_dos_msg_not_found,engine,initial,0C0B00,22,char xn_dos_msg_not_found[22],load,,dos.c,xdos.h:48,unobserved,size: up to the next named global; 22 non-zero bytes; text (22 characters)
+xn_dos_msg_create_failed,engine,initial,0C0B16,27,char xn_dos_msg_create_failed[27],load,,dos.c,xdos.h:49,unobserved,size: up to the next named global; 27 non-zero bytes; text (27 characters)
+xn_dos_msg_out_of_memory,engine,initial,0C0B31,34,char xn_dos_msg_out_of_memory[34],load,,dos.c,xdos.h:50,unobserved,size: up to the next named global; 34 non-zero bytes; text (34 characters)
+xn_dos_path,engine,zero,0C0B53,81,char xn_dos_path[81],bss,,dos.c,xdos.h:47,private,all zero in the image
+disk_last_file_size,engine,zero,0C0BA8,4,u32 disk_last_file_size,bss,,dos.c,xdos.h:54,visible,all zero in the image
+xn_vid_header,engine,zero,0C1000,15,struct xn_vid_header xn_vid_header,bss,,vid.c,xvid.h:57,private,all zero in the image
+xn_vid_sample,engine,zero,0C100F,240,xn_vid_sos_sample xn_vid_sample,bss,,vid.c,xvid.h:58,private,all zero in the image
+xn_vid_state,engine,zero,0C10FF,1010,struct xn_vid_player xn_vid_state,bss,,vid.c,xvid.h:59,private,all zero in the image
+xn_world_msg_out_of_memory,engine,initial,0C2300,24,char xn_world_msg_out_of_memory[24],load,,world.c,xworld.h:81,unobserved,size: up to the next named global; 24 non-zero bytes; text (24 characters)
+xn_world_file,engine,zero,0C233A,4,s32 xn_world_file,bss,,world.c,xworld.h:69,private,all zero in the image
+xn_world_offsets_window_bytes,engine,zero,0C2342,4,u32 xn_world_offsets_window_bytes,bss,,world.c,xworld.h:71,private,all zero in the image
+xn_world_offsets_window_max,engine,initial,0C2346,4,s32 xn_world_offsets_window_max,c,,world.c,xworld.h:72,unobserved,a scalar default: a C initializer (0x4000)
+xn_world_offsets_window_count,engine,zero,0C234A,4,s32 xn_world_offsets_window_count,bss,,world.c,xworld.h:73,private,all zero in the image
+xn_world_offsets_window_first,engine,zero,0C234E,4,s32 xn_world_offsets_window_first,bss,,world.c,xworld.h:74,private,all zero in the image
+xn_world_lone_tile_table,engine,initial,0C2352,16,u8 xn_world_lone_tile_table[16],load,,world.c,xworld.h:89,unobserved,15 non-zero bytes
+xn_world_tile_class,engine,initial,0C2362,65,u8 xn_world_tile_class[65],load,,world.c,xworld.h:88,unobserved,61 non-zero bytes
+xn_world_dir_dx,engine,initial,0C23A3,8,s8 xn_world_dir_dx[8],load,,world.c,xworld.h:90,unobserved,6 non-zero bytes
+xn_world_dir_dy,engine,initial,0C23AB,8,s8 xn_world_dir_dy[8],load,,world.c,xworld.h:90,unobserved,6 non-zero bytes
+xn_cam_pitch,engine,zero,0C23B8,4,s32 xn_cam_pitch,bss,,flat.c,xpipe.h:71,visible,all zero in the image
+xn_cam_yaw,engine,zero,0C23BC,4,s32 xn_cam_yaw,bss,,water.c,xwshare.h:26,visible,all zero in the image
+xn_cam_roll,engine,zero,0C23C0,4,s32 xn_cam_roll,bss,,game: 15 sites,src/engine_data/xndata.h,visible,between xn_cam_yaw and xn_cam_x: the game sets the eye's roll (15 sites); the canonical engine never reads it; all zero in the image
+xn_cam_x,engine,zero,0C23C4,4,s32 xn_cam_x,bss,,flat.c light.c model.c terrain.c world.c,xpipe.h:70 xwshare.h:25,visible,all zero in the image
+xn_cam_y,engine,zero,0C23C8,4,s32 xn_cam_y,bss,,flat.c light.c model.c terrain.c water.c,xpipe.h:70 xwshare.h:25,visible,all zero in the image
+xn_cam_z,engine,zero,0C23CC,4,s32 xn_cam_z,bss,,flat.c light.c model.c terrain.c world.c,xpipe.h:70 xwshare.h:25,visible,all zero in the image
+xn_world_size_x,engine,zero,0C23D0,4,s32 xn_world_size_x,bss,,world.c,xworld.h:56,private,all zero in the image
+xn_world_size_z,engine,zero,0C23D4,4,s32 xn_world_size_z,bss,,terrain.c world.c,xworld.h:56,private,all zero in the image
+xn_world_height_bands,engine,zero,0C23E9,1024,struct xn_wld_bands xn_world_height_bands[256],bss,,world.c,xworld.h:75,private,all zero in the image
+xn_world_header,engine,zero,0C27E9,144,struct xn_wld_header xn_world_header,bss,,world.c,xworld.h:70,private,all zero in the image
+xn_world_cell_header,engine,zero,0C2879,22,struct xn_wld_cell_header xn_world_cell_header,bss,,terrain.c world.c,xworld.h:76,private+visible,all zero in the image
+xn_world_nature_archive,engine,alias,0C287D,,#define xn_world_nature_archive (xn_world_cell_header.nature_archive),,,,,,xn_world_cell_header + 4: a field of the cell header read last (struct xn_wld_cell_header)
+xn_world_ground_archive,engine,alias,0C287F,,#define xn_world_ground_archive (xn_world_cell_header.ground_archive),,,,,,xn_world_cell_header + 6: a field of the cell header
+xn_world_slot_cells,engine,zero,0C2893,16,s32 xn_world_slot_cells[4],bss,,world.c,xworld.h:77,visible,all zero in the image
+xn_world_edge_near,engine,initial,0C28AB,4,s32 xn_world_edge_near,c,,world.c,xworld.h:80,unobserved,a scalar default: a C initializer (17)
+xn_world_edge_far,engine,initial,0C28AF,4,s32 xn_world_edge_far,c,,world.c,xworld.h:80,unobserved,a scalar default: a C initializer (111)
+xn_world_rand_elev_min,engine,initial,0C28B4,4,s32 xn_world_rand_elev_min,c,,world.c,xworld.h:87,unobserved,a scalar default: a C initializer (127)
+xn_world_rand_elev_max,engine,initial,0C28B8,4,s32 xn_world_rand_elev_max,c,,world.c,xworld.h:87,unobserved,a scalar default: a C initializer (127)
+xn_world_height_layer,engine,zero,0C28BC,4,u8 *xn_world_height_layer,bss,,terrain.c world.c,xworld.h:57,visible,all zero in the image
+xn_world_flat_layer,engine,zero,0C28C0,4,u8 *xn_world_flat_layer,bss,,terrain.c world.c,xworld.h:58,visible,all zero in the image
+xn_world_tile_layer,engine,zero,0C28C4,4,u8 *xn_world_tile_layer,bss,,terrain.c world.c,xworld.h:59,visible,all zero in the image
+xn_world_water_layer,engine,zero,0C28C8,4,u8 *xn_world_water_layer,bss,,world.c,xworld.h:60,private,all zero in the image
+xn_world_layers_alloc,engine,zero,0C28CC,4,u8 *xn_world_layers_alloc,bss,,world.c,xworld.h:61,private,all zero in the image
+xn_world_slot_x0,engine,initial,0C28F8,16,s32 xn_world_slot_x0[4],load,,world.c,xworld.h:78,unobserved,2 non-zero bytes
+xn_world_slot_y0,engine,initial,0C2908,16,s32 xn_world_slot_y0[4],load,,world.c,xworld.h:79,unobserved,2 non-zero bytes
+xn_world_grid_x,engine,initial,0C2918,20,s32 xn_world_grid_x[5],load,,world.c,xworld.h:85,unobserved,4 non-zero bytes
+xn_world_grid_y,engine,initial,0C2968,20,s32 xn_world_grid_y[5],load,,world.c,xworld.h:85,unobserved,4 non-zero bytes
+xn_world_height_scale,engine,initial,0C29B8,512,s32 xn_world_height_scale[128],load,,terrain.c world.c,xworld.h:62,unobserved,234 non-zero bytes
+xn_world_nature_flat_odds,engine,initial,0C2BB8,129,struct xn_world_nature_odds xn_world_nature_flat_odds,load,,world.c,xworld.h:94,visible,129 non-zero bytes
+xn_noise_values,engine,computed,0C4100,2052,s32 xn_noise_values[513],runtime,xn_rand_noise_init,rand.c,xrand.h:30,private,zero in the image; 256 random bytes twice from seed 1 (rand.c)
+xn_noise_fade_table,engine,computed,0C4904,2048,s32 xn_noise_fade_table[512],runtime,xn_rand_noise_init,rand.c,xrand.h:33,private,zero in the image; the fade curve (rand.c xn_rand_noise_fade_init)
+xn_snow_turn_shift,engine,zero,0C5400,4,s32 xn_snow_turn_shift,bss,,sky.c,xsky.h:38,visible,all zero in the image
+xn_model_angle_or_bits,engine,zero,0C5404,4,s32 xn_model_angle_or_bits,bss,,model.c,xmodel.h:48,visible,all zero in the image
+xn_model_base_matrix,engine,zero,0C5408,36,xn_mat3 xn_model_base_matrix,bss,,model.c,xmodel.h:49,private,all zero in the image
+xn_model_object_matrix,engine,zero,0C542C,36,xn_mat3 xn_model_object_matrix,bss,,model.c,xmodel.h:49,private,all zero in the image
+xn_model_combined_matrix,engine,zero,0C5450,36,xn_mat3 xn_model_combined_matrix,bss,,model.c,xmodel.h:49,private,all zero in the image
+xn_sys_dos_transfer_selector,engine,zero,0C5478,2,u16 xn_sys_dos_transfer_selector,bss,,sys.c,xsys.h:51,private,all zero in the image
+xn_sky_stars,engine,computed,0C547A,9216,xn_vec3 xn_sky_stars[768],runtime,xn_sky_init_stars,sky.c,xsky.h:34,private,zero in the image; random directions (sky.c)
+xn_sky_star_colours,engine,computed,0C787A,768,u8 xn_sky_star_colours[768],runtime,xn_sky_init_stars,sky.c,xsky.h:35,private,zero in the image; random colours of xn_sky_star_palette (sky.c)
+xn_sky_star_palette,engine,initial,0C7B7A,16,u8 xn_sky_star_palette[16],load,,sky.c,xsky.h:36,unobserved,16 non-zero bytes
+xn_draw_shade_row,engine,zero,0C7B8A,1,u8 xn_draw_shade_row,bss,,drawunr.c,xdraw.h:250,unobserved,all zero in the image
+xn_snow_flakes,engine,zero,0C7B8B,600,struct xn_snow_flake xn_snow_flakes[100],bss,,sky.c,xsky.h:37,private,all zero in the image
+xn_snow_speed_small,engine,initial,0C7DE3,4,u32 xn_snow_speed_small,c,,sky.c,xsky.h:40,private,a scalar default: a C initializer (2)
+xn_snow_speed_medium,engine,initial,0C7DE7,4,u32 xn_snow_speed_medium,c,,sky.c,xsky.h:41,private,a scalar default: a C initializer (3)
+xn_snow_speed_large,engine,initial,0C7DEB,4,u32 xn_snow_speed_large,c,,sky.c,xsky.h:42,private,a scalar default: a C initializer (4)
+xn_snow_drift_speed,engine,initial,0C7DEF,2,u16 xn_snow_drift_speed,c,,sky.c,xsky.h:43,private,a scalar default: a C initializer (2)
+xn_rain_streak_colours,engine,initial,0C7DF1,30,u8 xn_rain_streak_colours[30],load,,sky.c,xsky.h:44,unobserved,30 non-zero bytes; text (30 characters)
+xn_steer_region_handlers,engine,initial,0CAF00,36,void (*xn_steer_region_handlers[9])(void),c,,input.c,xinput.h:14,unobserved,a table of 9 code addresses: an initializer names them (FALL.EXE's fixups)
+spell_cost_formulas,engine,initial,0CAF24,28,s32 (*spell_cost_formulas[7])(void),c,,spell.c,xspell.h:26,unobserved,a table of 7 code addresses: an initializer names them (FALL.EXE's fixups)
+spell_effect_handlers,engine,initial,0CAF40,256,"s32 (*spell_effect_handlers[64])(void *spell, s32 slot, void *target)",c,,spell.c,xspell.h:28,unobserved,a table of 64 code addresses: an initializer names them (FALL.EXE's fixups); its last 52 bytes are xn_kludge_menu_handlers's in the asm (separate in C)
+xn_kludge_menu_handlers,engine,initial,0CB00C,52,void (*xn_kludge_menu_handlers[13])(s32 one),c,,spell.c,xspell.h:30,unobserved,a table of 13 code addresses: an initializer names them (FALL.EXE's fixups)
+xn_cel_row_buffer,engine,zero,0CB104,330,u8 xn_cel_row_buffer[330],bss,,drawimg.c,xdraw.h:166,private,all zero in the image
+xn_paperdoll_background,engine,zero,0CB24E,4,u8 *xn_paperdoll_background,bss,,drawimg.c,xdraw.h:165,visible,all zero in the image
+xn_fps_frame_count,engine,zero,0CDE06,4,u32 xn_fps_frame_count,bss,,timer.c,xtimer.h:23,private,all zero in the image
+xn_fps_last_tick,engine,zero,0CDE0A,4,u32 xn_fps_last_tick,bss,,timer.c,xtimer.h:24,private,all zero in the image
+xn_fps_average,engine,zero,0CDE0E,4,u32 xn_fps_average,bss,,timer.c,xtimer.h:25,private,all zero in the image
+xn_msg_bad_zero_page,engine,initial,0CDE12,29,char xn_msg_bad_zero_page[29],load,,sys.c,xsys.h:53,unobserved,size: up to the next named global; 28 non-zero bytes; text (28 characters)
+internal_check_failed,engine,zero,0CDE2F,4,u32 internal_check_failed,bss,,dos.c sys.c,xdos.h:55 xsys.h:65,visible,all zero in the image
+xn_zero_page_copy,engine,zero,0CDE4F,1024,u32 xn_zero_page_copy[256],bss,,sys.c,xsys.h:52,unobserved,all zero in the image
+xn_cam_near_z,engine,initial,0CEA20,4,s32 xn_cam_near_z,c,,cam.c model.c poly.c sky.c terrain.c water.c,xpipe.h:58 xwshare.h:29,visible,a scalar default: a C initializer (0x1000)
+xn_cam_far_z,engine,initial,0CEA24,4,s32 xn_cam_far_z,c,,cam.c flat.c poly.c shade.c terrain.c water.c,xpipe.h:58 xshade.h:49 xwshare.h:29,visible,a scalar default: a C initializer (0xFA000)
+xn_cam_half_width,engine,initial,0CEA28,4,s32 xn_cam_half_width,c,,cam.c flat.c poly.c render.c terrain.c water.c,xpipe.h:59 xwshare.h:31,unobserved,a scalar default: a C initializer (160)
+xn_cam_half_height,engine,initial,0CEA2C,4,s32 xn_cam_half_height,c,,cam.c flat.c poly.c render.c terrain.c water.c,xpipe.h:59 xwshare.h:31,private,a scalar default: a C initializer (100)
+xn_cam_centre_x,engine,initial,0CEA30,4,s32 xn_cam_centre_x,c,,cam.c flat.c model.c render.c rframe.c sky.c span.c terrain.c water.c,xpipe.h:60 xspan.h:77 xwshare.h:30,visible,a scalar default: a C initializer (160)
+xn_cam_centre_y,engine,initial,0CEA34,4,s32 xn_cam_centre_y,c,,cam.c flat.c model.c render.c rframe.c sky.c terrain.c water.c,xpipe.h:60 xwshare.h:30,visible,a scalar default: a C initializer (100)
+xn_cam_focal_x,engine,initial,0CEA38,4,s32 xn_cam_focal_x,c,,cam.c flat.c model.c render.c sky.c terrain.c,xpipe.h:61 xwshare.h:32,unobserved,a scalar default: a C initializer (200)
+xn_cam_inv_focal_x,engine,zero,0CEA3C,4,s32 xn_cam_inv_focal_x,bss,,cam.c terrain.c,xpipe.h:61 xwshare.h:33,private,all zero in the image
+xn_cam_focal_y,engine,initial,0CEA40,4,s32 xn_cam_focal_y,c,,cam.c flat.c model.c render.c sky.c terrain.c,xpipe.h:62 xwshare.h:32,unobserved,a scalar default: a C initializer (180)
+xn_cam_inv_focal_y,engine,zero,0CEA44,4,s32 xn_cam_inv_focal_y,bss,,cam.c,xpipe.h:62,private,all zero in the image
+xn_render_mode,engine,zero,0CEA48,4,s32 xn_render_mode,bss,,render.c,xpipe.h:96 xrender.h:44,private,all zero in the image
+xn_render_poly_count,engine,zero,0CEA4C,4,s32 xn_render_poly_count,bss,,model.c render.c,xpipe.h:95,private,all zero in the image
+xn_render_frame_flags,engine,zero,0CEA5C,4,s32 xn_render_frame_flags,bss,,render.c rframe.c,xpipe.h:98 xrframe.h:34,private,all zero in the image
+xn_render_span_next,engine,zero,0CEA60,4,struct xn_span *xn_render_span_next,bss,,poly.c render.c span.c,xpipe.h:94 xspan.h:178,private,all zero in the image
+xn_render_poly_next,engine,zero,0CEA64,4,struct xn_poly *xn_render_poly_next,bss,,flat.c model.c render.c span.c terrain.c,xpipe.h:87 xspan.h:179 xterrain.h:61,private,all zero in the image
+xn_render_light_list_next,engine,zero,0CEA68,4,struct xn_light_ref *xn_render_light_list_next,bss,,model.c render.c terrain.c,xpipe.h:91 xterrain.h:62,private,all zero in the image
+xn_render_row_y,engine,zero,0CEA6C,4,s32 xn_render_row_y,bss,,rframe.c span.c,xpipe.h:97 xspan.h:72,private,all zero in the image
+xn_render_matrix_next,engine,zero,0CEA70,4,struct xn_model_matrix_slot *xn_render_matrix_next,bss,,model.c render.c,xpipe.h:89,private,all zero in the image
+xn_cam_scale_x,engine,zero,0CEA78,4,s32 xn_cam_scale_x,bss,,cam.c mat.c model.c terrain.c,xmat.h:29 xpipe.h:63 xwshare.h:34,private,all zero in the image
+xn_cam_inv_scale_x,engine,zero,0CEA7C,4,s32 xn_cam_inv_scale_x,bss,,cam.c model.c,xpipe.h:63,private,all zero in the image
+xn_cam_scale_y,engine,zero,0CEA80,4,s32 xn_cam_scale_y,bss,,cam.c terrain.c,xmat.h:30 xpipe.h:64 xwshare.h:34,private,all zero in the image
+xn_cam_inv_scale_y,engine,zero,0CEA84,4,s32 xn_cam_inv_scale_y,bss,,cam.c model.c,xpipe.h:64,private,all zero in the image
+xn_cam_hfov_cos,engine,zero,0CEA88,4,s32 xn_cam_hfov_cos,bss,,cam.c,xpipe.h:65,private,all zero in the image
+xn_cam_hfov_sin,engine,zero,0CEA8C,4,s32 xn_cam_hfov_sin,bss,,cam.c,xpipe.h:65,private,all zero in the image
+xn_cam_vfov_cos,engine,zero,0CEA90,4,s32 xn_cam_vfov_cos,bss,,cam.c,xpipe.h:66,private,all zero in the image
+xn_cam_vfov_sin,engine,zero,0CEA94,4,s32 xn_cam_vfov_sin,bss,,cam.c,xpipe.h:66,private,all zero in the image
+xn_pick_skip_flats,engine,zero,0CEA98,1,u8 xn_pick_skip_flats,bss,,flat.c,xflat.h:63,unobserved,all zero in the image
+xn_cam_flat_scale_x,engine,zero,0CEA99,4,s32 xn_cam_flat_scale_x,bss,,cam.c flat.c,xpipe.h:67,private,all zero in the image
+xn_cam_flat_scale_y,engine,zero,0CEA9D,4,s32 xn_cam_flat_scale_y,bss,,cam.c flat.c,xpipe.h:67,private,all zero in the image
+xn_render_recip_table,engine,computed,0CEAA5,4,s32 *xn_render_recip_table,runtime,xn_render_init,render.c span.c,xrender.h:43 xspan.h:78,private,zero in the image; a block of 2^24 / k for k = 1..65536 from the game's allocator (render.c)
+xn_vert_cam,engine,zero,0CEAC0,12288,struct xn_vert_cam xn_vert_cam[1024],bss,,model.c poly.c terrain.c,model.c:19 poly.c:10 xterrain.h:58,private,all zero in the image
+xn_vert_screen,engine,zero,0D1AC0,12288,struct xn_vert_screen xn_vert_screen[1024],bss,,model.c poly.c terrain.c,model.c:20 poly.c:11 xterrain.h:59,private,all zero in the image
+xn_vert_flags,engine,zero,0D4AC0,12288,struct xn_vert_flags xn_vert_flags[1024],bss,,model.c poly.c terrain.c,model.c:21 poly.c:12 xterrain.h:60,private,all zero in the image
+xn_render_matrix_pool,engine,zero,0D7AC0,14400,struct xn_model_matrix_pool xn_render_matrix_pool,bss,,render.c,xpipe.h:88,private,all zero in the image
+xn_render_poly_pool,engine,zero,0DB320,100000,struct xn_poly xn_render_poly_pool[1000],bss,,render.c,xpipe.h:86,private+visible,all zero in the image
+xn_render_span_sentinel,engine,zero,0F39E0,16,struct xn_span xn_render_span_sentinel,bss,,render.c,xpipe.h:92,private,all zero in the image
+xn_render_span_rows,engine,zero,0F39F0,144016,struct xn_span xn_render_span_rows[9001],bss,,flat.c model.c poly.c render.c rframe.c water.c,xpipe.h:93,private,"size: names.csv: a head per screen row, then the span node pool, up to xn_render_light_list_pool (0x116C80): 9001 nodes of 16 bytes; all zero in the image"
+xn_render_light_list_pool,engine,zero,116C80,9600,struct xn_light_ref xn_render_light_list_pool[400],bss,,render.c,xpipe.h:90,private,all zero in the image
+xn_pick_view_x,engine,alias,120288,,#define xn_pick_view_x (xn_scratch_vecs.a.x),,,,,,xn_scratch_vecs + 0: the shared scratch vector a (struct xn_scratch): the pick's point; the model code writes a as an edge (Q-MODEL-03)
+xn_scratch_vecs,engine,zero,120288,44,struct xn_scratch xn_scratch_vecs,bss,,cam.c flat.c helmet.c model.c render.c terrain.c,xpipe.h:76 xwshare.h:38,private+visible,all zero in the image
+xn_pick_view_y,engine,alias,12028C,,#define xn_pick_view_y (xn_scratch_vecs.a.y),,,,,,xn_scratch_vecs + 4: scratch vector a
+pick_distance,engine,alias,120290,,#define pick_distance (xn_scratch_vecs.a.z),,,,,,xn_scratch_vecs + 8: scratch vector a's z: game-visible (the game reads 0x120290)
+xn_scratch_vec_b,engine,alias,120294,,#define xn_scratch_vec_b (xn_scratch_vecs.b),,,,,,xn_scratch_vecs + 12: scratch vector b
+xn_pick_flat_x,engine,alias,1202A0,,#define xn_pick_flat_x (xn_scratch_vecs.flat.x),,,,,,xn_scratch_vecs + 24: the flat pick's point
+xn_pick_flat_y,engine,alias,1202A4,,#define xn_pick_flat_y (xn_scratch_vecs.flat.y),,,,,,xn_scratch_vecs + 28: the flat pick's point
+xn_pick_flat_z,engine,alias,1202A8,,#define xn_pick_flat_z (xn_scratch_vecs.flat.z),,,,,,xn_scratch_vecs + 32: the flat pick's point
+xn_cam_dir_x_table,engine,computed,1202C0,4096,s32 xn_cam_dir_x_table[1024],runtime,xn_cam_set_focal,cam.c span.c,xcam.h:37 xspan.h:73,private,"zero in the image; (k << 18) / focal_x (cam.c), from xn_render_init and whenever the view changes"
+xn_cam_dir_x_mid,engine,alias,120AC0,,#define xn_cam_dir_x_mid (xn_cam_dir_x_table + 512),,,,,,"xn_cam_dir_x_table + 2048: the middle of the camera's x rays (k = -512..511), which xn_cam_set_focal fills through the table's start"
+xn_cam_dir_y_table,engine,computed,1212C0,3072,s32 xn_cam_dir_y_table[768],runtime,xn_cam_set_focal,cam.c span.c,xcam.h:38 xspan.h:74,private,zero in the image; (k << 18) / focal_y (cam.c)
+xn_cam_dir_y_mid,engine,alias,1218C0,,#define xn_cam_dir_y_mid (xn_cam_dir_y_table + 384),,,,,,xn_cam_dir_y_table + 1536: the middle of the y rays (k = -384..383)
+xn_squares_table,engine,computed,121EC0,32768,s32 xn_squares_table[8192],runtime,xn_render_init,light.c render.c,xlight.h:69 xrender.h:45,private,zero in the image; k * k << 8 for k = -4096..4095 (render.c)
+xn_squares_table_mid,engine,alias,125EC0,,#define xn_squares_table_mid (xn_squares_table + 4096),,,,,,"xn_squares_table + 16384: the middle of the squares (k = -4096..4095), filled through the start by xn_render_init, read through the middle"
+xn_tex_size_mask,engine,computed,129EC0,256,u8 xn_tex_size_mask[256],runtime,xn_render_init,render.c tex.c,tex.c:15 xrender.h:46,private,"zero in the image; n - 1 for a power of two n, else FFh (render.c)"
+xn_timer_fps,engine,zero,12AA04,4,u32 xn_timer_fps,bss,,timer.c,xtimer.h:22,visible,all zero in the image
+mouse_buttons,engine,zero,12AC00,1,u8 mouse_buttons,bss,,mouse.c vid.c,vid.c:39 xmouse.h:30,visible,all zero in the image
+xn_mouse_buttons_prev,engine,zero,12AC01,1,u8 xn_mouse_buttons_prev,bss,,mouse.c,xmouse.h:31,private,all zero in the image
+mouse_double_click,engine,zero,12AC02,2,u16 mouse_double_click,bss,,mouse.c,xmouse.h:32,visible,all zero in the image
+mouse_x,engine,initial,12AC04,2,s16 mouse_x,c,,mouse.c,xmouse.h:33,visible,a scalar default: a C initializer (160)
+mouse_y,engine,initial,12AC06,2,s16 mouse_y,c,,mouse.c,xmouse.h:33,visible,a scalar default: a C initializer (100)
+xn_mouse_cursor_x,engine,zero,12AC08,4,s32 xn_mouse_cursor_x,bss,,mouse.c,xmouse.h:35,private,all zero in the image
+xn_mouse_cursor_y,engine,zero,12AC0C,4,s32 xn_mouse_cursor_y,bss,,mouse.c,xmouse.h:35,private,all zero in the image
+xn_mouse_cursor_under,engine,zero,12AC10,256,u8 xn_mouse_cursor_under[256],bss,,mouse.c,xmouse.h:36,private,all zero in the image
+xn_mouse_cursor_clipped,engine,zero,12AD10,256,u8 xn_mouse_cursor_clipped[256],bss,,mouse.c,xmouse.h:37,private,all zero in the image
+xn_mouse_cursor_image,engine,zero,12AE10,256,u8 xn_mouse_cursor_image[256],bss,,mouse.c,xmouse.h:38,private,all zero in the image
+xn_mouse_cursor_w,engine,zero,12AF14,2,s16 xn_mouse_cursor_w,bss,,mouse.c,xmouse.h:39,private,all zero in the image
+xn_mouse_cursor_h,engine,zero,12AF16,2,s16 xn_mouse_cursor_h,bss,,mouse.c,xmouse.h:39,private,all zero in the image
+xn_mouse_hotspot_x,engine,zero,12AF18,2,s16 xn_mouse_hotspot_x,bss,,mouse.c,xmouse.h:40,unobserved,all zero in the image
+xn_mouse_hotspot_y,engine,zero,12AF1A,2,s16 xn_mouse_hotspot_y,bss,,mouse.c,xmouse.h:40,unobserved,all zero in the image
+xn_mouse_under_x,engine,zero,12AF1C,4,s32 xn_mouse_under_x,bss,,mouse.c,xmouse.h:41,private,all zero in the image
+xn_mouse_under_y,engine,zero,12AF20,4,s32 xn_mouse_under_y,bss,,mouse.c,xmouse.h:41,private,all zero in the image
+xn_mouse_left_press_tick,engine,zero,12AF24,4,u32 xn_mouse_left_press_tick,bss,,mouse.c,xmouse.h:42,private,all zero in the image
+xn_mouse_left_press_x,engine,zero,12AF28,2,s16 xn_mouse_left_press_x,bss,,mouse.c,xmouse.h:43,private,all zero in the image
+xn_mouse_left_press_y,engine,zero,12AF2A,2,s16 xn_mouse_left_press_y,bss,,mouse.c,xmouse.h:43,private,all zero in the image
+xn_mouse_right_press_tick,engine,zero,12AF2C,4,u32 xn_mouse_right_press_tick,bss,,mouse.c,xmouse.h:42,private,all zero in the image
+xn_mouse_right_press_x,engine,zero,12AF30,2,s16 xn_mouse_right_press_x,bss,,mouse.c,xmouse.h:44,private,all zero in the image
+xn_mouse_right_press_y,engine,zero,12AF32,2,s16 xn_mouse_right_press_y,bss,,mouse.c,xmouse.h:44,private,all zero in the image
+mouse_x_min,engine,zero,12AF34,2,s16 mouse_x_min,bss,,mouse.c,xmouse.h:34,visible,all zero in the image
+mouse_x_max,engine,initial,12AF36,2,s16 mouse_x_max,c,,mouse.c,xmouse.h:34,visible,a scalar default: a C initializer (319)
+mouse_y_min,engine,zero,12AF38,2,s16 mouse_y_min,bss,,mouse.c,xmouse.h:34,visible,all zero in the image
+mouse_y_max,engine,initial,12AF3A,2,s16 mouse_y_max,c,,mouse.c,xmouse.h:34,visible,a scalar default: a C initializer (199)
+xn_pal_current,engine,zero,12B500,4,u8 *xn_pal_current,bss,,gfx.c pal.c,xpal.h:33,visible,all zero in the image
+text_shadow_colour,engine,zero,12B504,1,u8 text_shadow_colour,bss,,gfx.c render.c,render.c:19 xgfx.h:54,visible,all zero in the image
+text_colour,engine,zero,12B508,1,u8 text_colour,bss,,draw.c drawline.c font.c render.c,render.c:19 xgfx.h:55,visible,all zero in the image
+xn_pal_ega16_map,engine,initial,12B812,16,u8 xn_pal_ega16_map[16],load,,img.c pal.c,img.c:6 xpal.h:39,private,15 non-zero bytes
+xn_pal_ega16_rgb,engine,initial,12B822,48,u8 xn_pal_ega16_rgb[16 * 3],load,,pal.c,xpal.h:38,unobserved,36 non-zero bytes
+xn_pal_black,engine,zero,12B878,768,u8 xn_pal_black[768],bss,,pal.c,xpal.h:35,unobserved,all zero in the image
+xn_font_filename,engine,initial,12DA00,13,char xn_font_filename[13],load,,font.c,xfont.h:39,private,size: up to the next named global; 12 non-zero bytes; text (12 characters)
+xn_font_msg_no_font,engine,initial,12DA0D,43,char xn_font_msg_no_font[43],load,,font.c,xfont.h:40,unobserved,size: up to the next named global; 42 non-zero bytes; text (42 characters)
+xn_font_text_x0,engine,zero,12DA38,4,s32 xn_font_text_x0,bss,,font.c,xfont.h:30,private,all zero in the image
+xn_font_text_y0,engine,zero,12DA3C,4,s32 xn_font_text_y0,bss,,font.c,xfont.h:31,private,all zero in the image
+font_space_width,engine,zero,12DA40,4,s32 font_space_width,bss,,font.c,xfont.h:32,visible,all zero in the image
+font_height,engine,zero,12DA44,4,s32 font_height,bss,,font.c,xfont.h:33,visible,all zero in the image
+font_char_spacing,engine,initial,12DA48,4,s32 font_char_spacing,c,,font.c,xfont.h:34,visible,a scalar default: a C initializer (1)
+xn_font_line_gap,engine,initial,12DA4C,4,s32 xn_font_line_gap,c,,font.c,xfont.h:35,unobserved,a scalar default: a C initializer (1)
+xn_font_current,engine,initial,12DA50,4,s32 xn_font_current,c,,font.c,xfont.h:36,visible,a scalar default: a C initializer (-1)
+xn_font_table,engine,initial,12DA54,32,struct xn_fnt_file *xn_font_table[8],load,,font.c,xfont.h:37,private,32 non-zero bytes
+font_glyphs,engine,zero,12DA74,4,struct xn_fnt_file *font_glyphs,bss,,font.c,xfont.h:38,visible,all zero in the image
+dungeon_water_level,engine,zero,12DE00,4,s32 dungeon_water_level,bss,,water.c,xwater.h:42,visible,all zero in the image
+xn_water_jitter,engine,computed,12DE18,2048,s32 xn_water_jitter[512],runtime,xn_water_init,water.c,xwater.h:43,private,"zero in the image; random -1, 0, +1 (water.c)"
+xn_water_row_velocity,engine,computed,12E618,800,s32 xn_water_row_velocity[200],runtime,xn_water_init,water.c,xwater.h:45,private,zero in the image; random (water.c)
+xn_water_row_phase,engine,computed,12E938,800,s32 xn_water_row_phase[200],runtime,xn_water_init,water.c,xwater.h:44,private,zero in the image; random (water.c)
+xn_water_row_base,engine,computed,12EC58,800,s32 xn_water_row_base[200],runtime,xn_water_init,water.c,xwater.h:46,private,zero in the image; random (water.c)
+xn_water_quadrant_dirs,engine,initial,12F49A,64,xn_water_dirs xn_water_quadrant_dirs[4],load,,water.c,xwater.h:40,unobserved,12 non-zero bytes
+xn_tex_msg_out_of_memory,engine,initial,132F00,22,char xn_tex_msg_out_of_memory[22],load,,tex.c,xtex.h:64,unobserved,size: up to the next named global; 22 non-zero bytes; text (22 characters)
+xn_tex_msg_unpack_full,engine,initial,132F3B,29,char xn_tex_msg_unpack_full[29],load,,tex.c,xtex.h:64,unobserved,size: up to the next named global; 28 non-zero bytes; text (28 characters)
+xn_tex_cache_full,engine,zero,132F58,1,u8 xn_tex_cache_full,bss,,rframe.c tex.c tmap.c,tex.c:13 xtmap.h:41,visible,all zero in the image
+xn_tex_archives,engine,zero,132F6C,2048,struct xn_tex_archive *xn_tex_archives[512],bss,,tex.c,xtex.h:49,visible,all zero in the image
+xn_tex_archive_use,engine,zero,133F6C,1024,u16 xn_tex_archive_use[512],bss,,tex.c,xtex.h:50,private,all zero in the image
+xn_tex_path,engine,zero,134378,65,char xn_tex_path[65],bss,,tex.c,xtex.h:52,visible,size: up to the next named global; all zero in the image
+xn_anim_ticks,engine,zero,1343C0,4,u32 xn_anim_ticks,bss,,anim.c tex.c,tex.c:16 xanim.h:36,visible,all zero in the image
+xn_tex_heap_size,engine,zero,1343C4,4,s32 xn_tex_heap_size,bss,,tex.c,xtex.h:56,private,all zero in the image
+xn_tex_unpack_buffer,engine,zero,1343D0,4,u8 *xn_tex_unpack_buffer,bss,,tex.c,xtex.h:58,private,all zero in the image
+xn_tex_heap_base,engine,zero,1343DC,4,struct xn_tex_block *xn_tex_heap_base,bss,,tex.c,xtex.h:54,private,all zero in the image
+xn_tex_heap_free_bytes,engine,zero,1343E0,4,s32 xn_tex_heap_free_bytes,bss,,tex.c,xtex.h:56,private,all zero in the image
+xn_tex_heap_head,engine,zero,1343E4,22,struct xn_tex_block xn_tex_heap_head,bss,,tex.c,xtex.h:55,private,all zero in the image
+xn_tex_unpack_strips,engine,zero,1343FA,2048,struct xn_tex_unpack_strip xn_tex_unpack_strips[256],bss,,tex.c,xtex.h:59,private,all zero in the image
+xn_tex_unpack_strip_count,engine,zero,134BFA,4,u32 xn_tex_unpack_strip_count,bss,,tex.c,xtex.h:60,private,all zero in the image
+xn_tex_unpack_used,engine,zero,134BFE,4,u32 xn_tex_unpack_used,bss,,tex.c,xtex.h:61,private,all zero in the image
+xn_tex_unpack_entries,engine,zero,134C02,2048,struct xn_tex_unpack_entry xn_tex_unpack_entries[256],bss,,tex.c,xtex.h:62,private,all zero in the image
+xn_tex_record_offsets,engine,computed,135402,2048,s32 xn_tex_record_offsets[512],compute,,tex.c,xtex.h:51,unobserved,20 k for k = 0..511: a record's directory entry (20 bytes) in an archive
+xn_light_msg_no_memory,engine,initial,136500,37,char xn_light_msg_no_memory[37],load,,light.c,xlight.h:65,unobserved,size: up to the next named global; 37 non-zero bytes; text (37 characters)
+xn_shade_filename,engine,initial,136525,10,char xn_shade_filename[10],load,,shade.c,xshade.h:41,unobserved,size: up to the next named global; 9 non-zero bytes; text (9 characters)
+xn_light_filename,engine,initial,13652F,17,char xn_light_filename[17],load,,light.c,xlight.h:64,unobserved,size: up to the next named global; 9 non-zero bytes; text (9 characters)
+xn_light_table,engine,zero,136540,957,struct xn_light xn_light_table[XN_LIGHTS + 1],bss,,flat.c light.c model.c terrain.c,model.c:23 xlight.h:58 xterrain.h:63,private,all zero in the image
+xn_light_next,engine,zero,1368FD,4,struct xn_light *xn_light_next,bss,,light.c,xlight.h:59,private,all zero in the image
+xn_light_falloff,engine,zero,136901,4,u16 *xn_light_falloff,bss,,light.c,xlight.h:62,private,all zero in the image
+xn_light_falloff_alloc,engine,zero,136905,4,u8 *xn_light_falloff_alloc,bss,,light.c,xlight.h:63,private,all zero in the image
+xn_light_code_next,engine,zero,136909,4,u8 *xn_light_code_next,bss,,light.c render.c,xlight.h:71,private,all zero in the image
+xn_light_count,engine,zero,13690D,4,s32 xn_light_count,bss,,flat.c light.c render.c terrain.c,xlight.h:60 xterrain.h:64,private,all zero in the image
+xn_light_ambient,engine,zero,136911,4,s32 xn_light_ambient,bss,,light.c render.c,xlight.h:61,visible,all zero in the image
+xn_shade_table,engine,zero,136915,4,u8 *xn_shade_table,bss,,drawimg.c drawunr.c light.c render.c shade.c,xdrawhlp.h:17 xlight.h:66 xshade.h:39,private,all zero in the image
+xn_shade_table_alloc,engine,zero,136919,4,u8 *xn_shade_table_alloc,bss,,light.c,xlight.h:67,private,all zero in the image
+xn_shade_table_last_row,engine,zero,13691D,4,u8 *xn_shade_table_last_row,bss,,flat.c light.c shade.c,xlight.h:68 xshade.h:40,private,all zero in the image
+xn_shade_blend_tables,engine,zero,136921,8,u8 *xn_shade_blend_tables[2],bss,,flat.c,xflat.h:58,unobserved+visible,size: docs/engine/structs.md: unsigned char *[2] (blend_index is 0 or 1: CDC99 sets 1); [1] is the game's translucency table; all zero in the image
+xn_water_tint_table,engine,zero,13695D,4,u8 *xn_water_tint_table,bss,,water.c,xwater.h:47,visible,all zero in the image
+xn_cam_rotation,engine,zero,136E00,36,xn_mat3 xn_cam_rotation,bss,,cam.c light.c model.c sky.c terrain.c,xpipe.h:68 xwshare.h:27,private+visible,all zero in the image
+xn_cam_forward_x,engine,alias,136E18,,#define xn_cam_forward_x (xn_cam_rotation.m[2][0]),,,,,,xn_cam_rotation + 24: the rotation's row 2: the view's forward direction
+xn_cam_forward_y,engine,alias,136E1C,,#define xn_cam_forward_y (xn_cam_rotation.m[2][1]),,,,,,xn_cam_rotation + 28: row 2
+xn_cam_forward_z,engine,alias,136E20,,#define xn_cam_forward_z (xn_cam_rotation.m[2][2]),,,,,,xn_cam_rotation + 32: row 2
+xn_cam_view_matrix,engine,zero,136E24,36,xn_mat3 xn_cam_view_matrix,bss,,cam.c flat.c model.c water.c,xpipe.h:69 xwshare.h:28,visible,all zero in the image
+xn_terrain_step_x,engine,zero,136E48,12,xn_vec3 xn_terrain_step_x,bss,,mat.c terrain.c,xmat.h:31 xterrain.h:44,private,all zero in the image
+xn_terrain_step_y,engine,zero,136E54,12,xn_vec3 xn_terrain_step_y,bss,,mat.c terrain.c,xmat.h:32 xterrain.h:45,private,all zero in the image
+xn_terrain_step_z,engine,zero,136E60,12,xn_vec3 xn_terrain_step_z,bss,,mat.c terrain.c,xmat.h:33 xterrain.h:46,private,all zero in the image
+xn_terrain_height_cam_x,engine,zero,137900,1024,s32 xn_terrain_height_cam_x[256],bss,,terrain.c,xterrain.h:50,private,all zero in the image
+xn_terrain_height_cam_y,engine,zero,137D00,1024,s32 xn_terrain_height_cam_y[256],bss,,terrain.c,xterrain.h:51,private,all zero in the image
+xn_terrain_height_cam_z,engine,zero,138100,1024,s32 xn_terrain_height_cam_z[256],bss,,terrain.c,xterrain.h:52,private,all zero in the image
+xn_terrain_tex_scale,engine,initial,138500,4,s32 xn_terrain_tex_scale,c,,terrain.c,xterrain.h:47,unobserved,a scalar default: a C initializer (0xF800000)
+xn_terrain_u_axis,engine,zero,138520,12,s32 xn_terrain_u_axis[3],bss,,terrain.c,xterrain.h:48,private,all zero in the image
+xn_terrain_v_axis,engine,zero,13852C,12,s32 xn_terrain_v_axis[3],bss,,terrain.c,xterrain.h:49,private,all zero in the image
+xn_terrain_vert_x,engine,zero,138578,12288,struct xn_terrain_vert_coord xn_terrain_vert_x[1024],bss,,terrain.c,xterrain.h:53,private,all zero in the image
+xn_terrain_vert_y,engine,zero,13B578,12288,struct xn_terrain_vert_coord xn_terrain_vert_y[1024],bss,,terrain.c,xterrain.h:54,private,all zero in the image
+xn_model_msg_too_many_verts,engine,initial,13F700,40,char xn_model_msg_too_many_verts[40],load,,model.c,xmodel.h:54,unobserved,size: up to the next named global; 40 non-zero bytes; text (40 characters)
+xn_model_msg_corrupted,engine,initial,13F728,32,char xn_model_msg_corrupted[32],load,,model.c,xmodel.h:54,unobserved,size: up to the next named global; 30 non-zero bytes; text (30 characters)
+xn_model_rot_matrix,engine,zero,13F748,36,xn_mat3 xn_model_rot_matrix,bss,,model.c,xmodel.h:50,private,all zero in the image
+xn_model_queue_count,engine,zero,13F76C,4,s32 xn_model_queue_count,bss,,model.c render.c,xmodel.h:53,visible,all zero in the image
+xn_model_drawn_count,engine,zero,13F770,4,s32 xn_model_drawn_count,bss,,model.c render.c,xmodel.h:53,private,all zero in the image
+xn_model_queue_ptr,engine,zero,13F780,4,struct xn_sort_pair *xn_model_queue_ptr,bss,,model.c render.c,xmodel.h:52,private,all zero in the image
+xn_model_queue,engine,zero,13F784,1600,struct xn_sort_pair xn_model_queue[200],bss,,render.c,xmodel.h:51,private,all zero in the image
+xn_kbd_old_int9_offset,engine,zero,142300,4,u32 xn_kbd_old_int9_offset,bss,,kbd.c,xkbd.h:31,private,all zero in the image
+xn_kbd_old_int9_selector,engine,zero,142304,2,u16 xn_kbd_old_int9_selector,bss,,kbd.c,xkbd.h:32,private,all zero in the image
+xn_kbd_installed,engine,zero,142306,1,u8 xn_kbd_installed,bss,,kbd.c,xkbd.h:33,private,all zero in the image
+xn_kbd_last_scancode,engine,zero,142307,1,volatile u8 xn_kbd_last_scancode,bss,,kbd.c,xkbd.h:34,visible,all zero in the image
+key_down,engine,zero,142308,128,volatile u8 key_down[128],bss,,kbd.c,xkbd.h:35,visible,all zero in the image
+xn_kbd_shift_flags,engine,zero,142388,4,volatile u32 xn_kbd_shift_flags,bss,,kbd.c,xkbd.h:36,unobserved,all zero in the image
+xn_kbd_keymap,engine,zero,142393,4,u8 *xn_kbd_keymap,bss,,kbd.c,xkbd.h:37,private,all zero in the image
+xn_kbd_ascii_table,engine,initial,142397,256,u8 xn_kbd_ascii_table[2][128],load,,kbd.c,xkbd.h:38,unobserved,110 non-zero bytes
+xn_gfx_mode,engine,zero,14291B,4,s32 xn_gfx_mode,bss,,gfx.c,xgfx.h:46,private,all zero in the image
+xn_gfx_saved_mode,engine,zero,14291F,4,s32 xn_gfx_saved_mode,bss,,gfx.c,xgfx.h:47,private,all zero in the image
+xn_gfx_driver,engine,zero,142923,4,s32 xn_gfx_driver,bss,,gfx.c,xgfx.h:48,unobserved,all zero in the image
+pen_x,engine,zero,142928,4,s32 pen_x,bss,,drawline.c,xdraw.h:112,visible,all zero in the image
+pen_y,engine,zero,14292C,4,s32 pen_y,bss,,drawline.c,xdraw.h:113,visible,all zero in the image
+xn_gfx_width,engine,zero,142930,4,s32 xn_gfx_width,bss,,draw.c drawline.c drawunr.c flat.c font.c gfx.c model.c mouse.c poly.c render.c rframe.c vid.c water.c,xgfx.h:38 xmouse.h:46 xpipe.h:101 xwshare.h:18,private,all zero in the image
+xn_gfx_height,engine,zero,142934,4,s32 xn_gfx_height,bss,,gfx.c model.c mouse.c render.c,xgfx.h:38 xmouse.h:46 xpipe.h:101,private,all zero in the image
+xn_gfx_screen_size,engine,zero,142938,4,s32 xn_gfx_screen_size,bss,,gfx.c,xgfx.h:38,private,all zero in the image
+xn_gfx_page_count,engine,zero,14293C,4,s32 xn_gfx_page_count,bss,,gfx.c,xgfx.h:50,private,all zero in the image
+xn_gfx_clip_left,engine,zero,142940,4,s32 xn_gfx_clip_left,bss,,draw.c drawimg.c drawline.c drawscl.c drawunr.c font.c gfx.c render.c sky.c vid.c,xgfx.h:39 xpipe.h:102 xwshare.h:14,visible,all zero in the image
+xn_gfx_clip_top,engine,zero,142944,4,s32 xn_gfx_clip_top,bss,,draw.c drawimg.c drawline.c drawscl.c drawunr.c font.c gfx.c render.c rframe.c sky.c vid.c water.c,xgfx.h:39 xpipe.h:102 xwshare.h:15,visible,all zero in the image
+xn_gfx_clip_right,engine,initial,142948,4,s32 xn_gfx_clip_right,c,,draw.c drawimg.c drawline.c drawscl.c drawunr.c font.c gfx.c render.c sky.c vid.c,xgfx.h:39 xpipe.h:102 xwshare.h:16,visible,a scalar default: a C initializer (320)
+xn_gfx_clip_bottom,engine,initial,14294C,4,s32 xn_gfx_clip_bottom,c,,draw.c drawimg.c drawline.c drawscl.c drawunr.c font.c gfx.c render.c sky.c vid.c water.c,xgfx.h:39 xpipe.h:102 xwshare.h:17,visible,a scalar default: a C initializer (200)
+xn_gfx_row_offset,engine,zero,142950,3072,s32 xn_gfx_row_offset[768],bss,,draw.c drawimg.c drawline.c drawscl.c drawunr.c flat.c font.c gfx.c render.c rframe.c sky.c vid.c water.c,xgfx.h:40 xpipe.h:103 xwshare.h:19,visible,all zero in the image
+screen_buffer,engine,initial,143550,4,u8 *screen_buffer,c,,draw.c drawimg.c drawline.c drawscl.c drawunr.c flat.c font.c gfx.c render.c rframe.c sky.c vid.c water.c,xgfx.h:37 xpipe.h:104 xwshare.h:20,visible,a scalar default: a C initializer (0xA0000)
+xn_gfx_buffer_base,engine,initial,143554,4,u8 *xn_gfx_buffer_base,c,,gfx.c,xgfx.h:51,private,a scalar default: a C initializer (0xA0000)
+xn_gfx_buffer_alloc,engine,zero,143558,4,void *xn_gfx_buffer_alloc,bss,,gfx.c,xgfx.h:52,private,all zero in the image
+xn_gfx_present_mode,engine,initial,14355C,1,u8 xn_gfx_present_mode,c,,gfx.c,xgfx.h:53,private,a scalar default: a C initializer (255)
+xn_mem_msg_alloc_failed,engine,initial,147900,38,char xn_mem_msg_alloc_failed[38],load,,mem.c,xmem.h:33,unobserved,size: up to the next named global; 38 non-zero bytes; text (38 characters)
+xn_mem_msg_lock_failed,engine,initial,147926,42,char xn_mem_msg_lock_failed[42],load,,mem.c,xmem.h:34,unobserved,size: up to the next named global; 40 non-zero bytes; text (40 characters)
+xn_sel_bios_data,engine,zero,147950,2,u16 xn_sel_bios_data,bss,,mem.c,xmem.h:26,private,all zero in the image
+xn_sel_vga,engine,zero,147952,2,u16 xn_sel_vga,bss,,mem.c,xmem.h:27,private,all zero in the image
+big_buffer,engine,zero,147954,4,u8 *big_buffer,bss,,colmodel.c mem.c model.c pal.c render.c tex.c vid.c water.c world.c,xdrawhlp.h:19 xmem.h:24 xpal.h:41 xpipe.h:105 xwshare.h:21,visible,all zero in the image
+xn_mem_work_block,engine,zero,147958,4,u8 *xn_mem_work_block,bss,,mem.c,xmem.h:25,private,all zero in the image
+xn_sys_cmd_tail,engine,zero,14795C,4,u32 xn_sys_cmd_tail,bss,,mem.c,xmem.h:29,private,all zero in the image
+xn_sys_psp_addr,engine,zero,147960,4,u32 xn_sys_psp_addr,bss,,mem.c,xmem.h:28,private,all zero in the image
+xn_mouse_cursor_drawn,engine,zero,147964,2,u16 xn_mouse_cursor_drawn,bss,,mouse.c,xmouse.h:45,visible,all zero in the image
+xn_recip16_table,engine,computed,147980,4096,u32 xn_recip16_table[1024],runtime,xn_mem_init,drawline.c mem.c poly.c span.c,poly.c:13 xdrawhlp.h:18 xmem.h:30 xspan.h:79,private,zero in the image; 0FFFFh / k (mem.c); entry 3FFh left (Q-MEM-01)
+xn_recip32_table,engine,computed,148980,4096,u32 xn_recip32_table[1024],runtime,xn_mem_init,mem.c poly.c shade.c span.c,poly.c:14 xmem.h:31 xspan.h:80,private,zero in the image; 0FFFFFFFFh / k (mem.c); entry 3FFh left (Q-MEM-01)
+xn_colour_fill_table,engine,computed,149980,1024,u32 xn_colour_fill_table[256],runtime,xn_mem_init,drawline.c gfx.c mem.c render.c span.c,xgfx.h:56 xmem.h:32 xspan.h:81,private,zero in the image; k * 01010101h (mem.c)
+xn_sys_old_div_handler_offset,engine,zero,149D80,4,u32 xn_sys_old_div_handler_offset,bss,,sys.c,xsys.h:54,private,all zero in the image
+xn_sys_old_div_handler_selector,engine,zero,149D84,2,u16 xn_sys_old_div_handler_selector,bss,,sys.c,xsys.h:55,private,all zero in the image
+xn_sys_div_handler_installed,engine,zero,149D86,1,u8 xn_sys_div_handler_installed,bss,,sys.c,xsys.h:56,private,all zero in the image
+xn_collide_flat_anchor_shift,engine,initial,14A249,32,u8 xn_collide_flat_anchor_shift[32],load,,colmodel.c,xcollide.h:46,unobserved,size: names.csv: byte pairs indexed by ((flags >> 1) & 15) * 2: 16 pairs (code follows from 0x14A300); 23 non-zero bytes
+xn_collide_normal,engine,zero,14BB3C,12,xn_vec3 xn_collide_normal,bss,,math.c,xmath.h:35,private,all zero in the image
+xn_haze_filename,engine,initial,14CC00,12,char xn_haze_filename[12],load,,shade.c,xshade.h:42,private,size: up to the next named global; 8 non-zero bytes; text (8 characters)
+xn_fog_table_last,engine,zero,14CC0C,4,u8 *xn_fog_table_last,bss,,flat.c shade.c,xshade.h:45,visible,all zero in the image
+xn_fog_start,engine,zero,14CC10,4,s32 xn_fog_start,bss,,flat.c shade.c,xshade.h:46,private,all zero in the image
+xn_fog_step,engine,zero,14CC14,4,u32 xn_fog_step,bss,,flat.c shade.c,xshade.h:47,private,all zero in the image
+xn_fog_min_inv_z,engine,zero,14CC18,4,u32 xn_fog_min_inv_z,bss,,shade.c,xshade.h:48,private,all zero in the image
+xn_sin_table,engine,computed,150200,10240,s32 xn_sin_table[XN_ANGLES + XN_ANGLES / 4],compute,,mat.c math.c vec.c,xngine.h:62,visible,"round(sin(2 pi k / 2048) * 2^28) for k = 0..2559, except k = 1718, which the original rounds the other way (its exact value is -227665571.50015: the table holds -227665571; Q-DATA-01)"
+xn_cos_table,engine,alias,150A00,,#define xn_cos_table (xn_sin_table + XN_ANGLES / 4),,,,,,xn_sin_table + 2048: the cosine is the sine table a quarter turn on: one table of 2560 entries (names.csv: it runs on into the cosine)
+xn_joy,engine,initial,152A00,110,struct xn_joy_state xn_joy,load,,joy.c,xjoy.h:31,private+unobserved+visible,1 non-zero bytes
+xn_helmet_port,engine,zero,153400,4,s32 xn_helmet_port,bss,,helmet.c,xhelmet.h:45,private,all zero in the image
+cfg_helmet,engine,initial,153404,4,s32 cfg_helmet,c,,helmet.c,xhelmet.h:46,visible,a scalar default: a C initializer (-1)
+xn_helmet_active,engine,zero,153408,1,u8 xn_helmet_active,bss,,helmet.c,xhelmet.h:47,visible,all zero in the image
+xn_helmet_smoothing,engine,zero,153409,4,s32 xn_helmet_smoothing,bss,,helmet.c,xhelmet.h:48,visible,all zero in the image
+xn_helmet_pitch,engine,zero,15340D,4,s32 xn_helmet_pitch,bss,,helmet.c,xhelmet.h:49,visible,all zero in the image
+xn_helmet_yaw,engine,zero,153411,4,s32 xn_helmet_yaw,bss,,helmet.c,xhelmet.h:49,visible,all zero in the image
+xn_helmet_roll,engine,zero,153415,4,s32 xn_helmet_roll,bss,,helmet.c,xhelmet.h:49,unobserved,all zero in the image
+xn_helmet_ring_pos,engine,zero,153461,4,u32 xn_helmet_ring_pos,bss,,helmet.c,xhelmet.h:50,private,all zero in the image
+xn_helmet_ring,engine,zero,153465,84,xn_vec3 xn_helmet_ring[7],bss,,helmet.c,xhelmet.h:51,private,all zero in the image
+xn_rand_seed,engine,initial,153800,4,u32 xn_rand_seed,c,,rand.c str.c world.c,xrand.h:26 xworld.h:86,private,a scalar default: a C initializer (1)
+xn_pow10_table,engine,computed,153804,40,u32 xn_pow10_table[10],c,,str.c,xstr.h:27,unobserved,10^k for k = 0..9
+xn_terrain_corner_tile,engine,initial,153A00,256,u8 xn_terrain_corner_tile[256],load,,world.c,xworld.h:92,unobserved,256 non-zero bytes
+xn_terrain_corner_flip,engine,initial,153B00,256,u8 xn_terrain_corner_flip[256],load,,world.c,xworld.h:93,unobserved,28 non-zero bytes
+xn_flat_sort_list,engine,zero,153C44,4096,struct xn_sort_pair xn_flat_sort_list[512],bss,,flat.c render.c,xflat.h:55,private,all zero in the image
+xn_flat_sort_end,engine,zero,154C44,4,struct xn_sort_pair *xn_flat_sort_end,bss,,flat.c render.c,xflat.h:56,private,all zero in the image
+xn_flat_count,engine,zero,154C48,4,s32 xn_flat_count,bss,,flat.c render.c,xflat.h:57,private,all zero in the image
+xn_flat_drawn_count,engine,zero,154C4C,4,s32 xn_flat_drawn_count,bss,,flat.c render.c,xflat.h:57,private,all zero in the image
+xn_flat_ignore_pitch,engine,zero,154C60,1,u8 xn_flat_ignore_pitch,bss,,flat.c,xflat.h:60,unobserved,all zero in the image
+xn_flat_matrix,engine,zero,154C61,36,xn_mat3 xn_flat_matrix,bss,,flat.c,xflat.h:61,private,all zero in the image
+xn_flat_proj_matrix,engine,zero,154C85,36,xn_mat3 xn_flat_proj_matrix,bss,,flat.c,xflat.h:62,private,all zero in the image
+xn_poly_clip_src,engine,zero,158200,4,struct xn_poly_vertex *xn_poly_clip_src,bss,,poly.c,xpoly.h:47,private,all zero in the image
+xn_poly_clip_dst,engine,zero,158204,4,struct xn_poly_vertex *xn_poly_clip_dst,bss,,poly.c,xpoly.h:48,private,all zero in the image
+xn_poly_clip_src_end,engine,zero,158208,4,struct xn_poly_vertex *xn_poly_clip_src_end,bss,,poly.c,xpoly.h:49,private,all zero in the image
+xn_poly_clip_outcode_and,engine,zero,158210,1,u8 xn_poly_clip_outcode_and,bss,,flat.c poly.c terrain.c,xpoly.h:50,private,all zero in the image
+xn_poly_clip_outcode_or,engine,zero,158211,1,u8 xn_poly_clip_outcode_or,bss,,flat.c poly.c terrain.c,xpoly.h:50,private,all zero in the image
+xn_poly_vertex_buf_a,engine,zero,158EA0,512,struct xn_poly_vertex xn_poly_vertex_buf_a[32],bss,,flat.c poly.c terrain.c,xpoly.h:51,private,all zero in the image
+xn_poly_vertex_buf_b,engine,zero,1590A0,512,struct xn_poly_vertex xn_poly_vertex_buf_b[32],bss,,poly.c,xpoly.h:51,private+unobserved,all zero in the image; its last 12 bytes are xn_poly_ring_a's in the asm (separate in C)
+xn_poly_ring_a,engine,computed,159294,116,struct xn_poly_vertex **xn_poly_ring_a[29],compute,,poly.c terrain.c,xpoly.h:52,unobserved,"size: rings for n = 0..28: the asm's [26..28] are ring_b's [0..2], which ring b never uses (n < 3); ring_b ends at 0x159370 (names.csv); ring n of buffer A for n = 3..28 (0 for n < 3); its last 12 bytes are xn_poly_ring_b's in the asm (separate in C)"
+xn_poly_ring_b,engine,computed,1592FC,116,struct xn_poly_vertex **xn_poly_ring_b[29],compute,,poly.c,xpoly.h:52,unobserved,"size: rings for n = 0..28 (0x1592FC..0x159370); ring n of buffer B for n = 3..28; [0..2]: ring a's [26..28], as the asm's overlapping arrays have them"
+xn_poly_ring_tables,engine,computed,159380,9728,struct xn_poly_vertex *xn_poly_ring_tables[2432],compute,,pointer: xn_poly_ring_a+12 xn_poly_ring_a+16 xn_poly_ring_a+20 (+52),src/engine_data/xndata.h,unobserved,"size: up to the next named global (xn_span_dzdx); the rings: for each buffer three lead entries (v0 v1 v2), then ring n for n = 3..27, 3n + 1 vertex addresses (v0..v(n-1) three times, then vn), and ring 28's first 56; the walker reads ring n at -n..2n-1 (the entries before a ring are the last of the one before it); 7 unused entries end each block (the asm's padding: 0xDB87DB87)"
+xn_span_dzdx,engine,zero,15B980,4,s32 xn_span_dzdx,bss,,model.c span.c terrain.c,model.c:22 xspan.h:176 xterrain.h:65,private,all zero in the image
+xn_tmap_msg_no_memory,engine,initial,15C100,76,char xn_tmap_msg_no_memory[76],load,,tmap.c,xtmap.h:42,unobserved,size: up to the next named global; 73 non-zero bytes; text (73 characters)
+xn_tmap_pool_block,engine,zero,15C14C,4,u8 *xn_tmap_pool_block,bss,,tmap.c,xtmap.h:38,private,all zero in the image
+xn_tmap_pool,engine,zero,15C150,4,u8 *xn_tmap_pool,bss,,tmap.c,xtmap.h:39,private,all zero in the image
+xn_tmap_pool_count,engine,zero,15C158,4,u32 xn_tmap_pool_count,bss,,tmap.c,xtmap.h:40,private,all zero in the image
+xn_face_edge_tables,engine,computed,15C524,100,const s32 *xn_face_edge_tables[25],compute,,collide.c,xcollide.h:44,unobserved,by point count n = 3..24: the slot offsets of an n-gon's points (0 for n < 3)
+xn_face_edge_slots,engine,computed,15C588,1276,s32 xn_face_edge_slots[319],compute,,pointer: xn_face_edge_tables+12 xn_face_edge_tables+16 xn_face_edge_tables+20 (+19),src/engine_data/xndata.h,unobserved,"size: names.csv: int[319], the 22 tables for 3..24 points; for n = 3..24: the point slot offsets 0, 8, .., 8(n - 1), each table closed by the next one's first slot (0): 298 used"
+xn_math_asin_values,engine,initial,15D400,4096,s32 xn_math_asin_values[1024],load,,math.c,xmath.h:31,unobserved,"2699 non-zero bytes; no formula found: trunc(asin(i/512) * 2048 / 2 pi) except 22 entries (|i| = 165, 168, 171...) rounded up, with fractions from .950 to .998 while others up to .994 are not"
+xn_math_asin_table,engine,alias,15DC00,,#define xn_math_asin_table (xn_math_asin_values + 512),,,,,,xn_math_asin_values + 2048: centred: the asm indexes it -512..511 (xn_math_asin_coarse); the negative half lies before 0x15DC00
+xn_math_sqrt_table,engine,computed,15E500,4096,u8 xn_math_sqrt_table[4096],compute,,math.c,xmath.h:33,unobserved,"round(4 sqrt(i)) for i = 0..4095, at most 255"
+xn_gfx_vesa_dos_selector,engine,zero,15FA00,4,u32 xn_gfx_vesa_dos_selector,bss,,gfx.c,xgfx.h:59,unobserved,all zero in the image
+xn_gfx_vesa_dos_buffer,engine,zero,15FA04,4,u8 *xn_gfx_vesa_dos_buffer,bss,,gfx.c,xgfx.h:60,private,all zero in the image
+xn_gfx_vesa_rm_regs,engine,zero,15FA08,50,struct xn_rm_regs xn_gfx_vesa_rm_regs,bss,,gfx.c,xgfx.h:61,private,all zero in the image
+xn_gfx_vesa_bank_step,engine,zero,15FA3A,2,u16 xn_gfx_vesa_bank_step,bss,,gfx.c,xgfx.h:62,unobserved,all zero in the image
+xn_gfx_vesa_bank_table,engine,zero,15FA3C,32,u16 xn_gfx_vesa_bank_table[16],bss,,gfx.c,xgfx.h:63,unobserved,all zero in the image
+xn_gfx_vesa_present,engine,zero,15FA60,1,u8 xn_gfx_vesa_present,bss,,gfx.c,xgfx.h:64,unobserved,all zero in the image
+xn_gfx_vesa_page,engine,zero,15FA61,4,s32 xn_gfx_vesa_page,bss,,gfx.c,xgfx.h:65,unobserved,all zero in the image
+xn_gfx_vesa_lfb,engine,zero,15FA65,4,u8 *xn_gfx_vesa_lfb,bss,,gfx.c,xgfx.h:66,unobserved,all zero in the image
+xn_gfx_vesa_bank,engine,zero,15FA69,4,s32 xn_gfx_vesa_bank,bss,,gfx.c,xgfx.h:67,private,all zero in the image
+xn_gfx_vesa_mode_info,engine,initial,15FA6D,256,struct xn_vesa_mode_info xn_gfx_vesa_mode_info,load,,gfx.c,xgfx.h:68,unobserved,1 non-zero bytes
+xn_serial_port_active,engine,zero,160000,4,u8 xn_serial_port_active[4],bss,,serial.c,xserial.h:25,private,all zero in the image
+xn_serial_port_base,engine,initial,160004,16,u32 xn_serial_port_base[4],load,,serial.c,xserial.h:26,unobserved,8 non-zero bytes
+xn_serial_port_vector,engine,initial,160014,16,u32 xn_serial_port_vector[4],load,,serial.c,xserial.h:27,unobserved,4 non-zero bytes
+xn_serial_port_pic_mask,engine,initial,160024,4,u8 xn_serial_port_pic_mask[4],load,,serial.c,xserial.h:28,unobserved,4 non-zero bytes
+xn_serial_old_vector_off,engine,zero,160028,16,u32 xn_serial_old_vector_off[4],bss,,serial.c,xserial.h:29,private,all zero in the image
+xn_serial_old_vector_sel,engine,zero,160038,8,u16 xn_serial_old_vector_sel[4],bss,,serial.c,xserial.h:30,private,all zero in the image
+xn_serial_irq_handlers,engine,initial,160040,16,void (*xn_serial_irq_handlers[4])(void),c,,serial.c,xserial.h:31,unobserved,a table of 4 code addresses: an initializer names them (FALL.EXE's fixups)
+xn_serial_rx_buffers,engine,zero,160050,2048,u8 xn_serial_rx_buffers[4][512],bss,,helmet.c serial.c,xserial.h:32,unobserved,all zero in the image
+xn_serial_rx_head,engine,zero,160850,16,volatile u32 xn_serial_rx_head[4],bss,,serial.c,xserial.h:33,unobserved,all zero in the image
+xn_serial_rx_tail,engine,zero,160860,16,volatile u32 xn_serial_rx_tail[4],bss,,helmet.c serial.c,xserial.h:34,unobserved,all zero in the image
+xn_serial_rx_count,engine,zero,160870,16,volatile u32 xn_serial_rx_count[4],bss,,helmet.c serial.c,xserial.h:35,unobserved,all zero in the image
+xn_helmet_a_port,engine,initial,160D00,4,s32 xn_helmet_a_port,c,,helmet.c,xhelmet.h:53,unobserved,a scalar default: a C initializer (1)
+xn_helmet_a_record,engine,initial,160D04,24,char xn_helmet_a_record[24],load,,helmet.c,xhelmet.h:54,unobserved,23 non-zero bytes; text (23 characters)
+xn_helmet_a_angles,engine,zero,160D1C,12,s32 xn_helmet_a_angles[3],bss,,helmet.c,xhelmet.h:55,unobserved,all zero in the image
+xn_helmet_b_str_reset,engine,initial,160F00,4,u8 xn_helmet_b_str_reset[4],load,,helmet.c,xhelmet.h:57,private,size: up to the next named global; 4 non-zero bytes
+xn_helmet_b_str_version,engine,initial,160F04,4,u8 xn_helmet_b_str_version[4],load,,helmet.c,xhelmet.h:58,private,size: up to the next named global; 4 non-zero bytes
+xn_helmet_b_str_mode,engine,initial,160F08,9,u8 xn_helmet_b_str_mode[9],load,,helmet.c,xhelmet.h:59,unobserved,size: up to the next named global; 9 non-zero bytes
+xn_helmet_b_str_start,engine,initial,160F11,2,u8 xn_helmet_b_str_start[2],load,,helmet.c,xhelmet.h:60,private,size: up to the next named global; 2 non-zero bytes
+xn_helmet_b_str_bang,engine,initial,160F13,5,u8 xn_helmet_b_str_bang[5],load,,helmet.c,xhelmet.h:61,unobserved,size: up to the next named global; 3 non-zero bytes
+xn_helmet_b_yaw_sign,engine,initial,160F18,4,s32 xn_helmet_b_yaw_sign,c,,helmet.c,xhelmet.h:56,unobserved,a scalar default: a C initializer (1)
+xn_helmet_c_rm_regs,engine,zero,161300,50,xn_dpmi_rm_regs xn_helmet_c_rm_regs,bss,,helmet.c,xhelmet.h:62,private,all zero in the image
+xn_helmet_c_dos_selector,engine,zero,161332,4,u32 xn_helmet_c_dos_selector,bss,,helmet.c,xhelmet.h:63,unobserved,all zero in the image
+xn_helmet_c_dos_buffer,engine,zero,161336,4,u8 *xn_helmet_c_dos_buffer,bss,,helmet.c,xhelmet.h:64,unobserved,all zero in the image
+tavern_open,game,function,01EE84,,,,,pointer: spell_effect_handlers+248 xn_kludge_menu_handlers+44,,,the game's C; the engine's data holds its address
+spell_cost_duration_chance,game,function,03937B,,,,,pointer: spell_cost_formulas+0,,,the game's C; the engine's data holds its address
+spell_cost_duration_magnitude,game,function,03946E,,,,,pointer: spell_cost_formulas+4,,,the game's C; the engine's data holds its address
+spell_cost_duration,game,function,0395AA,,,,,pointer: spell_cost_formulas+8,,,the game's C; the engine's data holds its address
+spell_cost_chance,game,function,039635,,,,,pointer: spell_cost_formulas+12,,,the game's C; the engine's data holds its address
+spell_cost_magnitude,game,function,0396C0,,,,,pointer: spell_cost_formulas+16,,,the game's C; the engine's data holds its address
+spell_cost_duration_magnitude_alt,game,function,03978C,,,,,pointer: spell_cost_formulas+20,,,the game's C; the engine's data holds its address
+spell_cost_magnitude_by_duration,game,function,03988A,,,,,pointer: spell_cost_formulas+24,,,the game's C; the engine's data holds its address
+kludge_show_rumor,game,function,044EE0,,,,,pointer: spell_effect_handlers+204 xn_kludge_menu_handlers+0,,,the game's C; the engine's data holds its address
+kludge_good_merchant_rep,game,function,044EFD,,,,,pointer: spell_effect_handlers+216 xn_kludge_menu_handlers+12,,,the game's C; the engine's data holds its address
+kludge_jump_month,game,function,044F3A,,,,,pointer: spell_effect_handlers+212 xn_kludge_menu_handlers+8,,,the game's C; the engine's data holds its address
+kludge_advance_level,game,function,044F5C,,,,,pointer: spell_effect_handlers+208 xn_kludge_menu_handlers+4,,,the game's C; the engine's data holds its address
+kludge_toggle_world_position,game,function,045B41,,,,,pointer: spell_effect_handlers+236 xn_kludge_menu_handlers+32,,,the game's C; the engine's data holds its address
+kludge_toggle_second_compass,game,function,045B60,,,,,pointer: spell_effect_handlers+240 xn_kludge_menu_handlers+36,,,the game's C; the engine's data holds its address
+kludge_pick_pockets,game,function,045B7F,,,,,pointer: spell_effect_handlers+244 xn_kludge_menu_handlers+40,,,the game's C; the engine's data holds its address
+kludge_toggle_quest_debug,game,function,045C6B,,,,,pointer: spell_effect_handlers+252 xn_kludge_menu_handlers+48,,,the game's C; the engine's data holds its address
+fatal_error,game,function,050069,,u32 fatal_error(const char *message),,,dos.c sys.c,xdos.h:59 xsys.h:68,,"the game's C (src/lifted, src/hand)"
+disease_become_vampire,game,function,066352,,,,,pointer: spell_effect_handlers+220 xn_kludge_menu_handlers+16,,,the game's C; the engine's data holds its address
+disease_cure_vampirism,game,function,06691F,,,,,pointer: spell_effect_handlers+224 xn_kludge_menu_handlers+20,,,the game's C; the engine's data holds its address
+disease_become_lycanthrope,game,function,066D3C,,,,,pointer: spell_effect_handlers+228 xn_kludge_menu_handlers+24,,,the game's C; the engine's data holds its address
+disease_cure_lycanthropy,game,function,067309,,,,,pointer: spell_effect_handlers+232 xn_kludge_menu_handlers+28,,,the game's C; the engine's data holds its address
+sound_timer_add,game,function,069B0E,,"int sound_timer_add(void (*callback)(void), int rate)",,,vid.c,vid.c:29,,"the game's C (src/lifted, src/hand)"
+sound_timer_remove,game,function,069B53,,void sound_timer_remove(int handle),,,vid.c,vid.c:30,,"the game's C (src/lifted, src/hand)"
+mem_check_heap,game,function,06A319,,void mem_check_heap(s32 checkpoint),,,rframe.c,rframe.c:7,,"the game's C (src/lifted, src/hand)"
+steer_forward_left,game,function,080727,,,,,pointer: xn_steer_region_handlers+0,,,the game's C; the engine's data holds its address
+steer_forward,game,function,0807AD,,,,,pointer: xn_steer_region_handlers+4,,,the game's C; the engine's data holds its address
+steer_forward_right,game,function,0807F2,,,,,pointer: xn_steer_region_handlers+8,,,the game's C; the engine's data holds its address
+steer_turn_left,game,function,080872,,,,,pointer: xn_steer_region_handlers+12,,,the game's C; the engine's data holds its address
+steer_center,game,function,0808DD,,,,,pointer: xn_steer_region_handlers+16,,,the game's C; the engine's data holds its address
+steer_turn_right,game,function,080929,,,,,pointer: xn_steer_region_handlers+20,,,the game's C; the engine's data holds its address
+steer_slide_left,game,function,08098C,,,,,pointer: xn_steer_region_handlers+24,,,the game's C; the engine's data holds its address
+steer_backward,game,function,0809DC,,,,,pointer: xn_steer_region_handlers+28,,,the game's C; the engine's data holds its address
+steer_slide_right,game,function,080A22,,,,,pointer: xn_steer_region_handlers+32,,,the game's C; the engine's data holds its address
+spfx_paralyze,game,function,088CF5,,,,,pointer: spell_effect_handlers+0,,,the game's C; the engine's data holds its address
+spfx_continuous_damage,game,function,088DE6,,,,,pointer: spell_effect_handlers+4,,,the game's C; the engine's data holds its address
+spfx_create_item,game,function,088E11,,,,,pointer: spell_effect_handlers+8,,,the game's C; the engine's data holds its address
+spfx_cure,game,function,088E62,,,,,pointer: spell_effect_handlers+12,,,the game's C; the engine's data holds its address
+spfx_damage,game,function,089035,,,,,pointer: spell_effect_handlers+16,,,the game's C; the engine's data holds its address
+spfx_disintegrate,game,function,08917D,,,,,pointer: spell_effect_handlers+20,,,the game's C; the engine's data holds its address
+spfx_dispel,game,function,0892BB,,,,,pointer: spell_effect_handlers+24,,,the game's C; the engine's data holds its address
+spfx_drain,game,function,08950A,,,,,pointer: spell_effect_handlers+28,,,the game's C; the engine's data holds its address
+spfx_elemental_resistance,game,function,08962A,,,,,pointer: spell_effect_handlers+32,,,the game's C; the engine's data holds its address
+spfx_fortify_attribute,game,function,0896A7,,,,,pointer: spell_effect_handlers+36,,,the game's C; the engine's data holds its address
+spfx_heal,game,function,089757,,,,,pointer: spell_effect_handlers+40,,,the game's C; the engine's data holds its address
+spfx_transfer,game,function,0898DE,,,,,pointer: spell_effect_handlers+44,,,the game's C; the engine's data holds its address
+spfx_soul_trap,game,function,08992F,,,,,pointer: spell_effect_handlers+48,,,the game's C; the engine's data holds its address
+spfx_invisibility,game,function,0899DF,,,,,pointer: spell_effect_handlers+52,,,the game's C; the engine's data holds its address
+spfx_levitate,game,function,089A2E,,,,,pointer: spell_effect_handlers+56,,,the game's C; the engine's data holds its address
+spfx_light,game,function,089A92,,,,,pointer: spell_effect_handlers+60,,,the game's C; the engine's data holds its address
+spfx_lock,game,function,089ACC,,,,,pointer: spell_effect_handlers+64,,,the game's C; the engine's data holds its address
+spfx_open,game,function,089B23,,,,,pointer: spell_effect_handlers+68,,,the game's C; the engine's data holds its address
+spfx_regenerate,game,function,089B7A,,,,,pointer: spell_effect_handlers+72,,,the game's C; the engine's data holds its address
+spfx_silence,game,function,089BC9,,,,,pointer: spell_effect_handlers+76,,,the game's C; the engine's data holds its address
+spfx_spell_absorption,game,function,089C52,,,,,pointer: spell_effect_handlers+80,,,the game's C; the engine's data holds its address
+spfx_spell_reflection,game,function,089C8C,,,,,pointer: spell_effect_handlers+84,,,the game's C; the engine's data holds its address
+spfx_spell_resistance,game,function,089CC6,,,,,pointer: spell_effect_handlers+88,,,the game's C; the engine's data holds its address
+spfx_chameleon,game,function,089D00,,,,,pointer: spell_effect_handlers+92,,,the game's C; the engine's data holds its address
+spfx_shadow,game,function,089D4F,,,,,pointer: spell_effect_handlers+96,,,the game's C; the engine's data holds its address
+spfx_slowfall,game,function,089D9E,,,,,pointer: spell_effect_handlers+100,,,the game's C; the engine's data holds its address
+spfx_free_action,game,function,089DED,,,,,pointer: spell_effect_handlers+104,,,the game's C; the engine's data holds its address
+spfx_jumping,game,function,089E59,,,,,pointer: spell_effect_handlers+108,,,the game's C; the engine's data holds its address
+spfx_climbing,game,function,089E93,,,,,pointer: spell_effect_handlers+112,,,the game's C; the engine's data holds its address
+spfx_morph_self,game,function,089ECD,,,,,pointer: spell_effect_handlers+116,,,the game's C; the engine's data holds its address
+spfx_water_breathing,game,function,089F42,,,,,pointer: spell_effect_handlers+120,,,the game's C; the engine's data holds its address
+spfx_water_walking,game,function,089F7C,,,,,pointer: spell_effect_handlers+124,,,the game's C; the engine's data holds its address
+spfx_diminution,game,function,089FB6,,,,,pointer: spell_effect_handlers+128,,,the game's C; the engine's data holds its address
+spfx_pacify,game,function,089FF5,,,,,pointer: spell_effect_handlers+132,,,the game's C; the engine's data holds its address
+spfx_charm,game,function,08A084,,,,,pointer: spell_effect_handlers+136,,,the game's C; the engine's data holds its address
+spfx_shield,game,function,08A113,,,,,pointer: spell_effect_handlers+140,,,the game's C; the engine's data holds its address
+spfx_telekinesis,game,function,08A189,,,,,pointer: spell_effect_handlers+144,,,the game's C; the engine's data holds its address
+spfx_astral_travel,game,function,08A1B0,,,,,pointer: spell_effect_handlers+148,,,the game's C; the engine's data holds its address
+spfx_etherealness,game,function,08A1D7,,,,,pointer: spell_effect_handlers+152,,,the game's C; the engine's data holds its address
+spfx_detect,game,function,08A1FE,,,,,pointer: spell_effect_handlers+156,,,the game's C; the engine's data holds its address
+spfx_identify,game,function,08A238,,,,,pointer: spell_effect_handlers+160,,,the game's C; the engine's data holds its address
+spfx_wizard_sight,game,function,08A2E3,,,,,pointer: spell_effect_handlers+164,,,the game's C; the engine's data holds its address
+spfx_darkness,game,function,08A30A,,,,,pointer: spell_effect_handlers+168,,,the game's C; the engine's data holds its address
+spell_recall_prompt,game,function,08A344,,,,,pointer: spell_effect_handlers+172,,,the game's C; the engine's data holds its address
+spfx_comprehend_languages,game,function,08A39A,,,,,pointer: spell_effect_handlers+176,,,the game's C; the engine's data holds its address
+spfx_intensify_fire,game,function,08A3D4,,,,,pointer: spell_effect_handlers+180,,,the game's C; the engine's data holds its address
+spfx_diminish_fire,game,function,08A40E,,,,,pointer: spell_effect_handlers+184,,,the game's C; the engine's data holds its address
+spfx_wall_of_stone,game,function,08A448,,,,,pointer: spell_effect_handlers+188,,,the game's C; the engine's data holds its address
+spfx_wall_of_fire,game,function,08A46F,,,,,pointer: spell_effect_handlers+192,,,the game's C; the engine's data holds its address
+spfx_wall_of_frost,game,function,08A496,,,,,pointer: spell_effect_handlers+196,,,the game's C; the engine's data holds its address
+spfx_wall_of_poison,game,function,08A4BD,,,,,pointer: spell_effect_handlers+200,,,the game's C; the engine's data holds its address
+dpmi_lock_region,game,function,0994F0,,"int dpmi_lock_region(int address, int size)",,,sys.c vid.c,vid.c:27 xsys.h:66,,"the game's C (src/lifted, src/hand)"
+dpmi_unlock_region,game,function,09957D,,"int dpmi_unlock_region(int address, int size)",,,sys.c vid.c,vid.c:28 xsys.h:67,,"the game's C (src/lifted, src/hand)"
+D_0018DD5C,game,data,18DD5C,4,s32 D_0018DD5C,,,vid.c,vid.c:35,,the game's data (object 3)
+D_0018DD60,game,data,18DD60,4,s32 D_0018DD60,,,vid.c,vid.c:36,,the game's data (object 3)
+arena2_path,game,data,1917E4,,char arena2_path[],,,dos.c,xdos.h:53,,the game's data (object 3)
+cfg_last_path,game,data,191884,,char cfg_last_path[],,,tex.c,tex.c:14,,the game's data (object 3)
+frame_counter,game,data,1959AC,4,s32 frame_counter,,,drawimg.c,drawimg.c:6,,the game's data (object 3)
+player_object,game,data,195AA4,4,u8 *player_object,,,model.c,model.c:18,,the game's data (object 3)
+frame_ticks,game,data,195AB0,4,u32 frame_ticks,,,sky.c,xwshare.h:41,,the game's data (object 3)
+frame_timer_ms,game,data,195B00,4,s32 frame_timer_ms,,,timer.c,xtimer.h:29,,the game's data (object 3)
+color_remap,game,data,195B80,4,u8 *color_remap,,,drawimg.c drawscl.c,xdrawhlp.h:21,,the game's data (object 3)
+icon_image,game,data,195B88,4,u8 *icon_image,,,drawimg.c,drawimg.c:7,,the game's data (object 3)
+scratch_buffer,game,data,195C44,4,u8 *scratch_buffer,,,drawimg.c drawscl.c,xdrawhlp.h:20,,the game's data (object 3)
+haze_table_1,game,data,195D18,4,u8 *haze_table_1,,,shade.c,xshade.h:43,,the game's data (object 3)
+timer_tick_count,game,data,1A3F40,4,volatile s32 timer_tick_count,,,timer.c,xtimer.h:28,,the game's data (object 3)
+file_resolver,game,data,1A4A04,4,char *(*file_resolver)(char *path),,,dos.c,xdos.h:56,,the game's data (object 3)
+xn_zero_page,hardware,memory,000000,1024,,,,sys.c:115 sys.c:124,,,the zero page: the real-mode interrupt vectors (CauseWay maps the first megabyte at 0); xn_sys_zero_page_save / _check
+linear 0Ch,hardware,memory,00000C,2,,,,anim.c:40,,,Q-ANIM-01: xn_anim_reset_with_rate's speed goes through the reset's 0 to linear 0Ch
+XN_BIOS_KBD_FLAGS,hardware,memory,000417,1,,,,xpc.h:31,,,the BIOS keyboard flags (0040:0017)
+XN_BIOS_TICKS,hardware,memory,00046C,4,,,,xpc.h:29,,,"the BIOS tick count (0040:006C), 18.2 a second"
+VGA_MEMORY,hardware,memory,0A0000,65536,,,,gfx.c:9,,,VGA memory: the screen in mode 13h and the VESA bank window (gfx.c); screen_buffer and xn_gfx_buffer_base start there
+linear 40006Ch,hardware,memory,40006C,4,,,,rand.c:57,,,Q-RAND-01: xn_rand_seed_from_ticks reads 0040:006C as a flat address
+exit,runtime,library,09DB11,,void exit(s32 status),,,dos.c,xdos.h:58,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:exit"
+func_000A10A8,runtime,library,0A10A8,,void *func_000A10A8(u32 size),,,dos.c gfx.c light.c mem.c render.c shade.c tex.c tmap.c vid.c world.c,xdos.h:60 xgfx.h:71 xmem.h:38,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): "
+func_000A117E,runtime,library,0A117E,,void func_000A117E(void *p),,,gfx.c light.c mem.c render.c tex.c tmap.c vid.c world.c,world.c:25 xgfx.h:72 xmem.h:39,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): "
+filelength,runtime,library,0A1235,,s32 filelength(s32 handle),,,dos.c tex.c,xdos.h:57,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:filelen"
+func_000A1272,runtime,library,0A1272,,far_handler func_000A1272(int intno),,,pc.c,pc.c:11,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): "
+func_000A12A6,runtime,library,0A12A6,,"void func_000A12A6(int intno, far_handler handler)",,,pc.c,pc.c:12,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): "
+xn_mem_game_lock_start,runtime,label,0A12B8,,u8 xn_mem_game_lock_start[],,,mem.c,xmem.h:35,,"a code address: the game's code (object 1, 0xA12B8) xn_mem_init locks 400h bytes of"
+func_000A2504,runtime,library,0A2504,,"int func_000A2504(int driver, xn_vid_sos_sample *sample)",,,vid.c,vid.c:31,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): "
+func_000A2687,runtime,library,0A2687,,"void func_000A2687(int driver, int handle)",,,vid.c,vid.c:32,,"a library FALL.EXE links (config/regions.csv: MemCheck, the Watcom C runtime, HMI SOS): "
+xn_sys_crit_error_entry,runtime,entry,0C0500,,void xn_sys_crit_error_entry(void),,,sys.c,xsys.h:60,,"an interrupt vector's entry: the build's stub that calls the C handler (tools/xn_rc.py isr_stub); alias of xn_sys_crit_error_handler: the int 24h vector's entry, where the build's interrupt stub calls the C handler (to"
+xn_kbd_code_start,runtime,label,142700,,u8 xn_kbd_code_start[],,,kbd.c,xkbd.h:48,,"a code address in object 2: the keyboard module's code, which xn_kbd_install locks with its data"
+xn_kbd_int9_entry,runtime,entry,142840,,void xn_kbd_int9_entry(void),,,kbd.c,xkbd.h:47,,"an interrupt vector's entry: the build's stub that calls the C handler (tools/xn_rc.py isr_stub); alias of xn_kbd_int9_handler: the int 9 vector's entry, where the build's interrupt stub loads DS and ES and calls the C"
+xn_sys_divide_error_entry,runtime,entry,149FC8,,void xn_sys_divide_error_entry(void),,,sys.c,xsys.h:61,,"an interrupt vector's entry: the build's stub that calls the C handler (tools/xn_rc.py isr_stub); alias of xn_sys_divide_error_handler: exception 0's entry, where the build's stub calls the C handler (retf)"
+xn_sys_divide_error_end,runtime,label,14A0E5,,u8 xn_sys_divide_error_end[],,,sys.c,xsys.h:62,,a code address in object 2: the end of the divide-error handler's asm: xn_sys_install_divide_handler locks the entry up to here
+xn_joy_timer_entry,runtime,entry,152EA0,,void xn_joy_timer_entry(void),,,joy.c,xjoy.h:38,,"an interrupt vector's entry: the build's stub that calls the C handler (tools/xn_rc.py isr_stub); alias of xn_joy_timer_isr: the int 1Ch vector's entry, where the build's interrupt stub loads DS and ES and calls the C "
+xn_joy_timer_end,runtime,label,152F41,,u8 xn_joy_timer_end[],,,joy.c,xjoy.h:39,,a code address in object 2: the end of the int 1Ch handler's asm: xn_joy_init locks the entry up to here
+xn_serial_irq_com1_entry,runtime,entry,160AE0,,void xn_serial_irq_com1_entry(void),,,pointer: xn_serial_irq_handlers+0,,,an IRQ handler's entry the serial table holds: xn_serial_irq_com1's (the build's interrupt stub)
+xn_serial_irq_com2_entry,runtime,entry,160B60,,void xn_serial_irq_com2_entry(void),,,pointer: xn_serial_irq_handlers+4,,,an IRQ handler's entry the serial table holds: the asm's copy of COM1's handler for another port (no C: nothing installs it; the game opens COM1 only)
+xn_serial_irq_com3_entry,runtime,entry,160BE0,,void xn_serial_irq_com3_entry(void),,,pointer: xn_serial_irq_handlers+8,,,an IRQ handler's entry the serial table holds: the asm's copy of COM1's handler for another port (no C: nothing installs it; the game opens COM1 only)
+xn_serial_irq_com4_entry,runtime,entry,160C60,,void xn_serial_irq_com4_entry(void),,,pointer: xn_serial_irq_handlers+12,,,an IRQ handler's entry the serial table holds: the asm's copy of COM1's handler for another port (no C: nothing installs it; the game opens COM1 only)

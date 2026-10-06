@@ -60,8 +60,10 @@ typedef struct xn_mat3 {
 #define XN_ANGLES       2048
 #define XN_ANGLE_MASK   0x7FF
 #define XN_ONE28        0x10000000      /* 1.0 in 2.28 */
-extern s32 xn_sin_table[XN_ANGLES];     /* sine of k/2048 of a turn, 2.28 (runs on into cos) */
-extern s32 xn_cos_table[XN_ANGLES];     /* cosine, 2.28 */
+/* sine of k/2048 of a turn, 2.28, for k = 0..2559: one table, and the cosine is the same table
+   a quarter turn on (0x150200; the cosine's name is 0x150A00) */
+extern s32 xn_sin_table[XN_ANGLES + XN_ANGLES / 4];
+#define xn_cos_table (xn_sin_table + XN_ANGLES / 4)
 
 /* ---- an asm caller's registers ----------------------------------------------------------- */
 

@@ -5,8 +5,6 @@
 
 extern s32 frame_counter;               /* the game's main-loop count */
 extern u8 *icon_image;                  /* the spell icons: 20 a row, 16x16, 320 wide */
-extern u8 *xn_paperdoll_background;     /* the paperdoll's background copy (the game's) */
-extern u8 xn_cel_row_buffer[330];       /* xn_draw_cel_frame's decoded RLE row */
 
 /* the screen offset of row y, where a negative y is the negative of row -y's (the RLE
    animations start above the screen) */

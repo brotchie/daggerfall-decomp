@@ -51,6 +51,17 @@ typedef struct xn_flat_walk {
     xn_edge_walk edges;         /* the quad's edges (xpoly.h) */
 } xn_flat_walk;
 
+/* ---- tables and state (object 2) --------------------------------------------------------- */
+extern struct xn_sort_pair xn_flat_sort_list[512];  /* the frame's flats: {-z, flat} pairs */
+extern struct xn_sort_pair *xn_flat_sort_end;
+extern s32 xn_flat_count, xn_flat_drawn_count;
+extern u8 *xn_shade_blend_tables[];     /* by a texture entry's blend_index: [1] the game's
+                                           translucency table */
+extern u8 xn_flat_ignore_pitch;         /* 64h: the flats ignore the camera's pitch */
+extern xn_mat3 xn_flat_matrix;          /* the camera pitch, for the corner offsets */
+extern xn_mat3 xn_flat_proj_matrix;     /* scaled for the flats' projection */
+extern u8 xn_pick_skip_flats;
+
 /* ---- queueing ------------------------------------------------------------------------------ */
 
 /* Queues a flat at the world position (x, y, z) for this frame (xn_flat_add_body). Returns

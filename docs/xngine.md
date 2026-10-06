@@ -759,3 +759,19 @@ is the guide; this part built the mechanism and proved it on vec, mat and math.
   million exhaustive), no difference. One quirk needed the game's own registers:
   `xn_math_isqrt(0)` depends on the caller's ECX (`bsr` of 0), and the game's site 080FFC
   reaches it, so its boundary route is an adapter (`xn_math_isqrt_b`).
+
+## 2026-10-06: phase 7, canonical C
+
+The engine is canonical C, shown equivalent to the asm at its boundary with the game:
+docs/xngine_canonical.md has the bar, the boundary, the tools and the proof;
+docs/engine/architecture.md has the overview.
+
+- 648 functions, all canonical.
+- 8,880 recorded calls pass through test shims; the game's calls 2,819 / 2,819.
+- 39 lockstep scenarios, 1,675 / 1,675 frames.
+- 140 equivalence specs, 217 million samples.
+- 98.1% of reachable blocks exercised.
+
+The engine's data is C too (src/engine_data/, docs/engine/data.md), and the engine links without
+FALL.EXE. An SDL port starts from docs/sdl_handoff.md.
+

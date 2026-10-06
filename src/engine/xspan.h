@@ -70,8 +70,10 @@ typedef void (*xn_span_fn)(struct xn_poly *poly, const struct xn_span *span, s32
 typedef void (*xn_flat_span_fn)(struct xn_flat *flat, u32 inv_z, s32 x, s32 n, u8 *pix);
 
 extern s32 xn_render_row_y;             /* the row being drawn - the view centre's (render) */
-extern s32 xn_cam_dir_x_mid[];          /* the camera's x ray of column x - centre x */
-extern s32 xn_cam_dir_y_mid[];          /* the y ray of row y - centre y */
+extern s32 xn_cam_dir_x_table[1024];    /* the camera's rays (xcam.h) */
+extern s32 xn_cam_dir_y_table[768];
+#define xn_cam_dir_x_mid (xn_cam_dir_x_table + 512)  /* the x ray of column x - centre x */
+#define xn_cam_dir_y_mid (xn_cam_dir_y_table + 384)  /* the y ray of row y - centre y */
 extern s32 xn_cam_centre_x;
 extern s32 *xn_render_recip_table;      /* 2^24 / k, k = 0..65536 (xn_render_init) */
 extern u32 xn_recip16_table[1024];      /* FFFFh / n (xmem.h) */

@@ -7,19 +7,7 @@
 #include "xmath.h"
 #include "xspan.h"
 #include "xlight.h"
-#include "xshade.h"                     /* the fog: xn_fog_start, _step, _table_last */
-
-extern struct xn_sort_pair xn_flat_sort_list[512];
-extern struct xn_sort_pair *xn_flat_sort_end;
-extern s32 xn_flat_count, xn_flat_drawn_count;
-extern u8 *xn_shade_blend_tables[];
-extern u8 xn_flat_ignore_pitch;         /* 64h: the flats ignore the camera's pitch */
-extern s32 xn_cam_pitch;
-extern xn_mat3 xn_flat_matrix;          /* the camera pitch, for the corner offsets */
-extern xn_mat3 xn_flat_proj_matrix;     /* scaled for the flats' projection */
-extern xn_vec3 xn_scratch_vec_b;        /* the pick's screen point (x, y) */
-extern s32 xn_pick_flat_x, xn_pick_flat_y, xn_pick_flat_z;
-extern u8 xn_pick_skip_flats;
+#include "xshade.h"                     /* the fog */
 
 /* ---- queueing ------------------------------------------------------------------------------ */
 

@@ -28,8 +28,11 @@
 
 #include "xngine.h"
 
-extern s32 xn_math_asin_table[];        /* asin(i/512) in 2048ths, i = -512..511 (centred) */
+extern s32 xn_math_asin_values[1024];   /* asin(i/512) in 2048ths, i = -512..511 (0x15D400) */
+#define xn_math_asin_table (xn_math_asin_values + 512)    /* centred: [i] for i = -512..511 */
 extern u8 xn_math_sqrt_table[4096];     /* 4*sqrt(i), i = 0..4095 */
+/* the collision tests' plane normal (0x14BB3C): xn_math_plane_y_at leaves its normal there */
+extern xn_vec3 xn_collide_normal;
 
 /* ---- distances ------------------------------------------------------------------------ */
 
