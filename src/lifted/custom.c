@@ -468,14 +468,14 @@ int classmaker_pick_from_list(iptr names, iptr background)
     if (((iptr)(char *)skill_names) == names) {
         *(int *)&i = 0;
         *(int *)&count = *(int *)&i;
-        while (*(int *)((char *)((((int)(short)i) << 2) + names)) != 0) {
+        while (*(iptr *)((char *)((((int)(short)i) << PTR_SHIFT) + names)) != 0) {
             if (classmaker_skill_taken((int)(short)i) == 0) {
                 scratch_190ce4[(int)(short)count] = *(signed char *)&i;
-                *(int *)(scratch_190ee4 + (((int)(short)(*(int *)&count)++) << 2)) = *(int *)(((char *)names + (((int)(short)i) << 2)));
+                *(iptr *)(scratch_190ee4 + (((int)(short)(*(int *)&count)++) << PTR_SHIFT)) = *(iptr *)(((char *)names + (((int)(short)i) << PTR_SHIFT)));
             }
             i++;
         }
-        *(int *)(scratch_190ee4 + (((int)(short)count) << 2)) = 0;
+        *(iptr *)(scratch_190ee4 + (((int)(short)count) << PTR_SHIFT)) = 0;
         list_popup_open((iptr)scratch_190ee4);
     } else {
         list_popup_open(names);

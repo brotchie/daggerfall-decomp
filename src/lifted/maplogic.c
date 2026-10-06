@@ -214,7 +214,13 @@ struct map_location *region_find_location(int map_id)
             low = mid + 1;
         }
     }
+#ifdef DAGGER_PORT
+    /* the search can end one past the table, whose next bytes DOS read (the heap's, never a
+       location's id): not natively */
+    if (low < region_location_count && (region_locations[low].map_id & 1048575) == map_id) {
+#else
     if ((region_locations[low].map_id & 1048575) == map_id) {
+#endif
         return (struct map_location *)((char *)region_locations + (low * 17));
     }
     return 0;

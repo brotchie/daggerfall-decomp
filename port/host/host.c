@@ -113,4 +113,5 @@ void host_install_fault_handlers(void)
     sigaction(SIGBUS, &sa, NULL);
     sigaction(SIGILL, &sa, NULL);
     sigaction(SIGFPE, &sa, NULL);
+    sigaction(SIGTRAP, &sa, NULL);      /* libmalloc's checks (heap corruption) trap */
 }

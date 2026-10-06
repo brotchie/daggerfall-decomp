@@ -8,7 +8,8 @@
   port_build.py app       build/port/Daggerfall.app from the build (SDL3 inside, signed ad hoc)
 
   PORT_BUILD=DIR sets the build folder (build/port by default); PORT_BUILD_TYPE=Release (or
-  RelWithDebInfo) configures a new folder optimised (Debug by default).
+  RelWithDebInfo) configures a new folder optimised (Debug by default); PORT_SANITIZE=address
+  configures a new folder with AddressSanitizer.
 
 How the build fills its gaps: the game's objects name ~4,000 functions and globals. Those the
 port defines (src/, port/shim, port/host) link as they are, and so do the C library functions
@@ -58,7 +59,13 @@ def configure():
     if not os.path.exists(os.path.join(BUILD, "build.ninja")):
         r = run(["cmake", "-S", PORT, "-B", BUILD, "-G", "Ninja",
                  "-DCMAKE_BUILD_TYPE=" + os.environ.get("PORT_BUILD_TYPE", "Debug"),
-                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"])
+                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"] + (
+                     # PORT_SANITIZE=address: AddressSanitizer (run with
+                     # ASAN_OPTIONS=handle_segv=0:handle_sigbus=0, so the zero page works)
+                     ["-DCMAKE_C_FLAGS=-fsanitize=%s -fsanitize-recover=%s -fno-omit-frame-pointer"
+                      % (os.environ["PORT_SANITIZE"], os.environ["PORT_SANITIZE"]),
+                      "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=%s" % os.environ["PORT_SANITIZE"]]
+                     if os.environ.get("PORT_SANITIZE") else []))
         if r.returncode:
             sys.exit("cmake configure failed")
 

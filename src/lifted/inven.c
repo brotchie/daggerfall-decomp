@@ -486,7 +486,7 @@ void inventory_close(void)
         inv_right_container->flags |= 0x200;
     }
     if (inv_right_container->type == 33) inv_right_container->flags |= 1;
-    if (D_00195DA8->type == 33 && D_00195DA8->children == 0) {
+    if (DOS_NULL(D_00195DA8)->type == 33 && D_00195DA8->children == 0) {     /* none: the zero page */
         D_00195DA8->flags |= 0x200;
     }
     if (inventory_close_callback != 0) ((int (*)())(inventory_close_callback))();

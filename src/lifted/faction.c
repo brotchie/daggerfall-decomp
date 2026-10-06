@@ -82,6 +82,12 @@ void faction_free(void)
     if (factions == 0 || (iptr)factions == (-1751672937)) return;
     mc_free(factions, D_00170464, 1082);
     factions = (struct faction *)(iptr)-1751672937;
+#ifdef DAGGER_PORT
+    /* faction_add_record's last record at each depth still points into the array just
+       freed, and the next load links its first record through it: a write into freed memory,
+       which DOS's heap took and the host's does not (its checks trap) */
+    mc_memset(D_001966BC, 0, 16 * PTR_SIZE, D_00170464, 1082, 4);
+#endif
 }
 
 void faction_add_record(struct faction *parsed, int depth, struct faction *added)

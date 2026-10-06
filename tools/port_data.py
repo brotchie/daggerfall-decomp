@@ -82,9 +82,10 @@ TYPES = {
     "scratch_190de4": "iptr __v[64]",
     # the next 256 bytes: a table of 64 pointers too (spell and item-maker lists)
     "scratch_190ee4": "iptr __v[64]",
-    # an int slot that also keeps a pointer (talk.c's faction target; potions' item list
-    # starts here and runs over the slots after it, as in DOS)
-    "scratch_190be4": "iptr __v",
+    # (scratch_190be4 is an int slot that also keeps a pointer: talk.c's faction target, and
+    # potions' item list starts there and runs over the slots after it. It stays in place as
+    # bytes, so the slots after it are where the code reaches them from it; a pointer there
+    # takes the next slot too, as the list does)
     # XnGine's: the vertex-pointer tables its polygon rings point at (xn_poly_ring_a/_b, 3n+1
     # pointers for n vertices), which the C reaches only through the rings: pointers up to
     # the next global ("all": the 0xDB87DB87 filler between the tables too)
