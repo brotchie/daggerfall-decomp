@@ -462,7 +462,9 @@ memory,obj,0CEAC0,0D1AC0,xn_vert_cam,private,data,the engine writes 12288 bytes 
 memory,obj,0D1AC0,0D4AC0,xn_vert_screen,private,data,the engine writes 7284 bytes (surveys) / 1753 (records)
 memory,obj,0D4AC0,0D7AC0,xn_vert_flags,private,data,the engine writes 3072 bytes (surveys) / 2153 (records)
 memory,obj,0D7AC0,0DB320,xn_render_matrix_pool,private,data,the engine writes 1440 bytes (surveys) / 950 (records)
-memory,obj,0DB320,0F39E0,xn_render_poly_pool,visible,data,the game reads 44 bytes the engine wrote; the engine writes 32004 bytes (surveys) / 13234 (records)
+memory,obj,0DB320,0DB328,"xn_render_poly_pool (face, handle)",visible,data every=64*1000,"1000 polygons of 100 bytes (struct xn_poly): the game reads only offsets 0..7 of each (face, handle: the pick's) in every survey flow (build/xn_canon/boundary/survey/*.pkl, checked by group C); the rest is the rasteriser's"
+memory,obj,0DB328,0DB384,xn_render_poly_pool (the rest),private,data every=64*1000,"1000 polygons of 100 bytes (struct xn_poly): the game reads only offsets 0..7 of each (face, handle: the pick's) in every survey flow (build/xn_canon/boundary/survey/*.pkl, checked by group C); the rest is the rasteriser's"
+memory,obj,0F39C0,0F39E0,xn_render_poly_pool (tail),visible,data,the 32 bytes after the 1000 polygons: the game reads 44 bytes the engine wrote; the engine writes 32004 bytes (surveys) / 13234 (records)
 memory,obj,0F39E0,0F39F0,xn_render_span_sentinel,private,data,the engine writes 12 bytes (surveys) / 0 (records)
 memory,obj,0F39F0,116C80,xn_render_span_rows,private,data,the engine writes 51232 bytes (surveys) / 23904 (records)
 memory,obj,116C80,120280,xn_render_light_list_pool,private,data,the engine writes 992 bytes (surveys) / 543 (records)

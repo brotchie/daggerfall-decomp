@@ -530,11 +530,12 @@ def check_dropped():
                            "map (class writer-private, writers=...)" % (
                                d["name"], d["start"], d["end"], d["function"], d["function"]))
             continue
-        lo, hi = int(d["start"], 16), int(d["end"], 16)
-        for r in rows:
-            if int(r["start"], 16) < hi and int(r["end"], 16) > lo and r["class"] == "visible":
-                out.append("dropped %s (%06X-%06X, %s) overlaps game-visible %s (%s)" % (
-                    d["name"], lo, hi, d["function"], r["name"], r["evidence"][:80]))
+        vis = [(rg, r) for r in rows if r["class"] == "visible" for rg in xn_boundary.row_ranges(r)]
+        for lo, hi in xn_boundary.row_ranges(d):
+            for (a, b), r in vis:
+                if a < hi and b > lo:
+                    out.append("dropped %s (%06X-%06X, %s) overlaps game-visible %s (%s)" % (
+                        d["name"], lo, hi, d["function"], r["name"], r["evidence"][:80]))
     return out
 
 
@@ -722,6 +723,22 @@ class RImage:
             uc.mem_map(RBASE, RSIZE)
             emu._xn_rc_mapped = True
         uc.mem_write(RBASE, self.bytes)         # the data and BSS as built, every time
+        self.adopt(emu)
+
+    def adopt(self, emu):
+        """Seed canonical C state from the asm's: config/xngine_adopt.csv (and the files in
+        XN_ADOPT) map a C variable to the asm's bytes that hold the same value (c_symbol,
+        asm_address, size, reason). A machine made from asm state (a record's, a snapshot's)
+        has run the asm's initialisation, not the C's: the C's own storage starts as built,
+        so state an earlier call set (the 1/z table, the view) is taken from where the asm
+        keeps it. A test-harness migration, never part of the engine."""
+        for r in adopt_rows():
+            name = r["c_symbol"].strip()
+            a = next((self.syms[n] for n in ("_" + name, name, name + "_") if n in self.syms), None)
+            if a is None:
+                continue                # not in this image (another group's, not built)
+            n = int(r["size"], 0)
+            emu.uc.mem_write(a, bytes(emu.uc.mem_read(LOAD + int(r["asm_address"], 16), n)))
 
     def game_routes(self):
         """The functions routed when the game runs (route_game)."""
@@ -892,7 +909,8 @@ def load_dropped(path=DROPPED_CSV):
             continue                # excused only in their function's records (own_drops)
         if kind == "memory":
             if alloc_ref(r["start"]) is None:
-                mem.append((LOAD + int(r["start"], 16), LOAD + int(r["end"], 16)))
+                import xn_boundary
+                mem += [(LOAD + lo, LOAD + hi) for lo, hi in xn_boundary.row_ranges(r)]
             continue                # (ALLOC+0xOFF: relative to an allocation, alloc_drops)
         if kind == "exceptions":
             # CPU exceptions the engine's own handler took (a divide error and the return
@@ -906,6 +924,19 @@ def load_dropped(path=DROPPED_CSV):
         elif kind == "flags":
             flags[va] = flags.get(va, 0) | m
     return merge_ranges(mem), regs, flags, rows
+
+
+ADOPT_CSV = os.path.join(ROOT, "config", "xngine_adopt.csv")
+
+
+def adopt_rows():
+    """config/xngine_adopt.csv and the files in XN_ADOPT=path[:path] (RImage.adopt)."""
+    rows = []
+    for q in [ADOPT_CSV] + [q for q in os.environ.get("XN_ADOPT", "").split(os.pathsep) if q]:
+        if os.path.exists(q):
+            with open(q, newline="") as f:
+                rows += list(csv.DictReader(f))
+    return rows
 
 
 def merge_ranges(ranges):
@@ -971,8 +1002,9 @@ def own_drops(rows=None):
     out = {}
     for r in (rows if rows is not None else load_dropped()[3]):
         if r["kind"].strip() == "memory-own":
-            out.setdefault(func_va(r["function"].strip()), []).append(
-                (LOAD + int(r["start"], 16), LOAD + int(r["end"], 16)))
+            import xn_boundary
+            out.setdefault(func_va(r["function"].strip()), []).extend(
+                (LOAD + lo, LOAD + hi) for lo, hi in xn_boundary.row_ranges(r))
     return out
 
 

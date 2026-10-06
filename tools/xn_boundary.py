@@ -1006,7 +1006,7 @@ def summary(rows, st, surveys, corpus):
     cnt = collections.Counter()
     for r in mem:
         try:
-            n = int(r["end"], 16) - int(r["start"], 16)
+            n = sum(hi - lo for lo, hi in row_ranges(r))
         except ValueError:
             n = 0
         cnt[(r["space"], r["class"])] += n
@@ -1021,6 +1021,22 @@ def summary(rows, st, surveys, corpus):
 
 
 # ---- reading the boundary (tests) ----------------------------------------------------------------
+
+EVERY = re.compile(r"every=([0-9A-Fa-f]+)\*(\d+)")
+
+
+def row_ranges(r):
+    """A memory row's ranges as (lo, hi) preferred addresses: one, or with `every=STRIDE*COUNT`
+    (STRIDE hex, in the boundary row's rule or a dropped row's `every` column) COUNT of them,
+    STRIDE apart: a field of each element of an array of records."""
+    lo, hi = int(r["start"], 16), int(r["end"], 16)
+    m = EVERY.search((r.get("rule") or "") + " " + ("every=" + r["every"] if r.get("every") else ""))
+    if not m:
+        return [(lo, hi)]
+    stride, n = int(m.group(1), 16), int(m.group(2))
+    return [(lo + k * stride, hi + k * stride) for k in range(n)]
+
+
 class Private:
     """Resolved engine-private ranges (linear addresses)."""
 
@@ -1053,7 +1069,7 @@ class Masks:
             if r["kind"] != "memory" or r["class"] != "private":
                 continue
             if r["space"] == "obj":
-                self.static.append((LOAD + int(r["start"], 16), LOAD + int(r["end"], 16)))
+                self.static += [(LOAD + lo, LOAD + hi) for lo, hi in row_ranges(r)]
             elif r["space"] == "low":
                 self.static.append((int(r["start"], 16), int(r["end"], 16)))
             elif r["space"] == "alloc":
@@ -1098,8 +1114,9 @@ def dropped_private(rows):
     and where its address is taken in object 2 the pointer goes only to engine functions
     (`xn_rc.py check_dropped` lists those uses for review). So the boundary comparison masks it
     like the private rows."""
-    vis = [(int(r["start"], 16), int(r["end"], 16)) for r in rows
-           if r["kind"] == "memory" and r["space"] == "obj" and r["class"] == "visible" and r["end"]]
+    vis = [rg for r in rows
+           if r["kind"] == "memory" and r["space"] == "obj" and r["class"] == "visible" and r["end"]
+           for rg in row_ranges(r)]
     paths = [os.path.join(ROOT, "config", "xngine_dropped.csv")] + \
         [q for q in os.environ.get("XN_DROPPED", "").split(os.pathsep) if q]
     out = []
@@ -1111,11 +1128,12 @@ def dropped_private(rows):
                 if d["kind"].strip() != "memory":
                     continue
                 try:
-                    lo, hi = int(d["start"], 16), int(d["end"], 16)
+                    rgs = row_ranges(d)
                 except ValueError:
                     continue            # allocation-relative rows: by their function's records
-                if not any(a < hi and b > lo for a, b in vis):
-                    out.append((LOAD + lo, LOAD + hi))
+                for lo, hi in rgs:
+                    if not any(a < hi and b > lo for a, b in vis):
+                        out.append((LOAD + lo, LOAD + hi))
     return out
 
 
@@ -1154,7 +1172,7 @@ def show(what):
             continue
         if a is not None and r["space"] in ("obj", "low") and r["end"]:
             try:
-                if int(r["start"], 16) <= a < int(r["end"], 16):
+                if any(lo <= a < hi for lo, hi in row_ranges(r)):
                     print(r)
             except ValueError:
                 pass
@@ -1199,10 +1217,11 @@ def dropped_review():
             if d["kind"].strip() != "memory":
                 continue
             try:
-                lo, hi = int(d["start"], 16), int(d["end"], 16)
+                rgs = row_ranges(d)
             except ValueError:
                 continue
-            hit = sorted(a for a in uses if lo <= a < hi)
+            lo, hi = rgs[0][0], rgs[-1][1]
+            hit = sorted(a for a in uses if any(x <= a < y for x, y in rgs))
             if hit:
                 n += 1
                 print("%-34s %06X-%06X  %s" % (d["name"][:34], lo, hi, "  ".join(
