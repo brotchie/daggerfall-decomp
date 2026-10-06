@@ -21,6 +21,7 @@ Assembler 4.0; the tools check the executables' SHA-1.
 - [docs/play.md](docs/play.md): playing the headless game with tools/fallplay.py: commands, start points, UI facts
 - [docs/state.md](docs/state.md): where the game keeps its state in memory (player, character record, mode, location), with the evidence for each
 - [docs/naming.md](docs/naming.md): the naming convention for functions, globals and record fields
+- [docs/port.md](docs/port.md): the native port (arm64 macOS, SDL3): how it builds, its rules and status
 - [docs/natural_c.md](docs/natural_c.md): making the lifted C read like real C (structuring, typed globals, local names, declarations) and the Watcom 10.0a control-flow rules
 
 ## Status
@@ -120,5 +121,7 @@ tools/build-and-verify.sh
 | `tools/xn_rc.py` | XnGine as readable C (`src/engine/`): build with Watcom 10.0a, route the asm's calls to the C, test against the records by each function's interface, differential tests, lockstep frames against the asm (`frames`) |
 | `tools/xn_declcheck.py` | the `#pragma aux` interfaces the readable C's files give a function, against its definition's |
 | `tools/xn_c.py`, `tools/xn_cload.py` | XnGine as C: translate every function to literal C (`src/xngine_c/`), compile it with Watcom 10.0a, and replay the record corpus, differential tests or the game itself with XnGine in C |
+| `tools/port_build.py` | the native build (docs/port.md): the game's C with clang and SDL3, stubs and data generated for what the port lacks; `run` starts it on a game folder |
+| `tools/port_census.py` | the native build's 64-bit worklist: clang's diagnostics on the game's C, by kind and file |
 
 Several tools are adapted from [KKND-Decomp](https://github.com/Wyrelade/KKND-Decomp) (CC0).

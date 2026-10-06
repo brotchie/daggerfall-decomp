@@ -16,6 +16,16 @@
 #define RECORD_SIZE(tag, n) typedef char tag##_size_check[(sizeof(struct tag) == (n)) ? 1 : -1]
 #define RECORD_OFFSET(tag, m, n) \
     typedef char tag##_##m##_offset_check[((unsigned)&((struct tag *)0)->m == (n)) ? 1 : -1]
+/* The same for a struct holding pointers: exact where pointers are 4 bytes (Watcom); in the
+   native build (docs/port.md) pointers are 8 bytes and the struct may only grow */
+#if defined(DAGGER_PORT)
+#define RECORD_SIZE_P(tag, n) typedef char tag##_size_check[(sizeof(struct tag) >= (n)) ? 1 : -1]
+#define RECORD_OFFSET_P(tag, m, n) \
+    typedef char tag##_##m##_offset_check[(__builtin_offsetof(struct tag, m) >= (n)) ? 1 : -1]
+#else
+#define RECORD_SIZE_P(tag, n) RECORD_SIZE(tag, n)
+#define RECORD_OFFSET_P(tag, m, n) RECORD_OFFSET(tag, m, n)
+#endif
 #endif
 
 #pragma pack(1)
@@ -134,7 +144,7 @@ struct xn_pick_hit {
     int model;                      /* +0x04: a polygon's: the address of its model pointer (pick_model_cb
                                        compares &instance.model); 0 a flat, 1 nothing to pick */
 };                                  /* +0x08 */
-RECORD_SIZE(xn_pick_hit, 8);
+RECORD_SIZE_P(xn_pick_hit, 8);
 
 /* ---- files ------------------------------------------------------------------------------ */
 
@@ -158,7 +168,7 @@ struct profile {
     char *line;                     /* +0xA8: the raw-line cursor (profile_get_raw_line) */
     int result;                     /* +0xAC: sos_read_settings' last result */
 };                                  /* +0xB0 */
-RECORD_SIZE(profile, 176);
+RECORD_SIZE_P(profile, 176);
 
 /* an IMG file, or one image of a CIF file (a CIF is several, each data_size bytes after the
  * end of its header): the 12-byte header, then the pixels (DFU ImgFile) */
@@ -226,7 +236,7 @@ struct tex_cache_entry {
     char pad00[12];                 /* +0x00 */
     struct texture_header *image;   /* +0x0C: the decoded frame (its header, then the pixels) */
 };                                  /* +0x10 */
-RECORD_SIZE(tex_cache_entry, 16);
+RECORD_SIZE_P(tex_cache_entry, 16);
 
 /* a BSA archive's directory entry: type-256 archives name their records, the others number them */
 struct bsa_name_entry {
@@ -302,7 +312,7 @@ struct flc_player {
     char pad22[9];                  /* +0x22 */
     unsigned char loops;            /* +0x2B: 255 forever */
 };                                  /* +0x2C */
-RECORD_SIZE(flc_player, 44);
+RECORD_SIZE_P(flc_player, 44);
 
 /* ---- the user interface ----------------------------------------------------------------- */
 
@@ -317,7 +327,7 @@ struct rect {
     short y1;                       /* +0x06 */
     int (*handler)();               /* +0x08: buttons */
 };                                  /* +0x0C */
-RECORD_SIZE(rect, 12);
+RECORD_SIZE_P(rect, 12);
 
 /* a where-is topic of the talk window (talk_place_topics, in scratch_buffer; talk_place_topic_count
  * of them): talk_build_place_topics lists the town's buildings by distance, the quest code adds
@@ -333,7 +343,7 @@ struct talk_place_topic {
     int distance;                   /* +0x0B: building_distance */
     short messages[2];              /* +0x0F: the quest resource's messages (kinds 1-3) */
 };                                  /* +0x13 */
-RECORD_SIZE(talk_place_topic, 19);
+RECORD_SIZE_P(talk_place_topic, 19);
 
 /* what the player asked an NPC where to find (D_001965FC; talk_where_target points at it):
  * talk_prepare_where_answer fills it, talk_hint_text_id and the %loc, %reg macros read it */
@@ -361,7 +371,7 @@ struct pick_result {
     short model_id;                 /* +0x0E: type-56 objects: the model's id */
     short variant;                  /* +0x10: and variant */
 };                                  /* +0x12 */
-RECORD_SIZE(pick_result, 18);
+RECORD_SIZE_P(pick_result, 18);
 
 /* the notebook's page (note_page, 3640 bytes): its entries one after the other, text (91 bytes)
  * or a line (11 bytes), up to a zero kind (note_page_walk) */
@@ -523,7 +533,7 @@ struct quest_face {
     int object_id;                  /* +0x02: the person or foe, 0 a free slot */
     struct image *image;            /* +0x06: the face's image (from quest_face_images) */
 };                                  /* +0x0A */
-RECORD_SIZE(quest_face, 10);
+RECORD_SIZE_P(quest_face, 10);
 
 /* ---- sound -------------------------------------------------------------------------------- */
 
@@ -544,14 +554,14 @@ struct sos_sample {
     int pan;                        /* +0x44: 0x8000 the centre (sound_volume_pan) */
     char pad48[168];                /* +0x48 */
 };                                  /* +0xF0 */
-RECORD_SIZE(sos_sample, 240);
+RECORD_SIZE_P(sos_sample, 240);
 
 /* HMI SOS's song descriptor (sos_load_song builds one in front of the MIDI data it loads) */
 struct sos_song {
     char *data;                     /* +0x00: the song (a MIDI.BSA record) */
     char pad04[28];                 /* +0x04 */
 };                                  /* +0x20 */
-RECORD_SIZE(sos_song, 32);
+RECORD_SIZE_P(sos_song, 32);
 
 /* a sound in the sound cache (sound_cache[256]: sound_cache_load fills it, sound_cache_trim frees
  * the oldest) */
@@ -561,7 +571,7 @@ struct sound_cache_entry {
     int size;                       /* +0x08 */
     char *data;                     /* +0x0C: 0 a free entry */
 };                                  /* +0x10 */
-RECORD_SIZE(sound_cache_entry, 16);
+RECORD_SIZE_P(sound_cache_entry, 16);
 
 /* a sound channel (sound_channels[4]: 0-2 the sounds, 3 the ambient loop) */
 struct sound_channel {
@@ -572,7 +582,7 @@ struct sound_channel {
     struct record *source;          /* +0xFC: the object the sound comes from, 0 none */
     int position[3];                /* +0x100: its x, y, z (sound_channel_set_source) */
 };                                  /* +0x10C */
-RECORD_SIZE(sound_channel, 268);
+RECORD_SIZE_P(sound_channel, 268);
 
 #pragma pack()
 

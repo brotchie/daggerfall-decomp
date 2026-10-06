@@ -22,6 +22,16 @@
 #define RECORD_SIZE(tag, n) typedef char tag##_size_check[(sizeof(struct tag) == (n)) ? 1 : -1]
 #define RECORD_OFFSET(tag, m, n) \
     typedef char tag##_##m##_offset_check[((unsigned)&((struct tag *)0)->m == (n)) ? 1 : -1]
+/* The same for a struct holding pointers: exact where pointers are 4 bytes (Watcom); in the
+   native build (docs/port.md) pointers are 8 bytes and the struct may only grow */
+#if defined(DAGGER_PORT)
+#define RECORD_SIZE_P(tag, n) typedef char tag##_size_check[(sizeof(struct tag) >= (n)) ? 1 : -1]
+#define RECORD_OFFSET_P(tag, m, n) \
+    typedef char tag##_##m##_offset_check[(__builtin_offsetof(struct tag, m) >= (n)) ? 1 : -1]
+#else
+#define RECORD_SIZE_P(tag, n) RECORD_SIZE(tag, n)
+#define RECORD_OFFSET_P(tag, m, n) RECORD_OFFSET(tag, m, n)
+#endif
 
 #pragma pack(1)
 
@@ -209,7 +219,7 @@ struct character {
     unsigned char resist_chances[5];        /* +0x22B: by element */
     struct career career;                   /* +0x230: the class record (names.csv class+ rows); player_class points here */
 };                                          /* +0x27A */
-RECORD_SIZE(character, 634);
+RECORD_SIZE_P(character, 634);
 
 /* the creature's animation struct (monster+0x2C1), driven by XnGine's ASCR interpreter */
 struct monster_anim {
@@ -233,14 +243,14 @@ struct monster_anim {
     unsigned char anim_current;     /* +0x17 */
     unsigned char pad18;            /* +0x18 */
 };                                  /* +0x19 */
-RECORD_SIZE(monster_anim, 25);
+RECORD_SIZE_P(monster_anim, 25);
 
 /* the data of a type-18 creature: names.csv `monster+` offsets are from the record, 0x47 more */
 struct monster {
     struct character character;     /* +0x000 */
     struct monster_anim anim;       /* +0x27A: monster+0x2C1 */
 };                                  /* +0x293 */
-RECORD_SIZE(monster, 659);
+RECORD_SIZE_P(monster, 659);
 
 /* ---- items: type 2 (and 54 in repair), 107 bytes, the savetree ItemRecord ---------------- */
 
@@ -383,7 +393,7 @@ struct faction {
     struct faction *child;          /* +0x54 */
     struct faction *parent;         /* +0x58 */
 };                                  /* +0x5C */
-RECORD_SIZE(faction, 92);
+RECORD_SIZE_P(faction, 92);
 
 /* ---- banks: type 25 holds 62 accounts, one per region ------------------------------------ */
 
@@ -426,7 +436,7 @@ struct location {
     struct building *buildings;     /* +0x2B */
     unsigned char pad2F;            /* +0x2F */
 };                                  /* +0x30 */
-RECORD_SIZE(location, 48);
+RECORD_SIZE_P(location, 48);
 
 struct building {
     unsigned short name_seed;       /* +0x00 */
@@ -486,7 +496,7 @@ struct picklist {
     char *list_background;          /* +0x33 */
     char *bar_background;           /* +0x37 */
 };                                  /* +0x3B */
-RECORD_SIZE(picklist, 0x3B);
+RECORD_SIZE_P(picklist, 0x3B);
 
 /* ---- quests: the data of a type-14 record is the QBN file, pointers relocated ------------ */
 
@@ -511,7 +521,7 @@ struct qbn_arg {
     int value;                      /* +0x07: -1 none, -2 filler */
     struct record *object;          /* +0x0B */
 };                                  /* +0x0F */
-RECORD_SIZE(qbn_arg, 15);
+RECORD_SIZE_P(qbn_arg, 15);
 
 struct qbn_op {                     /* section 8 */
     short opcode;                   /* +0x00 */
@@ -521,7 +531,7 @@ struct qbn_op {                     /* section 8 */
     short message;                  /* +0x51 */
     int last_minutes;               /* +0x53 */
 };                                  /* +0x57 */
-RECORD_SIZE(qbn_op, 87);
+RECORD_SIZE_P(qbn_op, 87);
 
 struct qbn_state {                  /* section 9 */
     short index;                    /* +0x00 */
@@ -544,7 +554,7 @@ struct qbn_timer {                  /* section 6 */
     struct record *link2;           /* +0x19 */
     int state_hash;                 /* +0x1D */
 };                                  /* +0x21 */
-RECORD_SIZE(qbn_timer, 33);
+RECORD_SIZE_P(qbn_timer, 33);
 
 struct qbn_item {                   /* section 0 */
     char pad00[2];                  /* +0x00 */
@@ -555,7 +565,7 @@ struct qbn_item {                   /* section 0 */
     struct record *object;          /* +0x0B */
     short messages[2];              /* +0x0F */
 };                                  /* +0x13 */
-RECORD_SIZE(qbn_item, 19);
+RECORD_SIZE_P(qbn_item, 19);
 
 struct qbn_person {                 /* section 3 */
     char pad00[2];                  /* +0x00 */
@@ -568,7 +578,7 @@ struct qbn_person {                 /* section 3 */
     struct record *object;          /* +0x0C */
     short messages[2];              /* +0x10 */
 };                                  /* +0x14 */
-RECORD_SIZE(qbn_person, 20);
+RECORD_SIZE_P(qbn_person, 20);
 
 struct qbn_place {                  /* section 4 (DFU Places.txt: p1 p2 p3) */
     char pad00[2];                  /* +0x00 */
@@ -585,7 +595,7 @@ struct qbn_place {                  /* section 4 (DFU Places.txt: p1 p2 p3) */
     struct record *object;          /* +0x10 */
     short messages[2];              /* +0x14 */
 };                                  /* +0x18 */
-RECORD_SIZE(qbn_place, 24);
+RECORD_SIZE_P(qbn_place, 24);
 
 struct qbn_foe {                    /* section 7 */
     char pad00[3];                  /* +0x00 */
@@ -595,7 +605,7 @@ struct qbn_foe {                    /* section 7 */
     int symbol;                     /* +0x06: the name's hash (quest_symbol_text) */
     struct record *object;          /* +0x0A */
 };                                  /* +0x0E */
-RECORD_SIZE(qbn_foe, 14);
+RECORD_SIZE_P(qbn_foe, 14);
 
 struct qbn_text_var {               /* section 10 (quest text_offset): the text variables */
     char name[20];                  /* +0x00: 0 ends the list */
@@ -603,7 +613,7 @@ struct qbn_text_var {               /* section 10 (quest text_offset): the text 
     short index;                    /* +0x15 */
     char *record;                   /* +0x17: quest_record(section, index) (quest_init_resources) */
 };                                  /* +0x1B */
-RECORD_SIZE(qbn_text_var, 27);
+RECORD_SIZE_P(qbn_text_var, 27);
 
 /* ---- NPCs, blessings, the automap -------------------------------------------------------- */
 
@@ -652,7 +662,7 @@ struct model_instance {
     int z;                          /* +0x28 */
     int missile_angles[3];          /* +0x2C: arrows: the heading, angle_z, 0 */
 };                                  /* +0x38 */
-RECORD_SIZE(model_instance, 56);
+RECORD_SIZE_P(model_instance, 56);
 
 /* the data of the automap record (type 51), saved as AT%05d.AMF */
 struct automap {
@@ -687,7 +697,7 @@ struct block_model {
                                        Unknown4) */
     char pad38[10];                 /* +0x38: DFU NullValue3, Unknown5, NullValue4 */
 };                                  /* +0x42 */
-RECORD_SIZE(block_model, 66);
+RECORD_SIZE_P(block_model, 66);
 
 /* a flat of an RMB block, 17 bytes (DFU RmbBlockFlatObjectRecord); people use the same layout
  * (DFU RmbBlockPeopleRecord) */
@@ -741,7 +751,7 @@ struct block {
     struct block_flat *flats;       /* +0x09 */
     struct block_section3 *section3; /* +0x0D */
 };                                  /* +0x11 */
-RECORD_SIZE(block, 17);
+RECORD_SIZE_P(block, 17);
 
 /* where a building's subrecords go in an RMB block (DFU RmbFldBlockPositions, 20 bytes;
  * town_block_place_building) */
@@ -778,7 +788,7 @@ struct rmb_file {
     char other_names[32][13];       /* +0x18D8: DFU OtherNames, by building */
     char data[1];                   /* +0x1A78: the subrecords, then the misc objects */
 };
-RECORD_OFFSET(rmb_file, data, 0x1A78);
+RECORD_OFFSET_P(rmb_file, data, 0x1A78);
 
 /* a model name of an RDB file (DFU RdbModelReference, 8 bytes: "55000DOR"; rdb_model_id_from_name
  * reads the digits) */
@@ -1034,7 +1044,7 @@ struct record {
     struct record *parent;          /* +0x43 */
     union record_data data;         /* +0x47: the record's data */
 };
-RECORD_OFFSET(record, data, 0x47);
+RECORD_OFFSET_P(record, data, 0x47);
 
 /* the data of a record as a char pointer: `(char *)r + 71` */
 #define RECORD_DATA(r) ((char *)(r) + 0x47)
@@ -1065,7 +1075,7 @@ struct loaded_location {
     struct record *object;          /* +0x0C: the header read from MAPS, then the location (malloc 119) */
     struct location *data;          /* +0x10: object + 0x47 */
 };                                  /* +0x14 */
-RECORD_SIZE(loaded_location, 20);
+RECORD_SIZE_P(loaded_location, 20);
 
 /* the header of a block of the game's memory pools (jmem.c); the data follows */
 struct mem_block {
@@ -1075,7 +1085,7 @@ struct mem_block {
     unsigned int size;              /* +0x0C: the data's size */
     unsigned short flags;           /* +0x10: bit 0 used */
 };                                  /* +0x12 */
-RECORD_SIZE(mem_block, 18);
+RECORD_SIZE_P(mem_block, 18);
 
 /* a memory pool (mem_pool_init, mem_pool_alloc, mem_pool_free) */
 struct mem_pool {
@@ -1084,7 +1094,7 @@ struct mem_pool {
     int pad08;                      /* +0x08 */
     int size;                       /* +0x0C */
 };                                  /* +0x10 */
-RECORD_SIZE(mem_pool, 16);
+RECORD_SIZE_P(mem_pool, 16);
 
 /* an action link of a dungeon object (an RDB action record, as loaded; links.c) */
 struct link {
@@ -1106,7 +1116,7 @@ struct link {
     short delta[3];                 /* +0x1D: the object's last move */
     struct record *object;          /* +0x23: the moved object (a record id in the save) */
 };                                  /* +0x27 */
-RECORD_SIZE(link, 39);
+RECORD_SIZE_P(link, 39);
 
 /* a house for sale at the bank (bank_houses_for_sale[20], bank_add_house_for_sale) */
 struct house_for_sale {
@@ -1116,7 +1126,7 @@ struct house_for_sale {
     unsigned int id;                /* +0x0C: the object's id (player_character->house when bought) */
     int saved_yaw;                  /* +0x10: block->models[0].yaw, put back by bank_restore_houses */
 };                                  /* +0x14 */
-RECORD_SIZE(house_for_sale, 20);
+RECORD_SIZE_P(house_for_sale, 20);
 
 /* a ship for sale at the bank (bank_ships_for_sale[2], bank_init_ships): a model and its price;
  * bank_draw_preview draws it as a one-model block */
@@ -1125,7 +1135,7 @@ struct ship_for_sale {
     unsigned int id;                /* +0x42: the ship's id (0x3E00001, 0x3E10001: ship_owned) */
     int price;                      /* +0x46 */
 };                                  /* +0x4A */
-RECORD_SIZE(ship_for_sale, 74);
+RECORD_SIZE_P(ship_for_sale, 74);
 
 /* a node of the model cache's binary tree (objlib.c) */
 struct model_node {
@@ -1135,7 +1145,7 @@ struct model_node {
     int key;                        /* +0x0C: model id + variant << 17 */
     char *model;                    /* +0x10: the ARCH3D record */
 };                                  /* +0x14 */
-RECORD_SIZE(model_node, 20);
+RECORD_SIZE_P(model_node, 20);
 
 /* what the collision code is asked to move (colstuff.c) */
 struct move_request {
@@ -1148,7 +1158,7 @@ struct move_request {
     struct collide_probe *probe;    /* +0x18: the mover's shape (D_00196D4C while it is tested) */
     unsigned short flags;           /* +0x1C: bit 0 (func_00023FA5) */
 };                                  /* +0x1E */
-RECORD_SIZE(move_request, 30);
+RECORD_SIZE_P(move_request, 30);
 
 #pragma pack()
 

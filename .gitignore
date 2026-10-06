@@ -12,3 +12,5 @@ __pycache__/
 /.venv/
 /asm/
 *.err
+/.venv
+/third_party
