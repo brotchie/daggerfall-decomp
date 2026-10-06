@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008C5C9 */
 #include "ptrint.h"
 #include "clib.h"
+#include "doslow.h"
 extern unsigned char D_0012B508;
 extern short font_height;
 extern short D_00142928;
@@ -30,7 +31,7 @@ int inpstr_update(void)
     {
         int *clk;
 
-        clk = (int *)0x46c;
+        clk = (int *)DOS_LOW(0x46C);
         if (*clk & 4)
             xn_draw_line(D_00142928, D_0014292C, D_00142928, (short)(D_0014292C + font_height - 1));
     }

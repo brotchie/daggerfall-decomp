@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -572,7 +573,7 @@ struct spell *spells_pick_list(void)
         }
         if (((int)(short)choice) == (-2)) return 0;
         xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00170B13, 1560, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00170B13, 1560, 4);
     }
 }
 

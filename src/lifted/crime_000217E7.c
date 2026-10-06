@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern iptr screen_buffer;
 extern char D_001706E1[];
@@ -36,7 +37,7 @@ void prison_serve_sentence(int days)
     D_001962A5 = 0;
     D_00196294 = 1;
     image = disk_read_file(D_001706E9, 0);
-    mc_memset((void *)655360, 0, 64000, D_001706E1, 384, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001706E1, 384, 4);
     for (day = 0; day < 768; day++) {
         *(signed char *)((char *)(image + day) + 64000) <<= 2;
     }
@@ -49,7 +50,7 @@ void prison_serve_sentence(int days)
         text_draw_centred_coloured((iptr)text_buffer, 156, 165, 190, 219);
         xn_gfx_present_inclusive(0);
     }
-    mc_memset((void *)655360, 0, 64000, D_001706E1, 397, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001706E1, 397, 4);
     mc_memset((void *)screen_buffer, 0, 64000, D_001706E1, 398, 4);
     palette_restore();
     if (image != 0 && image != (-1751672937)) {

@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern int xn_cam_pitch;
 extern int xn_cam_yaw;
@@ -458,7 +459,7 @@ void bank_draw_preview(int model_count, struct block_model *models)
     for (i = 0; i < model_count; i++, model++) {
         model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)climate_weathers[(int)(unsigned char)current_region]));
         if (model->model != 0) {
-            bios_ticks = (int *)1132;
+            bios_ticks = (int *)DOS_LOW(0x46C);
             model->yaw = ((*bios_ticks & 2047) << 4) & 2047;
             xn_model_submit(&model->model, 0);
             break;

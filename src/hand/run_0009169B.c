@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of generate.c from 0x00090FA1 to 0x0009169B, kept together for its switch table's alignment */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern char mouse_buttons;
 extern short mouse_x;
@@ -53,7 +54,7 @@ int chargen_screen_loop(int first, int last)
 
     for (;;) {
         chargen_draw();
-        mc_memcpy((void *)655360, screen_buffer, 64000, D_00176F41, 238, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), screen_buffer, 64000, D_00176F41, 238, 4);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 &&
             mouse_x > chargen_buttons[0].x0 && mouse_x < chargen_buttons[0].x1 &&
             mouse_y > chargen_buttons[0].y0 && mouse_y < chargen_buttons[0].y1) {

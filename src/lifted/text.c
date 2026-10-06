@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern int xn_cam_far_z;
 extern signed char mouse_buttons;
@@ -300,7 +301,7 @@ void msgbox_wait(void)
         xn_gfx_present_inclusive(1);
         if (((struct bf8_0_4 *)&frame_counter)->f == 0) func_0006987B();
     }
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     realtime_clock_tick = *bios_ticks;
     if (msgbox_saved_screen != 0 && msgbox_saved_screen != (-1751672937)) {
         mc_free((void *)msgbox_saved_screen, D_00170D55, 893);

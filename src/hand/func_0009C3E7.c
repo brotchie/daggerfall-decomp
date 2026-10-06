@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009C3E7 */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern unsigned char mouse_buttons;
 extern iptr screen_buffer;
@@ -100,7 +101,7 @@ void travel_begin_trip(void)
         last_skill_check_minutes = game_minutes;
         raise_skills();
     }
-    mc_memset((void *)655360, 0, 64000, D_0017743D, 782, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_0017743D, 782, 4);
     mc_memset((void *)screen_buffer, 0, 64000, D_0017743D, 783, 4);
     D_00196294 = 0;
     D_001962A8 = 0;

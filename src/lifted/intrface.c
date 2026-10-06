@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern int xn_snow_turn_shift;
 extern short xn_cam_centre_x;
@@ -445,7 +446,7 @@ void intrface_poll_controls(void)
         }
         if (not_turning == 0) return;
     }
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     D_001A5AE8 = *bios_ticks;
 }
 

@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern char D_00177350[];
 extern unsigned char player_environment;
@@ -87,10 +88,10 @@ void doors_update(void)
         if (doors_moving[i] == 0) continue;
         door = doors_moving[i];
         if ((door->door_swing & 0x80000000) == 0 && door_blocked_by_player(door) != 0) {
-            bios_ticks = (int *)1132;
+            bios_ticks = (int *)DOS_LOW(0x46C);
             door->door_swing = *bios_ticks | (-1073741824);
         }
-        ticks = (int *)1132;
+        ticks = (int *)DOS_LOW(0x46C);
         angle = ((*ticks - (door->door_swing & 1073741823)) * 22) & 2047;
         if (angle >= 512 || angle < 0) {
             if (angle >= 512) {

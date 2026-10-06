@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -192,7 +193,7 @@ void classmaker_run(void)
     scratch_190df8 = disk_read_file(D_00175450, 0);
     D_00190E00 = disk_read_file(D_0017545D, 0);
     scratch_190dfc = disk_read_file(D_0017546A, 0);
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     *(int *)scratch_190be4 = *bios_ticks;
     while (classmaker_done == 0) {
         keys_world_actions();
@@ -258,11 +259,11 @@ void classmaker_run(void)
             classmaker_specials_screen();
         }
         classmaker_update_advancement();
-        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175420, 205, 4);
-        bios_ticks_now = (int *)1132;
+        mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175420, 205, 4);
+        bios_ticks_now = (int *)DOS_LOW(0x46C);
         if (*(int *)scratch_190be4 != *bios_ticks_now) {
             D_00190D74++;
-            bios_ticks_set = (int *)1132;
+            bios_ticks_set = (int *)DOS_LOW(0x46C);
             *(int *)scratch_190be4 = *bios_ticks_set;
         }
     }
@@ -436,9 +437,9 @@ void classmaker_attribute_up(void)
     int *bios_ticks;
     int *bios_ticks_now;
 
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     if (((unsigned)(*bios_ticks - scratch_190be8)) < 6) return;
-    bios_ticks_now = (int *)1132;
+    bios_ticks_now = (int *)DOS_LOW(0x46C);
     scratch_190be8 = *bios_ticks_now;
     if (player_class->attributes[(int)(short)chargen_selected_attribute] == 75) return;
     player_class->attributes[(int)(short)chargen_selected_attribute]++;
@@ -450,9 +451,9 @@ void classmaker_attribute_down(void)
     int *bios_ticks;
     int *bios_ticks_now;
 
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     if (((unsigned)(*bios_ticks - scratch_190be8)) < 6) return;
-    bios_ticks_now = (int *)1132;
+    bios_ticks_now = (int *)DOS_LOW(0x46C);
     scratch_190be8 = *bios_ticks_now;
     if (player_class->attributes[(int)(short)chargen_selected_attribute] == 10) return;
     player_class->attributes[(int)(short)chargen_selected_attribute]--;
@@ -494,7 +495,7 @@ int classmaker_pick_from_list(iptr names, iptr background)
         }
         xn_mouse_cursor_drawn &= 254;
         xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175420, 568, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175420, 568, 4);
     }
 }
 
@@ -576,7 +577,7 @@ int classmaker_picklist_wait(void)
             return 0;
         }
         xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175420, 655, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175420, 655, 4);
     }
 }
 

@@ -5,6 +5,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -192,7 +193,7 @@ void hud_status_set(char *text)
     int *bios_ticks;
 
     mc_strncpy(hud_status_text, text, 1440, D_00176A10, 97);
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     hud_status_expiry = *bios_ticks + 36;
     D_00195C3C = (iptr)hud_status_text;
 }
@@ -279,7 +280,7 @@ int wait_key_from_list(signed char *keys, short key_count)
                 }
             }
         }
-        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00176A10, 234, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00176A10, 234, 4);
     }
     return -2;
 }
@@ -724,10 +725,10 @@ int icon_cycle_anim_frame(void)
     int *bios_ticks;
     int *bios_ticks_2;
 
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     if (((unsigned)(*bios_ticks - D_00190C7C)) > 38) {
         D_00190C74 = (D_00190C74 + 1) % 32;
-        bios_ticks_2 = (int *)1132;
+        bios_ticks_2 = (int *)DOS_LOW(0x46C);
         D_00190C7C = *bios_ticks_2;
     }
     return D_00190C74;
@@ -924,7 +925,7 @@ void func_0007F671(void)
     int *bios_ticks;
 
     D_001A59CC = xn_timer_read_pit();
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     D_001A59DC = *bios_ticks;
 }
 
@@ -937,7 +938,7 @@ void func_0007F6A4(void)
     D_001A59E0 = D_001A59CC;
     D_001A59E4 = D_001A59DC;
     D_001A59CC = xn_timer_read_pit();
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     if ((D_001A59DC = *bios_ticks) == D_001A59E4) {
         pit_elapsed = D_001A59E0 - D_001A59CC;
     } else {

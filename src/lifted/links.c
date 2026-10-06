@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern iptr D_00147954;
 extern char D_00175962[];
@@ -142,7 +143,7 @@ void link_start(struct link *link)
             link->speed = link->magnitude << 16;
         }
         if (((int)(unsigned char)(link->flags & 2)) != 0) link->speed = -link->speed;
-        ticks_addr = (int *)1132;
+        ticks_addr = (int *)DOS_LOW(0x46C);
         link->start_tick = *ticks_addr;
         switch (link->axis - 1) {
         case 0:
@@ -165,7 +166,7 @@ void link_start(struct link *link)
             link->speed = link->magnitude << 16;
         }
         if (((int)(unsigned char)(link->flags & 2)) != 0) link->speed = -link->speed;
-        ticks_addr2 = (int *)1132;
+        ticks_addr2 = (int *)DOS_LOW(0x46C);
         link->start_tick = *ticks_addr2;
         if (((int)(unsigned char)(link->flags & 32)) == 0 && (axis = func_000658CA(link->object->image2, link->object->image)) != 0) {
             link->flags |= 32;

@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of links.c from 0x00064589 to 0x0006480F, kept together for its switch table's alignment */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern struct link links[];
 extern struct link *active_links[];
@@ -242,7 +243,7 @@ int link_step(struct link *link)
             msgbox_show_rsc((int)(short)(((unsigned short)link->param) + 8600), 1);
             break;
         case 12:
-            mc_memcpy((void *)D_00147954, (void *)655360, 64000, D_00175962, 315, 4);
+            mc_memcpy((void *)D_00147954, (void *)DOS_LOW(0xA0000), 64000, D_00175962, 315, 4);
             D_001940DA |= 1;
             link_show_text(link->param + 5400);
             message = hud_message_add(D_0017596A);

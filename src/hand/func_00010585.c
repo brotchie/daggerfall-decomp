@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00010585 */
 #include "records.h"
+#include "doslow.h"
 
 struct bits8 {
     unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1;
@@ -107,7 +108,7 @@ void player_frame_update(void)
         if (D_0019628E == 0)
             rnd = 0;
         else
-            rnd = (*(unsigned int *)0x46c >> 1) & 3;
+            rnd = (*(unsigned int *)DOS_LOW(0x46C) >> 1) & 3;
         xn_draw_cif_rle_frame(sound, rnd, (game_settings->view_flags & 1) ? hud_bar_image->height : 0, 0);
     }
     player_base_speed = (speed * frame_ticks) / 1000;

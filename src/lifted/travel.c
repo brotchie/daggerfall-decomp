@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -192,17 +193,17 @@ void travel_map_update(void)
     }
     if (scratch_190ce5 != 0) {
         travel_draw_trip_popup();
-        popup_ticks = (int *)1132;
+        popup_ticks = (int *)DOS_LOW(0x46C);
         scratch_190cac = *popup_ticks;
     }
     if (scratch_190ce5 == 0) {
         travel_draw_hover_name();
         if (*(int *)D_001AA688 != (-1) && D_00190CE8 == 0) {
-            marker_ticks = (int *)1132;
+            marker_ticks = (int *)DOS_LOW(0x46C);
             if (((unsigned)(*marker_ticks - scratch_190cac)) > 50) {
                 *(int *)D_001AA688 = -1;
             } else {
-                blink_ticks = (int *)1132;
+                blink_ticks = (int *)DOS_LOW(0x46C);
                 if (((struct bf8_3_1 *)blink_ticks)->f != 0) {
                     if (scratch_190ce4[0] != 0) {
                         D_0012B508 = 244;
@@ -244,10 +245,10 @@ void travel_map_update(void)
             }
             *(int *)D_001AA688 = x;
             *(int *)D_001AA68C = y + 13;
-            found_ticks = (int *)1132;
+            found_ticks = (int *)DOS_LOW(0x46C);
             scratch_190cac = *found_ticks;
             text_macro_travel_city = (iptr)(D_00196A7C + ((travel_selected_location = i) << 5)) + 4;
-            prompt_ticks = (int *)1132;
+            prompt_ticks = (int *)DOS_LOW(0x46C);
             D_001AA694 = *prompt_ticks + 24;
             while (key_down_enter != 0);
             key_pressed_once(28);
@@ -255,14 +256,14 @@ void travel_map_update(void)
             msgbox_show_rsc(13, 1);
         }
     }
-    prompt_due_ticks = (int *)1132;
+    prompt_due_ticks = (int *)DOS_LOW(0x46C);
     if (D_001AA694 != 0 && ((unsigned)*prompt_due_ticks) > D_001AA694) {
         D_001AA694 = 0;
         msgbox_yes_no_rsc(31);
         if (((int)D_00196271) == 1) {
             travel_open_trip();
         } else {
-            cancel_ticks = (int *)1132;
+            cancel_ticks = (int *)DOS_LOW(0x46C);
             scratch_190cac = *cancel_ticks;
         }
     }
@@ -474,7 +475,7 @@ void travel_mark_player(int region)
         }
         *(int *)D_001AA688 = x;
         *(int *)D_001AA68C = y + 13;
-        bios_ticks = (int *)1132;
+        bios_ticks = (int *)DOS_LOW(0x46C);
         scratch_190cac = *bios_ticks;
         return;
     }
@@ -892,7 +893,7 @@ void travel_button_im_at(void)
         return;
     }
     *(int *)D_001AA688 = 0;
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     scratch_190cac = *bios_ticks;
 }
 

@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern struct region regions[];
 extern signed char mouse_buttons;
@@ -431,7 +432,7 @@ void quest_run_opcodes(struct quest *quest)
                     while (mouse_buttons != 0) xn_mouse_poll_clamped();
                     path = disk_resolve_path((iptr)text_buffer);
                     xn_vid_play((char *)path, 0, 0, 1);
-                    mc_memset((void *)655360, 0, 64000, D_001707F0, 362, 4);
+                    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001707F0, 362, 4);
                     palette_restore();
                     sky_loaded_frame = 10000;
                     night_sky_loaded = 0;

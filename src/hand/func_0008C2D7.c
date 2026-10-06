@@ -13,6 +13,7 @@ extern int inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
 extern int inpstr_text_width(char *, short);
 #include "clib.h"
+#include "doslow.h"
 extern void xn_gfx_wait_vretrace_start(void);
 extern void xn_gfx_wait_vretrace_end(void);
 extern void xn_gfx_present_inclusive(int);
@@ -42,7 +43,7 @@ int inpstr_edit(char *text, short x, short y, short w, short h, short max_length
             D_0012B508 = 12;
             D_00142928 = x + inpstr_text_width(inpstr_text, inpstr_cursor);
             D_0014292C = y;
-            if (*(int *)0x46c & 32)
+            if (*(int *)DOS_LOW(0x46C) & 32)
                 xn_draw_line(D_00142928, D_0014292C, D_00142928, D_0014292C + font_height - 1);
             D_0012B508 = old;
             text_draw(inpstr_text, x, y);

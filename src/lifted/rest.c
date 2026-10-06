@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern signed char D_0012B508;
@@ -84,9 +85,9 @@ void rest_close(void)
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         path = disk_resolve_path((iptr)D_00176141);
-        mc_memset((void *)655360, 0, 64000, D_001760D6, 285, 4);
+        mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001760D6, 285, 4);
         xn_vid_play((char *)path, 0, 0, 1);
-        mc_memset((void *)655360, 0, 64000, D_001760D6, 287, 4);
+        mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001760D6, 287, 4);
         palette_restore();
         night_sky_loaded = 0;
         sky_loaded_frame = 10000;
@@ -94,9 +95,9 @@ void rest_close(void)
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         path = disk_resolve_path((iptr)D_0017614E);
-        mc_memset((void *)655360, 0, 64000, D_001760D6, 297, 4);
+        mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001760D6, 297, 4);
         xn_vid_play((char *)path, 0, 0, 1);
-        mc_memset((void *)655360, 0, 64000, D_001760D6, 299, 4);
+        mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001760D6, 299, 4);
         palette_restore();
         night_sky_loaded = 0;
         sky_loaded_frame = 10000;
@@ -164,7 +165,7 @@ void breath_update(void)
     if (endurance > 100) endurance = 100;
     if (((int)(unsigned char)fog_colour) != 107) {
         *(int *)breath_remaining = 0;
-        bios_clock = (int *)1132;
+        bios_clock = (int *)DOS_LOW(0x46C);
         breath_last_tick = *bios_clock;
         return;
     }
@@ -174,14 +175,14 @@ void breath_update(void)
         membership = guild_find_membership_by_kind(149);
         if (membership != 0) *(int *)breath_remaining += membership->rank * 3;
     }
-    bios_clock2 = (int *)1132;
+    bios_clock2 = (int *)DOS_LOW(0x46C);
     if (((unsigned)(*bios_clock2 - breath_last_tick)) > 18) {
         (*(int *)breath_remaining)--;
-        bios_clock3 = (int *)1132;
+        bios_clock3 = (int *)DOS_LOW(0x46C);
         if (player_character->race == 7 && ((struct bf8_0_1 *)bios_clock3)->f != 0) {
             (*(int *)breath_remaining)++;
         }
-        bios_clock4 = (int *)1132;
+        bios_clock4 = (int *)DOS_LOW(0x46C);
         breath_last_tick = *bios_clock4;
     }
     D_0012B508 = 145;

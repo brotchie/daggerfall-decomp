@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000830C7 */
 #include "records.h"
+#include "doslow.h"
 
 #pragma pack(1)
 struct stat15 { unsigned short f:15; };
@@ -93,7 +94,7 @@ int object_draw_cb(struct record *object)
         else
             n = 4;
         if ((object->image & 127) >= 5)
-            object->draw_handle = xn_flat_add(object->x, object->y, object->z, object->image, (unsigned)(*(int *)0x46c & 32) >> 5, n, 256);
+            object->draw_handle = xn_flat_add(object->x, object->y, object->z, object->image, (unsigned)(*(int *)DOS_LOW(0x46C) & 32) >> 5, n, 256);
         else
             object->draw_handle = xn_flat_add(object->x, object->y, object->z, object->image, -1, n, 256);
         break;

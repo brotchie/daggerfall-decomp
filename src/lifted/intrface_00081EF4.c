@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -41,7 +42,7 @@ void intrface_steer(int unused, int region, int region_x, int region_y)
                 steer_weight_left = ((((int)(short)steer_region_width) - (((int)(short)mouse_x) - region_x)) << 8) / ((int)(short)steer_region_width);
                 steer_weight_up = ((((int)(short)steer_region_height) - (((int)(short)mouse_y) - region_y)) << 8) / ((int)(short)steer_region_height);
             } else {
-                bios_ticks = (int *)1132;
+                bios_ticks = (int *)DOS_LOW(0x46C);
                 if ((D_001A5AFC = *bios_ticks - D_001A5AE8) > steer_turn_speed_max) {
                     D_001A5AFC = steer_turn_speed_max;
                 }

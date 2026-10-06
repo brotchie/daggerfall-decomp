@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00051B3E */
 #include "ptrint.h"
 #include "clib.h"
+#include "doslow.h"
 #pragma pack(1)
 struct Snd {
     char pad0[2];
@@ -39,14 +40,14 @@ int pflc_play(iptr file_name, struct Snd *s)
         if (s->loops == 0)
             s->count--;
         while (s->count-- != 0) {
-            t0 = *(int *)0x46c;
+            t0 = *(int *)DOS_LOW(0x46C);
             if (flc_next_frame(s) != 0)
                 break;
             flc_show_frame(s);
             xn_mouse_poll_clamped();
             if (xn_kbd_last_scancode != 0 || (int)(unsigned char)(mouse_buttons & 3) != 0)
                 goto out;
-            while (*(int *)0x46c - t0 < s->delay) {
+            while (*(int *)DOS_LOW(0x46C) - t0 < s->delay) {
                 xn_mouse_poll_clamped();
                 if (xn_kbd_last_scancode != 0 || (int)(unsigned char)(mouse_buttons & 3) != 0)
                     goto out;

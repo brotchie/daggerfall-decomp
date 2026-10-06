@@ -38,6 +38,7 @@ extern void config_read(char *);
 extern int dpmi_lock_region(void *, int);
 extern void causeway_disable_error_dump(void);
 #include "clib.h"
+#include "doslow.h"
 extern void func_0009DBF9(void);
 extern void xn_sys_install_crit_error_handler(void);
 extern void xn_sys_yield(void);
@@ -73,8 +74,8 @@ int func_00010010(short argc, char **argv)
     causeway_disable_error_dump();
     xn_sys_install_crit_error_handler();
     dpmi_lock_region(func_00010010, 2048000);
-    srand(*(int *)0x46c);
-    D_0018DC1C = *(int *)0x46c;
+    srand(*(int *)DOS_LOW(0x46C));
+    D_0018DC1C = *(int *)DOS_LOW(0x46C);
     config_read(argv[1]);
     n = open(D_00170035, 546, 384);
     if (n < 0) {
@@ -97,7 +98,7 @@ int func_00010010(short argc, char **argv)
     }
 restart:
     title_menu();
-    D_0018DC0C = *(int *)0x46c + 18;
+    D_0018DC0C = *(int *)DOS_LOW(0x46C) + 18;
     time_pass(1);
     xn_timer_fps = 23;
     xn_render_set_mode(8);

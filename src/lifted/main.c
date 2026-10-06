@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern int xn_cam_pitch;
 extern int xn_cam_yaw;
@@ -172,7 +173,7 @@ void game_frame(void)
     if ((iptr)D_00195A88 != 0 && player_on_ground != 0 && (iptr)player_object->parent != (iptr)D_00195A88) {
         object_reparent(D_00195A88, player_object);
     }
-    ticks_addr = (int *)1132;
+    ticks_addr = (int *)DOS_LOW(0x46C);
     elapsed = *ticks_addr - D_0018DC30;
     frame_checkpoint = 101;
     links_update();

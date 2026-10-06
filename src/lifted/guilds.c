@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -542,7 +543,7 @@ void rest_open(void)
     D_00196272 = 1;
     D_00190D1A = 0;
     D_00190DD0 = 0;
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     D_00190CBC = *bios_ticks;
     D_00187CA8 = 0;
     D_00196299 = 0;

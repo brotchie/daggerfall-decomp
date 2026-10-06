@@ -204,6 +204,26 @@ each with a Python reference model.
     from the live audio stream.
   - Rendering runs at about 15 times real time.
 
+**2026-10-05, phase 3 done (the 64-bit pass, cb305f2).**
+- The census of diagnostics that lose half a pointer is down from 7,243 to 19. All 19 are
+  calls through `struct rect`'s button handler, which its tables call with 0 to 4 arguments.
+- How:
+  - `iptr`/`uptr` for ints that hold addresses (`tools/port_iptr.py`, a dataflow over
+    clang's AST);
+  - `include/clib.h` for the library prototypes;
+  - prototypes for every declaration without parameters (`tools/port_protos.py`);
+  - 165 pointer tables retyped (`tools/port_globals.py`).
+  FALL.EXE stays byte-identical throughout.
+- The data generator gives 521 globals native layouts. Two lists are left, both in
+  `build/port/agents/x64/` with the reasons:
+  - 510 relocated pointers in 18 globals whose neighbours have no symbols;
+  - 76 declaration disagreements, 54 of them only in pointee type.
+- What the pass left alone: the record and struct size literals and the save/load paths
+  (the next pass, with the disk converters); 35 four-byte strides over pointer data.
+- `tools/port_lowmem.py` has been applied: the game's 112 reads of real-mode memory (the
+  BIOS tick, VGA memory) go through `DOS_LOW()` (include/doslow.h), with FALL.EXE
+  byte-identical.
+
 The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a pointer:
 
 | Kind | Count | Files |

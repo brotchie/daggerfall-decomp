@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 struct missile_step { int x, y, z; struct record *light; };   /* a step vector, then the missile's light */
 extern short xn_cam_centre_x;
@@ -674,7 +675,7 @@ void spell_hud_draw_icons(void)
             x = (int)(unsigned short)D_00185CEC[(D_00199D6C % columns)];
             if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) x += 35;
             y = ((D_00199D6C / 12) * 24) + 16;
-            bios_ticks = (unsigned char *)1132;
+            bios_ticks = (unsigned char *)DOS_LOW(0x46C);
             if ((expiring != 0 && ((struct bf8_3_1 *)bios_ticks)->f != 0) || expiring == 0) {
                 if (cast_by_other != 0) {
                     if (((int)(unsigned short)(game_settings->view_flags & 1)) != 0) {

@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004ED36 */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 #pragma pack(1)
 extern unsigned disk_last_file_size;
@@ -160,7 +161,7 @@ void init_game_data(void)
     int flag;
 
     flag = 0;
-    srand(*(int *)0x46c);
+    srand(*(int *)DOS_LOW(0x46C));
     xn_font_load(0, 1);
     xn_font_load(1, 2);
     xn_font_load(2, 3);
@@ -265,7 +266,7 @@ void init_game_data(void)
     D_00195CF8 = mc_malloc(16640, D_00175040, 200);
     disk_read_file(D_001751CB, D_00195D18 = xn_mem_align_up(D_00195CF8, 256));
     func_000C9EB2();
-    realtime_clock_tick = *(int *)0x46c;
+    realtime_clock_tick = *(int *)DOS_LOW(0x46C);
     func_0007E066();
     if (cfg_helmet != 0) {
         if (cfg_helmet == 1)

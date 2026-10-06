@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -155,9 +156,9 @@ void chargen_skill_arrow(int button)
     int *bios_ticks;
     int *bios_ticks_now;
 
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     if (((unsigned)(*bios_ticks - *(int *)scratch_190be4)) < 6) return;
-    bios_ticks_now = (int *)1132;
+    bios_ticks_now = (int *)DOS_LOW(0x46C);
     *(int *)scratch_190be4 = *bios_ticks_now;
     button += -14;
     group = button >> 1;

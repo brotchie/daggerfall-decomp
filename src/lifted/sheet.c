@@ -5,6 +5,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -433,9 +434,9 @@ void sheet_levelup_adjust(int button)
     int *bios_ticks_now;
 
     if (((struct bf8_2_1 *)&D_001940D9)->f == 0) return;
-    bios_ticks = (int *)1132;
+    bios_ticks = (int *)DOS_LOW(0x46C);
     if (((unsigned)(*bios_ticks - *(int *)scratch_190be4)) < 6) return;
-    bios_ticks_now = (int *)1132;
+    bios_ticks_now = (int *)DOS_LOW(0x46C);
     *(int *)scratch_190be4 = *bios_ticks_now;
     if (button == 21) {
         if (*(short *)scratch_190d64 != 0 && player_character->base_attributes[(int)(unsigned char)D_0019626C] < 100) {

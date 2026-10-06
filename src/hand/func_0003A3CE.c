@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003A3CE */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -89,7 +90,7 @@ L3A3EC:;
     }
     disk_read_file(D_00170B90, (iptr)scratch_buffer);
     mc_memcpy((void *)screen_buffer, (void *)scratch_buffer, 64000, D_00170B88, 55, 4);
-    mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00170B88, 56, 4);
+    mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00170B88, 56, 4);
     for (choice = 0; ((int)(short)*(short *)&choice) < 768; choice++) {
         (scratch_buffer)[choice + 64000] <<= 2;
     }
@@ -107,7 +108,7 @@ L3A496:;
             game_exit(0);
         }
         if (pick == 0 || (((int)(signed char)pick) == (-2) && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 72, 46, 217, 58) != 0)) {
-            mc_memset((void *)655360, 0, 64000, D_00170B88, 72, 4);
+            mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_00170B88, 72, 4);
             palette_restore();
             saveload_menu(0);
             if (scratch_190d16 != 0) goto L3A3EC;
@@ -130,7 +131,7 @@ L3A496:;
     player_character->level = 1;
     new_game = 1;
     automap_delete_files();
-    mc_memset((void *)655360, 0, 64000, D_00170B88, 139, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_00170B88, 139, 4);
     palette_restore();
     do {
         D_00196271 = 0;
@@ -197,7 +198,7 @@ L3A496:;
             keys_world_actions();
             xn_mouse_poll_clamped();
             xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-            mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00170B88, 226, 4);
+            mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00170B88, 226, 4);
             if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
                 if (((int)(short)mouse_x) > 68 && ((int)(short)mouse_x) < 251 && ((int)(short)mouse_y) > 60 && ((int)(short)mouse_y) < 111) {
                     choice = 2;
@@ -243,7 +244,7 @@ L3AABE:;
                 }
                 xn_mouse_cursor_drawn &= 254;
                 xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-                mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00170B88, 283, 4);
+                mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00170B88, 283, 4);
             }
         } else {
             if ((D_00199634 = class_questions_run()) < 0) goto L3AABE;
@@ -267,7 +268,7 @@ L3AABE:;
             keys_world_actions();
             xn_mouse_poll_clamped();
             xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-            mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00170B88, 311, 4);
+            mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00170B88, 311, 4);
             if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
                 if (((int)(short)mouse_x) > 76 && ((int)(short)mouse_x) < 243 && ((int)(short)mouse_y) > 58 && ((int)(short)mouse_y) < 111) {
                     choice = 0;
@@ -283,13 +284,13 @@ L3AABE:;
         career_background_summary(D_00199634, (int)(short)*(short *)&choice);
         palette_restore();
     } while (chargen_name_character() != 0);
-    mc_memset((void *)655360, 0, 64000, D_00170B88, 335, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_00170B88, 335, 4);
     mc_memset((void *)screen_buffer, 0, 64000, D_00170B88, 336, 4);
     intro_play_movie();
     chargen_give_starting_equipment();
     newgame_init_player();
     xn_gfx_clear(0);
-    mc_memset((void *)655360, 0, 64000, D_00170B88, 343, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_00170B88, 343, 4);
     palette_restore();
     newgame_place_player();
     realtime_clock_tick = BIOS_TICKS;

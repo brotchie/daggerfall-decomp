@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007A983 */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern int xn_cam_x;
 extern int xn_cam_y;
@@ -176,7 +177,7 @@ int load_game(char *name)
     xn_mouse_poll_clamped();
     while (mouse_buttons != 0)
         xn_mouse_poll_clamped();
-    realtime_clock_tick = *(int *)0x46c;
+    realtime_clock_tick = *(int *)DOS_LOW(0x46C);
     world_loading = 0;
     building_update_open_state();
     sky_loaded_frame = 10000;

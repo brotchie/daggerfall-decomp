@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007193D */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -118,7 +119,7 @@ void rest_update(void)
                 rest_image = (struct image *)(iptr)-1751672937;
             }
             rest_image = (struct image *)disk_read_file(D_0017610F, 0);
-            D_00190CBC = *(int *)1132;
+            D_00190CBC = *(int *)DOS_LOW(0x46C);
         } else if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 185, 63, 232, 86) != 0) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
             rest_ticks_per_hour = 32;
@@ -154,7 +155,7 @@ void rest_update(void)
             } else {
                 D_00190DD0 = *(short *)inpstr_result;
                 D_00190D1A = 2;
-                D_00190CBC = *(int *)1132;
+                D_00190CBC = *(int *)DOS_LOW(0x46C);
             }
         }
         return;
@@ -165,11 +166,11 @@ void rest_update(void)
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
             rest_close();
         }
-        if (((unsigned)(*(int *)1132 - D_00190CBC)) > rest_ticks_per_hour) {
+        if (((unsigned)(*(int *)DOS_LOW(0x46C) - D_00190CBC)) > rest_ticks_per_hour) {
             time_pass_minutes(60);
             if (rest_loitering == 0) rest_recover(player_entity);
             D_00190DD0--;
-            D_00190CBC = *(int *)1132;
+            D_00190CBC = *(int *)DOS_LOW(0x46C);
         }
         if (D_00190DD0 == 0) {
             msgbox_show_rsc((int)(short)((rest_loitering != 0) ? 349 : 353), 1);
@@ -182,11 +183,11 @@ void rest_update(void)
     text_draw_centred_coloured((iptr)itoa((int)(short)D_00190DD0, (char *)text_buffer, 10), 118, 62, 146, 156);
     if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
         rest_close();
-    } else if (((unsigned)(*(int *)1132 - D_00190CBC)) > rest_ticks_per_hour) {
+    } else if (((unsigned)(*(int *)DOS_LOW(0x46C) - D_00190CBC)) > rest_ticks_per_hour) {
         time_pass_minutes(60);
         rest_recover(player_entity);
         D_00190DD0++;
-        D_00190CBC = *(int *)1132;
+        D_00190CBC = *(int *)DOS_LOW(0x46C);
     }
     if (player_character->health != player_character->max_health || (player_character->magicka != player_character->max_magicka && (player_class->flags & 8) == 0) || player_character->fatigue != ((player_character->attributes[0] + player_character->attributes[4]) << 6)) {
         return;

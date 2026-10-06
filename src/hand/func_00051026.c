@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00051026 */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 struct anims {
     char *a;
@@ -62,7 +63,7 @@ int class_questions_run(void)
 
     tries = 10;
     mc_memset(screen_buffer, 0, 64000, D_0017539B, 79, 4);
-    mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 80, 4);
+    mc_memcpy((void *)DOS_LOW(0xA0000), screen_buffer, 64000, D_0017539B, 80, 4);
     mc_memset(class_questions_asked, 0, 10, D_0017539B, 81, 10);
     mc_memset(class_answer_counts, 0, 3, D_0017539B, 82, 3);
     rgb[0] = rgb[1] = rgb[2] = 0;
@@ -98,11 +99,11 @@ int class_questions_run(void)
                 xn_pal_set_range_8bit(rgb, D_0018528E[sel], 1);
                 done = 1;
             }
-            mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 122, 4);
+            mc_memcpy((void *)DOS_LOW(0xA0000), screen_buffer, 64000, D_0017539B, 122, 4);
         }
     }
     xn_gfx_clear(0);
-    mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 127, 4);
+    mc_memcpy((void *)DOS_LOW(0xA0000), screen_buffer, 64000, D_0017539B, 127, 4);
     palette_restore();
     sel = class_result_ids[class_question_pick_class()];
     if (chargen_popup_choice(sel + 2100, 4, 5, 0, 21, 49) != 0)
@@ -121,7 +122,7 @@ int class_questions_run(void)
         h.b = (char *)0x97979797;
     }
     mc_memset(screen_buffer, 0, 64000, D_0017539B, 140, 4);
-    mc_memcpy((void *)0xa0000, screen_buffer, 64000, D_0017539B, 141, 4);
+    mc_memcpy((void *)DOS_LOW(0xA0000), screen_buffer, 64000, D_0017539B, 141, 4);
     palette_restore();
     return sel;
 }

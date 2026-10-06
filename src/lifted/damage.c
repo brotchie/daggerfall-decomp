@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern iptr screen_buffer;
@@ -147,7 +148,7 @@ void damage_collapse_exhausted(struct record *target)
     int unused;
 
     start_ticks = xn_timer_bios_ticks();
-    mc_memset((void *)655360, 0, ((((int)(unsigned short)(*(short *)((char *)(game_settings)) & 1)) != 0) ? 64000 : hud_bar_image->y * 320), D_001709E4, 701, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, ((((int)(unsigned short)(*(short *)((char *)(game_settings)) & 1)) != 0) ? 64000 : hud_bar_image->y * 320), D_001709E4, 701, 4);
     time_pass(20160);
     while ((xn_timer_bios_ticks() - start_ticks) < 22);
 }
@@ -250,13 +251,13 @@ void play_death_video(void)
     iptr path;
 
     xn_pal_fade_to(D_00196DC4, 50);
-    mc_memset((void *)655360, 0, 64000, D_001709E4, 875, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001709E4, 875, 4);
     mc_memset((void *)screen_buffer, 0, 64000, D_001709E4, 876, 4);
     palette_restore();
     path = disk_resolve_path((iptr)D_001709FB);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     xn_vid_play((char *)path, 0, 0, 1);
-    mc_memset((void *)655360, 0, 64000, D_001709E4, 883, 4);
+    mc_memset((void *)DOS_LOW(0xA0000), 0, 64000, D_001709E4, 883, 4);
     mc_memset((void *)screen_buffer, 0, 64000, D_001709E4, 884, 4);
     palette_restore();
     sky_loaded_frame = 10000;

@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern struct region regions[];
 extern signed char D_0012B508;
@@ -140,12 +141,12 @@ void time_update_realtime(void)
     int *bios_clock2;
 
     if (((struct bf8_6_1 *)&D_001940D8)->f != 0 || D_00187CA8 == 0) {
-        bios_clock = (int *)1132;
+        bios_clock = (int *)DOS_LOW(0x46C);
         realtime_clock_tick = *bios_clock;
         return;
     }
     old_minutes = game_minutes;
-    bios_clock2 = (int *)1132;
+    bios_clock2 = (int *)DOS_LOW(0x46C);
     minutes = ((unsigned)(*bios_clock2 - realtime_clock_tick)) / 90;
     realtime_clock_tick += minutes * 90;
     if (((struct bf8_4_1 *)&D_001940D9)->f != 0 && ((int)(unsigned short)(player_character->flags & 1536)) == 0) {

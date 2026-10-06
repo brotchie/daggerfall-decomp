@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern signed char key_down_y;
@@ -39,15 +40,15 @@ void flc_show_frame(struct flc_player *anim)
 {
     if (anim->width != 320 || anim->height != 200) {
         xn_draw_image_transparent(anim->x, anim->y, anim->width, anim->height, anim->image);
-        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 113, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175404, 113, 4);
         return;
     }
     if (anim->frames_left != 0) {
-        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 117, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175404, 117, 4);
         return;
     }
     if (anim->loops <= 1) return;
-    mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 118, 4);
+    mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175404, 118, 4);
 }
 
 int flc_play_with_text(iptr name, struct flc_player *anim, int text_id, int ask_yes_no)
@@ -84,14 +85,14 @@ int flc_play_with_text(iptr name, struct flc_player *anim, int text_id, int ask_
         anim->frames_left += anim->frame_count;
         if (anim->loops == 0) anim->frames_left--;
         while (anim->frames_left-- != 0) {
-            ticks_addr = (int *)1132;
+            ticks_addr = (int *)DOS_LOW(0x46C);
             frame_start = *ticks_addr;
             if (flc_next_frame(anim) != 0) break;
             next_page = flc_draw_text_page(page);
             if (anim->frames_left != 0) {
-                mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 163, 4);
+                mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175404, 163, 4);
             } else if (anim->loops > 1) {
-                mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 164, 4);
+                mc_memcpy((void *)DOS_LOW(0xA0000), (void *)screen_buffer, 64000, D_00175404, 164, 4);
             }
             do {
                 mouse_buttons_prev = mouse_buttons;

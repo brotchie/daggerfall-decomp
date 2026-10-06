@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008CFE6 */
 #include "records.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern signed char mouse_double_click;
@@ -34,8 +35,8 @@ short picklist_poll(struct picklist *l)
             }
             return -5;
         }
-        if ((*((char *)&key_down_down) || point_in_rect(mouse_x, mouse_y, l->down_rect.x, l->down_rect.y, l->down_rect.x + l->down_rect.w, l->down_rect.y + l->down_rect.h)) && (unsigned)(*(int *)0x46c - picklist_repeat_clock) > 3) {
-            picklist_repeat_clock = *(int *)0x46c;
+        if ((*((char *)&key_down_down) || point_in_rect(mouse_x, mouse_y, l->down_rect.x, l->down_rect.y, l->down_rect.x + l->down_rect.w, l->down_rect.y + l->down_rect.h)) && (unsigned)(*(int *)DOS_LOW(0x46C) - picklist_repeat_clock) > 3) {
+            picklist_repeat_clock = *(int *)DOS_LOW(0x46C);
             if (l->selected < l->count - 1) {
                 l->selected++;
                 if (l->count > l->visible_rows)
@@ -44,8 +45,8 @@ short picklist_poll(struct picklist *l)
                 return -3;
             }
         }
-        if ((*((char *)&key_down_up) || point_in_rect(mouse_x, mouse_y, l->up_rect.x, l->up_rect.y, l->up_rect.x + l->up_rect.w, l->up_rect.y + l->up_rect.h)) && (unsigned)(*(int *)0x46c - picklist_repeat_clock) > 3) {
-            picklist_repeat_clock = *(int *)0x46c;
+        if ((*((char *)&key_down_up) || point_in_rect(mouse_x, mouse_y, l->up_rect.x, l->up_rect.y, l->up_rect.x + l->up_rect.w, l->up_rect.y + l->up_rect.h)) && (unsigned)(*(int *)DOS_LOW(0x46C) - picklist_repeat_clock) > 3) {
+            picklist_repeat_clock = *(int *)DOS_LOW(0x46C);
             if (l->selected != 0) {
                 l->selected--;
                 if (l->count > l->visible_rows)

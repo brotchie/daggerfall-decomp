@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern struct monster_template monster_table[];
 extern char D_001758B8[];
@@ -1079,7 +1080,7 @@ void ai_update_creatures(void)
         ai_characters[i] = (struct character *)(((char *)ai_entities[i] + 71));
     }
     for (i = 0; (creature_count - 1) > i; i++) {
-        bios_ticks = (int *)1132;
+        bios_ticks = (int *)DOS_LOW(0x46C);
         if (ai_characters[i]->target == 0 || (ai_characters[i]->target != 0 && ((unsigned)(((unsigned)*bios_ticks) % 200)) < 4) || ai_characters[i]->target->type == 44 || ai_characters[i]->target->type == 34) {
             target_index = ai_pick_target(ai_entities[i], ai_characters[i], i);
             if (target_index == (-1)) {

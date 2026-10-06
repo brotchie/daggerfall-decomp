@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003B0B4 */
 #include "ptrint.h"
 #include "clib.h"
+#include "doslow.h"
 extern char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -51,7 +52,7 @@ int chargen_popup_choice(short text_id, short button1, short button2, char *imag
         xn_mouse_poll_clamped();
         msgbox_update();
         xn_mouse_cursor_move(mouse_x, mouse_y);
-        mc_memcpy((void *)655360, screen_buffer, 64000, D_00170B88, 412, 4);
+        mc_memcpy((void *)DOS_LOW(0xA0000), screen_buffer, 64000, D_00170B88, 412, 4);
     }
     return D_00196271 - 1;
 }
