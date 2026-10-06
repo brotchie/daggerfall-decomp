@@ -257,7 +257,7 @@ void career_bio_page_up(void)
         while (*(signed char *)(((char *)career_bio_page)) != 0) (career_bio_page)--;
         D_00196D68--;
     }
-    if (((unsigned)career_bio_page) >= career_bio_text) return;
+    if (((uptr)career_bio_page) >= (uptr)career_bio_text) return;
     career_bio_page = career_bio_text;
     D_00196D68 = 0;
 }
@@ -305,7 +305,7 @@ void career_bio_draw(void)
     row = 0;
     line = career_bio_page;
     mc_memcpy((void *)screen_buffer, (void *)window_image, 64000, D_00170738, 515, 4);
-    while (((unsigned)line) < D_00196D70 && row < 21) {
+    while (((uptr)line) < (uptr)D_00196D70 && row < 21) {
         text_draw_coloured(line, 10, (int)(short)((row * 7) + 25), 145, 156);
         line += strlen((char *)line) + 1;
         row++;
@@ -323,7 +323,7 @@ int career_bio_count_lines(void)
 
     line = career_bio_text;
     count = 0;
-    while (((unsigned)line) < D_00196D70) {
+    while (((uptr)line) < (uptr)D_00196D70) {
         count++;
         line += strlen((char *)line) + 1;
     }

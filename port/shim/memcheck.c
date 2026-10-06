@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "port_host.h"
+
 void *mc_malloc(unsigned int size, const char *file, int line)
 {
     (void)file;
@@ -21,12 +23,30 @@ void mc_free(void *p, const char *file, int line)
     free(p);
 }
 
+void *port_copy_forward(void *dst, const void *src, unsigned int n)
+{
+    unsigned char *d = dst;
+    const unsigned char *s = src;
+
+    /* apart, or the destination first: the host's copy does the same */
+    if (d <= s || d >= s + n)
+        return memmove(dst, src, n);
+    for (; n >= 4; n -= 4, d += 4, s += 4) {
+        unsigned char t[4];
+        memcpy(t, s, 4);                /* a dword read, then written, as movsd */
+        memcpy(d, t, 4);
+    }
+    while (n--)
+        *d++ = *s++;
+    return dst;
+}
+
 void *mc_memcpy(void *dst, const void *src, unsigned int n, const char *file, int line, int kind)
 {
     (void)file;
     (void)line;
     (void)kind;
-    return memcpy(dst, src, n);
+    return port_copy_forward(dst, src, n);
 }
 
 void *mc_memmove(void *dst, const void *src, unsigned int n, const char *file, int line, int kind)
@@ -55,7 +75,9 @@ char *mc_strncpy(char *dst, const char *src, unsigned int n, const char *file, i
     (void)n;
     (void)file;
     (void)line;
-    return strcpy(dst, src);
+    /* the string's length first, then the bytes forward (the game copies within a buffer) */
+    port_copy_forward(dst, src, (unsigned int)strlen(src) + 1);
+    return dst;
 }
 
 /* the location for the next checked call that cannot take one (mc_sprintf) */

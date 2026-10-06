@@ -25,6 +25,9 @@ void host_install_fault_handlers(void);
 /* ARCH3D.BSA and DAGGER.SND from ARENA2\PACKED.DAT into the overlay when the install lacks
    them, as the installer did (port/host/packed.c); 0 when both are there */
 int port_unpack_packed(void);
+/* copies as Watcom's library made them (forward: rep movsd then rep movsb), so a copy into
+   an overlapping buffer after its source repeats as it did under DOS (port/shim/memcheck.c) */
+void *port_copy_forward(void *dst, const void *src, unsigned int n);
 /* the overlay folder (given, $DAGGER_OVERLAY or ~/Library/Application Support/Daggerfall) and
    the game folder (given, $DAGGER_GAME, the remembered one, or the player picks it): launch.c */
 const char *launch_overlay_dir(const char *given);

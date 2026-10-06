@@ -12,6 +12,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "port_host.h"
+
 /* mc_set_location, MemCheck's public API entry (0x9DA1C): it brackets the internal location
    setter (0xA0ED9, the game's mc_set_location) with API entry index 11, "mc_set_location".
    The game calls it before printf. */
@@ -82,7 +84,8 @@ char *func_000A1054(char *dst, const char *src, const char *file, int line, int 
     (void)file;
     (void)line;
     (void)size;
-    return strcat(dst, src);
+    port_copy_forward(dst + strlen(dst), src, (unsigned int)strlen(src) + 1);
+    return dst;
 }
 
 /* mc_strncpy (0xA14E8): Watcom's strncpy (0xB37B7, via 0xA988B, API entry 25) after the
@@ -93,7 +96,13 @@ char *func_000A14E8(char *dst, const char *src, unsigned int n, const char *file
     (void)file;
     (void)line;
     (void)size;
-    return strncpy(dst, src, n);
+    {
+        unsigned int len = (unsigned int)strnlen(src, n);
+        port_copy_forward(dst, src, len);
+        if (len < n)
+            memset(dst + len, 0, n - len);
+    }
+    return dst;
 }
 
 /* memset (0xA1944): MemCheck's interception of memset itself, without a location (API entry
@@ -111,5 +120,5 @@ void *func_000A2EC5(void *dst, const void *src, unsigned int n, const char *file
     (void)file;
     (void)line;
     (void)kind;
-    return memcpy(dst, src, n);
+    return port_copy_forward(dst, src, n);
 }
