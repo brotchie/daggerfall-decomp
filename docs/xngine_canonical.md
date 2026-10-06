@@ -236,7 +236,9 @@ The mechanism that keeps per-function equivalence while interfaces become plain 
   scenarios, play) the build routes a canonical function's asm entry only if it is a
   boundary entry: straight to its C (kind `boundary`) when its plain prototype gives the game
   everything it reads; through a stub that keeps the registers the game reads and the
-  prototype may change (`boundary-keep`: `push ebx; call; pop ebx`); or to a boundary
+  prototype may change (`boundary-keep`: `push ebx; call; pop ebx`; it keeps EAX too, for a
+  void prototype whose asm keeps the parts of EAX the game reads after the call, as
+  `xn_mouse_poll_clamped` and `xn_kbd_flush` do); or to a boundary
   adapter `NAME_b(xn_regs *)` in the module (`boundary-adapter`) when the game's own
   registers change the result (a quirk, like Q-MATH-02). Internal calls are plain C; an asm
   entry no game code reaches has no route outside the tests.
@@ -296,6 +298,11 @@ shims go in `$XN_RC_SRC/test/`.
 drops), with where it is, the asm that shows it (addresses), what callers get, who can see it
 (with evidence), the C that keeps it and the test that checks it, and its status. The file
 gives the exact format.
+
+Comparing services: a service call's EAX is compared by AX (`xn_rc.service_ax`). Every
+DOS, DPMI, BIOS and mouse service takes its function in AH or AX, so EAX's upper half is
+whatever the caller left. What a service returns is compared in the registers it defines
+(`tools/xn_services.py`). An agent's own dropped rows can be added with `XN_DROPPED=path[:path]`.
 
 ## The tools
 

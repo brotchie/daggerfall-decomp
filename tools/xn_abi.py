@@ -995,20 +995,26 @@ class Analysis:
         op0 = ops[0] if ops else None
         if m == "push":
             n = opsize(i, op0)
-            if op0.type == cx.X86_OP_REG and i.reg_name(op0.reg) in SEG_NAMES:
-                v = t.get(i.reg_name(op0.reg), V_M)
+            nm0 = i.reg_name(op0.reg) if op0.type == cx.X86_OP_REG else None
+            if nm0 in SEG_NAMES:
+                v = t.get(nm0, V_M)
             elif n == 4:
                 v = src32(op0)
+            elif n == 2 and nm0 in NAME and NAME[nm0][2] == VL | VH:
+                # a 16-bit register (push ax): its 32-bit state goes along, so that the pop of
+                # the same word (pop ax) leaves the register's low word as it was pushed
+                v = ("W16", NAME[nm0][0]) + tuple(t.get(NAME[nm0][0], v_ident(NAME[nm0][0])))
             else:
                 v = V_M
             new_esp = None if esp is None else esp - n
             if new_esp is not None:
                 t[new_esp] = v
-                if n != 4:
-                    t[new_esp & ~3] = V_M
+                if n != 4 and (new_esp & ~3 != new_esp or v[0] != "W16"):
+                    t[new_esp & ~3] = V_M       # a word over half of that dword
         elif m == "pop":
             n = opsize(i, op0)
             v = t.get(esp, V_M) if esp is not None else V_M
+            w16 = v if isinstance(v, tuple) and len(v) == 5 and v[0] == "W16" and n == 2 else None
             if not (isinstance(v, tuple) and len(v) == 3 and v[0] != "FL") or n != 4:
                 v = V_M
             new_esp = None if esp is None else esp + n
@@ -1021,6 +1027,16 @@ class Analysis:
                     t[nm] = v
                 elif e and e[2] == VL | VH | VU:
                     t[e[0]] = v
+                    if e[0] == "eax":
+                        axc = [None, None]
+                elif e and w16 is not None and w16[1] == e[0] and e[2] == VL | VH and \
+                        w16[2] not in (TOK_M, TOK_X) and t.get(e[0], v_ident(e[0]))[0] == w16[2]:
+                    # pop ax after push ax, the register given no other 32-bit value between:
+                    # its low word as it was pushed (those parts' dirty bits from then), the
+                    # upper half as it is now
+                    tok, dm, du = t.get(e[0], v_ident(e[0]))
+                    t[e[0]] = (tok, (dm & ~(VL | VH)) | (w16[3] & (VL | VH)),
+                               (du & ~(VL | VH)) | (w16[4] & (VL | VH)))
                     if e[0] == "eax":
                         axc = [None, None]
                 elif e:

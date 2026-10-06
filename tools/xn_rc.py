@@ -563,7 +563,10 @@ def boundary_route(va, name, e, row, protos, c):
         out["problem"] = "%s (%06X): the game reads %s after the call, which the asm sets (an " \
             "output the prototype does not return): a boundary adapter is needed" % (
                 name, va, xn_abi.names_of(need & row["out"]))
-    elif "eax" in keep:
+    elif "eax" in keep and (row is None or
+                            need & xn_abi.RMASK["eax"] & (row["out"] | row["clob"])):
+        # the game reads a part of EAX the asm changes, and the prototype returns nothing.
+        # (A part the asm keeps, the stub keeps too: push eax; call; pop eax.)
         out["problem"] = "%s (%06X): the game reads EAX after the call and the prototype " \
             "returns nothing" % (name, va)
     elif keep and n > 4:
@@ -750,16 +753,20 @@ def route_table():
 # Tests
 
 def load_dropped(path=DROPPED_CSV):
-    """config/xngine_dropped.csv: what canonical C no longer writes on purpose.
+    """config/xngine_dropped.csv (and the files in XN_DROPPED): what canonical C no longer
+    writes on purpose.
     Returns (memory: a sorted list of linear (lo, hi), registers: {va: mask}, flags: {va: mask},
     rows). Memory rows are excused in every record (a canonical function's scratch is
     nobody's input); register and flag rows only in the records of their function."""
     import xn_abi
     mem, regs, flags, rows = [], {}, {}, []
-    if not os.path.exists(path):
-        return mem, regs, flags, rows
-    with open(path, newline="") as f:
-        rows = list(csv.DictReader(f))
+    # XN_DROPPED=path[:path]: an agent's own rows, read after config/xngine_dropped.csv's
+    paths = [path] + ([q for q in os.environ.get("XN_DROPPED", "").split(os.pathsep) if q]
+                      if path == DROPPED_CSV else [])
+    for q in paths:
+        if os.path.exists(q):
+            with open(q, newline="") as f:
+                rows += list(csv.DictReader(f))
     for r in rows:
         kind = r["kind"].strip()
         if kind == "memory":
@@ -785,6 +792,18 @@ def _in_ranges(ranges, starts, a):
     return k >= 0 and a < ranges[k][1]
 
 
+def service_ax(e):
+    """An I/O log entry as compared: a service call ("int", vector, eax) by AX, or by AH alone
+    for a service whose AL is no input (xn_services.AH_ONLY). Every DOS, DPMI, BIOS and mouse
+    service the engine and the game call takes its function in AH or AX (tools/xn_services.py
+    keys on them), so EAX's upper half is whatever the caller left there, which canonical C
+    keeps differently from the asm."""
+    if e[0] != "int":
+        return e
+    import xn_services
+    return (e[0], e[1], e[2] & xn_services.eax_mask(e[1], e[2]))   # AH alone when AL is no input
+
+
 def comparer(abi, dropped=None):
     """compare(rec, got) per function: tools/xn_abi.py's abi_compare by the record's function's
     row, with config/xngine_dropped.csv's excuses (memory everywhere; registers and flags in
@@ -798,7 +817,7 @@ def comparer(abi, dropped=None):
         return {a: v for a, v in writes.items() if not _in_ranges(mem, starts, a)}
 
     def io(log):
-        return [e for e in log if not (e[0] == "exc" and e[1] in excs)]
+        return [service_ax(e) for e in log if not (e[0] == "exc" and e[1] in excs)]
 
     def for_func(va):
         row = abi.get(va)
@@ -811,7 +830,7 @@ def comparer(abi, dropped=None):
             if mem and "writes" in got:
                 rec = dict(rec, writes=drop(rec["writes"]))
                 got = dict(got, writes=drop(got["writes"]))
-            if excs and "io" in got:
+            if "io" in got:
                 rec = dict(rec, io=io(rec["io"]))
                 got = dict(got, io=io(got["io"]))
             return xn_abi.abi_compare(rec, got, r)
@@ -911,8 +930,8 @@ def boundary_compare(rec, got, entry, priv, row, ref_io=None):
         first = min(extra | set(wrong))
         diffs.append("game-visible writes: %d addresses differ in the set, %d in value (first %#x)"
                      % (len(extra), len(wrong), first))
-    io_g = [e for e in got["io"] if e[0] != "exc"]
-    io_r = [e for e in (ref_io if ref_io is not None else rec["io"]) if e[0] != "exc"]
+    io_g = [service_ax(e) for e in got["io"] if e[0] != "exc"]
+    io_r = [service_ax(e) for e in (ref_io if ref_io is not None else rec["io"]) if e[0] != "exc"]
     if io_g != io_r:
         diffs.append("port or DOS I/O differs")
     return diffs

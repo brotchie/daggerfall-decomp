@@ -81,6 +81,8 @@ SERVICES = {
     (0x33, "ax", 0x0014): ("eax ecx edx es", "ecx edx es", ""),
     (0x33, "ax", 0x001A): ("eax ebx ecx edx", "", ""),
     (0x33, "ax", 0x0024): ("eax", "ebx ecx", ""),
+    (0x33, "ax", 0x001B): ("eax", "ebx ecx edx", ""),       # mouse sensitivity
+    (0x2F, "ax", 0x1680): ("eax", "", "eax"),                # release the time slice (AL = 0)
     (0x10, "ah", 0x00): ("eax", "", "eax"),
     (0x10, "ah", 0x0F): ("eax", "eax ebx", ""),
     (0x10, "ax", 0x1012): ("eax ebx ecx edx es", "", ""),
@@ -91,6 +93,56 @@ SERVICES = {
     (0x16, "ah", 0x10): ("eax", "eax", ""),
     (0x16, "ah", 0x11): ("eax", "ZF", "eax"),
 }
+
+
+# The services whose AL is not an input (the DOS and BIOS references): a call of one is
+# compared by AH alone (eax_mask), since AL is whatever its caller left there (`mov ah, N`),
+# which canonical C keeps differently from the asm. Checked against tools/fallemu.py's own
+# implementations (int21, int16, int10): none of them reads AL for these.
+AH_ONLY = {
+    0x21: {
+        0x09: "print a '$'-terminated string",
+        0x1A: "set the disk transfer area",
+        0x2A: "get the date",
+        0x2C: "get the time",
+        0x36: "free disk space (DL the drive)",
+        0x39: "make a directory",
+        0x3A: "remove a directory",
+        0x3B: "change the directory",
+        0x3C: "create a file (CX the attributes)",
+        0x3E: "close a file",
+        0x3F: "read from a file",
+        0x40: "write to a file",
+        0x41: "delete a file",
+        0x47: "get the current directory",
+        0x48: "allocate memory",
+        0x49: "free memory",
+        0x4A: "resize memory",
+        0x4E: "find the first file (CX the attributes)",
+        0x4F: "find the next file",
+        0x51: "get the PSP",
+        0x56: "rename a file",
+    },
+    0x16: {
+        0x00: "read a key",
+        0x01: "is a key waiting",
+        0x02: "the shift flags",
+        0x10: "read a key (enhanced)",
+        0x11: "is a key waiting (enhanced)",
+    },
+    0x10: {
+        0x02: "set the cursor position",
+        0x03: "get the cursor position",
+        0x0F: "get the video mode",
+    },
+}
+
+
+def eax_mask(vector, eax):
+    """The bits of EAX a call of service (vector, eax) is compared by: AH for the services of
+    AH_ONLY, AX for the rest (every service the engine and the game call takes its function in
+    AH or AX: EAX's upper half is the caller's)."""
+    return 0xFF00 if ((eax >> 8) & 0xFF) in AH_ONLY.get(vector, ()) else 0xFFFF
 
 
 def replay_regs(vector, eax):

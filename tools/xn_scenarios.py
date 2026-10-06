@@ -508,6 +508,8 @@ def io_view(log, boundary):
             continue
         if e[0] == "int":
             last = (e[1], e[2])
+            # by AX (AH alone when AL is no input): EAX's upper half is the caller's (xn_rc.service_ax)
+            e = (e[0], e[1], e[2] & xn_services.eax_mask(e[1], e[2]))
         elif e[0] == "int-ret" and last is not None:
             keep = xn_services.replay_regs(*last)
             # the BIOS and the mouse driver answer in 16-bit registers: the upper halves are
