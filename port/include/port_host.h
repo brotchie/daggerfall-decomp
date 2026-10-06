@@ -22,6 +22,9 @@ void host_started(void);
 
 /* a fault prints the call chain before the process ends */
 void host_install_fault_handlers(void);
+/* ARCH3D.BSA and DAGGER.SND from ARENA2\PACKED.DAT into the overlay when the install lacks
+   them, as the installer did (port/host/packed.c); 0 when both are there */
+int port_unpack_packed(void);
 /* a fault at a low address: finish the access against the virtual PC's low memory, as DOS's
    flat memory did (port/host/zeropage.c); 1 when handled */
 int port_zero_page_fault(void *siginfo, void *ucontext);

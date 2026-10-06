@@ -156,7 +156,8 @@ struct record *rmb_add_subrecord(struct record *parent)
             rmb_add_editor_marker(parent, flat);
         } else {
             flat_cfg = (struct flat_cfg *)flats_cfg_find(flat->image);
-            if ((flat_cfg->flags & 2) != 0 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
+            /* a flat FLATS.CFG does not list: 0, whose flags DOS read from the zero page */
+            if ((DOS_NULL(flat_cfg)->flags & 2) != 0 && ((int)(unsigned short)(game_settings->view_flags & 4)) != 0) {
                 flat->image = 0;
             }
         }

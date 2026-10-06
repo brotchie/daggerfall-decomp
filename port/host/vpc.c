@@ -347,9 +347,12 @@ void xn_int15(struct vpc_regs *r)
     carry(r, 1);
 }
 
+volatile unsigned long vpc_frame_yields;
+
 void xn_int2f(struct vpc_regs *r)
 {
-    if (AX(r) == 0x1680) {      /* release the time slice */
+    if (AX(r) == 0x1680) {      /* release the time slice: the game's loop does once a frame */
+        vpc_frame_yields++;
         vpc_poll();
         SDL_DelayNS(100000);
         SET8L(r->eax, 0);

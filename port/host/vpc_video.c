@@ -97,10 +97,44 @@ static void render_pixels(void)
    the screen to be shown, and the main thread shows it within a couple of ms */
 static SDL_AtomicInt present_wanted;
 
+/* PORT_FPS=1: how many different pictures the game showed each second (stderr, every 5 s) */
+static void count_frames(void)
+{
+    static int on = -1;
+    static Uint64 last_hash, since;
+    static int frames;
+    const unsigned char *vga = port_low_memory + 0xA0000;
+    Uint64 h = 1469598103934665603ull, now = SDL_GetTicksNS();
+    int i;
+
+    if (on < 0)
+        on = SDL_getenv("PORT_FPS") != NULL;
+    if (!on)
+        return;
+    for (i = 0; i < VGA_W * VGA_H; i += 8)
+        h = (h ^ *(const Uint64 *)(vga + i)) * 1099511628211ull;
+    if (h != last_hash)
+        frames++;
+    last_hash = h;
+    if (since == 0)
+        since = now;
+    if (now - since >= 5000000000ull) {
+        static unsigned long last_yields;
+        extern volatile unsigned long vpc_frame_yields;
+        unsigned long y = vpc_frame_yields;
+        fprintf(stderr, "port: %.1f pictures a second, the game's loop %.1f times\n",
+                frames * 1e9 / (double)(now - since), (y - last_yields) * 1e9 / (double)(now - since));
+        last_yields = y;
+        frames = 0;
+        since = now;
+    }
+}
+
 static void present_now(void)
 {
     SDL_FRect dst = {0, 0, VGA_W, 240};
 
+    count_frames();
     last_present = SDL_GetTicksNS();
     if (renderer == NULL || texture == NULL)
         return;

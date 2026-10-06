@@ -94,6 +94,47 @@ So every value that holds an address must have a type as wide as a pointer.
 
 ## Status
 
+**2026-10-06, the game runs natively.** With XnGine linked (see "Linking the engine"), `fall`:
+- plays the intro movie with its sound;
+- loads the classic saves (SAVE0-SAVE5 of the install, from the load screen);
+- lets the player walk and turn in town, with sound effects and the OPL3 music;
+- shows the character sheet, the options panel and the other screens.
+
+What it took, beyond the engine:
+- **Threads.** The game runs on a thread of its own (`vpc_run`). The main thread takes SDL's
+  events, shows the screen at 70 Hz and runs the scripted driver, whatever loop the game is
+  in. A wait for a key with no port I/O (`options_open`'s `while (key_down_esc)`) used to
+  hang.
+- **The zero page.** Under the DOS extender a null pointer reads linear 0, the real-mode
+  interrupt table. The game does that: enemy slots of factions, flats FLATS.CFG does not list,
+  the settings before a save sets them.
+  - `port/host/zeropage.c` finishes such faults against the virtual PC's low memory: it
+    decodes arm64 LDR/STR/LDP/STP and resumes, and reports each place once.
+  - `DOS_NULL(p)` (doslow.h) marks the known places in the source.
+- **Packing.** Watcom 10.0a packs structs to 1 byte by default; a wcc386 probe puts
+  `{char; int}`'s int at 1. The game and the engine are compiled with `-fpack-struct=1`, and
+  port_data lays out i386 and native data the same way.
+  - The link uses `-no_fixup_chains`: chained fixups cannot relocate pointers at odd offsets.
+- **Data.** Every game table holding pointers is now declared so: port_data's narrow rows went
+  from 494 to 0. MemCheck's and Watcom's own data (`library_data`) stays as FALL.EXE's 32-bit
+  values, since only the library code the native build replaces reads it.
+- **The freed-pointer sentinel** 0x97979797 is written one way, `(T *)(iptr)-1751672937`. A
+  zero-extended spelling never compared equal to a sign-extended one.
+- **Boundary adapters.** `xn_draw_paperdoll_mask`'s game call passes the engine's argument
+  order natively. The other adapters only reproduce registers the asm left behind
+  (Q-DRAW-02/03/05, Q-FONT-01, Q-MATH-02, Q-KBD-01); natively the game sites see their C
+  values.
+- **DOS handles.** File handles are DOS's (the lowest free from 5), each standing for a host
+  descriptor, so the game's 20-handle archive tables hold.
+- **SOS's sample callback.** The mixer calls it at a voice's end, under the interrupt lock,
+  and plays on any data it gives (the movies stream their sound this way).
+- **The installer's files.** ARCH3D.BSA and DAGGER.SND are unpacked from PACKED.DAT
+  (`port/host/packed.c`, PKWARE DCL) into the overlay on the first run.
+- **Checks without a person.**
+  - `PORT_SCRIPT` (keys, clicks and screenshots on a timeline), `PORT_SHOT_EVERY`,
+    `PORT_EXIT_AFTER`;
+  - `PORT_AUDIO_RAW` (the final mix), `PORT_FPS`.
+
 **2026-10-05, phase 1 done.**
 - `build/port/fall` is a Mach-O arm64 executable built from all 427 game files.
 - The build compiles with no errors. The 39 game structs that hold pointers check their size

@@ -79,6 +79,8 @@ int main(int argc, char **argv)
         fclose(f);
     }
 
+    port_unpack_packed();
+
     if (!nosound) {
         char hmi[1024];
         FILE *f;

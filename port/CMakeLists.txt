@@ -41,6 +41,10 @@ target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${
 target_compile_options(engine PRIVATE
     -std=gnu89 -include ${CMAKE_CURRENT_SOURCE_DIR}/include/port.h -DPORT_ENGINE
     -funsigned-char -fwrapv -fno-strict-aliasing -fpack-struct=1 -ffp-contract=off
+    # optimised in every build: the renderer is the hot path, and the engine's waits read
+    # volatile globals or ports (the game's own C stays as its build type has it: its waits
+    # read the BIOS tick and the keys through plain pointers, which -O2 would hoist)
+    -O2
     # tools/port_engine.py counts the warnings
     -w -Wno-error=int-conversion -Wno-error=incompatible-function-pointer-types
     -Wno-error=implicit-function-declaration)

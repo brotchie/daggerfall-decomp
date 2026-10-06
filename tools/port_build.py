@@ -6,7 +6,8 @@
                           (arguments after `run` go to fall)
   port_build.py missing   list what the build still lacks, by kind (the stubs it generated)
 
-  PORT_BUILD=DIR sets the build folder (build/port by default).
+  PORT_BUILD=DIR sets the build folder (build/port by default); PORT_BUILD_TYPE=Release (or
+  RelWithDebInfo) configures a new folder optimised (Debug by default).
 
 How the build fills its gaps: the game's objects name ~4,000 functions and globals. Those the
 port defines (src/, port/shim, port/host) link as they are, and so do the C library functions
@@ -41,8 +42,10 @@ EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 HOST_LIBC = {
     "abs", "atoi", "exp", "memchr", "memcmp", "printf", "strchr", "strcmp", "strlen",
     "strncmp", "strstr", "tolower", "toupper",
-    # and XnGine's (clang's own calls for struct copies and zeroing, too)
-    "memcpy", "memset",
+    # and XnGine's (clang's own calls for struct copies and zeroing, too, and what its
+    # optimiser makes of loops on Darwin)
+    "memcpy", "memset", "memmove", "bzero", "memset_pattern4", "memset_pattern8",
+    "memset_pattern16",
 }
 
 
@@ -53,7 +56,8 @@ def run(cmd, **kw):
 def configure():
     if not os.path.exists(os.path.join(BUILD, "build.ninja")):
         r = run(["cmake", "-S", PORT, "-B", BUILD, "-G", "Ninja",
-                 "-DCMAKE_BUILD_TYPE=Debug", "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"])
+                 "-DCMAKE_BUILD_TYPE=" + os.environ.get("PORT_BUILD_TYPE", "Debug"),
+                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"])
         if r.returncode:
             sys.exit("cmake configure failed")
 
