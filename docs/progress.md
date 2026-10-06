@@ -1626,3 +1626,43 @@ docs/xngine_readable.md).
 - code patching and generation (the texture mapper and the light shaders as plain C);
 - data at fixed addresses, which can become C definitions.
 It would be tested against the game's calls into the engine and lockstep frames.
+
+## 2026-10-06: XnGine as canonical C, shown equivalent at its boundary
+
+The readable C of phase 6 still answered to the asm: register interfaces, `_r` adapters,
+patched code bytes, generated code, leftover registers. This pass made it canonical C, plain
+modules that keep only what the game can see (docs/xngine_canonical.md, the overview
+docs/engine/architecture.md).
+
+**How it was built:**
+- An infrastructure agent mapped the engine's boundary with the game (config/xngine_boundary.csv:
+  181 entries, the exits, and the memory the game reads, found by running it). It also built
+  boundary comparisons, 39 lockstep scenarios with input inside the frames, asm coverage, and test
+  shims that keep per-function equivalence once interfaces change. It piloted all of this on
+  vec/mat/math.
+- Five groups converted the rest, and were merged by the coordinator.
+- A data agent moved the engine's data into C (src/engine_data/, docs/engine/data.md): computed
+  tables by code; initial data loaded from the user's own FALL.EXE, so no game bytes are committed.
+
+**Result:**
+- **The code:** 648 functions, all canonical. Register files remain only at the DOS/BIOS boundary
+  and in 8 catalogued game-facing adapters. Every function and module is documented, and every
+  declaration agrees with its definition.
+- **Quirks:** 149 original quirks are kept or dropped and catalogued (docs/engine/quirks.md), with
+  one deviation (D-VID-01, DPMI page unlocks the game cannot see).
+
+**Equivalence:**
+- 8,880 recorded calls replay through shims.
+- The game's calls: 2,819 / 2,819.
+- Scenarios: 1,675 / 1,675 frames, identical on the screen, game memory and I/O.
+- Pure helpers: 140 specs and 217 million samples (89 million exhaustive), no difference.
+- Coverage: 98.1% of the asm's reachable blocks are exercised, the rest justified one by one.
+- The data module equals FALL.EXE's load image symbol by symbol.
+
+Two things found on the way:
+- The game copies 30 bytes of the compiled light shaders through a stale collision pointer every
+  frame (Q-LIGHT-07). So the C still writes the shaders' image, as data.
+- Unicorn keeps code it has translated, so a stop address or rewritten code needs a hook, not
+  emu_start's `until`.
+
+**Next:** an SDL port starts from docs/sdl_handoff.md.
