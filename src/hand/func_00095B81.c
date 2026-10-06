@@ -28,7 +28,7 @@ void inv_list_right_item(struct record *object, iptr rects)
     if ((!(D_001940D6 & 4) && object->parent != wagon_container ? 1 : 0) && xn_math_approx_hypot(object->z - player_object->z, xn_math_approx_dist2d(object->x, object->y, player_object->x, player_object->y)) > 160)
         return;
     if (D_001AA588 >= inv_right_scroll && D_001AA588 < inv_right_scroll + 4) {
-        if (!(D_001940D8 & 4) && xn_str_find_u32((char *)player_character->equipped, object, 27) != 0) {
+        if (!(D_001940D8 & 4) && PTR_TABLE_FIND_ARGS((char *)player_character->equipped, object, 27) != 0) {
             item = &object->data.item;
             if (item->group != 1)
                 return;

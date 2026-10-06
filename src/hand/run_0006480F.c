@@ -76,7 +76,7 @@ void links_trigger(struct record *object, int trigger)
                     return;
             }
             p = &links[i];
-            if (xn_str_find_u32(active_links, p, active_link_count) != 0) return;
+            if (PTR_TABLE_FIND_ARGS(active_links, p, active_link_count) != 0) return;
             active_links[active_link_count++] = p;
             n = p->chain_count + 1;
             for (j = 0; j < n; j++, p++)

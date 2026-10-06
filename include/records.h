@@ -1114,6 +1114,15 @@ static __inline__ void *ptr_table_find(void *table, void *value, unsigned count)
     xn_str_find_u32((unsigned *)(table), (uptr)(value), (count))
 #endif
 
+/* the same search where the file declares xn_str_find_u32 with its own types: under Watcom
+   the arguments go as they are, so the call is the original */
+#if defined(DAGGER_PORT)
+#define PTR_TABLE_FIND_ARGS(table, value, count) \
+    ptr_table_find((void *)(table), (void *)(uptr)(value), (count))
+#else
+#define PTR_TABLE_FIND_ARGS(table, value, count) xn_str_find_u32(table, value, count)
+#endif
+
 /* ---- other structures (not records) --------------------------------------------------------- */
 
 /* a rumor (RUMOR.DAT): the 34-byte header, then text_length bytes of text */

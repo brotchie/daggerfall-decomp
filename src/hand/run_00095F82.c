@@ -95,7 +95,7 @@ void func_00095EDB(void)
     int unused2;
 
     D_001AA454 = 0;
-    if (xn_str_find_u32(player_character->equipped, (uptr)inv_selected_item, 27) != 0)
+    if (PTR_TABLE_FIND(player_character->equipped, inv_selected_item, 27) != 0)
         return;
     inv_store_item(inv_selected_item);
     inv_equip_item(inv_selected_item);

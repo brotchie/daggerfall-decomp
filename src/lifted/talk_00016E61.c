@@ -27,7 +27,7 @@ void talk_draw_answer(int left, int top, int right, int bottom)
     line = talk_answer_scroll;
     do {
         if (line >= talk_answer_line_count) return;
-        mc_strncpy((char *)text_rsc_buffer, (char *)*(iptr *)((talk_answer_lines + (line++ << 2))), 2048, D_001703F0, 1192);
+        mc_strncpy((char *)text_rsc_buffer, ((char **)talk_answer_lines)[line++], 2048, D_001703F0, 1192);
         if (((int)(unsigned char)(text_rsc_buffer[0] & 128)) != 0) {
             colour = 96;
         } else {
