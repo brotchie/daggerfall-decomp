@@ -113,13 +113,13 @@ int class_questions_run(void)
         mc_sprintf(((char *)text_buffer), D_001753CD, sel);
         disk_read_file(((char *)text_buffer), (iptr)player_class);
     }
-    if (h.a != 0 && h.a != (char *)0x97979797) {
+    if (h.a != 0 && h.a != (char *)(iptr)-1751672937) {
         mc_free(h.a, D_0017539B, 138);
-        h.a = (char *)0x97979797;
+        h.a = (char *)(iptr)-1751672937;
     }
-    if (h.b != 0 && h.b != (char *)0x97979797) {
+    if (h.b != 0 && h.b != (char *)(iptr)-1751672937) {
         mc_free(h.b, D_0017539B, 139);
-        h.b = (char *)0x97979797;
+        h.b = (char *)(iptr)-1751672937;
     }
     mc_memset(screen_buffer, 0, 64000, D_0017539B, 140, 4);
     mc_memcpy((void *)DOS_LOW(0xA0000), screen_buffer, 64000, D_0017539B, 141, 4);

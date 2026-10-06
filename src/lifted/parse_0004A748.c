@@ -28,7 +28,7 @@ void quest_load_text(struct quest *quest, int message_id, short flags, int width
     text = (char *)text_qrc_load(file_name, (int)(short)*(short *)&message_id, (int)(short)flags, (int)(short)*(short *)&width);
     if (text == 0) return;
     mc_strncpy((char *)text_rsc_buffer, text, 2048, D_0017110C, 2022);
-    if (text == 0 || text == (char *)0x97979797) return;
+    if (text == 0 || text == (char *)(iptr)-1751672937) return;
     mc_free(text, D_0017110C, 2023);
-    text = (char *)0x97979797;
+    text = (char *)(iptr)-1751672937;
 }

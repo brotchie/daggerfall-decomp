@@ -2,7 +2,7 @@
 #include "records.h"
 #include "clib.h"
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
-#define FREED ((char *)0x97979797)
+#define FREED ((char *)(iptr)-1751672937)
 extern char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;

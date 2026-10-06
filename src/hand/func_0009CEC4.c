@@ -101,9 +101,9 @@ int travel_route(int x0, int y0, int x1, int y1, int go)
         climate_update_at_player();
     }
     if (D_001AA698 != 0) {
-        if (!(D_001AA690 == 0 || D_001AA690 == (char *)0x97979797)) {
+        if (!(D_001AA690 == 0 || D_001AA690 == (char *)(iptr)-1751672937)) {
             mc_free(D_001AA690, D_0017743D, 1058);
-            D_001AA690 = (char *)0x97979797;
+            D_001AA690 = (char *)(iptr)-1751672937;
         }
     }
     p = guild_find_membership_by_kind(145);

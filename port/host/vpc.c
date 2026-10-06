@@ -80,33 +80,122 @@ void vpc_shutdown(void)
     vpc_video_shutdown();
 }
 
-/* ---- the main thread's poll ---------------------------------------------------------------- */
+/* ---- the threads -------------------------------------------------------------------------- *
+   The game runs on a thread of its own (vpc_run), as a PC's CPU runs beside its hardware: the
+   main thread, which SDL's window and events belong to, takes the keyboard and the mouse,
+   shows the screen at the VGA's 70 Hz and runs the scripted driver, whatever loop the game is
+   in (a game loop waiting for a key with no port I/O still sees the key come up). A program
+   that runs everything on the main thread (vpcdemo) gets the same from vpc_poll. */
 
-void vpc_poll(void)
+static SDL_ThreadID game_thread_id;
+static SDL_AtomicInt game_done;
+static int game_exit_code;
+static int threaded;
+
+int vpc_on_main_thread(void)
 {
-    static Uint64 last;
-    Uint64 now = SDL_GetTicksNS();
+    return SDL_GetCurrentThreadID() == main_thread;
+}
+
+/* the main thread's turn: events, the script, the screen */
+static void pump(void)
+{
     SDL_Event e;
 
-    /* only the main thread: an interrupt handler's port reads come here from SDL's timer
-       thread */
-    if (!vpc_initialised || SDL_GetCurrentThreadID() != main_thread)
-        return;
-    if (now - last < 1000000)
-        return;
-    last = now;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_EVENT_QUIT)
             vpc_quit_requested = 1;
         else if (!vpc_video_handle_event(&e))
             vpc_input_handle_event(&e);
     }
-    vpc_video_maybe_present();
     vpc_script_poll();
+    vpc_video_maybe_present();
+}
+
+void vpc_poll(void)
+{
+    static Uint64 last;
+    Uint64 now;
+
+    if (!vpc_initialised)
+        return;
+    if (!vpc_on_main_thread()) {
+        /* the game thread (or an interrupt): a quit ends the game where it stands */
+        if (vpc_quit_requested && threaded && SDL_GetCurrentThreadID() == game_thread_id)
+            vpc_game_exit(0);
+        return;
+    }
+    now = SDL_GetTicksNS();
+    if (now - last < 1000000)
+        return;
+    last = now;
+    pump();
     if (vpc_quit_requested) {
         fprintf(stderr, "port: quit\n");
         port_exit(0);
     }
+}
+
+void vpc_game_exit(int code)
+{
+    if (!threaded || vpc_on_main_thread())
+        return;
+    game_exit_code = code;
+    SDL_SetAtomicInt(&game_done, 1);
+    for (;;)                            /* the main thread ends the process */
+        SDL_Delay(1000);
+}
+
+struct game_start {
+    int (*fn)(void *);
+    void *arg;
+};
+
+static int SDLCALL game_main(void *p)
+{
+    struct game_start *g = p;
+
+    game_thread_id = SDL_GetCurrentThreadID();
+    vpc_game_exit(g->fn(g->arg));
+    return 0;
+}
+
+int vpc_run(int (*fn)(void *), void *arg)
+{
+    static struct game_start g;
+    SDL_PropertiesID props = SDL_CreateProperties();
+    SDL_Thread *t;
+    Uint64 quit_at = 0;
+
+    g.fn = fn;
+    g.arg = arg;
+    threaded = 1;
+    SDL_SetPointerProperty(props, SDL_PROP_THREAD_CREATE_ENTRY_FUNCTION_POINTER, (void *)game_main);
+    SDL_SetPointerProperty(props, SDL_PROP_THREAD_CREATE_USERDATA_POINTER, &g);
+    SDL_SetStringProperty(props, SDL_PROP_THREAD_CREATE_NAME_STRING, "game");
+    SDL_SetNumberProperty(props, SDL_PROP_THREAD_CREATE_STACKSIZE_NUMBER, 64 << 20);
+    t = SDL_CreateThreadWithProperties(props);
+    SDL_DestroyProperties(props);
+    if (t == NULL) {
+        fprintf(stderr, "port: no game thread: %s\n", SDL_GetError());
+        return 1;
+    }
+    SDL_DetachThread(t);
+    while (!SDL_GetAtomicInt(&game_done)) {
+        SDL_WaitEventTimeout(NULL, 2);
+        pump();
+        if (vpc_quit_requested) {
+            /* the game stops at its next port access; one in a loop without any, soon after */
+            if (quit_at == 0) {
+                fprintf(stderr, "port: quit\n");
+                quit_at = SDL_GetTicksNS();
+            } else if (SDL_GetTicksNS() - quit_at > 500000000ull) {
+                game_exit_code = 0;
+                break;
+            }
+        }
+    }
+    return game_exit_code;
 }
 
 /* ---- ports ------------------------------------------------------------------------------- */

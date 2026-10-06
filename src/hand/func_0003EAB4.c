@@ -48,9 +48,9 @@ int msgbox_render_quest_text(struct quest *quest, short message_id, char **image
         }
         close(text_rsc_file);
     }
-    if (text != 0 && text != (char *)0x97979797) {
+    if (text != 0 && text != (char *)(iptr)-1751672937) {
         mc_free(text, D_00170D55, 685);
-        text = (char *)0x97979797;
+        text = (char *)(iptr)-1751672937;
     }
     text_rsc_file = saved_file;
     return single_page;

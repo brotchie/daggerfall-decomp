@@ -231,9 +231,9 @@ void msgbox_render(char *text, char **out)
     xn_draw_get_rect(x0, y0, msgbox_w, msgbox_h, *out, 0);
     if (save != 0) {
         mc_memcpy(screen_buffer, save, 64000, D_00170D55, 515, 4);
-        if (save != 0 && save != (char *)0x97979797) {
+        if (save != 0 && save != (char *)(iptr)-1751672937) {
             mc_free(save, D_00170D55, 516);
-            save = (char *)0x97979797;
+            save = (char *)(iptr)-1751672937;
         }
     }
 }

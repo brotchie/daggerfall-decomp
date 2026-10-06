@@ -13,6 +13,7 @@
 #define STRUCTS_H
 
 #include "ptrint.h"
+#include "doslow.h"
 
 #ifndef RECORD_SIZE
 #define RECORD_SIZE(tag, n) typedef char tag##_size_check[(sizeof(struct tag) == (n)) ? 1 : -1]
@@ -39,7 +40,12 @@
 struct record;
 
 /* the BIOS tick count (18.2 a second) in the BIOS data area, 0040:006C */
+#ifdef DAGGER_PORT
+/* the virtual PC's BIOS data area (doslow.h); volatile: the timer interrupt counts it */
+#define BIOS_TICKS (*(volatile int *)DOS_LOW(0x46C))
+#else
 #define BIOS_TICKS (*(int *)0x46C)
+#endif
 
 /* ---- the engine -------------------------------------------------------------------------- */
 

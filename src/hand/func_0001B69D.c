@@ -53,9 +53,9 @@ void faction_load_file(void)
         if (D_00147954[i] == '#')
             faction_count++;
     if (factions != 0) {
-        if (factions != 0 && factions != (struct faction *)0x97979797) {
+        if (factions != 0 && factions != (struct faction *)(iptr)-1751672937) {
             mc_free(factions, D_00170464, 973);
-            factions = (struct faction *)0x97979797;
+            factions = (struct faction *)(iptr)-1751672937;
         }
     }
     dest = factions = mc_malloc(faction_count * REC_SIZEOF(struct faction), D_00170464, 975);

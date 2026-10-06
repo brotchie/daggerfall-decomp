@@ -6,7 +6,14 @@ extern iptr color_remap;
 extern char *scratch_buffer;
 extern unsigned char *color_remap_tables;
 extern void xn_draw_image_scaled(int, int, int, int, int, int, int, char *);
+#ifdef DAGGER_PORT
+/* the engine's canonical order: dst, src, w, h, colour. The game passes its registers as the
+   asm took them (dst EAX, w EDX, h EBX, src ECX: the boundary adapter xn_draw_paperdoll_mask_b),
+   so the native call puts them in the engine's order */
+extern void xn_draw_paperdoll_mask(char *, char *, int, int, int);
+#else
 extern void xn_draw_paperdoll_mask(char *, char *, int, iptr, int);
+#endif
 extern void xn_draw_paperdoll_item(int, int, int, int, void *);
 extern void *xn_tex_cache_lookup(int, int, int *);
 extern void xn_tex_cache_flush(void);
@@ -38,5 +45,9 @@ void paperdoll_draw_item(struct item *item, int x, int y, int mask_value)
     mask_x = image->x - 192;
     mask_y = image->y - 1;
     mask = (char *)paperdoll_mask + ((((int)(short)mask_y) * 125) + ((int)(short)mask_x));
+#ifdef DAGGER_PORT
+    xn_draw_paperdoll_mask(mask, (char *)(iptr)scratch_buffer, image->width, image->height, mask_value);
+#else
     xn_draw_paperdoll_mask(mask, (char *)(iptr)image->width, image->height, (iptr)scratch_buffer, mask_value);
+#endif
 }

@@ -72,9 +72,9 @@ void paperdoll_draw(int x, int y)
     xn_draw_image(pic->x + x, pic->y + y, pic->width, pic->height, pic->pixels);
     xn_paperdoll_background = D_00147954;
     screen_buffer = saved;
-    if (pic != 0 && pic != (struct image *)0x97979797) {
+    if (pic != 0 && pic != (struct image *)(iptr)-1751672937) {
         mc_free(pic, D_0017573C, 54);
-        pic = (struct image *)0x97979797;
+        pic = (struct image *)(iptr)-1751672937;
     }
     paperdoll_items = scratch_buffer + 64000;
     paperdoll_slots = scratch_buffer + 64500;
@@ -93,9 +93,9 @@ void paperdoll_draw(int x, int y)
     }
     pic = disk_read_file(((char *)text_buffer), 0);
     xn_draw_image_transparent(pic->x + x, pic->y + y, pic->width, pic->height, pic->pixels);
-    if (pic != 0 && pic != (struct image *)0x97979797) {
+    if (pic != 0 && pic != (struct image *)(iptr)-1751672937) {
         mc_free(pic, D_0017573C, 71);
-        pic = (struct image *)0x97979797;
+        pic = (struct image *)(iptr)-1751672937;
     }
     n = player_character->face;
     if (player_character->race == 9 || player_character->race == 10) {
@@ -148,9 +148,9 @@ void paperdoll_draw(int x, int y)
         }
         paperdoll_draw_items(x, y);
     }
-    if (strip != 0 && strip != (struct image *)0x97979797) {
+    if (strip != 0 && strip != (struct image *)(iptr)-1751672937) {
         mc_free(strip, D_0017573C, 143);
-        strip = (struct image *)0x97979797;
+        strip = (struct image *)(iptr)-1751672937;
     }
     xn_draw_get_rect(x + 192, y + 1, 125, 197, D_00195B64, 0);
     color_remap = color_remap_tables;

@@ -33,6 +33,15 @@ static const char hmiset_sb16[] =
     "[MIDI]\r\nDeviceName  = Sound Blaster 16          \r\nDevicePort  = 0x388\r\n"
     "DeviceID    = 0xa009\r\n";
 
+static char *game_argv[3];
+
+/* the game's thread (vpc_run): FALL.EXE's main */
+static int run_game(void *arg)
+{
+    (void)arg;
+    return func_00010010(2, game_argv);
+}
+
 int main(int argc, char **argv)
 {
     const char *game = getenv("DAGGER_GAME");
@@ -40,8 +49,7 @@ int main(int argc, char **argv)
     const char *config = "Z.CFG";
     int nosound = 0;
     char path[1024];
-    char *game_argv[3];
-    int i;
+    int i, code;
 
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--game") == 0 && i + 1 < argc)
@@ -94,7 +102,7 @@ int main(int argc, char **argv)
     game_argv[0] = "FALL.EXE";
     game_argv[1] = (char *)config;
     game_argv[2] = NULL;
-    func_00010010(2, game_argv);
+    code = vpc_run(run_game, NULL);
     host_shutdown();
-    return 0;
+    return code;
 }

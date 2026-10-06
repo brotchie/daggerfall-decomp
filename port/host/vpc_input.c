@@ -233,6 +233,15 @@ static struct {
 } mouse;
 
 static int captured;
+/* the mouse's state: the main thread's events change it, the game's int 33h reads it */
+static SDL_Mutex *mouse_lock;
+
+/* driver units across a mode 13h pixel: 2 in the default 0-639 range; 1 once the program
+   sets a range of a screen's width in pixels (XnGine's 0-310) */
+static int units_x(void)
+{
+    return mouse.maxx - mouse.minx >= 400 ? 2 : 1;
+}
 
 static void mouse_reset(void)
 {
@@ -250,6 +259,8 @@ static void mouse_reset(void)
 
 void vpc_input_init(void)
 {
+    if (mouse_lock == NULL)
+        mouse_lock = SDL_CreateMutex();
     mouse_reset();
 }
 
@@ -286,7 +297,19 @@ static void set_capture(SDL_Window *w, int on)
     captured = on;
 }
 
+static int handle_event(const void *ev);
+
 int vpc_input_handle_event(const void *ev)
+{
+    int r;
+
+    SDL_LockMutex(mouse_lock);
+    r = handle_event(ev);
+    SDL_UnlockMutex(mouse_lock);
+    return r;
+}
+
+static int handle_event(const void *ev)
 {
     const SDL_Event *e = ev;
     SDL_Window *w;
@@ -314,10 +337,10 @@ int vpc_input_handle_event(const void *ev)
         picture_scale(w, &sx, &sy);
         gx = e->motion.xrel * sx;               /* game pixels */
         gy = e->motion.yrel * sy;
-        /* the driver's units: 2 across a mode 13h pixel; mickeys at the drivers' ratio */
-        mouse.mx += gx * 2 * mouse.ratio_x / 8.0;
+        /* the driver's units (units_x); mickeys at the drivers' ratio */
+        mouse.mx += gx * units_x() * mouse.ratio_x / 8.0;
         mouse.my += gy * mouse.ratio_y / 8.0;
-        mouse.x = clampd(mouse.x + gx * 2, mouse.minx, mouse.maxx);
+        mouse.x = clampd(mouse.x + gx * units_x(), mouse.minx, mouse.maxx);
         mouse.y = clampd(mouse.y + gy, mouse.miny, mouse.maxy);
         return 1;
     }
@@ -358,7 +381,16 @@ int vpc_input_handle_event(const void *ev)
 #define DXr(r) ((int)(short)((r)->edx & 0xFFFF))
 #define SET(reg, v) ((reg) = ((reg) & ~0xFFFFul) | ((unsigned long)(v) & 0xFFFF))
 
+static void mouse_service(struct vpc_regs *r);
+
 void vpc_mouse_service(struct vpc_regs *r)
+{
+    SDL_LockMutex(mouse_lock);
+    mouse_service(r);
+    SDL_UnlockMutex(mouse_lock);
+}
+
+static void mouse_service(struct vpc_regs *r)
 {
     int b;
 
@@ -461,16 +493,19 @@ void vpc_input_key(int sdl_scancode, int down)
 /* the pointer to (x, y) in mode 13h pixels; button b (0 left, 1 right) down or up */
 void vpc_input_mouse_to(int x, int y)
 {
-    double dx = x * 2 - mouse.x, dy = y - mouse.y;
+    SDL_LockMutex(mouse_lock);
+    double dx = x * units_x() - mouse.x, dy = y - mouse.y;
 
     mouse.mx += dx * mouse.ratio_x / 8.0;
     mouse.my += dy * mouse.ratio_y / 8.0;
-    mouse.x = clampd(x * 2, mouse.minx, mouse.maxx);
+    mouse.x = clampd(x * units_x(), mouse.minx, mouse.maxx);
     mouse.y = clampd(y, mouse.miny, mouse.maxy);
+    SDL_UnlockMutex(mouse_lock);
 }
 
 void vpc_input_mouse_button(int b, int down)
 {
+    SDL_LockMutex(mouse_lock);
     if (down) {
         mouse.buttons |= 1 << b;
         mouse.press_count[b]++;
@@ -482,4 +517,5 @@ void vpc_input_mouse_button(int b, int down)
         mouse.release_x[b] = (int)mouse.x;
         mouse.release_y[b] = (int)mouse.y;
     }
+    SDL_UnlockMutex(mouse_lock);
 }

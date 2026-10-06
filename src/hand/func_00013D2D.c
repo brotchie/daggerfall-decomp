@@ -8,12 +8,13 @@ extern struct bits8 D_001940DA;
 extern int marquee_x;
 extern char *marquee_text;
 #include "clib.h"
+#include "ptrint.h"
 
 void marquee_start(char *text)
 {
-    if (marquee_owned_text != 0 && marquee_owned_text != (char *)0x97979797) {
+    if (marquee_owned_text != 0 && marquee_owned_text != (char *)(iptr)-1751672937) {
         mc_free(marquee_owned_text, D_001702CC, 52);
-        marquee_owned_text = (char *)0x97979797;
+        marquee_owned_text = (char *)(iptr)-1751672937;
     }
     marquee_owned_text = D_001940DA.b3 ? text : 0;
     marquee_text = text;

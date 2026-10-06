@@ -1871,9 +1871,9 @@ void parse_rsc_text(int id, int flags, int width)
     *(int *)text_rsc_file = text_rsc_main_file;
     text = (char *)text_rsc_load((int)(short)*(short *)&id, (int)(short)*(short *)&flags, (int)(short)*(short *)&width);
     mc_strncpy((char *)text_rsc_buffer, text, 2048, D_0017110C, 2003);
-    if (text != 0 && text != (char *)0x97979797) {
+    if (text != 0 && text != (char *)(iptr)-1751672937) {
         mc_free(text, D_0017110C, 2004);
-        text = (char *)0x97979797;
+        text = (char *)(iptr)-1751672937;
     }
     *(int *)text_rsc_file = (int)(short)saved_file;
 }
@@ -1887,9 +1887,9 @@ void parse_rsc_text_copy(int id, char *out)
     *(int *)text_rsc_file = text_rsc_main_file;
     text = (char *)text_rsc_load((int)(short)*(short *)&id, 0, 0);
     mc_strncpy(out, text, 4, D_0017110C, 2034);
-    if (text != 0 && text != (char *)0x97979797) {
+    if (text != 0 && text != (char *)(iptr)-1751672937) {
         mc_free(text, D_0017110C, 2035);
-        text = (char *)0x97979797;
+        text = (char *)(iptr)-1751672937;
     }
     *(int *)text_rsc_file = (int)(short)saved_file;
 }

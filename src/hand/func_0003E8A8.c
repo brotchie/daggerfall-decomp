@@ -21,9 +21,9 @@ int msgbox_render_rsc(short text_id, char **image, short flags)
     } else {
         single_page = 1;
     }
-    if (text != 0 && text != (char *)0x97979797) {
+    if (text != 0 && text != (char *)(iptr)-1751672937) {
         mc_free(text, D_00170D55, 599);
-        text = (char *)0x97979797;
+        text = (char *)(iptr)-1751672937;
     }
     return single_page;
 }

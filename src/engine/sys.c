@@ -2,6 +2,7 @@
    are in xsys.h). */
 #include "xsys.h"
 #include "ptrint.h"
+#include "doslow.h"
 #include "xsysutil.h"
 #include "xpc.h"
 #include "xmem.h"
@@ -113,7 +114,7 @@ void xn_sys_set_dos_transfer_buffer(void)
 /* (linear 0: the real-mode interrupt vectors, which CauseWay maps at address 0) */
 void xn_sys_zero_page_save(void)
 {
-    const volatile u32 *zero = 0;
+    const volatile u32 *zero = (const volatile u32 *)DOS_LOW(0);    /* linear 0 */
     s32 k;
 
     for (k = 0; k < 256; k++)
@@ -122,7 +123,7 @@ void xn_sys_zero_page_save(void)
 
 void xn_sys_zero_page_check(void)
 {
-    volatile u32 *zero = 0;
+    volatile u32 *zero = (volatile u32 *)DOS_LOW(0);
     s32 k;
 
     for (k = 0; k < 256; k++) {

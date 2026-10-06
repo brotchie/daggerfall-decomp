@@ -2,6 +2,7 @@
    PC, stopping on a stub, a fatal error or a fault with the call chain, and the check for a
    pointer that lost its top half. */
 #include <execinfo.h>
+#include <sys/ucontext.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -73,9 +74,20 @@ void port_check_ptr(const void *p, const char *what)
 }
 
 /* a fault (often a pointer cut to 32 bits, docs/port.md): name it, show where, and end */
-static void on_fault(int sig)
+static void on_fault(int sig, siginfo_t *info, void *ucontext)
 {
     static const char msg[] = "port: fatal signal, backtrace:\n";
+
+    /* a read or write through a null pointer: DOS's low memory (zeropage.c) */
+    if ((sig == SIGSEGV || sig == SIGBUS) && port_zero_page_fault(info, ucontext))
+        return;
+    if (info != NULL && ucontext != NULL) {
+        char buf[160];
+        int n = snprintf(buf, sizeof buf, "port: signal %d at address 0x%llX, pc 0x%llX\n", sig,
+                         (unsigned long long)(uintptr_t)info->si_addr,
+                         (unsigned long long)((ucontext_t *)ucontext)->uc_mcontext->__ss.__pc);
+        write(2, buf, (size_t)n);
+    }
 
     write(2, msg, sizeof msg - 1);
     backtrace_stderr();
@@ -91,8 +103,14 @@ void host_started(void)
 
 void host_install_fault_handlers(void)
 {
-    signal(SIGSEGV, on_fault);
-    signal(SIGBUS, on_fault);
-    signal(SIGILL, on_fault);
-    signal(SIGFPE, on_fault);
+    struct sigaction sa;
+
+    memset(&sa, 0, sizeof sa);
+    sa.sa_sigaction = on_fault;
+    sa.sa_flags = SA_SIGINFO | SA_NODEFER;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGSEGV, &sa, NULL);
+    sigaction(SIGBUS, &sa, NULL);
+    sigaction(SIGILL, &sa, NULL);
+    sigaction(SIGFPE, &sa, NULL);
 }

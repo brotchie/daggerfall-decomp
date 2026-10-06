@@ -4,6 +4,7 @@ extern short text_format_flags;
 extern void parse_expand(unsigned char *, char *);
 extern int font_char_width(unsigned char);
 #include "clib.h"
+#include "ptrint.h"
 
 char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, char *text)
 {
@@ -21,14 +22,14 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
     else
         mc_strncpy(text, src, 4, D_00170D55, 169);
     text_format_flags = saved;
-    if (src != 0 && src != (char *)0x97979797) {
+    if (src != 0 && src != (char *)(iptr)-1751672937) {
         mc_free(src, D_00170D55, 173);
-        src = (char *)0x97979797;
+        src = (char *)(iptr)-1751672937;
     }
     if (!(flags & ~8)) {
-        if (buf != 0 && buf != (char *)0x97979797) {
+        if (buf != 0 && buf != (char *)(iptr)-1751672937) {
             mc_free(buf, D_00170D55, 177);
-            buf = (char *)0x97979797;
+            buf = (char *)(iptr)-1751672937;
         }
         return text;
     }
@@ -93,9 +94,9 @@ char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, 
             break;
         }
     }
-    if (text != 0 && text != (char *)0x97979797) {
+    if (text != 0 && text != (char *)(iptr)-1751672937) {
         mc_free(text, D_00170D55, 265);
-        text = (char *)0x97979797;
+        text = (char *)(iptr)-1751672937;
     }
     return buf;
 }

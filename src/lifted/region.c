@@ -115,7 +115,12 @@ unsigned char pak_lookup(int column, int row, iptr pak)
     struct pak_run *run;
 
     base = pak;
+#ifdef DAGGER_PORT
+    /* the file's row table: 32-bit offsets from its start, not pointers */
+    run = (struct pak_run *)((char *)(iptr)((int *)base)[row] + pak);
+#else
     run = (struct pak_run *)(((char **)base)[row] + pak);
+#endif
     column -= run->count;
     while (column > 0) {
         run++;

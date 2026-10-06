@@ -52,17 +52,17 @@ int options_mouse_screen(void)
         }
         xn_gfx_present_inclusive(0);
     }
-    if (D_00195B60 != 0 && D_00195B60 != 0x97979797) {
+    if (D_00195B60 != 0 && D_00195B60 != (-1751672937)) {
         mc_free((void *)D_00195B60, D_00170EE8, 468);
-        D_00195B60 = 0x97979797;
+        D_00195B60 = -1751672937;
     }
-    if (D_00195B5C != 0 && D_00195B5C != 0x97979797) {
+    if (D_00195B5C != 0 && D_00195B5C != (-1751672937)) {
         mc_free((void *)D_00195B5C, D_00170EE8, 469);
-        D_00195B5C = 0x97979797;
+        D_00195B5C = -1751672937;
     }
-    if (background != 0 && background != 0x97979797) {
+    if (background != 0 && background != (-1751672937)) {
         mc_free((void *)background, D_00170EE8, 470);
-        background = 0x97979797;
+        background = -1751672937;
     }
     return 0;
 }

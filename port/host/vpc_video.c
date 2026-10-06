@@ -93,7 +93,11 @@ static void render_pixels(void)
         pixels[i] = pal[vga[i]];
 }
 
-void vpc_present(void)
+/* the window is the main thread's: the game's thread (a retrace it saw, a mode set) asks for
+   the screen to be shown, and the main thread shows it within a couple of ms */
+static SDL_AtomicInt present_wanted;
+
+static void present_now(void)
 {
     SDL_FRect dst = {0, 0, VGA_W, 240};
 
@@ -108,10 +112,20 @@ void vpc_present(void)
     SDL_RenderPresent(renderer);
 }
 
+void vpc_present(void)
+{
+    if (vpc_on_main_thread())
+        present_now();
+    else
+        SDL_SetAtomicInt(&present_wanted, 1);
+}
+
 void vpc_video_maybe_present(void)
 {
-    if (SDL_GetTicksNS() - last_present >= RETRACE_PERIOD_NS)
-        vpc_present();
+    if (SDL_GetAtomicInt(&present_wanted) || SDL_GetTicksNS() - last_present >= RETRACE_PERIOD_NS) {
+        SDL_SetAtomicInt(&present_wanted, 0);
+        present_now();
+    }
 }
 
 int vpc_screenshot(const char *path)

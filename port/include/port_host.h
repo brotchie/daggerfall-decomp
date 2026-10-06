@@ -22,6 +22,9 @@ void host_started(void);
 
 /* a fault prints the call chain before the process ends */
 void host_install_fault_handlers(void);
+/* a fault at a low address: finish the access against the virtual PC's low memory, as DOS's
+   flat memory did (port/host/zeropage.c); 1 when handled */
+int port_zero_page_fault(void *siginfo, void *ucontext);
 
 /* a symbol the native build does not provide yet: logs its name and stops (port/gen stubs) */
 void port_unimplemented(const char *name) __attribute__((noreturn));

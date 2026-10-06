@@ -49,6 +49,12 @@ void vpc_shutdown(void);
    Every port and service call comes through here at most every millisecond, so the game's
    own polling loops keep the window alive. */
 void vpc_poll(void);
+/* Runs fn(arg), the game, on a thread of its own while the main thread takes the window's
+   events, shows the screen and runs the script; returns the game's exit code. */
+int vpc_run(int (*fn)(void *), void *arg);
+/* The game thread's exit (port_exit): the main thread ends the process; elsewhere returns */
+void vpc_game_exit(int code);
+int vpc_on_main_thread(void);
 
 /* show the screen now (mode 13h through the palette) */
 void vpc_present(void);

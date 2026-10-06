@@ -48,9 +48,9 @@ void msgbox_show_string(char *text, short kind)
     }
     copy = text_expand_wrap((int)(unsigned short)(flags | 32770), (int)(short)msgbox_wrap_width, copy, wrap_buf, expand_buf);
     msgbox_render(copy, (iptr)msgbox_image);
-    if (copy != 0 && copy != (char *)0x97979797) {
+    if (copy != 0 && copy != (char *)(iptr)-1751672937) {
         mc_free(copy, D_00170D55, 717);
-        copy = (char *)0x97979797;
+        copy = (char *)(iptr)-1751672937;
     }
     msgbox_kind = kind;
     mode_push();

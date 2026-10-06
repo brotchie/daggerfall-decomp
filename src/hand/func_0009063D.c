@@ -2,7 +2,7 @@
 #include "records.h"
 #include "clib.h"
 
-#define FREED ((void *)0x97979797)
+#define FREED ((void *)(iptr)-1751672937)
 #define FREE(p, line) if ((p) != 0 && (p) != FREED) { mc_free((p), D_00176F41, (line)); (p) = FREED; }
 extern unsigned char D_0012B508;
 extern char D_00176F28[];

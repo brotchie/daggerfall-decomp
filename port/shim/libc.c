@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "port_host.h"
+#include "port_vpc.h"
 
 /* Watcom 10.0a's rand (FALL.EXE 0x9DC25, byte-identical to CLIB3R): the game's random
    sequence, so a native run can follow an emulated one */
@@ -77,6 +78,7 @@ int strnicmp(const char *a, const char *b, unsigned int n)
 
 void port_exit(int status)
 {
+    vpc_game_exit(status);              /* from the game's thread: the main thread ends it */
     host_shutdown();
     exit(status);
 }

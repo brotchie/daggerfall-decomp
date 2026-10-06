@@ -22,9 +22,9 @@ int profile_open(struct profile *r, char *name)
     }
     if (read(fd, r->buffer, r->length) != r->length) {
         close(fd);
-        if (r->buffer != 0 && r->buffer != (char *)0x97979797) {
+        if (r->buffer != 0 && r->buffer != (char *)(iptr)-1751672937) {
             mc_free(r->buffer, D_00170129, 110);
-            r->buffer = (char *)0x97979797;
+            r->buffer = (char *)(iptr)-1751672937;
         }
         return 0;
     }
