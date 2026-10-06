@@ -68,6 +68,7 @@ int vpc_init(const char *title)
     vpc_irq_init();
     vpc_audio_init();
     vpc_music_init();
+    vpc_script_init();
     return 0;
 }
 
@@ -101,6 +102,7 @@ void vpc_poll(void)
             vpc_input_handle_event(&e);
     }
     vpc_video_maybe_present();
+    vpc_script_poll();
     if (vpc_quit_requested) {
         fprintf(stderr, "port: quit\n");
         port_exit(0);

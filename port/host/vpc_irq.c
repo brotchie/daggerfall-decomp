@@ -50,6 +50,11 @@ void port_sti(void)
     }
 }
 
+int port_cli_depth(void)
+{
+    return cli_depth;
+}
+
 /* ---- vectors --------------------------------------------------------------------------- */
 
 static void bios_int1c(void)

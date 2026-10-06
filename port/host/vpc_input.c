@@ -444,3 +444,42 @@ void vpc_mouse_service(struct vpc_regs *r)
         fprintf(stderr, "port: int 33h ax=%04X not implemented\n", AXr(r));
     }
 }
+
+/* ---- the scripted driver's input (vpc_script.c) ------------------------------------------- */
+
+void vpc_input_key(int sdl_scancode, int down)
+{
+    unsigned short code = set1((SDL_Scancode)sdl_scancode);
+
+    if (code == 0)
+        return;
+    if (code & 0x100)
+        kq_put(0xE0);
+    kq_put((unsigned char)((code & 0x7F) | (down ? 0 : 0x80)));
+}
+
+/* the pointer to (x, y) in mode 13h pixels; button b (0 left, 1 right) down or up */
+void vpc_input_mouse_to(int x, int y)
+{
+    double dx = x * 2 - mouse.x, dy = y - mouse.y;
+
+    mouse.mx += dx * mouse.ratio_x / 8.0;
+    mouse.my += dy * mouse.ratio_y / 8.0;
+    mouse.x = clampd(x * 2, mouse.minx, mouse.maxx);
+    mouse.y = clampd(y, mouse.miny, mouse.maxy);
+}
+
+void vpc_input_mouse_button(int b, int down)
+{
+    if (down) {
+        mouse.buttons |= 1 << b;
+        mouse.press_count[b]++;
+        mouse.press_x[b] = (int)mouse.x;
+        mouse.press_y[b] = (int)mouse.y;
+    } else {
+        mouse.buttons &= ~(1 << b);
+        mouse.release_count[b]++;
+        mouse.release_x[b] = (int)mouse.x;
+        mouse.release_y[b] = (int)mouse.y;
+    }
+}

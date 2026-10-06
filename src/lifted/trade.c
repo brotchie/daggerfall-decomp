@@ -4,7 +4,7 @@
 #include "records.h"
 #include "clib.h"
 
-extern char D_000CDDA8[];
+extern void xn_timer_tick_callback(void);
 extern signed char D_0012B508;
 extern char D_00175A30[];
 extern char D_00175A38[];
@@ -126,9 +126,9 @@ int sound_init_music(void)
     }
     sound_enabled = 1;
     dpmi_lock_region((iptr)sound_channels, 4 * REC_SIZEOF(struct sound_channel) + 4096);
-    dpmi_lock_region((iptr)D_000CDDA8, 4096);
+    dpmi_lock_region((iptr)xn_timer_tick_callback, 4096);
     dpmi_lock_region((iptr)&timer_tick_count, 4096);
-    D_001A3F3C = sound_timer_add((iptr)D_000CDDA8, 140);
+    D_001A3F3C = sound_timer_add((iptr)xn_timer_tick_callback, 140);
     return 1;
 }
 
@@ -145,6 +145,6 @@ void sound_shutdown_music(void)
     }
     sos_shutdown();
     dpmi_unlock_region((iptr)sound_channels, 4 * REC_SIZEOF(struct sound_channel) + 4096);
-    dpmi_unlock_region((iptr)D_000CDDA8, 4096);
+    dpmi_unlock_region((iptr)xn_timer_tick_callback, 4096);
     dpmi_unlock_region((iptr)&timer_tick_count, 4096);
 }

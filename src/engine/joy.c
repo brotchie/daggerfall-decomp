@@ -39,7 +39,7 @@ void xn_joy_init(void)
     xn_sti();
     xn_pc_get_vector(0x1C, &xn_joy.old_int1c_off, &xn_joy.old_int1c_sel);
     xn_pc_install_vector(0x1C, xn_joy_timer_entry);
-    xn_mem_lock_region((void *)xn_joy_timer_entry, xn_joy_timer_end - (u8 *)xn_joy_timer_entry);
+    xn_mem_lock_region((void *)xn_joy_timer_entry, (u32)(xn_joy_timer_end - (u8 *)xn_joy_timer_entry));
     xn_mem_lock_region(&xn_joy, sizeof xn_joy);
 }
 
@@ -175,3 +175,13 @@ void xn_joy_timer_isr(void)
     xn_joy.button2 = (bits & 0x20) == 0;
     xn_joy.button1 = (bits & 0x10) == 0;
 }
+
+#ifdef DAGGER_PORT
+/* DAGGER_PORT: the interrupt entry (as kbd.c's: the virtual PC calls the vector as C) */
+void xn_joy_timer_entry(void)
+{
+    xn_joy_timer_isr();
+}
+
+u8 xn_joy_timer_end[1];
+#endif

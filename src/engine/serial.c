@@ -126,3 +126,11 @@ void xn_serial_irq_com1(void)
     }
     xn_outb(PIC_COMMAND, PIC_EOI);
 }
+
+#ifdef DAGGER_PORT
+/* DAGGER_PORT: the IRQ entries (object 2's table of COM1's handler and its copies). The
+   virtual PC calls a vector as C, and has no UART: no config opens a tracker. */
+void (*xn_serial_irq_handlers[4])(void) = {
+    xn_serial_irq_com1, xn_serial_irq_com1, xn_serial_irq_com1, xn_serial_irq_com1
+};
+#endif

@@ -73,7 +73,7 @@ extern int inv_take_arrow(int);
 extern int door_start_swing(struct record *, int);
 extern void *xn_vec_unit_direction(void *, void *, void *);
 extern void *xn_vec_advance(void *, int, void *);
-extern int func_000C2068(void *);
+extern int xn_vec_dir_to_angles(void *);
 extern int xn_math_approx_dist2d(int, int, int, int);
 extern int xn_math_approx_hypot(int, int);
 extern int xn_math_angle_to_point(int, int, int, int);
@@ -241,7 +241,7 @@ void weapon_missile_orient(struct record *arrow)
     int angles[3];
 
     mc_memcpy(angles, arrow->data.item.arrow.direction, 12, D_0017615C, 426, 12);
-    func_000C2068(angles);
+    xn_vec_dir_to_angles(angles);
     arrow->missile_yaw = (short)angles[0] & 2047;
     arrow->angle_z = (short)angles[1] & 2047;
 }

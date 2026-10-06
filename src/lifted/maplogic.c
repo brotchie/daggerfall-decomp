@@ -104,7 +104,7 @@ extern struct record *object_find_by_id(struct record *, iptr);
 extern int marker_count(struct record *, int);
 extern int player_to_nearest_marker(struct record *, int);
 extern int xn_world_cell_at(int, int);
-extern int func_000C810C(void *);
+extern int xn_model_push_player_from_pick(void *);
 extern void xn_pal_set_range_8bit(char *, int, int);
 extern void xn_tex_cache_flush(void);
 extern void archive_close(int);
@@ -419,7 +419,7 @@ void building_exit(void)
     object_free_children((struct record *)D_00196120);
     building_grant_access(building, 0, 0);
     player_to_nearest_marker(player_object->parent->children, 6);
-    func_000C810C(pick_hit);
+    xn_model_push_player_from_pick(pick_hit);
     object_reparent(location_object, player_object);
     if (building->type == 24) player_to_nearest_marker(location_object, 6);
     position_history_reset();

@@ -1,6 +1,7 @@
 /* vid.c: XnGine's VID movie player (canonical C; the interface and the module's documentation
    are in xvid.h). */
 #include "xvid.h"
+#include "ptrint.h"
 #include "xgfx.h"
 #include "xpal.h"
 #include "xdos.h"
@@ -24,8 +25,8 @@
 #define VID_AUDIO       0x7D
 
 /* ---- the game's (object 1, Watcom C: the boundary's exits) ---------------------------------- */
-int dpmi_lock_region(int address, int size);
-int dpmi_unlock_region(int address, int size);
+int dpmi_lock_region(iptr address, int size);
+int dpmi_unlock_region(iptr address, int size);
 int sound_timer_add(void (*callback)(void), int rate);     /* its handle, -1 when it failed */
 void sound_timer_remove(int handle);
 int func_000A2504(int driver, xn_vid_sos_sample *sample);  /* SOS: start a sample: its handle */
@@ -50,7 +51,7 @@ static void vid_code_start(void)
 }
 
 static void vid_code_end(void);
-#define VID_CODE_SIZE ((u8 *)vid_code_end - (u8 *)vid_code_start)
+#define VID_CODE_SIZE ((int)((u8 *)vid_code_end - (u8 *)vid_code_start))
 
 /* ---- the player ------------------------------------------------------------------------------- */
 
@@ -90,8 +91,8 @@ int xn_vid_play(const char *path, s32 x, s32 y, s32 skippable)
     int played = 0;
 
     /* the timer and sample callbacks run under interrupts: lock the player's data and code */
-    dpmi_lock_region((int)&xn_vid_header, VID_DATA_SIZE);
-    dpmi_lock_region((int)vid_code_start, VID_CODE_SIZE);
+    dpmi_lock_region((iptr)&xn_vid_header, VID_DATA_SIZE);
+    dpmi_lock_region((iptr)vid_code_start, VID_CODE_SIZE);
     v->skippable = skippable;
     xn_str_copy(path, v->path);
     if (xn_dos_file_exists(v->path)) {
@@ -107,8 +108,8 @@ int xn_vid_play(const char *path, s32 x, s32 y, s32 skippable)
         game_free(v->audio_buf_b);
     }
     /* Deviation D-VID-01: the asm's unlocks got a size it never set (a leftover register) */
-    dpmi_unlock_region((int)&xn_vid_header, VID_DATA_SIZE);
-    dpmi_unlock_region((int)vid_code_start, VID_CODE_SIZE);
+    dpmi_unlock_region((iptr)&xn_vid_header, VID_DATA_SIZE);
+    dpmi_unlock_region((iptr)vid_code_start, VID_CODE_SIZE);
     xn_gfx_clip_bottom = bottom;
     xn_gfx_clip_top = top;
     xn_gfx_clip_right = right;
@@ -132,9 +133,9 @@ void xn_vid_open(s32 x, s32 y, const char *path)
     v->buf_end = v->buf + VID_BUFFER;
     v->refill_mark = v->buf_end - VID_REFILL_MARGIN;
     v->audio_buf_a = game_malloc(VID_AUDIO_BUFFER);
-    dpmi_lock_region((int)v->audio_buf_a, VID_AUDIO_BUFFER);
+    dpmi_lock_region((iptr)v->audio_buf_a, VID_AUDIO_BUFFER);
     v->audio_buf_b = game_malloc(VID_AUDIO_BUFFER);
-    dpmi_lock_region((int)v->audio_buf_b, VID_AUDIO_BUFFER);
+    dpmi_lock_region((iptr)v->audio_buf_b, VID_AUDIO_BUFFER);
     v->audio_buffer = 0;
     v->sample_done = 0;
     v->sample_restart = 0;
@@ -198,8 +199,8 @@ void xn_vid_finish(void)
     u8 *p;
 
     xn_vid_audio_stop();
-    dpmi_unlock_region((int)v->audio_buf_a, VID_AUDIO_BUFFER);     /* (D-VID-01) */
-    dpmi_unlock_region((int)v->audio_buf_b, VID_AUDIO_BUFFER);
+    dpmi_unlock_region((iptr)v->audio_buf_a, VID_AUDIO_BUFFER);     /* (D-VID-01) */
+    dpmi_unlock_region((iptr)v->audio_buf_b, VID_AUDIO_BUFFER);
     p = v->audio_buf_a;
     v->audio_buf_a = 0;
     if (p != 0)
@@ -488,10 +489,10 @@ u8 *xn_vid_refill(u8 *p)
 
     if (p == v->buf)
         return p;
-    left = v->buf_end - p;
+    left = (u32)(v->buf_end - p);
     v->file_pos += p - v->buf;
     copy_dwords(v->buf, p, left);
-    xn_dos_read(v->file, v->buf + left, v->buf_end - (v->buf + left));
+    xn_dos_read(v->file, v->buf + left, (u32)(v->buf_end - (v->buf + left)));
     return v->buf;
 }
 
@@ -529,7 +530,7 @@ void xn_vid_read_audio(u8 *p)
     p += 2;
     v->audio_left = v->audio_size;
     do {
-        n = v->buf_end - p;
+        n = (u32)(v->buf_end - p);
         if (n <= (u32)v->audio_size) {
             p = xn_vid_refill(p);
             n = VID_AUDIO_BUFFER;

@@ -1,6 +1,7 @@
 /* helmet.c: XnGine's head trackers (canonical C; the interface and the module's documentation
    are in xhelmet.h). */
 #include "xhelmet.h"
+#include "doslow.h"
 #include "xserial.h"
 #include "xstr.h"
 #include "xpc.h"
@@ -425,7 +426,7 @@ s32 xn_helmet_c_open(void)
     rm->ds = rm->es = segment;
     xn_helmet_c_dos_selector = selector;
     xn_dpmi_selector_base(selector, &base);
-    xn_helmet_c_dos_buffer = (u8 *)base;
+    xn_helmet_c_dos_buffer = (u8 *)DOS_LOW(base);
     /* (BX: the selector, as the asm's EBX still holds it) */
     xn_helmet_c_int33(TRACKER_GET, selector, 0, 0);
     if ((u16)rm->eax != 0)

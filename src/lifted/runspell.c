@@ -88,7 +88,7 @@ extern int spell_effect_dispatch(int, void *, int, void *);
 extern void xn_draw_spell_icon(int, int, int);
 extern void xn_draw_cast_anim_mirrored(void *, int, int);
 extern int spell_find_effect_type(char *, int);
-extern int func_000CE4E0(void *);
+extern int spell_has_no_effects(void *);
 extern void xn_math_advance_pitch_yaw(int, int, int, void *);
 extern void damage_spawn_splash(struct record *, int, int);
 extern void damage_knockback(struct record *, int, int, int);
@@ -389,7 +389,7 @@ void spell_remove_effect_type(struct record *object, int effect_type)
             slot = spell_find_effect_type(spell, effect_type);
             if (slot != 0) {
                 spell->effects[slot].type = 255;
-                if (func_000CE4E0(spell) != 0) {
+                if (spell_has_no_effects(spell) != 0) {
                     object_delete(object);
                     return;
                 }

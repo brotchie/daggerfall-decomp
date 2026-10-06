@@ -5,11 +5,12 @@
    the platform boundary). The function number goes in AX; the registers DOS does not read
    are left 0. */
 #include "xdos.h"
+#include "ptrint.h"
 #include "xgfx.h"
 
 /* int 21h function ax with ebx, ecx and edx; DOS's registers back in *r. Returns 1 when DOS
    reports a failure (its carry). */
-static int dos_call(xn_regs *r, u16 ax, u32 ebx, u32 ecx, u32 edx)
+static int dos_call(xn_regs *r, u16 ax, u32 ebx, u32 ecx, uptr edx)
 {
     r->eax = ax;
     r->ebx = ebx;
@@ -54,17 +55,17 @@ s32 xn_dos_open(const char *path)
 
     if (file_resolver != 0)
         path = file_resolver((char *)path);
-    if (dos_call(&r, 0x3D00, 0, 0, (u32)path))
+    if (dos_call(&r, 0x3D00, 0, 0, (uptr)path))
         /* Quirk Q-DOS-01: the asm reported its caller's EAX here (a leftover); the path's
            address stands for it */
-        dos_fatal((u32)path, xn_dos_msg_not_found);
+        dos_fatal((u32)(uptr)path, xn_dos_msg_not_found);
     return (u16)r.eax;
 }
 
 u32 xn_dos_open_mode(const char *path, u8 mode, s32 *handle)
 {
     xn_regs r;
-    int failed = dos_call(&r, 0x3D00 | mode, 0, 0, (u32)path);
+    int failed = dos_call(&r, 0x3D00 | mode, 0, 0, (uptr)path);
 
     *handle = (u16)r.eax;
     return failed ? (u16)r.eax : 0;
@@ -74,8 +75,8 @@ s32 xn_dos_create(const char *path)
 {
     xn_regs r;
 
-    if (dos_call(&r, 0x3C00, 0, 0, (u32)path))
-        dos_fatal((u32)path, xn_dos_msg_create_failed);     /* Quirk Q-DOS-01 */
+    if (dos_call(&r, 0x3C00, 0, 0, (uptr)path))
+        dos_fatal((u32)(uptr)path, xn_dos_msg_create_failed);     /* Quirk Q-DOS-01 */
     return (u16)r.eax;
 }
 
@@ -90,8 +91,8 @@ u32 xn_dos_read(s32 handle, void *buf, u32 count)
 {
     xn_regs r;
 
-    dos_call(&r, 0x3F00, handle, count, (u32)buf);
-    return r.eax;                       /* Quirk Q-DOS-02: an error code after a failure */
+    dos_call(&r, 0x3F00, handle, count, (uptr)buf);
+    return (u32)r.eax;                  /* Quirk Q-DOS-02: an error code after a failure */
 }
 
 int xn_dos_write(s32 handle, const void *buf, s32 count)
@@ -100,11 +101,11 @@ int xn_dos_write(s32 handle, const void *buf, s32 count)
     xn_regs r;
 
     while (count > 0x8000) {            /* Quirk Q-DOS-03: these pieces' failures go unseen */
-        dos_call(&r, 0x4000, handle, 0x8000, (u32)p);
+        dos_call(&r, 0x4000, handle, 0x8000, (uptr)p);
         count -= 0x8000;
         p += 0x8000;
     }
-    return dos_call(&r, 0x4000, handle, count, (u32)p);
+    return dos_call(&r, 0x4000, handle, count, (uptr)p);
 }
 
 u32 xn_dos_seek(s32 handle, s32 offset, u8 mode, u32 *pos)
@@ -114,7 +115,7 @@ u32 xn_dos_seek(s32 handle, s32 offset, u8 mode, u32 *pos)
     if (dos_call(&r, 0x4200 | mode, handle, (u32)offset >> 16, offset & 0xFFFF))
         return (u16)r.eax;
     if (pos != 0)
-        *pos = r.edx << 16 | (r.eax & 0xFFFF);  /* DX:AX */
+        *pos = (u32)(r.edx << 16 | (r.eax & 0xFFFF));  /* DX:AX */
     return 0;
 }
 
@@ -122,7 +123,7 @@ int xn_dos_find_first(const char *spec)
 {
     xn_regs r;
 
-    return !dos_call(&r, 0x4E00, 0, 0, (u32)spec);
+    return !dos_call(&r, 0x4E00, 0, 0, (uptr)spec);
 }
 
 int xn_dos_find_next(void)
@@ -282,7 +283,7 @@ void xn_dos_print(const char *msg)
 {
     xn_regs r;
 
-    dos_call(&r, 0x0900, 0, 0, (u32)msg);
+    dos_call(&r, 0x0900, 0, 0, (uptr)msg);
 }
 
 void xn_dos_exit(u8 code)

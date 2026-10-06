@@ -56,6 +56,18 @@ void vpc_present(void);
 /* save the screen as it would be shown (320x200, palette applied) as a .bmp; 0 on success */
 int vpc_screenshot(const char *path);
 
+/* The scripted driver (vpc_script.c), for runs without a person: PORT_SCRIPT is a timeline,
+   "SECONDS COMMAND [ARGS]" steps separated by ';' (seconds since start-up):
+     shot FILE.bmp | key NAME (SDL's key names: Return, Escape, Up, A ...) | down NAME |
+     up NAME | type TEXT | click X Y (mode 13h pixels) | rclick X Y | move X Y | quit
+   PORT_SHOT_EVERY=SECONDS with PORT_SHOT_DIR=DIR saves the screen that often (shot_NNNN.bmp);
+   PORT_EXIT_AFTER=SECONDS quits. The main thread's poll runs it. */
+void vpc_script_init(void);
+void vpc_script_poll(void);
+void vpc_input_key(int sdl_scancode, int down);
+void vpc_input_mouse_to(int x, int y);
+void vpc_input_mouse_button(int b, int down);
+
 /* the window was closed or the game asked to quit: the next poll exits */
 extern volatile int vpc_quit_requested;
 
@@ -83,6 +95,7 @@ void _dos_setvect(unsigned int intno, vpc_handler h);
 /* hold off interrupts (cli) and let them run again (sti); they nest */
 void port_cli(void);
 void port_sti(void);
+int port_cli_depth(void);               /* 0: interrupts on */
 
 /* run fn on the interrupt thread every period_ns until vpc_stop_timer; for HMI SOS's timer
    events. Returns a handle (0 on failure). */

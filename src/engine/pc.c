@@ -4,6 +4,7 @@
    Each function fills a register file with the service's inputs (the registers it does not
    read left 0), makes the call through glue.asm's xn_intNN and reads the answer back. */
 #include "xpc.h"
+#include "ptrint.h"
 
 /* The game's C library (Watcom's, in object 1): protected-mode vectors as far pointers
    (selector:offset: returned in DX:EAX, passed in CX:EBX) */
@@ -32,6 +33,53 @@ typedef union far_parts {
 
 /* ---- interrupt vectors ------------------------------------------------------------------ */
 
+#ifdef DAGGER_PORT
+/* The native build (docs/port.md): a vector is a C function in the virtual PC's table
+   (port/host/vpc_irq.c). A saved vector cannot fit a 32-bit offset, so the offset handed out
+   is an index into these saved handlers, given back by xn_pc_set_vector. */
+typedef void (*vpc_handler)(void);
+vpc_handler vpc_getvect(unsigned int intno);
+void vpc_setvect(unsigned int intno, vpc_handler h);
+
+static vpc_handler saved_handlers[64];
+static int saved_count;
+
+static u32 save_handler(vpc_handler h)
+{
+    int i;
+
+    for (i = 0; i < saved_count; i++)
+        if (saved_handlers[i] == h)
+            return (u32)i + 1;
+    if (saved_count == 64)
+        return 0;
+    saved_handlers[saved_count] = h;
+    return (u32)++saved_count;
+}
+
+static vpc_handler saved_handler(u32 index)
+{
+    return index >= 1 && index <= (u32)saved_count ? saved_handlers[index - 1] : 0;
+}
+
+void xn_pc_get_vector(u8 n, u32 *offset, u16 *selector)
+{
+    *offset = save_handler(vpc_getvect(n));
+    *selector = 0x0008;
+}
+
+void xn_pc_set_vector(u8 n, u32 offset, u16 selector)
+{
+    (void)selector;
+    vpc_setvect(n, saved_handler(offset));
+}
+
+void xn_pc_install_vector(u8 n, void (*entry)(void))
+{
+    vpc_setvect(n, entry);
+}
+#else
+
 void xn_pc_get_vector(u8 n, u32 *offset, u16 *selector)
 {
     far_parts v;
@@ -54,6 +102,8 @@ void xn_pc_install_vector(u8 n, void (*entry)(void))
 {
     func_000A12A6(n, (far_handler)entry);       /* (the far pointer takes CS) */
 }
+
+#endif
 
 /* ---- DPMI ------------------------------------------------------------------------------- */
 
@@ -81,7 +131,7 @@ int xn_dpmi_selector_base(u16 selector, u32 *base)
 
     regs(&r, 0x0006, selector, 0, 0);
     ok = dpmi(&r);
-    *base = r.ecx << 16 | (r.edx & 0xFFFF);         /* CX:DX */
+    *base = (u32)(r.ecx << 16 | (r.edx & 0xFFFF));         /* CX:DX */
     return ok;
 }
 
@@ -105,6 +155,29 @@ int xn_dpmi_dos_free(u16 selector)
     return dpmi(&r);
 }
 
+#ifdef DAGGER_PORT
+/* The native build: no CPU exception reaches the program (an arm64 divide does not trap, and
+   the engine checks its divides: Q-SYS-01). The handlers are kept, by index, as vectors are. */
+static vpc_handler exception_handlers[32];
+
+void xn_dpmi_get_exception(u8 n, u32 *offset, u16 *selector)
+{
+    *offset = save_handler(exception_handlers[n & 31]);
+    *selector = 0x0008;
+}
+
+void xn_dpmi_set_exception(u8 n, u32 offset, u16 selector)
+{
+    (void)selector;
+    exception_handlers[n & 31] = saved_handler(offset);
+}
+
+void xn_dpmi_install_exception(u8 n, void (*entry)(void))
+{
+    exception_handlers[n & 31] = entry;
+}
+
+#else
 void xn_dpmi_get_exception(u8 n, u32 *offset, u16 *selector)
 {
     xn_regs r;
@@ -131,12 +204,14 @@ void xn_dpmi_install_exception(u8 n, void (*entry)(void))
     xn_dpmi_set_exception(n, v.p.offset, v.p.selector);
 }
 
+#endif
+
 int xn_dpmi_real_int(u8 n, xn_dpmi_rm_regs *rm)
 {
     xn_regs r;
 
     regs(&r, 0x0300, n, 0, 0);                  /* BH = 0 flags, CX = 0 words */
-    r.edi = (u32)rm;
+    r.edi = (uptr)rm;
     return dpmi(&r);
 }
 
@@ -144,7 +219,7 @@ int xn_dpmi_lock(const void *addr, u32 size)
 {
     xn_regs r;
 
-    regs(&r, 0x0600, (u32)addr >> 16, (u32)addr & 0xFFFF, 0);  /* BX:CX the address */
+    regs(&r, 0x0600, (u32)(uptr)addr >> 16, (u32)(uptr)addr & 0xFFFF, 0);  /* BX:CX the address */
     r.esi = size >> 16;                         /* SI:DI the size */
     r.edi = size & 0xFFFF;
     return dpmi(&r);

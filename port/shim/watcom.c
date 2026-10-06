@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* pow (MATH387R, 0xA166C -> 0xA1516). FALL.EXE runs the FPU with control word 0x127F
@@ -96,4 +97,16 @@ int port_sscanf(const char *s, const char *fmt, ...)
     n = vsscanf(s, fmt, ap);
     va_end(ap);
     return n;
+}
+
+/* Watcom's malloc and free (0xA10A8, 0xA117E), which XnGine calls (its game_malloc and
+   game_free, xgfx.h) */
+void *func_000A10A8(unsigned int size)
+{
+    return malloc(size ? size : 1);
+}
+
+void func_000A117E(void *block)
+{
+    free(block);
 }

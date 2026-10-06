@@ -17,6 +17,7 @@
    dispatcher already holds them in, so Watcom needs no other register (a saved one would be
    left on the stack under the handler's return address). */
 
+#ifndef DAGGER_PORT
 /* jmp fn: fn() (fn in EAX) */
 s32 xn_tail_jump(void *fn);
 #pragma aux xn_tail_jump = "jmp eax" parm [eax] aborts modify exact [];
@@ -41,5 +42,34 @@ void xn_cli(void);
 #pragma aux xn_cli = "cli" modify exact [];
 void xn_sti(void);
 #pragma aux xn_sti = "sti" modify exact [];
+
+#else
+/* The native build (docs/port.md): a dispatcher's jump is a call (the handler runs a frame
+   deeper, which nothing native depends on); the interrupt flag is the virtual PC's interrupt
+   lock (port/include/port_vpc.h: cli and sti nest), and IF in the saved flags says whether it
+   was free. */
+#include "ptrint.h"
+void port_cli(void);
+void port_sti(void);
+int port_cli_depth(void);
+static __inline__ s32 xn_tail_jump(void *fn) { return ((s32 (*)(void))fn)(); }
+static __inline__ s32 xn_tail_jump_1(void *fn) { return ((s32 (*)(s32))fn)(1); }
+static __inline__ s32 xn_tail_jump3(void *fn, iptr a, iptr b, iptr c)
+{
+    return ((s32 (*)(iptr, iptr, iptr))fn)(a, b, c);
+}
+static __inline__ u32 xn_save_flags(void) { return port_cli_depth() ? 0 : 0x200; }
+static __inline__ void xn_restore_flags(u32 flags)
+{
+    if (flags & 0x200) {
+        while (port_cli_depth() > 0)
+            port_sti();
+    } else if (port_cli_depth() == 0) {
+        port_cli();
+    }
+}
+static __inline__ void xn_cli(void) { port_cli(); }
+static __inline__ void xn_sti(void) { port_sti(); }
+#endif
 
 #endif

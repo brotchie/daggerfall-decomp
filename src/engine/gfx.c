@@ -2,12 +2,22 @@
    documentation are in xgfx.h). The game runs in mode 13h: the VESA paths never run in it, but
    are kept as the asm has them. */
 #include "xgfx.h"
+#include "ptrint.h"
+#include "doslow.h"
 #include "xpal.h"
 
 #define VGA_STATUS      0x3DA
 #define VGA_IN_RETRACE  0x08
+#ifdef DAGGER_PORT
+extern unsigned char *port_low_memory;     /* the native build's real-mode memory (port_vpc.h) */
+#define VGA_MEMORY      (port_low_memory + 0xA0000)
+#define VGA_WINDOW_END  ((uptr)VGA_MEMORY + 0x10000)
+#define VGA_WINDOW_OFFSET(p) ((u32)((p) - VGA_MEMORY) & 0xFFFF)
+#else
 #define VGA_MEMORY      ((u8 *)0xA0000)     /* the screen, and the VESA bank window */
 #define VGA_WINDOW_END  0xB0000
+#define VGA_WINDOW_OFFSET(p) ((u32)(p) & 0xFFFF)  /* a pointer's place in the bank window */
+#endif
 #define BANK            0x10000
 
 #define VBE_OK          0x004F
@@ -203,7 +213,7 @@ static int alloc_back_buffer(void)
     if (block == 0)
         return 0;
     xn_gfx_buffer_alloc = block;
-    screen_buffer = (u8 *)(((u32)block + 31) & ~31u);
+    screen_buffer = (u8 *)(((uptr)block + 31) & ~(uptr)31);
     xn_gfx_buffer_base = screen_buffer;
     p = (u32 *)screen_buffer;
     for (n = (u32)xn_gfx_screen_size >> 2; n != 0; n--)
@@ -361,7 +371,7 @@ int xn_gfx_vesa_int10(u32 ax, u32 bx, u32 cx, u32 dx)
     r.eax = 0x300;                      /* simulate a real-mode interrupt */
     r.ebx = 0x10;
     r.ecx = 0;
-    r.edi = (u32)rm;
+    r.edi = (uptr)rm;
     xn_int31(&r);
     if (r.eflags & XN_CF)
         return 0;
@@ -385,8 +395,8 @@ int xn_gfx_vesa_init(void)
     r.ebx = xn_gfx_vesa_dos_selector;
     r.eax = 6;                          /* the selector's base address: CX:DX */
     xn_int31(&r);
-    xn_gfx_vesa_dos_buffer = (u8 *)((r.ecx & 0xFFFF) << 16 | (r.edx & 0xFFFF));
-    if (xn_gfx_vesa_int10(VBE_INFO, r.ebx, r.ecx, r.edx)) {
+    xn_gfx_vesa_dos_buffer = (u8 *)DOS_LOW((r.ecx & 0xFFFF) << 16 | (r.edx & 0xFFFF));
+    if (xn_gfx_vesa_int10(VBE_INFO, (u32)r.ebx, (u32)r.ecx, (u32)r.edx)) {
         info = xn_gfx_vesa_dos_buffer;
         if (*(const u32 *)info == 0x41534556 && *(const u16 *)(info + 4) >= 0x102) {
             xn_gfx_vesa_present = 1;            /* "VESA", version 1.2 or later */
@@ -545,9 +555,9 @@ void xn_gfx_vesa_blit_rect_banked(s32 x, s32 y, u32 w, u32 h, const u8 *src)
 
     xn_gfx_vesa_set_bank(bank);
     do {
-        if ((u32)dst + w >= VGA_WINDOW_END) {
+        if ((uptr)dst + w >= (uptr)VGA_WINDOW_END) {
             /* the row crosses the window's end: the rest of it in the next bank */
-            first = BANK - ((u32)dst & 0xFFFF);
+            first = BANK - VGA_WINDOW_OFFSET(dst);
             for (k = first; k != 0; k--)
                 *dst++ = *src++;
             xn_gfx_vesa_set_bank(++bank);
@@ -561,7 +571,7 @@ void xn_gfx_vesa_blit_rect_banked(s32 x, s32 y, u32 w, u32 h, const u8 *src)
                 *dst++ = *src++;
         }
         dst += skip;
-        if ((u32)dst >= VGA_WINDOW_END) {
+        if ((uptr)dst >= (uptr)VGA_WINDOW_END) {
             xn_gfx_vesa_set_bank(++bank);
             dst -= BANK;
         }

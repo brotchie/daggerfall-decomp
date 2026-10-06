@@ -136,7 +136,7 @@ extern void color_init_remap_tables(void);
 extern void xn_rand_noise_init(void);
 extern void xn_sky_snow_init(void);
 extern char *xn_shade_table_63(void);
-extern int func_000C9EB2(void);
+extern int xn_shade_init_reserved(void);
 extern int xn_shade_build_translucent_table(char *);
 extern char *xn_mem_align_up(char *, int);
 extern int xn_mouse_set_sensitivity(short, short);
@@ -265,7 +265,7 @@ void init_game_data(void)
     disk_read_file(D_001751C2, D_00195CF4 = xn_mem_align_up(D_00195D24, 256));
     D_00195CF8 = mc_malloc(16640, D_00175040, 200);
     disk_read_file(D_001751CB, D_00195D18 = xn_mem_align_up(D_00195CF8, 256));
-    func_000C9EB2();
+    xn_shade_init_reserved();
     realtime_clock_tick = *(int *)DOS_LOW(0x46C);
     func_0007E066();
     if (cfg_helmet != 0) {

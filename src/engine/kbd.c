@@ -1,6 +1,7 @@
 /* kbd.c: XnGine's keyboard (canonical C; the interface and the module's documentation are in
    xkbd.h). */
 #include "xkbd.h"
+#include "ptrint.h"
 #include "xpc.h"
 #include "xmem.h"
 
@@ -75,7 +76,7 @@ void xn_kbd_read_key_b(xn_regs *r)
     /* Quirk Q-KBD-01: the asm looks the key up with EAX pointing into the keymap and leaves
        that pointer's upper half */
     if (from_handler && key != 0)
-        r->eax |= ((u32)xn_kbd_keymap + (key >> 8) - 1) & 0xFFFF0000;
+        r->eax |= ((u32)(uptr)xn_kbd_keymap + (key >> 8) - 1) & 0xFFFF0000;
 }
 
 u16 xn_kbd_wait_key(void)
@@ -134,3 +135,14 @@ void xn_kbd_numlock_off(void)
     XN_BIOS_KBD_FLAGS &= ~XN_BIOS_NUMLOCK;
     xn_bios_key_waiting(0);
 }
+
+#ifdef DAGGER_PORT
+/* DAGGER_PORT: the interrupt entry. The virtual PC (port/host/vpc_irq.c) calls a vector as a
+   C function on its interrupt thread, so the entry is the handler; nothing to lock. */
+void xn_kbd_int9_entry(void)
+{
+    xn_kbd_int9_handler();
+}
+
+u8 xn_kbd_code_start[1];
+#endif

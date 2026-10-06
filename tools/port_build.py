@@ -41,6 +41,8 @@ EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 HOST_LIBC = {
     "abs", "atoi", "exp", "memchr", "memcmp", "printf", "strchr", "strcmp", "strlen",
     "strncmp", "strstr", "tolower", "toupper",
+    # and XnGine's (clang's own calls for struct copies and zeroing, too)
+    "memcpy", "memset",
 }
 
 
@@ -80,13 +82,20 @@ def nm_symbols(objs):
 
 
 def symbol_table():
-    """name -> (address, kind) for every name the sources may use: config/symbols.txt's names,
-    and the address names (func_X, D_X, xn_data_X)"""
+    """name -> (address, kind) for every name the sources may use: config/symbols.txt's names
+    (the game's), then XnGine's as its harness resolves them (tools/xn_rc.py: config/names.csv
+    at any confidence, and config/xngine_aliases.csv's second names for an address), and the
+    address names (func_X, D_X, xn_data_X)"""
     table = {}
     for line in open(os.path.join(ROOT, "config", "symbols.txt")):
         m = re.match(r"(\w+) = (0x[0-9A-Fa-f]+); (\w+)", line)
         if m:
             table[m.group(1)] = (int(m.group(2), 16), m.group(3))
+    for p in ("names.csv", "xngine_aliases.csv"):
+        with open(os.path.join(ROOT, "config", p), newline="") as f:
+            for r in csv.DictReader(f):
+                if r["kind"] in ("func", "global") and r["name"] not in table:
+                    table[r["name"]] = (int(r["address"], 16), r["kind"])
     return table
 
 
@@ -109,6 +118,7 @@ def generate(need, table, defined):
     for r in csv.DictReader(open(os.path.join(ROOT, "config", "xngine_functions.csv"))):
         xn_funcs.add(int(r["va"], 16))
 
+    declared = port_data.declarations()     # extern data declarations: data, whatever names.csv says
     funcs, data, unknown = [], {}, []
     for name in sorted(need):
         addr, kind = address_of(name, table)
@@ -116,7 +126,10 @@ def generate(need, table, defined):
             unknown.append(name)
             continue
         o = image.obj_of_va(addr)
-        if kind == "func" or (o is not None and o.index == 2 and addr in xn_funcs):
+        # a name the sources declare as data is data: names.csv calls some "func" (the
+        # helmet's command strings, which xngine_functions.csv takes for code)
+        if name not in declared and ((o is not None and o.index == 2 and addr in xn_funcs) or
+                                     (kind == "func" and not (o is not None and o.index == 2))):
             funcs.append((name, addr))
         elif o is None:
             unknown.append(name)
@@ -153,7 +166,7 @@ def build():
     configure()
     # compile everything; the link may fail until the generated definitions are current
     r = run(["ninja", "-C", BUILD, "fall"], capture_output=True)
-    game_objs = objects("game.dir")
+    game_objs = objects("game.dir") + objects("engine.dir")
     port_objs = [o for o in objects("fall.dir") + objects("porthost.dir") if "/gen/" not in o]
     errors = [l for l in (r.stdout + r.stderr).splitlines() if re.search(r"\.[ch]:\d+:\d+: error:", l)]
     if errors or not game_objs:

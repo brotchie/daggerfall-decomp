@@ -1,6 +1,7 @@
 /* sys.c: XnGine's system services (canonical C; the interface and the module's documentation
    are in xsys.h). */
 #include "xsys.h"
+#include "ptrint.h"
 #include "xsysutil.h"
 #include "xpc.h"
 #include "xmem.h"
@@ -54,7 +55,7 @@ void xn_sys_install_divide_handler(void)
     xn_dpmi_get_exception(0, &xn_sys_old_div_handler_offset, &xn_sys_old_div_handler_selector);
     xn_dpmi_install_exception(0, xn_sys_divide_error_entry);
     xn_mem_lock_region((void *)xn_sys_divide_error_entry,
-                       xn_sys_divide_error_end - (u8 *)xn_sys_divide_error_entry);
+                       (u32)(xn_sys_divide_error_end - (u8 *)xn_sys_divide_error_entry));
 }
 
 void xn_sys_remove_divide_handler(void)
@@ -87,7 +88,7 @@ void xn_sys_divide_error_handler(xn_int_frame *f)
     /* the host's frame starts above the EFLAGS the entry stub pushed first */
     xn_dpmi_exc_frame *x = (xn_dpmi_exc_frame *)(f->esp + 4);
 
-    x->eip += divide_length(((const u8 *)x->eip)[1]);
+    x->eip += divide_length(((const u8 *)(uptr)x->eip)[1]);
     f->eax = 0;                         /* Quirk Q-SYS-01: the quotient and remainder are 0 */
     f->edx = 0;
 }
@@ -134,3 +135,20 @@ void xn_sys_zero_page_check(void)
         return;
     }
 }
+
+#ifdef DAGGER_PORT
+/* DAGGER_PORT: the interrupt entries (as kbd.c's). The virtual PC raises neither: its DOS
+   has no critical errors, and arm64 divides by zero to 0 without a trap (Q-SYS-01's answer). */
+void xn_sys_crit_error_entry(void)
+{
+    xn_int_frame f = {0};
+
+    xn_sys_crit_error_handler(&f);
+}
+
+void xn_sys_divide_error_entry(void)
+{
+}
+
+u8 xn_sys_divide_error_end[1];
+#endif

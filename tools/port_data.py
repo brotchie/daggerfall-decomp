@@ -52,9 +52,10 @@ EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 # virtual PC's port_low_memory_block
 LOWMEM_FIRST, LOWMEM_END = 0x400, 0x110000
 CFLAGS = ["-std=gnu89", "-include", os.path.join(ROOT, "port", "include", "port.h"),
-          "-funsigned-char", "-I" + os.path.join(ROOT, "port", "include"),
-          "-I" + os.path.join(ROOT, "include"), "-fsyntax-only", "-w", "-ferror-limit=0",
-          "-Xclang", "-fdump-record-layouts"]
+          "-DPORT_ENGINE", "-funsigned-char", "-I" + os.path.join(ROOT, "port", "include"),
+          "-I" + os.path.join(ROOT, "include"), "-I" + os.path.join(ROOT, "src", "engine"),
+          "-fsyntax-only", "-w", "-ferror-limit=0",
+          "-Xclang", "-fdump-record-layouts-canonical"]
 TARGETS = {"32": ["-target", "i386-unknown-linux-gnu"], "64": []}
 
 # ---- declarations ---------------------------------------------------------------------------
@@ -84,11 +85,19 @@ TYPES = {
     # an int slot that also keeps a pointer (talk.c's faction target; potions' item list
     # starts here and runs over the slots after it, as in DOS)
     "scratch_190be4": "iptr __v",
+    # XnGine's: the vertex-pointer tables its polygon rings point at (xn_poly_ring_a/_b, 3n+1
+    # pointers for n vertices), which the C reaches only through the rings: pointers up to
+    # the next global ("all": the 0xDB87DB87 filler between the tables too)
+    "xn_poly_ring_tables": ("void *__v[1]", "all"),
 }
 
 DECL = re.compile(r"^extern\s+((?:const\s+|volatile\s+|signed\s+|unsigned\s+|struct\s+|union\s+)*"
                   r"[A-Za-z_]\w*(?:\s*\*)*)\s*(\**)\s*([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)\s*;")
 FPTR_DECL = re.compile(r"^extern\s+(.+?)\(\s*\*\s*([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)\s*\)\s*(\(.*\))\s*;")
+# several declarators on one line: `extern struct v **ring_a[], **ring_b[];`
+MULTI_DECL = re.compile(r"^extern\s+((?:const\s+|volatile\s+|signed\s+|unsigned\s+|struct\s+|union\s+)*"
+                        r"[A-Za-z_]\w*)\s+([^;(]*,[^;(]*);\s*$")
+DECLARATOR = re.compile(r"^\s*(\**)\s*([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)\s*$")
 
 
 def source_files():
@@ -100,6 +109,9 @@ def source_files():
                   if f.endswith(".c"))
     out += sorted(os.path.join(ROOT, "include", f) for f in os.listdir(os.path.join(ROOT, "include"))
                   if f.endswith(".h"))
+    # XnGine's (object 2): its headers declare its globals, a few .c files their own
+    engine = os.path.join(ROOT, "src", "engine")
+    out += sorted(os.path.join(engine, f) for f in os.listdir(engine) if f.endswith((".h", ".c")))
     return out
 
 
@@ -115,6 +127,17 @@ def declarations():
                 dims = re.sub(r"\[\s*\]", "[1]", dims, count=1)
                 decls[name].append((path, "%s %s__v%s" % (base, stars, dims), "[]" in m.group(4)
                                     or "[ ]" in m.group(4)))
+                continue
+            m = MULTI_DECL.match(re.sub(r"/\*.*?\*/|//.*", "", line).rstrip())
+            if m:
+                base = m.group(1).strip()
+                for part in m.group(2).split(","):
+                    d = DECLARATOR.match(part)
+                    if d:
+                        stars, name, dims = d.group(1), d.group(2), d.group(3)
+                        unsized = "[]" in dims or "[ ]" in dims
+                        dims = re.sub(r"\[\s*\]", "[1]", dims, count=1)
+                        decls[name].append((path, "%s %s__v%s" % (base, stars, dims), unsized))
                 continue
             m = FPTR_DECL.match(line)
             if m:
@@ -196,6 +219,19 @@ def is_pointerish(typ):
 
 
 ARRAY = re.compile(r"^(.*?)\s*\[(\d+)\]((?:\[\d+\])*)$")
+# an array of function pointers as clang writes its type: `void (*[9])(void)`
+FPTR_ARRAY = re.compile(r"^.*\(\*\[(\d+)\]((?:\[\d+\])*)\)\s*\(.*\)$")
+
+
+def fptr_array(typ):
+    """`void (*[9])(void)` -> (9, "void (*)(void)"); None for other types"""
+    m = FPTR_ARRAY.match(typ)
+    if not m:
+        return None
+    n = int(m.group(1))
+    for d in re.findall(r"\[(\d+)\]", m.group(2)):
+        n *= int(d)
+    return n, "void (*)(void)"
 
 
 class Layouts:
@@ -206,6 +242,9 @@ class Layouts:
 
     def size(self, typ, t):
         typ = typ.strip()
+        fa = fptr_array(typ)
+        if fa:
+            return fa[0] * (4 if t == "32" else 8)
         m = ARRAY.match(typ)
         if m:
             inner = m.group(1) + m.group(3)
@@ -220,6 +259,10 @@ class Layouts:
     def leaves(self, typ, t, base=0, path=""):
         """[(offset, size, type, path)] of the scalar parts of typ, in declaration order"""
         typ = typ.strip()
+        fa = fptr_array(typ)
+        if fa:
+            z = 4 if t == "32" else 8
+            return [(base + i * z, z, fa[1], "%s[%d]" % (path, i)) for i in range(fa[0])]
         m = ARRAY.match(typ)
         if m:
             inner = m.group(1) + m.group(3)
@@ -321,6 +364,8 @@ def code_ranges():
     out = []
     for r in csv.DictReader(open(os.path.join(ROOT, "config", "functions.csv"))):
         a = int(r["va"], 16)
+        if 0xC0000 <= a < 0x170000:
+            continue        # XnGine's: its span there runs over its data; code_bytes below
         out.append((a, a + int(r["span"] or r["size"])))
     for r in csv.DictReader(open(os.path.join(ROOT, "config", "xngine_functions.csv"))):
         a = int(r["va"], 16)
@@ -352,6 +397,14 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
     for name, (addr, kind) in table.items():
         if kind == "func":
             func_name.setdefault(addr, name)
+    for name, (addr, kind) in table.items():
+        # a name the build defines first (a game function its source still calls func_X
+        # while names.csv has a candidate name for it)
+        if kind == "func" and name in defined and func_name[addr] not in defined:
+            func_name[addr] = name
+    for addr in list(func_name):
+        if func_name[addr] not in defined and "func_%08X" % addr in defined:
+            func_name[addr] = "func_%08X" % addr
 
     def in_code(a):
         i = bisect.bisect_right(code_starts, a) - 1
@@ -365,11 +418,18 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
     for name, (addr, kind) in table.items():
         if kind == "global" and not in_code(addr):
             starts.setdefault(addr, name)
-    for name, addr in need.items():
-        starts[addr] = name
+    need_at = collections.defaultdict(list)    # names the code uses for one address
+    for name, addr in sorted(need.items()):
+        need_at[addr].append(name)
+        starts[addr] = need_at[addr][0]
     for o in image.objs:
         if o.index == 3 and o.base not in starts:
             starts[o.base] = "D_%08X" % o.base
+    # XnGine's object: its data lies between its functions; all of it, in order, as object 3
+    eng = next(o for o in image.objs if o.index == 2)
+    for a in [eng.base] + [e for _s, e in code]:
+        if eng.base <= a < eng.base + eng.vsize and not in_code(a):
+            starts.setdefault(a, "D_%08X" % a)
     addrs = sorted(starts)
 
     def extent(addr):
@@ -380,24 +440,49 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
         j = bisect.bisect_right(code_starts, addr)
         if o.index != 3 and j < len(code_starts):
             end = min(end, code_starts[j])
-        if o.index != 3:
-            # XnGine's object: its globals sit between big unnamed buffers, which belong to the
-            # engine (it brings its own data when it is linked); take what the game declares
+        if o.index == 1:
+            # data the code names in object 1 (code): what its declaration says
             end = min(end, addr + declared_size.get(starts[addr], 64))
         return end
 
-    # emit all of object 3 (the game's data, in order) and the object-2 globals the game names
-    chosen = set(a for a in addrs if image.obj_of_va(a) and image.obj_of_va(a).index == 3)
+    # emit all of objects 3 (the game's data) and 2 (XnGine's), in order, and whatever else
+    # the code names
+    chosen = set(a for a in addrs if image.obj_of_va(a) and image.obj_of_va(a).index in (2, 3)
+                 and not in_code(a))
     chosen |= set(need.values())
 
-    # types
     decls = declarations()
+
+    # two names for one address (XnGine's aliases: a struct and its first field): the one
+    # whose declaration is the largest is laid out, the others are labels at its start
+    def score(d):
+        return (d[1].count("*") + len(re.findall(r"\b(iptr|uptr|struct|union)\b", d[1])))
+    alias_labels = {}
+    multi = {a: ns for a, ns in need_at.items() if len(ns) > 1}
+    if multi:
+        g = collections.defaultdict(list)
+        for ns in multi.values():
+            for n in ns:
+                if decls.get(n):
+                    d = max(decls[n], key=lambda d: (score(d), not d[2]))
+                    g[d[0]].append((n, d[1]))
+        sizes = layouts_for(g)
+        for a, ns in multi.items():
+            def size(n):
+                v = sizes.get(n)
+                return v[0] if v is not None and not isinstance(v, str) else 0
+            ns = sorted(ns, key=lambda n: (-size(n), n))
+            starts[a] = ns[0]
+            alias_labels[a] = ns[1:]
+
+    # types
     groups = collections.defaultdict(list)
     pick = {}
     for addr in sorted(chosen):
         name = starts[addr]
         if name in TYPES:
-            pick[name] = (os.path.join(ROOT, "include", "records.h"), TYPES[name], False)
+            decl, unsized = TYPES[name] if isinstance(TYPES[name], tuple) else (TYPES[name], False)
+            pick[name] = (os.path.join(ROOT, "include", "records.h"), decl, unsized)
             groups[pick[name][0]].append((name, pick[name][1]))
             continue
         ds = decls.get(name)
@@ -405,8 +490,6 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
             continue
         # most pointer-wide declaration first (a disagreement is reported below); of those, one
         # that gives the array's size
-        def score(d):
-            return (d[1].count("*") + len(re.findall(r"\b(iptr|uptr|struct|union)\b", d[1])))
         ds = sorted(ds, key=lambda d: (score(d), not d[2]), reverse=True)
         pick[name] = ds[0]
         if len({re.sub(r"\s+", " ", d[1]) for d in ds}) > 1 and \
@@ -442,7 +525,9 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
             size32, size64, l32, l64 = typed[name]
             wide = size32 != size64 or any(is_pointerish(t) for _o, _s, t, _p in l32)
             if wide and size32:
-                if pick[name][2]:
+                if pick[name][2] == "all":
+                    count = max(1, (end - addr) // size32)
+                elif pick[name][2]:
                     # [] arrays: the elements before the next global, up to the first whose
                     # pointer parts are neither relocated nor zero (data of another kind)
                     count = 0
@@ -546,9 +631,10 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
         a2, e2, count, s32, s64, l32, l64 = layout_of[name]
         if is_typed:
             asm.append(".p2align 3")
-        if name not in defined:
-            asm.append(".globl _%s" % name)
-            asm.append("_%s:" % name)
+        for n in [name] + alias_labels.get(addr, []):
+            if n not in defined:
+                asm.append(".globl _%s" % n)
+                asm.append("_%s:" % n)
         if not is_typed:
             # relocations inside an untyped global: the declaration is too narrow
             for a in range(addr, end):
@@ -578,7 +664,8 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
                 # real-mode data lives (an iptr table can hold plain numbers too:
                 # D_00178848's powers of 16 run up to 0x10000000)
                 if (("*" in t) and LOWMEM_FIRST <= val < LOWMEM_END) or \
-                        (t in ("iptr", "uptr") and count == 1 and "[" not in p and
+                        (t in ("long", "unsigned long") and count == 1 and p == ".__v" and
+                         re.match(r"(volatile\s+)?[iu]ptr\b", pick[name][1]) and
                          (0x400 <= val < 0x500 or 0xA0000 <= val < LOWMEM_END)):
                     # a real-mode address (VGA's 0xA0000, the BIOS data area): the native
                     # build's low memory block (port/host/vpc.c)
@@ -586,6 +673,8 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
                     continue
                 if val and ("*" in t):
                     plan.problems["raw-pointer"].append("%s%s = 0x%08X" % (name, p, val))
+                    if val == 0xFFFFFFFF:
+                        val = -1        # a pointer at -1 (XnGine's "no font" slots): all ones
                 if t in ("long", "iptr") and val & 0x80000000:
                     val -= 1 << 32
                 buf[dst:dst + 8] = struct.pack("<q" if val < 0 else "<Q", val)

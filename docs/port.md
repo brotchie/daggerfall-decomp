@@ -38,6 +38,7 @@ work on `main`.
 | `port/test/opltest.c`, `musictest.c` | the OPL3 against the datasheet's numbers; a song rendered offline through the whole music path to a WAV (`--all`: every song) |
 | `port/test/vpcdemo.c` | the virtual PC on its own, through XnGine's entry points, with the game's image, palette and sounds; `--selftest` checks it end to end |
 | `port/host/host.c` | stopping SDL and the virtual PC, stopping on a stub or fault with the call chain, `port_check_ptr` |
+| `port/host/vpc_script.c` | the scripted driver: `PORT_SCRIPT` (a timeline of `shot`, `key`, `type`, `click` ... steps), `PORT_SHOT_EVERY`/`PORT_SHOT_DIR`, `PORT_EXIT_AFTER` |
 | `port/host/main.c` | `main`: SDL, the folders, then the game's main (0x10010) with `Z.CFG`, as `FALL.EXE Z.CFG` ran; a backtrace for a stub or a fault; `port_check_ptr` stops on a pointer that lost its top half |
 | `tools/port_build.py` | configure, build and generate; `run` prepares a game folder as `tools/fallemu.py` does and starts the build; `missing` lists the stubs |
 | `tools/port_census.py` | the 64-bit worklist: clang's diagnostics on the game's C, by kind and by file |
@@ -53,6 +54,10 @@ build/port/vpcdemo --game ~/dagger_comp/build/game        # the virtual PC on it
 build/port/musictest --game ~/dagger_comp/build/game --song D1.HMI --seconds 60 --out d1.wav
 SDL_VIDEO_DRIVER=offscreen SDL_AUDIO_DRIVER=dummy DAGGER_OVERLAY=build/port/run \
     build/port/vpcdemo --game ~/dagger_comp/build/game --selftest
+# a run without a person: screenshots every 2 s, keys and clicks on a timeline, quit at 60 s
+PORT_SHOT_EVERY=2 PORT_SHOT_DIR=/tmp/shots PORT_EXIT_AFTER=60 \
+    PORT_SCRIPT="8 key Escape; 12 click 160 100; 20 shot /tmp/a.bmp" \
+    DAGGER_GAME=~/dagger_comp/build/game .venv/bin/python tools/port_build.py run
 .venv/bin/python tools/port_build.py missing         # what the stubs stand in for
 .venv/bin/python tools/port_census.py                # the 64-bit worklist
 ```
@@ -260,24 +265,43 @@ The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a po
 
 ## Linking the engine
 
-When XnGine's canonical C lands on `main`, the native build compiles `src/engine/` in place of
-the 175 stubs. What the engine needs under `DAGGER_PORT`:
-- `xn_inb`/`xn_outb`/`xn_inw`/`xn_outw` as plain function declarations, without the inline
-  `in`/`out` pragmas: the virtual PC defines them.
-- `xn_regs`'s registers pointer-wide (`unsigned long`, the layout of `struct vpc_regs` in
-  port_vpc.h): a DOS read passes its buffer's address in EDX. Code that puts an address in a
-  register uses `uptr`, not `u32`.
-- `VGA_MEMORY` and every other real-mode address through the virtual PC's low memory:
-  `(port_low_memory + 0xA0000)`, or `DOS_LOW()` from include/doslow.h.
-- Interrupt handlers as plain C functions installed with `_dos_setvect`. They run on the
-  interrupt thread under its lock and send EOI as before (`xn_outb(0x20, 0x20)`). Globals
-  that a handler changes and a loop waits on must be `volatile`.
-- `cli`/`sti` sections as `port_cli()`/`port_sti()`.
-- No hardware exceptions (an arm64 divide does not trap; the canonical C's `arith.c`
-  checks).
-- The structs the game and the engine share (the model handle in `model_instance` and
-  `block_model`, `monster_anim`, the texture cache entries) declared with the same
-  pointer fields on both sides.
+XnGine's canonical C (`src/engine/`, from `main`) is compiled natively in place of the 175
+stubs: CMake's `engine` object library, the game's dialect plus `-DPORT_ENGINE` (port.h leaves
+the engine's own `open`/`read` members alone). `glue.asm` is the matching build's; natively the
+virtual PC is the glue. What the engine has under `DAGGER_PORT`:
+- **Registers and services.** `xn_regs` is pointer-wide (`unsigned long`, the layout of
+  `struct vpc_regs`): a DOS read passes its buffer's address in EDX. `xn_int10`..`xn_int33` and
+  `xn_inb`/`xn_outb`/`xn_inw`/`xn_outw` are the virtual PC's (port/host/vpc.c); xngine.h's
+  arithmetic pragmas are inline C there.
+- **Real-mode memory** through the virtual PC's low memory: xpc.h's BIOS tick and keyboard
+  flags, gfx.c's `VGA_MEMORY` and VESA window, DOS buffers through `DOS_LOW()`.
+- **Interrupts.** A vector is a C function in the virtual PC's table. pc.c's get/set/install
+  hand out an index for a saved vector, since a 32-bit offset cannot hold a native pointer. The
+  entries the Watcom build makes as stubs (`xn_kbd_int9_entry`, `xn_joy_timer_entry`,
+  `xn_sys_crit_error_entry`, `xn_sys_divide_error_entry`, `xn_serial_irq_handlers`) are C
+  functions at the end of their modules, and the lock regions' bounds are dummies. `cli`/`sti`
+  and `pushfd`/`popfd` (xsysutil.h) are the interrupt lock (`port_cli`/`port_sti`,
+  `port_cli_depth`).
+- **No hardware exceptions**: an arm64 divide does not trap, and its 0 for a zero divisor is
+  what Q-SYS-01's handler gave.
+- **Names.** The game calls five engine functions by address in the sources. Four of them
+  (`xn_vec_dir_to_angles`, `xn_model_push_player_from_pick`, `xn_shade_init_reserved`,
+  `spell_has_no_effects`) were promoted to strong in names.csv. `xn_timer_tick_callback` was
+  named `D_000CDDA8` as data. The matching build is unchanged.
+- **The engine's data** comes from tools/port_data.py, the way the game's data does:
+  - all of object 2's data, in address order, between its functions;
+  - types from the engine's headers and .c files (several declarators on a line are parsed);
+  - names from names.csv at any confidence and from xngine_aliases.csv (a struct and its first
+    field get one layout, the other name as a label);
+  - clang's canonical layouts, so typedefs (`u32`, function-pointer arrays) lay out.
+  `xn_poly_ring_tables`, which the C reaches only through the rings, is typed in port_data's
+  TYPES as pointers. A pointer at -1 stays all ones.
+- Watcom's `malloc`/`free` (0xA10A8, 0xA117E), which the engine calls, are in port/shim/watcom.c.
+
+The engine's own 64-bit pass (the struct checks in xnstruct.h, pointers through `u32`,
+pointer-table strides, data-file pointer slots) is the engine agent's, merged separately.
+The platform files' changes compile to identical Watcom objects (all nine checked with
+tools/wcc10.py).
 
 ## Phases
 

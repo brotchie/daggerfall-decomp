@@ -28,6 +28,21 @@ target_compile_options(game PRIVATE
     -Wno-error=implicit-function-declaration -Wno-error=implicit-int
     -Wno-error=return-type)
 
+# XnGine, the engine (FALL.EXE's object 2), as its canonical C (src/engine,
+# docs/engine/architecture.md): the game's dialect, with PORT_ENGINE (port.h leaves the
+# engine's file calls alone: its own go through int 21h). glue.asm is the matching build's;
+# here the virtual PC is the glue (port/include/port_vpc.h).
+file(GLOB ENGINE_SRC CONFIGURE_DEPENDS ${ROOT}/src/engine/*.c)
+add_library(engine OBJECT ${ENGINE_SRC})
+target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${ROOT}/include
+    ${ROOT}/src/engine)
+target_compile_options(engine PRIVATE
+    -std=gnu89 -include ${CMAKE_CURRENT_SOURCE_DIR}/include/port.h -DPORT_ENGINE
+    -funsigned-char -fwrapv -fno-strict-aliasing -ffp-contract=off
+    # tools/port_engine.py counts the warnings
+    -w -Wno-error=int-conversion -Wno-error=incompatible-function-pointer-types
+    -Wno-error=implicit-function-declaration)
+
 # The host side: the C library and MemCheck as the game expects them, DOS and DPMI services,
 # and the virtual PC on SDL3 (port/include/port_vpc.h). A static library, so the demo links
 # the platform without the game.
@@ -41,7 +56,8 @@ target_link_libraries(porthost PUBLIC SDL3::SDL3)
 
 file(GLOB GEN_SRC CONFIGURE_DEPENDS ${CMAKE_BINARY_DIR}/gen/*.c)
 
-add_executable(fall ${CMAKE_CURRENT_SOURCE_DIR}/host/main.c ${GEN_SRC} $<TARGET_OBJECTS:game>)
+add_executable(fall ${CMAKE_CURRENT_SOURCE_DIR}/host/main.c ${GEN_SRC} $<TARGET_OBJECTS:game>
+    $<TARGET_OBJECTS:engine>)
 target_compile_options(fall PRIVATE -std=gnu11 -Wall -Wno-unused-function -ffp-contract=off)
 target_link_libraries(fall PRIVATE porthost)
 

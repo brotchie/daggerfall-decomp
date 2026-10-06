@@ -25,10 +25,17 @@
 
 /* ---- the BIOS data area ------------------------------------------------------------------ */
 
+#ifdef DAGGER_PORT
+/* the native build: real-mode memory is the virtual PC's (port/include/port_vpc.h) */
+extern unsigned char *port_low_memory;
+#define XN_BIOS_TICKS       (*(volatile u32 *)(port_low_memory + 0x46C))
+#define XN_BIOS_KBD_FLAGS   (*(volatile u8 *)(port_low_memory + 0x417))
+#else
 /* The BIOS tick count (0040:006C), 18.2 a second */
 #define XN_BIOS_TICKS       (*(volatile u32 *)0x46C)
 /* The BIOS keyboard flags (0040:0017): bit 5 NumLock */
 #define XN_BIOS_KBD_FLAGS   (*(volatile u8 *)0x417)
+#endif
 #define XN_BIOS_NUMLOCK     0x20
 
 /* ---- interrupt vectors (the game's C library: _dos_getvect, and its setvect at 0xA12A6) --- */
