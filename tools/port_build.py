@@ -169,7 +169,7 @@ def build():
           "(%d with native layouts), problems: %s (gen/data_problems.txt)"
           % (len(game_objs), len(funcs), len(unknown), len(plan.items), typed,
              ", ".join("%s %d" % (k, len(v)) for k, v in sorted(plan.problems.items()))))
-    r = run(["ninja", "-C", BUILD, "fall", "vpcdemo"])
+    r = run(["ninja", "-C", BUILD, "fall", "vpcdemo", "opltest", "musictest"])
     if r.returncode:
         sys.exit("port: link failed")
     print("port: built", os.path.relpath(os.path.join(BUILD, "fall"), ROOT))

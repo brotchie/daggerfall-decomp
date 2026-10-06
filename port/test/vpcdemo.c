@@ -7,10 +7,12 @@
    - the mouse through int 33h (reset, ranges, position, mickeys), with a cursor drawn into
      VGA memory;
    - frames paced by the retrace at port 3DAh; the BIOS tick at 0x46C;
-   - a DAGGER.SND sound through HMI SOS's calls (port/shim/sos.c), on a click or Space.
+   - a DAGGER.SND sound through HMI SOS's calls (port/shim/sos.c), on a click or Space;
+   - a song from MIDI.BSA (--song, D1.HMI by default) through SOS's MIDI calls as sos_init and
+     music_play make them: HMI's OPL3 driver from HMIMDRV.386 on the virtual OPL3.
 
-   usage: vpcdemo --game DIR [--image NAME.IMG] [--sound N] [--frames N] [--shot FILE]
-                  [--selftest]
+   usage: vpcdemo --game DIR [--image NAME.IMG] [--sound N] [--song NAME.HMI] [--frames N]
+                  [--shot FILE] [--selftest]
    --selftest feeds SDL key and mouse events in and checks what comes out at the ports and
    services; it prints PASS or FAIL for each check and exits 0 when all pass. With
    SDL_VIDEO_DRIVER=offscreen SDL_AUDIO_DRIVER=dummy it runs without a window. */
@@ -30,6 +32,14 @@ W32 func_0009E8FF(const char *path, W32 debug);         /* sosDIGIInitSystem */
 W32 func_0009F4DE(void *driver, W32 *handle);           /* sosDIGIInitDriver */
 W32 func_000A2504(W32 h, const void *start);            /* sosDIGIStartSample */
 W32 func_000A2460(W32 h, W32 sample);                   /* sosDIGISampleDone */
+W32 func_0009E9C2(const char *path, W32 debug);         /* sosMIDIInitSystem */
+W32 func_0009EC82(const W32 *hardware, W32 *handle);    /* sosMIDIInitDriver */
+W32 func_0009FEE5(W32 h, const void *bank, W32 flag);   /* sosMIDISetInsData */
+W32 func_000A021C(const void *song, W32 *handle);       /* sosMIDIInitSong */
+W32 func_000A27A0(W32 h);                               /* sosMIDIStartSong */
+W32 func_000A2941(W32 h);                               /* sosMIDISongDone */
+
+#include "opl3.h"
 
 #pragma pack(push, 1)
 struct sos_sample {                 /* struct sos_sample (include/structs.h, port/shim/sos.c) */
@@ -82,6 +92,24 @@ static unsigned char *bsa_record(unsigned char *d, int size, int n, int *len)
         unsigned char *e = d + dir + i * 8;
         int sz = e[4] | e[5] << 8 | e[6] << 16 | e[7] << 24;
         if (i == n) {
+            *len = sz;
+            return d + pos;
+        }
+        pos += sz;
+    }
+    return NULL;
+}
+
+/* a named record of MIDI.BSA (18-byte directory entries) */
+static unsigned char *bsa_named(unsigned char *d, int size, const char *name, int *len)
+{
+    int count = d[0] | d[1] << 8, i, pos = 4;
+    int dir = size - count * 18;
+
+    for (i = 0; i < count; i++) {
+        unsigned char *e = d + dir + i * 18;
+        int sz = e[14] | e[15] << 8 | e[16] << 16 | e[17] << 24;
+        if (strncasecmp((char *)e, name, 14) == 0) {
             *len = sz;
             return d + pos;
         }
@@ -152,6 +180,7 @@ static void push_key(SDL_Scancode s, int down)
 int main(int argc, char **argv)
 {
     const char *game = getenv("DAGGER_GAME"), *image = "CHGN00I0.IMG", *shot = NULL;
+    const char *song_name = "D1.HMI";
     int frames = 600, sound = 203, selftest = 0, i, size;
     char path[256];
     unsigned char *img, *snd = NULL, *clip = NULL;
@@ -168,6 +197,7 @@ int main(int argc, char **argv)
         if (!strcmp(argv[i], "--game") && i + 1 < argc) game = argv[++i];
         else if (!strcmp(argv[i], "--image") && i + 1 < argc) image = argv[++i];
         else if (!strcmp(argv[i], "--sound") && i + 1 < argc) sound = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--song") && i + 1 < argc) song_name = argv[++i];
         else if (!strcmp(argv[i], "--frames") && i + 1 < argc) frames = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--shot") && i + 1 < argc) shot = argv[++i];
         else if (!strcmp(argv[i], "--selftest")) selftest = 1;
@@ -255,6 +285,40 @@ int main(int argc, char **argv)
             while (func_000A2460(digi, h) == 0 && SDL_GetTicksNS() < until)
                 SDL_DelayNS(10000000);
             check(func_000A2460(digi, h) == 1, "SOS: the sample finishes");
+        }
+    }
+
+    /* music, as sos_init and music_play start it: an SB16's OPL3 (0xA009) at 0x388 */
+    {
+        static W32 hw[12];
+        static struct { char *data; char pad[28]; } song_block;
+        W32 hmidi = 0, hsong = 0;
+        int ml = 0, dl = 0, bl = 0, sl = 0;
+        unsigned char *mel = load("MELODIC.BNK", &ml), *drm = load("DRUM.BNK", &dl);
+        unsigned char *midi = load("ARENA2\\MIDI.BSA", &bl);
+        unsigned char *rec = midi ? bsa_named(midi, bl, song_name, &sl) : NULL;
+        hw[0] = 0xA009;
+        ((unsigned char *)hw)[0x22] = 0x88;         /* HMISET.CFG's DevicePort, at +0x22 */
+        ((unsigned char *)hw)[0x23] = 0x03;
+        func_0009E9C2(NULL, 0);
+        check(func_0009EC82(hw, &hmidi) == 0, "SOS MIDI: the OPL3 driver from HMIMDRV.386");
+        if (mel && drm && rec) {
+            func_0009FEE5(hmidi, mel, 1);
+            func_0009FEE5(hmidi, drm, 1);
+            song_block.data = malloc((size_t)sl);
+            memcpy(song_block.data, rec, (size_t)sl);
+            check(func_000A021C(&song_block, &hsong) == 0 && func_000A27A0(hsong) == 0,
+                  "SOS MIDI: a MIDI.BSA song starts");
+            if (selftest) {
+                int k, keys = 0;
+                SDL_DelayNS(1500000000ull);
+                vpc_music_lock();
+                for (k = 0; k < 18; k++)
+                    keys += vpc_music_chip()->chan[k].keyon;
+                vpc_music_unlock();
+                check(keys > 0 && func_000A2941(hsong) == 0,
+                      "music: the song plays on the OPL3 (keys down after 1.5 s)");
+            }
         }
     }
 

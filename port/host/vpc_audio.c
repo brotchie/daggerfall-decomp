@@ -116,25 +116,43 @@ static void SDLCALL feed(void *userdata, SDL_AudioStream *stream, int additional
     SDL_PutAudioStreamData(stream, mixbuf, frames * 2 * (int)sizeof(float));
 }
 
+static SDL_AudioDeviceID device;
+
 int vpc_audio_init(void)
 {
-    SDL_AudioSpec spec = {SDL_AUDIO_F32, 2, OUT_RATE};
+    SDL_AudioSpec spec = {SDL_AUDIO_F32, 2, OUT_RATE}, dst;
 
     mix_mutex = SDL_CreateMutex();
-    out = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, feed, NULL);
-    if (out == NULL) {
+    /* the device itself, so the music's stream (vpc_music.c) can play on it too */
+    device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
+    if (device == 0 || !SDL_GetAudioDeviceFormat(device, &dst, NULL)) {
         fprintf(stderr, "port: no audio device (%s): sounds play silently\n", SDL_GetError());
         return -1;
     }
-    SDL_ResumeAudioStreamDevice(out);
+    out = SDL_CreateAudioStream(&spec, &dst);
+    if (out == NULL || !SDL_SetAudioStreamGetCallback(out, feed, NULL) ||
+        !SDL_BindAudioStream(device, out)) {
+        fprintf(stderr, "port: sound stream: %s\n", SDL_GetError());
+        return -1;
+    }
+    SDL_ResumeAudioDevice(device);
     return 0;
+}
+
+/* the device the mixer plays on, for other streams (the music, vpc_music.c); 0 without one */
+SDL_AudioDeviceID vpc_audio_device(void)
+{
+    return out != NULL ? device : 0;
 }
 
 void vpc_audio_shutdown(void)
 {
     if (out != NULL)
         SDL_DestroyAudioStream(out);
+    if (device != 0)
+        SDL_CloseAudioDevice(device);
     out = NULL;
+    device = 0;
 }
 
 int vpc_audio_play(int voice, const void *data, int bytes, int rate, int bits, int channels,

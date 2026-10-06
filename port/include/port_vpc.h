@@ -120,6 +120,16 @@ int vpc_audio_playing(int voice);
 void vpc_audio_set_volume(int voice, unsigned int volume);
 void vpc_audio_set_pan(int voice, unsigned int pan);
 
+/* ---- music (vpc_music.c): an OPL3 in its own stream, the music driver's tick inside it ----- */
+
+int vpc_music_init(void);
+void vpc_music_shutdown(void);
+void vpc_music_lock(void);
+void vpc_music_unlock(void);
+struct opl3 *vpc_music_chip(void);
+void vpc_music_set_tick(double hz, void (*fn)(void *), void *arg);
+void vpc_music_render(short *out, int frames);
+
 /* ---- the parts' own entry points (port/host/vpc_*.c) -------------------------------------- */
 
 void vpc_video_init(const char *title);

@@ -5,7 +5,7 @@
 
    Each call answers as FALL.EXE's would and keeps the state the game looks at (handles,
    which samples and songs are playing). Samples play on the virtual PC's sound card
-   (port/host/vpc_audio.c); music has no synthesiser yet (docs/port.md). The timer services are real: SOS's events are the game's clocks
+   (port/host/vpc_audio.c); music on its OPL3, through HMI's own player and OPL driver. The timer services are real: SOS's events are the game's clocks
    (xn_timer_tick_callback at 140 Hz counts frame time; the video player's 60 Hz callback),
    and they run on SDL's timer thread, as they ran from the timer interrupt.
 
@@ -15,12 +15,16 @@
 
    Each function returns SOS's error code (0 none). */
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <SDL3/SDL.h>
 
 #include "port_host.h"
 #include "port_vpc.h"
+#include "hmi_opl.h"
+#include "hmi_seq.h"
+#include "opl3.h"
 
 typedef unsigned int W32;
 
@@ -346,6 +350,12 @@ W32 func_000A20BF(W32 h, W32 hs, W32 pan)
 
 /* ---- MIDI driver (music) ---------------------------------------------------------------- */
 
+/* Music plays as FALL.EXE played it on an FM card: HMI's song player (port/host/hmi_seq.c)
+   sends MIDI to HMI's own OPL driver, run from the install's HMIMDRV.386 (port/host/
+   hmi_opl.c), which writes the registers of the virtual PC's OPL3 (port/host/vpc_music.c).
+   The player ticks at 120 Hz inside the music stream; every call here takes its lock. Other
+   devices (MPU-401, GUS ...) are accepted and play nothing. */
+
 #define MIDI_DRIVERS 8
 #define MIDI_SONGS 32
 
@@ -354,13 +364,31 @@ static W32 midi_master_volume = 0x7F;
 static struct {
     int used;
     W32 device;                         /* the device id (0xA002 ... 0xA00A) */
+    int has_opl;
+    struct hmi_opl opl;
 } midi_drv[MIDI_DRIVERS];
 static struct {
     int used;
     int ready;                          /* a track has a driver (FALL.EXE: +0x20 bit 0x1000) */
-    int playing;                        /* +0x20 bit 0x8000 */
-    struct sos_song init;               /* the game's song block: the data at +0 */
+    struct hmi_song *song;
 } songs[MIDI_SONGS];
+
+static void opl_write(void *ctx, unsigned reg, unsigned val)
+{
+    (void)ctx;
+    opl3_write(vpc_music_chip(), reg, (uint8_t)val);
+}
+
+static void opl_send(void *ctx, unsigned st, unsigned d1, unsigned d2)
+{
+    hmi_opl_send(ctx, st, d1, d2);
+}
+
+static void music_tick(void *arg)
+{
+    (void)arg;
+    hmi_tick();
+}
 
 /* sosMIDIInitSystem(driver path, debug) (0x9E9C2): the game passes (0, 0) */
 W32 func_0009E9C2(const char *path, W32 debug)
@@ -369,10 +397,13 @@ W32 func_0009E9C2(const char *path, W32 debug)
     (void)debug;
     if (midi_system)
         return SOS_ERR_ALREADY_INIT;
+    vpc_music_lock();
     memset(midi_drv, 0, sizeof midi_drv);
     memset(songs, 0, sizeof songs);
     midi_master_volume = 0x7F;
+    hmi_set_master_volume(0x7F);
     midi_system = 1;
+    vpc_music_unlock();
     return SOS_OK;
 }
 
@@ -395,12 +426,13 @@ static int midi_any_driver(void)
     return 0;
 }
 
-/* sosMIDIInitDriver(hardware block, &handle) (0x9EC82): the block (0x18DD64, 46 bytes)
-   starts with the device id; FALL.EXE loads its driver from HMIMDRV.386 (OPL devices 0xA002
-   and 0xA009 also need sosMIDISetInsData's banks). phase 5: SDL audio */
+/* sosMIDIInitDriver(hardware block, &handle) (0x9EC82): the block (0x18DD64, 46 bytes) starts
+   with the device id and holds the port at +0x22 (HMI's OPL3 driver sets the chip up only for
+   0x388 or 0x380). SOS then sends CC123, CC7 0 and CC121 on every channel but 9. */
 W32 func_0009EC82(const W32 *hardware, W32 *handle)
 {
     int i;
+    char path[1024];
 
     port_check_ptr(hardware, "sosMIDIInitDriver's hardware");
     port_check_ptr(handle, "sosMIDIInitDriver's handle");
@@ -408,8 +440,27 @@ W32 func_0009EC82(const W32 *hardware, W32 *handle)
         ;
     if (i == MIDI_DRIVERS)
         return SOS_ERR_NO_HANDLES;
+    vpc_music_lock();
     midi_drv[i].used = 1;
     midi_drv[i].device = hardware[0];
+    if ((hardware[0] == 0xA009 || hardware[0] == 0xA002) &&
+        dos_host_path("HMIMDRV.386", 0, path, sizeof path) &&
+        hmi_opl_load(&midi_drv[i].opl, hardware[0] == 0xA009, path, opl_write, NULL) == 0) {
+        midi_drv[i].has_opl = 1;
+        /* the driver's Init gets the port from block + 0x22 (0x9F0AB), which sos_read_settings
+           filled from HMISET.CFG's [MIDI] DevicePort: 0x388 for an SB16 */
+        hmi_opl_init(&midi_drv[i].opl, hardware[0x22 / 4] & 0xFFFF);
+        hmi_set_driver(hardware[0], opl_send, &midi_drv[i].opl);
+        hmi_driver_reset();
+        vpc_music_set_tick(HMI_TICK_HZ, music_tick, NULL);
+    } else {
+        /* another device (MPU-401, GUS ...), or no OPL driver to be had: songs still match
+           their tracks to it, and play nothing */
+        if (hardware[0] == 0xA009 || hardware[0] == 0xA002)
+            fprintf(stderr, "port: no OPL driver in HMIMDRV.386: music is silent\n");
+        hmi_set_driver(hardware[0], NULL, NULL);
+    }
+    vpc_music_unlock();
     *handle = (W32)i;
     return SOS_OK;
 }
@@ -422,26 +473,43 @@ W32 func_0009F253(W32 h, W32 release)
         return SOS_ERR_INVALID_HANDLE;
     if (!midi_drv[h].used)
         return SOS_ERR_NOT_INIT;
-    midi_drv[h].used = 0;
+    vpc_music_lock();
+    if (midi_drv[h].has_opl) {
+        vpc_music_set_tick(0, NULL, NULL);
+        hmi_opl_uninit(&midi_drv[h].opl);
+        hmi_set_driver(0, NULL, NULL);
+        hmi_opl_free(&midi_drv[h].opl);
+    }
+    memset(&midi_drv[h], 0, sizeof midi_drv[h]);
+    vpc_music_unlock();
     return SOS_OK;
 }
 
-/* sosMIDISetInsData(handle, instrument bank, flag) (0x9FEE5): MELODIC.BNK and DRUM.BNK for an
-   OPL device; FALL.EXE passes them to the driver and returns its result. phase 5: SDL audio */
+/* sosMIDISetInsData(handle, instrument bank, flag) (0x9FEE5): MELODIC.BNK then DRUM.BNK for an
+   OPL device, handed to the driver. A BNK is its header, 128 names and 128 instruments. */
 W32 func_0009FEE5(W32 h, const void *bank, W32 flag)
 {
-    (void)h;
-    (void)bank;
+    const unsigned char *b = bank;
+
     (void)flag;
+    if (h >= MIDI_DRIVERS || !midi_drv[h].used)
+        return SOS_ERR_INVALID_HANDLE;
+    port_check_ptr(bank, "sosMIDISetInsData's bank");
+    if (midi_drv[h].has_opl && b != NULL) {
+        size_t len = (size_t)(b[0x10] | b[0x11] << 8 | b[0x12] << 16 | (unsigned)b[0x13] << 24) + 128 * 30;
+        vpc_music_lock();
+        hmi_opl_set_ins_data(&midi_drv[h].opl, b, len);
+        vpc_music_unlock();
+    }
     return SOS_OK;
 }
 
 /* sosMIDIInitSong(song block, &handle) (0xA021C): checks the song's signature, takes a slot
-   and prepares the tracks for their drivers. With no track on a driver (no MIDI driver) it
+   and matches the tracks to the drivers by their designations. With no track on a driver it
    fails with 0x1A and keeps the slot, as FALL.EXE does (after 32 such songs: 0x0B). */
 W32 func_000A021C(const struct sos_song *init, W32 *handle)
 {
-    int i;
+    int i, ready = 0;
 
     port_check_ptr(init, "sosMIDIInitSong's song");
     port_check_ptr(handle, "sosMIDIInitSong's handle");
@@ -452,10 +520,12 @@ W32 func_000A021C(const struct sos_song *init, W32 *handle)
         ;
     if (i == MIDI_SONGS)
         return SOS_ERR_NO_HANDLES;
+    vpc_music_lock();
     songs[i].used = 1;
-    songs[i].init = *init;
-    songs[i].playing = 0;
-    songs[i].ready = midi_any_driver();
+    songs[i].song = hmi_song_new((const unsigned char *)init->data,
+                                 hmi_song_size((const unsigned char *)init->data), &ready);
+    songs[i].ready = midi_any_driver() && songs[i].song != NULL && ready;
+    vpc_music_unlock();
     if (!songs[i].ready)
         return SOS_ERR_NO_TRACKS;
     *handle = (W32)i;
@@ -467,45 +537,61 @@ W32 func_000A0517(W32 h)
 {
     if (h >= MIDI_SONGS || !songs[h].used)
         return SOS_ERR_INVALID_HANDLE;
+    vpc_music_lock();
+    hmi_song_free(songs[h].song);
     memset(&songs[h], 0, sizeof songs[h]);
+    vpc_music_unlock();
     return SOS_OK;
 }
 
-/* sosMIDIStartSong(handle) (0xA27A0): FALL.EXE registers the song's sequencer as a timer
-   event at the song's rate. phase 5: SDL audio */
+/* sosMIDIStartSong(handle) (0xA27A0): FALL.EXE registers the song's sequencer as a 120 Hz
+   timer event; here the music stream's tick plays every started song */
 W32 func_000A27A0(W32 h)
 {
     if (h >= MIDI_SONGS || !songs[h].used)
         return SOS_ERR_INVALID_HANDLE;
     if (!songs[h].ready)
         return SOS_ERR_NOT_INIT;
-    songs[h].playing = 1;
+    vpc_music_lock();
+    hmi_song_start(songs[h].song);
+    vpc_music_unlock();
     return SOS_OK;
 }
 
-/* sosMIDIStopSong(handle) (0xA2857) */
+/* sosMIDIStopSong(handle) (0xA2857): its notes off, its channels freed, the song rewound */
 W32 func_000A2857(W32 h)
 {
     if (h >= MIDI_SONGS || !songs[h].used)
         return SOS_ERR_INVALID_HANDLE;
-    if (!songs[h].ready || !songs[h].playing)
+    if (!songs[h].ready || !hmi_song_playing(songs[h].song))
         return SOS_ERR_NOT_INIT;
-    songs[h].playing = 0;           /* phase 5: SDL audio */
+    vpc_music_lock();
+    hmi_song_stop(songs[h].song);
+    vpc_music_unlock();
     return SOS_OK;
 }
 
 /* sosMIDISongDone(handle) (0xA2941): 0 while it plays, 1 when it has stopped (music_update
-   then starts it again), 0x0A for a bad handle. Without a sequencer a song never ends. */
+   then starts it again), 0x0A for a bad handle. Every game song but FOLK3.HMI loops for ever
+   inside the player. */
 W32 func_000A2941(W32 h)
 {
+    int playing;
+
     if (h >= MIDI_SONGS || !songs[h].used)
         return SOS_ERR_INVALID_HANDLE;
-    return songs[h].playing ? 0 : 1;
+    vpc_music_lock();
+    playing = hmi_song_playing(songs[h].song);
+    vpc_music_unlock();
+    return playing ? 0 : 1;
 }
 
-/* sosMIDISetMasterVolume(volume 0-127) (0xA1D3C): FALL.EXE applies it to every song */
+/* sosMIDISetMasterVolume(volume 0-127) (0xA1D3C): CC7 again on every playing channel */
 W32 func_000A1D3C(W32 volume)
 {
-    midi_master_volume = volume;    /* phase 5: SDL audio */
+    vpc_music_lock();
+    midi_master_volume = volume;
+    hmi_set_master_volume(volume);
+    vpc_music_unlock();
     return SOS_OK;
 }

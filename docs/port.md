@@ -31,6 +31,11 @@ work on `main`.
 | `port/shim/dosfile.c` | DOS files: `C:\` and relative paths are the install folder, names match without regard to case, writes go to an overlay folder (read first), Watcom's `open` flags; `_dos_findfirst`/`_dos_findnext` as DOS matches (`*.*` matches every name, 8.3 upper case, directories only with `_A_SUBDIR`) |
 | `port/shim/dos.c` | `int386`/`int386x`: DPMI 0500h (free memory, the emulator's figures), 0600h-0603h, 0100h/0101h/0006h (DOS memory as host blocks), CauseWay FF30h; anything else logs and sets carry |
 | `port/include/port_vpc.h`, `port/host/vpc*.c` | the virtual PC on SDL3 (phase 5, below): low memory, VGA mode 13h and its DAC, the 70 Hz retrace, the keyboard (scan codes, int 9, the BIOS buffer), the mouse driver (int 33h), the PIT and BIOS tick, the vector table, DOS/BIOS/DPMI services with a register file, the sound card |
+| `port/host/opl3.c` | a YMF262 (OPL3) from the chip's documented behaviour: log-sine and exponent tables, the 9-bit envelope generator and its rates, the eight waveforms, feedback, two- and four-operator channels, the rhythm section and its noise, tremolo, vibrato, OPL3 stereo; 49716 Hz |
+| `port/host/hmi_opl.c` | HMI SOS's OPL MIDI drivers (fmmidi3.com 0xA009, fmmidi.com 0xA002), run from the install's HMIMDRV.386 as the game ran them: the driver's image is its memory, so its tables, state and quirks are the original's |
+| `port/host/hmi_seq.c` | HMI SOS's song player as FALL.EXE links it: "HMI-MIDISONG061595" songs at 120 ticks a second, its loops and branches, track groups on hardware channels, CC7 by the master volume |
+| `port/host/vpc_music.c` | the OPL3 in its own SDL3 stream at 49716 Hz; the player ticks inside the stream, so notes land on their sample |
+| `port/test/opltest.c`, `musictest.c` | the OPL3 against the datasheet's numbers; a song rendered offline through the whole music path to a WAV (`--all`: every song) |
 | `port/test/vpcdemo.c` | the virtual PC on its own, through XnGine's entry points, with the game's image, palette and sounds; `--selftest` checks it end to end |
 | `port/host/host.c` | stopping SDL and the virtual PC, stopping on a stub or fault with the call chain, `port_check_ptr` |
 | `port/host/main.c` | `main`: SDL, the folders, then the game's main (0x10010) with `Z.CFG`, as `FALL.EXE Z.CFG` ran; a backtrace for a stub or a fault; `port_check_ptr` stops on a pointer that lost its top half |
@@ -44,7 +49,8 @@ work on `main`.
 ```sh
 .venv/bin/python tools/port_build.py                 # build/port/fall
 DAGGER_GAME=~/dagger_comp/build/game .venv/bin/python tools/port_build.py run [--nosound]
-build/port/vpcdemo --game ~/dagger_comp/build/game        # the virtual PC on its own
+build/port/vpcdemo --game ~/dagger_comp/build/game        # the virtual PC on its own (with music)
+build/port/musictest --game ~/dagger_comp/build/game --song D1.HMI --seconds 60 --out d1.wav
 SDL_VIDEO_DRIVER=offscreen SDL_AUDIO_DRIVER=dummy DAGGER_OVERLAY=build/port/run \
     build/port/vpcdemo --game ~/dagger_comp/build/game --selftest
 .venv/bin/python tools/port_build.py missing         # what the stubs stand in for
@@ -139,9 +145,9 @@ a few helpers, which the canonical engine keeps (docs/xngine_canonical.md on mai
   selectors, DOS memory and exception vectors. There is no VESA, so XnGine stays in
   mode 13h.
 - **Sound:** SOS's samples play on a mixer of 160 voices into one SDL3 stream, with SOS's
-  volume and pan. The overlay gets an HMISET.CFG with a Sound Blaster 16, so the game
-  turns its sound effects on (`--nosound` keeps the install's). Music has no synthesiser
-  yet: HMI songs on an OPL3 with the game's MELODIC.BNK and DRUM.BNK are to come.
+  volume and pan. The overlay gets an HMISET.CFG with a Sound Blaster 16 (its digital
+  device and its FM synthesiser at 0x388), so the game turns its sound effects and music
+  on (`--nosound` keeps the install's). Music: below.
 - **Data:** `screen_buffer`, whose initial value in FALL.EXE is 0xA0000, now points into the
   native low memory (tools/port_data.py).
 
@@ -161,6 +167,42 @@ play sounds.
 `tools/port_lowmem.py` finds the game's own reads of real-mode memory by address: 68 of the
 tick at 0x46C, 44 of VGA memory. It rewrites them as `DOS_LOW()`. A trial on three files kept
 all 49 functions byte-identical. It is applied once the 64-bit pass has finished with `src/`.
+
+**2026-10-05, music.** The game's music plays as it did on a Sound Blaster 16. The HMI
+format and SOS's player were worked out statically from FALL.EXE, and HMI's OPL drivers from
+HMIMDRV.386. The two analyses are in `build/port/agents/hmi/` and `build/port/agents/opl/`,
+each with a Python reference model.
+- **Songs** (`hmi_seq.c`):
+  - The format: tracks with MIDI channels and device designations.
+  - Timing: one tick is 1/120 s. There are no tempo events, and note-ons carry their
+    durations.
+  - HMI's 0xFE events: branch points, local and global loop ends (a count of 0xFF loops
+    for ever), loop-counter resets.
+  - Channels: tracks with the same MIDI channel share one hardware channel, the first free
+    of 0-8 and 10-15; drums stay on 9.
+  - Volume: CC7 is scaled by the master volume, and drum velocities by the drum channel's
+    volume.
+  - Every game song but FOLK3.HMI loops for ever inside the player, as in DOS.
+- **The driver** (`hmi_opl.c`): HMI's own fmmidi3.com, from HMIMDRV.386.
+  - 9 voices, each written to both OPL3 register sets: set 0 heard on one side, set 1 on the
+    other, with CC10 pan making one quieter.
+  - Instruments from MELODIC.BNK. Drums from DRUM.BNK by note, at the pitch in byte 2 of
+    the drum's name record.
+  - Volume: TL from a 64-entry volume table at the scaled velocity.
+  - Its quirks are kept: programs 125-127 silent, voice stealing that spares channels which
+    had a pitch bend, the overlapping register shadows.
+  - The analysis found that pan comes out mirrored on an SB16 (MIDI left on the right
+    speaker); the port keeps that.
+- **Checks:**
+  - The note counts after 60 s match the reference simulator exactly: D1.HMI 107, 04.HMI 589,
+    and TAVERN.HMI 1,089 with its local loop followed.
+  - All 131 songs play: notes and level, no silence beyond the songs' own rests, no clipping.
+  - The song length the player works out matches all 131 MIDI.BSA records (sosMIDIInitSong
+    is given no length).
+  - `vpcdemo --selftest` drives the game's own SOS MIDI calls (sos_init's order: the driver
+    for 0xA009 at port 0x388, the two banks, a MIDI.BSA song) and finds the OPL3 playing
+    from the live audio stream.
+  - Rendering runs at about 15 times real time.
 
 The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a pointer:
 

@@ -67,11 +67,13 @@ int vpc_init(const char *title)
     vpc_input_init();
     vpc_irq_init();
     vpc_audio_init();
+    vpc_music_init();
     return 0;
 }
 
 void vpc_shutdown(void)
 {
+    vpc_music_shutdown();
     vpc_audio_shutdown();
     vpc_irq_shutdown();
     vpc_video_shutdown();

@@ -50,3 +50,13 @@ target_link_libraries(fall PRIVATE porthost)
 add_executable(vpcdemo ${CMAKE_CURRENT_SOURCE_DIR}/test/vpcdemo.c)
 target_compile_options(vpcdemo PRIVATE -std=gnu11 -Wall)
 target_link_libraries(vpcdemo PRIVATE porthost)
+
+# The OPL3 model against the chip's documented numbers (port/test/opltest.c)
+add_executable(opltest ${CMAKE_CURRENT_SOURCE_DIR}/test/opltest.c)
+target_compile_options(opltest PRIVATE -std=gnu11 -Wall)
+target_link_libraries(opltest PRIVATE porthost)
+
+# A song offline through the music path: HMI's player, its OPL3 driver, the OPL3 (port/test/musictest.c)
+add_executable(musictest ${CMAKE_CURRENT_SOURCE_DIR}/test/musictest.c)
+target_compile_options(musictest PRIVATE -std=gnu11 -Wall)
+target_link_libraries(musictest PRIVATE porthost)

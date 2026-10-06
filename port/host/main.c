@@ -6,8 +6,8 @@
      --game DIR     the installed game (only read): ARENA2, the .BNK and .CFG files
      --overlay DIR  where the game's writes go (saves, its config), read before DIR
      --nosound      keep the install's HMISET.CFG ("No Digital Device"), as the emulator runs;
-                    otherwise the overlay gets one with a Sound Blaster 16 for the game's sound
-                    effects (music needs a synthesiser the port does not have yet)
+                    otherwise the overlay gets one with a Sound Blaster 16: its sound effects,
+                    and its OPL3 for the music
      CONFIG         the config file, Z.CFG by default (written to the overlay when missing) */
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,12 +25,13 @@ extern int func_00010010(short argc, char **argv);     /* the game's main */
 static const char z_cfg[] = "type 4\r\npath C:\\ARENA2\\\r\npathcd C:\\ARENA2\\\r\n"
                             "maps mapsave.sav\r\nmapfile maps.bsa\r\ncontrols 1\r\n";
 
-/* HMI's sound setup with a Sound Blaster 16 (SETUP.INI's device 003) and no MIDI device */
+/* HMI's sound setup with a Sound Blaster 16: its digital device (SETUP.INI's digital 003) and
+   its FM synthesiser (MIDI 006, the OPL3 at 0x388) */
 static const char hmiset_sb16[] =
     "[DIGITAL]\r\nDeviceName  = Sound Blaster 16/AWE32    \r\nDeviceIRQ   = 5\r\n"
     "DeviceDMA   = 1\r\nDevicePort  = 0x220\r\nDeviceID    = 0xe015\r\n\r\n"
-    "[MIDI]\r\nDeviceName  = No MIDI Device            \r\nDevicePort  = 0xffffffff\r\n"
-    "DeviceID    = 0xffffffff\r\n";
+    "[MIDI]\r\nDeviceName  = Sound Blaster 16          \r\nDevicePort  = 0x388\r\n"
+    "DeviceID    = 0xa009\r\n";
 
 int main(int argc, char **argv)
 {
