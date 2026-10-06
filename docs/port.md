@@ -149,6 +149,17 @@ What it took, beyond the engine:
   0.84-1.00; the rest is random (rain, torch flicker, clouds, walking people).
   - The comparison found two bugs: the sun's direction (three locals the asm took as a vector)
     and the weapon's colours (an offset counted from the 71-byte header).
+- **Random inputs and AddressSanitizer.** `PORT_SANITIZE=address` builds a folder with ASan
+  (recovering, so a run logs every report; run it with
+  `ASAN_OPTIONS=handle_segv=0:handle_sigbus=0:detect_leaks=0:halt_on_error=0` so the zero page
+  works). Two minutes of random keys and clicks after loading each classic save, plain and
+  under ASan, found:
+  - the faction list's use-after-free (DOS's heap took it; macOS's malloc traps);
+  - a pointer cut to 32 bits in a compare (the biography: strlen off the heap);
+  - the rank names' 4-byte stride;
+  - overlapping strcpy, now copied forward as Watcom's library did;
+  - the original's own reads a little past a buffer (the stat bars, a search one past its
+    table), which are left alone.
 - **Frame rate.** The world runs at the VGA's 70 Hz at most, about a quarter of a core, while
   the yield of the game's loop sleeps out each frame.
 - **Checks without a person.**
