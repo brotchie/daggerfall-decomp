@@ -1,40 +1,22 @@
-/* pipe.c: helpers of the 3D pipeline's readable C (xpipe.h); candidates for xngine.h. */
+/* pipe.c: the 3D pipeline's shared helpers (canonical C; the interface and the module's
+   documentation are in xpipe.h). */
 #include "xpipe.h"
 
-u32 xn_add_flags(s32 a, s32 b)
+u32 xn_umod64_or0(u32 hi, u32 lo, u32 d)
 {
-    s32 sum = (s32)((u32)a + (u32)b);
-    u32 f = 0;
+    xn_s64 n;
+    u32 rem;
 
-    if (sum == 0)
-        f |= XN_ZF;
-    if (sum < 0)
-        f |= XN_SF;
-    if (((a ^ sum) & (b ^ sum)) < 0)
-        f |= XN_OF;
-    return f;
+    n.lo = lo;
+    n.hi = (s32)hi;
+    xn_u64_divrem_or0(&n, d, &rem);
+    return rem;
 }
 
-void xn_call_asm(xn_routine fn)
+s32 xn_muldiv_or0(s32 a, s32 b, s32 d)
 {
-    xn_regs r;
+    xn_s64 n;
 
-    r.eax = r.ecx = r.edx = r.ebx = r.ebp = r.esi = r.edi = 0;
-    xn_asmcall(fn, &r);
-}
-
-s32 xn_call_light_setup(xn_routine fn, struct xn_poly *poly, xn_regs *r)
-{
-    xn_regs lr = *r;
-
-    lr.edi = (u32)poly;
-    xn_asmcall(fn, &lr);
-    r->edx = lr.edx;
-    return lr.eax;
-}
-
-void xn_run_span(xn_routine fn, xn_regs *r)
-{
-    r->ecx = (u32)fn;
-    xn_asmcall(fn, r);
+    xn_s64_mul(&n, a, b);
+    return xn_s64_div_or0(&n, d);
 }

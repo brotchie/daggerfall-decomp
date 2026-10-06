@@ -1,0 +1,1067 @@
+kind,space,start,end,name,class,rule,evidence
+entry,obj,0C0100,,xn_anim_rand_seed,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0C010F,,xn_anim_reset,call,"game_reads=ecx,ebx,ebp,esi,edi",2 game call sites; convention watcom
+entry,obj,0C013B,,xn_anim_update,call,"game_reads=edx.u,ebx.u,ebp,edi",1 game call sites; convention reg
+entry,obj,0C0500,,xn_sys_crit_error_handler,vector,game_reads=all,interrupt 24h installed (a snapshot's protected-mode vector table)
+entry,obj,0C0520,,xn_sys_install_crit_error_handler,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,0C0580,,xn_sys_restore_crit_error_handler,call,game_reads=,1 game call sites; convention watcom
+entry,obj,0C0700,,xn_draw_image_scaled,call,"game_reads=ebp,esi,edi",4 game call sites; convention watcom
+entry,obj,0C1500,,xn_vid_play,call,"game_reads=ebp,esi,edi",8 game call sites; convention reg
+entry,obj,0C1CDC,,xn_vid_timer_cb,icall,game_reads=watcom,called through a pointer from object-1 site(s) 09E8AC (survey)
+entry,obj,0C2000,,xn_vec_unit_direction,call,game_reads=ebp,4 game call sites; convention watcom
+entry,obj,0C2043,,xn_vec_advance,call,game_reads=ebp,5 game call sites; convention watcom
+entry,obj,0C2068,,xn_vec_dir_to_angles,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0C2D00,,xn_world_init,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,0C2D81,,xn_world_cell_at,call,"game_reads=eax,ebp",4 game call sites; convention watcom
+entry,obj,0C2E05,,xn_world_update,call,"game_reads=edx,ebx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,0C2FF5,,xn_world_reload,call,"game_reads=ebp,esi,edi",4 game call sites; convention watcom
+entry,obj,0C310F,,xn_world_open,call,game_reads=,1 game call sites; convention reg
+entry,obj,0C3A60,,xn_world_place_nature_flats,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0C3FCB,,xn_world_mark_nonplanar_quads,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0C5200,,xn_rand_noise_init,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0C5280,,xn_rand_noise_2d,call,"game_reads=eax,ebp",6 game call sites; convention watcom
+entry,obj,0C7F00,,xn_sys_yield,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,0C7F07,,xn_model_set_angles,call,"game_reads=ebp,esi,edi",3 game call sites; convention watcom
+entry,obj,0C7F14,,xn_model_compose_angles,call,game_reads=ebp,2 game call sites; convention watcom
+entry,obj,0C7F98,,xn_model_set_angles_yaw_offset,call,game_reads=ebp,2 game call sites; convention watcom
+entry,obj,0C7FD9,,xn_math_approx_dist2d,call,"game_reads=eax,ebp,esi,edi",46 game call sites; convention watcom
+entry,obj,0C7FF4,,xn_math_approx_hypot,call,"game_reads=eax,ebp",17 game call sites; convention watcom
+entry,obj,0C808D,,xn_math_angle_to_point,call,"game_reads=eax,ebp,esi,edi",20 game call sites; convention watcom
+entry,obj,0C810C,,xn_model_push_player_from_pick,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0C8167,,xn_math_fixmul28_v2,call,"game_reads=eax,ebp",4 game call sites; convention watcom
+entry,obj,0C816E,,xn_sky_init_stars,call,game_reads=,1 game call sites; convention watcom
+entry,obj,0C9A89,,xn_sky_draw_snow,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0C9BF7,,xn_sky_snow_init,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0C9C70,,xn_sky_snow_update_speeds,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0C9CB9,,xn_sky_draw_rain,call,game_reads=ebp,1 game call sites; convention reg
+entry,obj,0C9EA7,,xn_shade_table_63,call,"game_reads=eax,ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0C9EB2,,xn_shade_init_reserved,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0C9F08,,xn_timer_bios_ticks,call,"game_reads=eax,ebp,esi,edi",2 game call sites; convention watcom
+entry,obj,0C9F29,,xn_sys_set_dos_transfer_buffer,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,0CAE00,,xn_input_steer_dispatch,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CAE07,,spell_cost_formula_dispatch,call,"game_reads=eax,ebp,esi,edi",3 game call sites; convention watcom
+entry,obj,0CAE0E,,spell_effect_dispatch,call,"game_reads=eax,ebp",1 game call sites; convention unknown
+entry,obj,0CAE1C,,xn_spell_kludge_menu_dispatch,call,game_reads=,1 game call sites; convention unknown
+entry,obj,0CB300,,xn_shade_keep_colours_0_255,call,"game_reads=ecx,ebp,esi,edi",2 game call sites; convention watcom
+entry,obj,0CB31E,,xn_sky_copy_rows,call,"game_reads=ebp,esi,edi",9 game call sites; convention watcom
+entry,obj,0CB34E,,xn_draw_copy_rect_stride,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CB381,,xn_img_cif_group,call,"game_reads=eax,ebx,esi",2 game call sites; convention watcom
+entry,obj,0CB39A,,xn_draw_cif_rle_frame,call,game_reads=ebp,4 game call sites; convention watcom
+entry,obj,0CB473,,xn_draw_img_masked_remap,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CB552,,xn_draw_fullscreen_overlay_shaded,call,"game_reads=ah,eax.u,ecx,edx,ebx,ebp,esi,edi",9 game call sites; convention reg
+entry,obj,0CD0F1,,xn_draw_darken_rect,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CD126,,xn_draw_cel_frame,call,game_reads=,1 game call sites; convention watcom
+entry,obj,0CD1C5,,xn_draw_image_drop_shadow,call,"game_reads=ebp,edi",2 game call sites; convention watcom
+entry,obj,0CD20E,,xn_draw_spell_icon,call,"game_reads=ecx,ebp,esi,edi",4 game call sites; convention watcom
+entry,obj,0CD262,,xn_draw_paperdoll_mask,call,game_reads=,1 game call sites; convention reg
+entry,obj,0CD291,,xn_draw_paperdoll_item,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CD308,,xn_gfx_wait_vretrace_start,call,"game_reads=eax,ecx,edx,ebx,ebp,esi,edi",3 game call sites; convention reg
+entry,obj,0CD31A,,xn_gfx_wait_vretrace_end,call,"game_reads=al,eax.u,ecx,edx,ebx,ebp,esi,edi",3 game call sites; convention reg
+entry,obj,0CD33A,,xn_pal_set_range_8bit,call,"game_reads=eax.u,ecx,ebp,esi,edi",9 game call sites; convention reg
+entry,obj,0CD367,,xn_pal_set_all_8bit,call,"game_reads=ebp,esi,edi",5 game call sites; convention watcom
+entry,obj,0CD53C,,xn_draw_view_checkerboard,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CDB7A,,xn_draw_cast_anim_mirrored,call,game_reads=,2 game call sites; convention watcom
+entry,obj,0CDC4B,,xn_shade_build_translucent_table,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CDC99,,xn_tex_archive_set_translucent,call,"game_reads=ecx,ebx,ebp,esi,edi",3 game call sites; convention watcom
+entry,obj,0CDCB8,,xn_draw_image_masked_at_origin,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CDD49,,xn_draw_zoom4x,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CDD6C,,xn_draw_mark_matching,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CDD81,,xn_gfx_present_inclusive,call,"game_reads=eax,ecx,edx,ebx,ebp,esi,edi",28 game call sites; convention reg
+entry,obj,0CDDA8,,xn_timer_tick_callback,pointer+icall,game_reads=watcom,"0 game call sites, held by 3 object-1 pointer(s); convention reg; called through a pointer from object-1 site(s) 09E8AC (survey)"
+entry,obj,0CE300,,xn_str_copy_line,call,"game_reads=eax,ebp",2 game call sites; convention watcom
+entry,obj,0CE31C,,xn_draw_copy_rect_stride_bytes,call,"game_reads=ecx,ebp,esi,edi",7 game call sites; convention reg
+entry,obj,0CE3E3,,xn_str_copy_word,call,game_reads=ebp,1 game call sites; convention watcom
+entry,obj,0CE3FD,,xn_str_copy_alnum,call,"game_reads=eax,ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE44C,,xn_str_find_u32,call,"game_reads=eax,ecx,ebp,esi,edi",9 game call sites; convention watcom
+entry,obj,0CE45E,,xn_str_find_u16,call,"game_reads=eax,ebp,esi,edi",7 game call sites; convention watcom
+entry,obj,0CE46D,,xn_str_copy_until,call,"game_reads=ecx,ebp,esi,edi",2 game call sites; convention watcom
+entry,obj,0CE483,,xn_str_fill_u16,call,"game_reads=eax.u,ecx,ebp,esi,edi",2 game call sites; convention reg
+entry,obj,0CE49E,,xn_str_append_char,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE4A9,,xn_bits_set_or_clear_u8,call,game_reads=eax.u,10 game call sites; convention reg
+entry,obj,0CE4B5,,xn_bits_set_or_clear_u16,call,game_reads=eax.u,12 game call sites; convention reg
+entry,obj,0CE4C4,,spell_find_effect_type,call,"game_reads=eax,ebp",2 game call sites; convention watcom
+entry,obj,0CE4E0,,spell_has_no_effects,call,"game_reads=eax,ebp",1 game call sites; convention watcom
+entry,obj,0CE4FA,,xn_draw_line_text_colour,call,"game_reads=ebp,esi,edi",4 game call sites; convention reg
+entry,obj,0CE663,,xn_str_fill_ascending,call,"game_reads=ebp,edi",11 game call sites; convention watcom
+entry,obj,0CE66C,,xn_mem_align_up,call,"game_reads=eax,ecx,ebx,ebp,esi,edi",5 game call sites; convention watcom
+entry,obj,0CE69A,,xn_mouse_set_range_320x200,call,"game_reads=ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE6D4,,xn_math_mul_sin,call,"game_reads=eax,ebp",1 game call sites; convention watcom
+entry,obj,0CE6E2,,xn_math_yaw_offset_xz,call,"game_reads=bh,ebx.u,ebp,esi,edi",14 game call sites; convention reg
+entry,obj,0CE70D,,xn_math_advance_pitch_yaw,call,"game_reads=ebp,esi,edi",4 game call sites; convention watcom
+entry,obj,0CE74F,,xn_math_fixmul28,call,"game_reads=eax,ebp",4 game call sites; convention watcom
+entry,obj,0CE758,,xn_pal_read_dac,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE77F,,xn_str_count_nonzero,call,"game_reads=eax,ebp",1 game call sites; convention watcom
+entry,obj,0CE790,,xn_str_skip_fields,call,"game_reads=eax,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE7A7,,xn_str_find_byte_pair,call,"game_reads=eax,ebp",1 game call sites; convention watcom
+entry,obj,0CE7BB,,xn_timer_fps_update,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE808,,xn_model_max_y,call,"game_reads=eax,ebp",1 game call sites; convention watcom
+entry,obj,0CE87B,,xn_str_find_nonzero,call,"game_reads=eax,ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE88D,,xn_mouse_set_sensitivity,call,"game_reads=ecx,ebp,esi,edi",4 game call sites; convention watcom
+entry,obj,0CE8A0,,xn_mouse_get_sensitivity,call,"game_reads=ecx,ebx,ebp,esi,edi",3 game call sites; convention reg
+entry,obj,0CE8B2,,xn_timer_read_pit,call,"game_reads=eax,ebp",2 game call sites; convention watcom
+entry,obj,0CE8C4,,xn_sys_zero_page_save,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE8D5,,xn_sys_zero_page_check,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE918,,xn_timer_wait_ticks,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,0CE92C,,xn_kbd_wait_all_released,call,game_reads=ebp,3 game call sites; convention watcom
+entry,obj,0CE957,,xn_kbd_numlock_off,call,"game_reads=ecx,ebx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,12A100,,xn_render_init,call,"game_reads=ebp,esi,edi",1 game call sites; convention reg
+entry,obj,12A230,,xn_render_shutdown,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,12A254,,xn_render_set_mode,call,"game_reads=ecx,ebx,ebp,esi,edi",4 game call sites; convention watcom
+entry,obj,12A274,,xn_cam_set_focal,call,"game_reads=ecx,ebx,ebp,esi,edi",3 game call sites; convention reg
+entry,obj,12A2D0,,xn_cam_set_view_window,call,"game_reads=ebp,esi,edi",13 game call sites; convention watcom
+entry,obj,12A4F0,,xn_render_begin_frame,call,"game_reads=ebp,esi,edi",3 game call sites; convention watcom
+entry,obj,12A608,,xn_render_pick,call,"game_reads=eax,ebp",1 game call sites; convention unknown
+entry,obj,12A870,,xn_render_frame,call,"game_reads=eax,ebp,esi,edi",4 game call sites; convention reg
+entry,obj,12B100,,xn_mouse_init,call,"game_reads=eax.u,ecx.u,edx.u,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,12B136,,xn_mouse_poll_clamped,call,"game_reads=eax,ecx,edx,ebx,ebp,esi,edi",107 game call sites; convention reg
+entry,obj,12B2D3,,xn_mouse_cursor_move,call,"game_reads=eax,ecx,ebx,ebp,esi,edi",14 game call sites; convention reg
+entry,obj,12B2EB,,xn_mouse_cursor_erase,call,"game_reads=ebp,esi,edi",8 game call sites; convention reg
+entry,obj,12B3ED,,xn_mouse_cursor_draw,call,"game_reads=ecx,dh,edx.u,ebx,ebp,esi,edi",9 game call sites; convention reg
+entry,obj,12B45B,,xn_mouse_set_cursor_image,call,game_reads=,1 game call sites; convention watcom
+entry,obj,12B47E,,xn_mouse_read_motion,call,"game_reads=ecx,ebx,ebp,esi,edi",2 game call sites; convention reg
+entry,obj,12B49E,,xn_mouse_set_position,call,game_reads=ebp,3 game call sites; convention reg
+entry,obj,12D851,,xn_pal_set,call,game_reads=,1 game call sites; convention watcom
+entry,obj,12D887,,xn_pal_get,call,"game_reads=ebp,esi,edi",2 game call sites; convention watcom
+entry,obj,12D8BD,,xn_pal_fade_to,call,"game_reads=ebp,esi,edi",1 game call sites; convention reg
+entry,obj,12DB00,,xn_font_init,call,"game_reads=ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,12DB28,,xn_font_load,call,"game_reads=ecx,ebx,ebp,esi,edi",4 game call sites; convention reg
+entry,obj,12DB50,,xn_font_select,call,"game_reads=eax.u,ecx,edx,ebx,ebp,esi,edi",47 game call sites; convention reg
+entry,obj,12DBCC,,xn_font_draw_string,call,"game_reads=ah,eax.u,ebp",4 game call sites; convention watcom
+entry,obj,12F500,,xn_water_init,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,12F79C,,xn_water_draw,call,game_reads=,1 game call sites; convention watcom
+entry,obj,135D00,,xn_tex_cache_lookup,call,"game_reads=eax,ecx,ebp,esi,edi",11 game call sites; convention reg
+entry,obj,135DE4,,xn_tex_cache_lookup_image,call,"game_reads=eax,ebx,ebp,esi,edi",8 game call sites; convention reg
+entry,obj,135E39,,xn_tex_cache_flush,call,"game_reads=ecx,ebx,ebp,esi,edi",12 game call sites; convention watcom
+entry,obj,135E90,,xn_tex_cache_begin_frame,call,"game_reads=ecx,edx,ebx,ebp,esi,edi",8 game call sites; convention watcom
+entry,obj,136026,,xn_tex_cache_init,call,"game_reads=ebp,esi,edi",1 game call sites; convention reg
+entry,obj,136A00,,xn_light_init,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,136AB4,,xn_light_reset,call,"game_reads=ebp,esi,edi",3 game call sites; convention watcom
+entry,obj,136AD8,,xn_light_add,call,"game_reads=eax,ebp,esi,edi",10 game call sites; convention watcom
+entry,obj,136B88,,xn_shade_load,call,"game_reads=ecx,ebp,esi,edi",2 game call sites; convention reg
+entry,obj,137000,,xn_mat_from_angles,call,"game_reads=ebp,esi,edi",12 game call sites; convention watcom
+entry,obj,137486,,xn_mat_transform_ptr,call,"game_reads=ebp,esi,edi",8 game call sites; convention watcom
+entry,obj,1374FC,,xn_mat_transform_transposed_ptr,call,"game_reads=ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,1376C8,,xn_cam_project_ptr,call,"game_reads=ebp,esi,edi",3 game call sites; convention watcom
+entry,obj,137725,,xn_cam_scale_matrix,call,"game_reads=ecx,ebx,ebp,esi,edi",7 game call sites; convention watcom
+entry,obj,13E600,,xn_terrain_draw,call,"game_reads=edx,ebx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,13FE15,,xn_model_prepare,call,"game_reads=eax,ebp",1 game call sites; convention unknown
+entry,obj,1401D4,,xn_model_submit,call,"game_reads=ebx,ebp,esi,edi",8 game call sites; convention watcom
+entry,obj,142700,,xn_kbd_install,call,"game_reads=eax.u,ecx.u,edx.u,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,142764,,xn_kbd_remove,call,game_reads=ecx.u,1 game call sites; convention reg
+entry,obj,142790,,xn_kbd_flush,call,"game_reads=eax.u,ecx,edx,ebx,ebp,esi,edi",11 game call sites; convention reg
+entry,obj,1427A8,,xn_kbd_read_key,call,"game_reads=eax,ecx,edx,ebx,ebp,esi,edi",3 game call sites; convention reg
+entry,obj,142840,,xn_kbd_int9_handler,vector,game_reads=all,interrupt 09h installed (a snapshot's protected-mode vector table)
+entry,obj,143600,,xn_gfx_set_mode,call,"game_reads=eax.u,ch,ecx.u,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,143700,,xn_gfx_restore_mode,call,"game_reads=ecx,edx,ebx,ebp,esi,edi",2 game call sites; convention reg
+entry,obj,143914,,xn_gfx_clear,call,"game_reads=ecx,ebp,esi,edi",5 game call sites; convention reg
+entry,obj,144D00,,xn_draw_fill_rect,call,"game_reads=ebp,esi,edi",13 game call sites; convention watcom
+entry,obj,144E84,,xn_draw_get_rect,call,"game_reads=ah,eax.u,ebp,esi,edi",7 game call sites; convention watcom
+entry,obj,144ED8,,xn_draw_put_rect,call,"game_reads=ebp,esi,edi",5 game call sites; convention watcom
+entry,obj,144F68,,xn_draw_image,call+pointer+icall,"game_reads=ah,eax.u,ecx,ebp,esi,edi","67 game call sites, held by 1 object-1 pointer(s); convention reg; called through a pointer from object-1 site(s) 03E0DE 03E11A 03E174 03E1C2 (survey)"
+entry,obj,144FB4,,xn_draw_image_transparent,call+pointer,"game_reads=ah,eax.u,ecx,ebp,esi,edi","33 game call sites, held by 1 object-1 pointer(s); convention reg"
+entry,obj,149E00,,xn_mem_init,call,"game_reads=ecx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,149EF8,,xn_mem_shutdown,call,game_reads=,1 game call sites; convention reg
+entry,obj,149FC8,,xn_sys_divide_error_handler,vector,game_reads=all,exception 00h installed (a snapshot's DPMI exception table)
+entry,obj,14A300,,xn_collide_segment_model,call,"game_reads=eax,ebp",9 game call sites; convention watcom
+entry,obj,14AA92,,xn_collide_spheres_model,call,"game_reads=eax,ecx,ebp,esi,edi",7 game call sites; convention unknown
+entry,obj,14B1C7,,xn_collide_segment_flat_stk,call,"game_reads=eax,ebp",1 game call sites; convention reg
+entry,obj,14B45B,,xn_terrain_height_at,call,"game_reads=eax,ecx,ebx,ebp,esi,edi",18 game call sites; convention reg
+entry,obj,14BC00,,xn_math_isqrt,call,"game_reads=eax,ecx,ebp,esi,edi",4 game call sites; convention reg
+entry,obj,14BDDD,,xn_vec_normalize_ptr,call,game_reads=ebp,3 game call sites; convention watcom
+entry,obj,14D23C,,xn_shade_set_fog,call,"game_reads=ebp,esi,edi",7 game call sites; convention watcom
+entry,obj,152B00,,xn_joy_init,call,"game_reads=ebp,esi,edi",1 game call sites; convention reg
+entry,obj,152BA8,,xn_joy_shutdown,call,"game_reads=ecx,edx,ebx,ebp,esi,edi",1 game call sites; convention reg
+entry,obj,152BDC,,xn_joy_reset_range,call,"game_reads=ebp,esi,edi",1 game call sites; convention watcom
+entry,obj,152C40,,xn_joy_calibrate,call,"game_reads=ecx,ebp,esi,edi",2 game call sites; convention watcom
+entry,obj,152D00,,xn_joy_poll,call,"game_reads=ah,eax.u,ecx,ebp,esi,edi",3 game call sites; convention reg
+entry,obj,152EA0,,xn_joy_timer_isr,vector,game_reads=all,interrupt 1Ch installed (a snapshot's protected-mode vector table)
+entry,obj,1531F0,,xn_draw_line,call,"game_reads=ebp,esi,edi",2 game call sites; convention watcom
+entry,obj,1532B4,,xn_draw_line_to,call,"game_reads=ecx,ebx,ebp,esi,edi",12 game call sites; convention watcom
+entry,obj,153500,,xn_helmet_open,call,game_reads=ebp,2 game call sites; convention reg
+entry,obj,154D00,,xn_flat_add,call,"game_reads=eax,ebp",14 game call sites; convention watcom
+entry,obj,160AE0,,xn_serial_irq_com1,vector,game_reads=all,interrupt 0Ch installed (a snapshot's protected-mode vector table)
+exit,obj,050069,,fatal_error,game-function,,4 object-2 call sites: xn_dos_load_file xn_sys_zero_page_check
+exit,obj,069B0E,,sound_timer_add,game-function,,1 object-2 call sites: xn_vid_open
+exit,obj,069B53,,sound_timer_remove,game-function,,1 object-2 call sites: xn_vid_finish
+exit,obj,06A319,,mem_check_heap,game-function,,3 object-2 call sites: xn_render_frame xn_render_frame_rows_done
+exit,obj,06D13E,,disk_resolve_path,game-function,,1 object-2 call sites: xn_dos_open
+exit,obj,0994F0,,dpmi_lock_region,game-function,,5 object-2 call sites: xn_sys_install_crit_error_handler xn_vid_open xn_vid_play
+exit,obj,09957D,,dpmi_unlock_region,game-function,,5 object-2 call sites: xn_sys_restore_crit_error_handler xn_vid_finish xn_vid_play
+exit,obj,09DB11,,exit,game-function,,3 object-2 call sites: xn_dos_load_file
+exit,obj,0A10A8,,malloc,game-function,,17 object-2 call sites: xn_dos_load_file xn_dos_load_palette xn_gfx_change_mode xn_gfx_set_mode xn_light_init xn_mem_init
+exit,obj,0A117E,,free,game-function,,15 object-2 call sites: xn_gfx_change_mode xn_gfx_restore_mode xn_light_free xn_mem_shutdown xn_render_shutdown xn_tex_cache_free
+exit,obj,0A1235,,filelength,game-function,,2 object-2 call sites: xn_dos_load_file xn_tex_load_archive
+exit,obj,0A1272,,_dos_getvect,game-function,,4 object-2 call sites: xn_joy_init xn_kbd_install xn_serial_open xn_sys_install_crit_error_handler
+exit,obj,0A12A6,,_dos_setvect,game-function,,8 object-2 call sites: xn_joy_init xn_joy_shutdown xn_kbd_install xn_kbd_remove xn_serial_close_restore_vector xn_serial_open
+exit,obj,0A2504,,sos_start_sample,game-function,,1 object-2 call sites: xn_vid_audio_start
+exit,obj,0A2687,,sos_stop_sample,game-function,,1 object-2 call sites: xn_vid_audio_stop
+exit,int,10:0013,,int 10:0013,service,,by xn_gfx_set_mode13
+exit,int,10:02h,,int 10:02h,service,,by xn_gfx_set_cursor_pos
+exit,int,10:03h,,int 10:03h,service,,by xn_gfx_get_cursor_pos
+exit,int,10:0F00,,int 10:0F00,service,,by xn_gfx_set_mode13
+exit,int,10:?,,int 10:?,service,,by xn_gfx_restore_mode
+exit,int,15:C202,,int 15:C202,service,,by xn_mouse_ps2_set_sample_rate
+exit,int,16:01h,,int 16:01h,service,,by xn_kbd_numlock_off xn_kbd_read_key
+exit,int,16:?,,int 16:?,service,,by xn_kbd_read_key xn_kbd_wait_key
+exit,int,21:0900,,int 21:0900,service,,by xn_mem_init
+exit,int,21:09h,,int 21:09h,service,,by xn_dos_create xn_dos_load_file xn_dos_open xn_font_select xn_light_init xn_mem_lock_region (+8)
+exit,int,21:3C00,,int 21:3C00,service,,by xn_dos_create
+exit,int,21:3D00,,int 21:3D00,service,,by xn_dos_file_exists xn_dos_open xn_vid_open
+exit,int,21:3E00,,int 21:3E00,service,,by xn_dos_close xn_dos_file_exists xn_vid_close_file
+exit,int,21:3F00,,int 21:3F00,service,,by xn_dos_read xn_vid_fill xn_vid_open xn_vid_refill
+exit,int,21:4000,,int 21:4000,service,,by xn_dos_write
+exit,int,21:42h,,int 21:42h,service,,by xn_dos_seek
+exit,int,21:4C00,,int 21:4C00,service,,by xn_font_select xn_light_init xn_mem_init xn_mem_lock_region xn_model_prepare xn_tex_cache_init (+6)
+exit,int,21:4C01,,int 21:4C01,service,,by xn_dos_create xn_dos_load_file xn_dos_open
+exit,int,21:4Eh,,int 21:4Eh,service,,by xn_dos_find_first
+exit,int,21:4Fh,,int 21:4Fh,service,,by xn_dos_find_next
+exit,int,21:51h,,int 21:51h,service,,by xn_mem_init
+exit,int,21:?,,int 21:?,service,,by xn_dos_create xn_dos_load_file xn_dos_open
+exit,int,2F:1680,,int 2F:1680,service,,by xn_sys_yield
+exit,int,31:0002,,int 31:0002,service,,by xn_mem_init
+exit,int,31:0006,,int 31:0006,service,,by xn_gfx_vesa_init xn_helmet_c_open
+exit,int,31:0100,,int 31:0100,service,,by xn_gfx_vesa_init xn_helmet_c_open xn_sys_set_dos_transfer_buffer
+exit,int,31:0101,,int 31:0101,service,,by xn_gfx_vesa_free xn_gfx_vesa_init xn_helmet_c_close
+exit,int,31:0202,,int 31:0202,service,,by xn_sys_install_divide_handler
+exit,int,31:0203,,int 31:0203,service,,by xn_sys_install_divide_handler xn_sys_remove_divide_handler
+exit,int,31:0300,,int 31:0300,service,,by xn_gfx_vesa_int10 xn_helmet_c_int33
+exit,int,31:0600,,int 31:0600,service,,by xn_mem_lock_region
+exit,int,31:0800,,int 31:0800,service,,by xn_gfx_vesa_set_mode
+exit,int,31:FF26,,int 31:FF26,service,,by xn_sys_set_dos_transfer_buffer
+exit,int,33:0003,,int 33:0003,service,,by xn_mouse_poll
+exit,int,33:0004,,int 33:0004,service,,by xn_mouse_init xn_mouse_set_position
+exit,int,33:0007,,int 33:0007,service,,by xn_mouse_init xn_mouse_set_range_320x200 xn_mouse_set_range_640x480
+exit,int,33:0008,,int 33:0008,service,,by xn_mouse_init xn_mouse_set_range_320x200 xn_mouse_set_range_640x480
+exit,int,33:000B,,int 33:000B,service,,by xn_mouse_read_motion
+exit,int,33:001A,,int 33:001A,service,,by xn_mouse_set_sensitivity
+exit,int,33:001B,,int 33:001B,service,,by xn_mouse_get_sensitivity
+exit,port,0020,,port 0020,port,,by xn_kbd_int9_eoi xn_serial_close_restore_vector xn_serial_irq_com1 xn_serial_open
+exit,port,0021,,port 0021,port,,by xn_serial_close xn_serial_open
+exit,port,0040,,port 0040,port,,by xn_timer_read_pit
+exit,port,0043,,port 0043,port,,by xn_timer_read_pit
+exit,port,0060,,port 0060,port,,by xn_kbd_int9_read_scancode
+exit,port,0061,,port 0061,port,,by xn_kbd_int9_read_scancode
+exit,port,0201,,port 0201,port,,by xn_joy_init xn_joy_timer_isr_read
+exit,port,03C7,,port 03C7,port,,by xn_pal_get xn_pal_read_dac
+exit,port,03C8,,port 03C8,port,,by xn_pal_fade_write_entry xn_pal_set xn_pal_set_range_8bit xn_vid_decode_chunk
+exit,port,03C9,,port 03C9,port,,by xn_pal_get xn_pal_set_range_8bit
+exit,port,03DA,,port 03DA,port,,by xn_gfx_wait_vretrace_end xn_gfx_wait_vretrace_start xn_pal_fade_to xn_pal_set xn_serial_send_byte
+exit,port,03F8,,port 03F8,port,,by xn_serial_irq_com1
+exit,port,dx,,port dx,port,,by xn_joy_init xn_joy_timer_isr_read xn_pal_fade_write_entry xn_pal_read_dac xn_pal_set_range_8bit xn_serial_close (+3)
+memory,obj,0C0000,0C0030,xn_anim_opcodes,unobserved,data,neither seen
+memory,obj,0C0030,0C0100,xn_anim_rand_state,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0C0100,0C0307,xn_anim_rand_seed .. xn_anim_rand_range,private,code,code
+memory,obj,0C0307,0C0400,xn_anim_rand_next,unobserved,data,neither seen
+memory,obj,0C0400,0C0402,xn_sys_old_int24_sel,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0C0402,0C0406,xn_sys_old_int24_offset,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0C0406,0C0500,xn_sys_int24_installed,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0C0500,0C0520,xn_sys_crit_error_handler,unobserved,data,neither seen
+memory,obj,0C0520,0C0580,xn_sys_install_crit_error_handler,private,code,code
+memory,obj,0C0580,0C0600,xn_sys_restore_crit_error_handler,unobserved,data,neither seen
+memory,obj,0C0600,0C0602,xn_draw_scaled_flags,private,data,the engine writes 2 bytes (surveys) / 2 (records)
+memory,obj,0C0602,0C0604,xn_draw_scaled_x,private,data,the engine writes 2 bytes (surveys) / 2 (records)
+memory,obj,0C0604,0C0606,xn_draw_scaled_y,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C0606,0C0608,xn_draw_scaled_src_w,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C0608,0C060A,xn_draw_scaled_src_h,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C060A,0C060C,xn_draw_scaled_w,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C060C,0C060E,xn_draw_scaled_h,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C060E,0C0612,xn_draw_scaled_src,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,0C0612,0C0613,xn_draw_scaled_x_int,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,0C0613,0C0614,xn_draw_scaled_y_int,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,0C0614,0C0616,xn_draw_scaled_x_frac,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C0616,0C0618,xn_draw_scaled_y_frac,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C0618,0C061A,xn_draw_scaled_skip_x,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C061A,0C061C,xn_draw_scaled_skip_y,private,data,the engine writes 2 bytes (surveys) / 0 (records)
+memory,obj,0C061C,0C061E,xn_draw_scaled_src_ofs,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C061E,0C0700,xn_draw_scaled_compile_fn,unobserved,data,neither seen
+memory,obj,0C0700,0C0B00,xn_draw_image_scaled .. xn_img_unpack_rows,private,code,code; the engine writes 9 bytes (surveys) / 8 (records)
+memory,obj,0C0B00,0C0B16,xn_dos_msg_not_found,unobserved,data,neither seen
+memory,obj,0C0B16,0C0B31,xn_dos_msg_create_failed,unobserved,data,neither seen
+memory,obj,0C0B31,0C0B53,xn_dos_msg_out_of_memory,unobserved,data,neither seen
+memory,obj,0C0B53,0C0BA8,xn_dos_path,private,data,the engine writes 0 bytes (surveys) / 22 (records)
+memory,obj,0C0BA8,0C0C00,disk_last_file_size,visible,data,"21 object-1 references (read 20, write 1); the game reads 4 bytes it wrote itself; the engine writes 0 bytes (surveys) / 3 (records); the game writes 4 bytes"
+memory,obj,0C0C00,0C0ED0,xn_dos_load_palette .. xn_dos_load_file,private,code,code
+memory,obj,0C0ED0,0C1000,xn_dos_make_path,unobserved,data,neither seen
+memory,obj,0C1000,0C1005,xn_vid_header,private,data,the engine writes 5 bytes (surveys) / 4 (records)
+memory,obj,0C1005,0C1007,xn_vid_header_frames,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C1007,0C1009,xn_vid_header_width,private,data,the engine writes 2 bytes (surveys) / 2 (records)
+memory,obj,0C1009,0C100D,xn_vid_header_height,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0C100D,0C100F,xn_vid_header_flags,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C100F,0C10FF,xn_vid_sample,private,data,the engine writes 240 bytes (surveys) / 19 (records)
+memory,obj,0C10FF,0C1101,xn_vid_audio_state,private,data,the engine writes 2 bytes (surveys) / 2 (records)
+memory,obj,0C1101,0C1105,xn_vid_sample_handle,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0C1105,0C1112,xn_vid_sample_rate,private,data,the engine writes 13 bytes (surveys) / 2 (records)
+memory,obj,0C1112,0C111A,xn_vid_audio_buf_a,private,data,the engine writes 8 bytes (surveys) / 6 (records)
+memory,obj,0C111A,0C1125,xn_vid_audio_buf_b,private,data,the engine writes 11 bytes (surveys) / 7 (records)
+memory,obj,0C1125,0C1425,xn_vid_palette,private,data,the engine writes 768 bytes (surveys) / 767 (records)
+memory,obj,0C1425,0C1429,xn_vid_dest_offset,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0C1429,0C142B,xn_vid_frames_left,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C142B,0C1431,xn_vid_file,private,data,the engine writes 6 bytes (surveys) / 4 (records)
+memory,obj,0C1431,0C1453,xn_vid_buf,private,data,the engine writes 34 bytes (surveys) / 24 (records)
+memory,obj,0C1453,0C1462,xn_vid_done,private,data,the engine writes 15 bytes (surveys) / 6 (records)
+memory,obj,0C1462,0C1466,xn_vid_timer,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C1466,0C146C,xn_vid_frame_ticks,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C146C,0C14ED,xn_vid_path,private,data,the engine writes 23 bytes (surveys) / 22 (records)
+memory,obj,0C14ED,0C1500,xn_vid_skippable,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0C1500,0C1D6E,xn_vid_play .. xn_vid_audio_stop,private,code,code
+memory,obj,0C1D6E,0C1F00,xn_vid_audio_start,unobserved,data,neither seen
+memory,obj,0C1F00,0C2000,xn_vec_angles_in,private,data,the engine writes 0 bytes (surveys) / 9 (records)
+memory,obj,0C2000,0C2173,xn_vec_unit_direction .. xn_vec_scale_unit14,private,code,code
+memory,obj,0C2173,0C2300,xn_mat_to_angles,unobserved,data,neither seen
+memory,obj,0C2300,0C2318,xn_world_msg_out_of_memory,unobserved,data,neither seen
+memory,obj,0C2318,0C233A,xn_world_msg_open_failed,unobserved,data,neither seen
+memory,obj,0C233A,0C2342,xn_world_file,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0C2342,0C2346,xn_world_offsets_window_bytes,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0C2346,0C234A,xn_world_offsets_window_max,unobserved,data,neither seen
+memory,obj,0C234A,0C234E,xn_world_offsets_window_count,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0C234E,0C2352,xn_world_offsets_window_first,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,0C2352,0C2362,xn_world_lone_tile_table,unobserved,data,neither seen
+memory,obj,0C2362,0C23A3,xn_world_tile_class,unobserved,data,neither seen
+memory,obj,0C23A3,0C23AB,xn_world_dir_dx,unobserved,data,neither seen
+memory,obj,0C23AB,0C23B3,xn_world_dir_dy,unobserved,data,neither seen
+memory,obj,0C23B3,0C23B4,xn_world_last_dx,unobserved,data,neither seen
+memory,obj,0C23B4,0C23B5,xn_world_last_dy,unobserved,data,neither seen
+memory,obj,0C23B5,0C23B6,xn_world_path_avoid_dx,unobserved,data,neither seen
+memory,obj,0C23B6,0C23B8,xn_world_path_avoid_dy,unobserved,data,neither seen
+memory,obj,0C23B8,0C23BC,xn_cam_pitch,visible,data,"16 object-1 references (read 9, write 7); the game reads 4 bytes it wrote itself; the game writes 4 bytes"
+memory,obj,0C23BC,0C23C0,xn_cam_yaw,visible,data,"17 object-1 references (read 10, write 7); the game reads 4 bytes it wrote itself; the game writes 4 bytes"
+memory,obj,0C23C0,0C23C4,xn_cam_roll,visible,data,"15 object-1 references (read 8, write 7); the game reads 4 bytes it wrote itself; the game writes 4 bytes"
+memory,obj,0C23C4,0C23C8,xn_cam_x,visible,data,"9 object-1 references (addr 1, read 1, write 7); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 0 (records); the game writes 4 bytes"
+memory,obj,0C23C8,0C23CC,xn_cam_y,visible,data,"18 object-1 references (addr 1, read 10, write 7); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 0 (records); the game writes 4 bytes"
+memory,obj,0C23CC,0C23D0,xn_cam_z,visible,data,"10 object-1 references (addr 1, read 2, write 7); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 0 (records); the game writes 4 bytes"
+memory,obj,0C23D0,0C23D4,xn_world_size_x,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0C23D4,0C23D8,xn_world_size_z,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0C23D8,0C23DC,xn_world_eye_sub_x,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C23DC,0C23E0,xn_world_eye_sub_z,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C23E0,0C23E4,xn_world_eye_col,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0C23E4,0C23E8,xn_world_eye_row,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0C23E8,0C23E9,xn_world_loaded_dirs,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,0C23E9,0C27E9,xn_world_height_bands,private,data,the engine writes 0 bytes (surveys) / 12 (records)
+memory,obj,0C27E9,0C27ED,xn_world_header,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,0C27ED,0C27F1,xn_world_width,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0C27F1,0C27F5,xn_world_height,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0C27F5,0C27F9,xn_world_offsets,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0C27F9,0C2879,xn_world_bands_offset,private,data,the engine writes 0 bytes (surveys) / 8 (records)
+memory,obj,0C2879,0C287D,xn_world_cell_header,visible,data,1 object-1 references (data 1); the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,0C287D,0C287F,xn_world_nature_archive,visible,data,1 object-1 references (write 1); the engine writes 2 bytes (surveys) / 2 (records); the game writes 2 bytes
+memory,obj,0C287F,0C2881,xn_world_ground_archive,visible,data,1 object-1 references (write 1); the engine writes 2 bytes (surveys) / 2 (records); the game writes 2 bytes
+memory,obj,0C2881,0C2882,xn_world_cell_climate,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,0C2882,0C2883,xn_world_cell_noise,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,0C2883,0C2893,xn_world_cell_path_starts,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,0C2893,0C28A3,xn_world_slot_cells,visible,data,4 object-1 references (read 4); the game reads 16 bytes the engine wrote; the engine writes 16 bytes (surveys) / 16 (records)
+memory,obj,0C28A3,0C28A7,xn_world_noise_amp,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C28A7,0C28AB,xn_world_noise_bias,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C28AB,0C28AF,xn_world_edge_near,unobserved,data,neither seen
+memory,obj,0C28AF,0C28B3,xn_world_edge_far,unobserved,data,neither seen
+memory,obj,0C28B3,0C28B4,xn_world_update_pass,private,data,the engine writes 1 bytes (surveys) / 0 (records)
+memory,obj,0C28B4,0C28B8,xn_world_rand_elev_min,unobserved,data,neither seen
+memory,obj,0C28B8,0C28BC,xn_world_rand_elev_max,unobserved,data,neither seen
+memory,obj,0C28BC,0C28C0,xn_world_height_layer,visible,data,1 object-1 references (read 1); the game reads 4 bytes the engine wrote; the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0C28C0,0C28C4,xn_world_flat_layer,visible,data,2 object-1 references (read 2); the game reads 4 bytes the engine wrote; the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0C28C4,0C28C8,xn_world_tile_layer,visible,data,2 object-1 references (read 2); the game reads 4 bytes the engine wrote; the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0C28C8,0C28CC,xn_world_water_layer,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0C28CC,0C28D4,xn_world_layers_alloc,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0C28D4,0C28D8,xn_world_gen_step,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C28D8,0C28DC,xn_world_gen_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C28DC,0C28E0,xn_world_scratch_x,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,0C28E0,0C28E4,xn_world_scratch_x2,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C28E4,0C28E8,xn_world_scratch_y,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,0C28E8,0C28F4,xn_world_scratch_y2,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C28F4,0C28F8,xn_world_slot,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0C28F8,0C2908,xn_world_slot_x0,unobserved,data,neither seen
+memory,obj,0C2908,0C2918,xn_world_slot_y0,unobserved,data,neither seen
+memory,obj,0C2918,0C2968,xn_world_grid_x,unobserved,data,neither seen
+memory,obj,0C2968,0C29B8,xn_world_grid_y,unobserved,data,neither seen
+memory,obj,0C29B8,0C2BB8,xn_world_height_scale,unobserved,data,neither seen
+memory,obj,0C2BB8,0C2D00,xn_world_nature_flat_odds,visible,data,1 object-1 references (addr 1); the game writes 129 bytes
+memory,obj,0C2D00,0C4100,xn_world_init .. xn_world_mark_nonplanar_quads,private,code,code
+memory,obj,0C4100,0C4500,xn_noise_values,private,data,the engine writes 0 bytes (surveys) / 254 (records)
+memory,obj,0C4500,0C4904,xn_noise_values_copy,private,data,the engine writes 0 bytes (surveys) / 255 (records)
+memory,obj,0C4904,0C4D04,xn_noise_fade_table,private,data,the engine writes 0 bytes (surveys) / 377 (records)
+memory,obj,0C4D04,0C5200,xn_noise_fade,private,data,the engine writes 0 bytes (surveys) / 249 (records)
+memory,obj,0C5200,0C5304,xn_rand_noise_init .. xn_rand_noise_2d,private,code,code
+memory,obj,0C5304,0C5400,xn_rand_noise_empty,unobserved,data,neither seen
+memory,obj,0C5400,0C5404,xn_snow_turn_shift,visible,data,8 object-1 references (write 8); the engine writes 0 bytes (surveys) / 4 (records); the game writes 4 bytes
+memory,obj,0C5404,0C5408,xn_model_angle_or_bits,visible,data,4 object-1 references (write 4); the game writes 4 bytes
+memory,obj,0C5408,0C542C,xn_model_base_matrix,private,data,the engine writes 36 bytes (surveys) / 19 (records)
+memory,obj,0C542C,0C5450,xn_model_object_matrix,private,data,the engine writes 36 bytes (surveys) / 0 (records)
+memory,obj,0C5450,0C5478,xn_model_combined_matrix,private,data,the engine writes 36 bytes (surveys) / 19 (records)
+memory,obj,0C5478,0C547A,xn_sys_dos_transfer_selector,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0C547A,0C787A,xn_sky_stars,private,data,the engine writes 0 bytes (surveys) / 8863 (records)
+memory,obj,0C787A,0C7B7A,xn_sky_star_colours,private,data,the engine writes 0 bytes (surveys) / 768 (records)
+memory,obj,0C7B7A,0C7B8A,xn_sky_star_palette,unobserved,data,neither seen
+memory,obj,0C7B8A,0C7B8B,xn_draw_shade_row,unobserved,data,neither seen
+memory,obj,0C7B8B,0C7DE3,xn_snow_flakes,private,data,the engine writes 0 bytes (surveys) / 599 (records)
+memory,obj,0C7DE3,0C7DE7,xn_snow_speed_small,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C7DE7,0C7DEB,xn_snow_speed_medium,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0C7DEB,0C7DEF,xn_snow_speed_large,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0C7DEF,0C7DF1,xn_snow_drift_speed,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,0C7DF1,0C7F00,xn_rain_streak_colours,unobserved,data,neither seen
+memory,obj,0C7F00,0CAE1C,xn_sys_yield .. spell_effect_dispatch,private,code,code; the engine writes 21 bytes (surveys) / 0 (records)
+memory,obj,0CAE1C,0CAF00,xn_spell_kludge_menu_dispatch,unobserved,data,neither seen
+memory,obj,0CAF00,0CAF24,xn_steer_region_handlers,unobserved,data,neither seen
+memory,obj,0CAF24,0CAF40,spell_cost_formulas,unobserved,data,neither seen
+memory,obj,0CAF40,0CB00C,spell_effect_handlers,unobserved,data,neither seen
+memory,obj,0CB00C,0CB104,xn_kludge_menu_handlers,unobserved,data,neither seen
+memory,obj,0CB104,0CB24E,xn_cel_row_buffer,private,data,the engine writes 0 bytes (surveys) / 320 (records)
+memory,obj,0CB24E,0CB300,xn_paperdoll_background,visible,data,1 object-1 references (write 1)
+memory,obj,0CB300,0CDDA8,xn_shade_keep_colours_0_255 .. xn_gfx_present_inclusive,private,code,code
+memory,obj,0CDDA8,0CDE06,xn_timer_tick_callback,unobserved,data,neither seen
+memory,obj,0CDE06,0CDE0A,xn_fps_frame_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0CDE0A,0CDE0E,xn_fps_last_tick,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0CDE0E,0CDE12,xn_fps_average,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0CDE12,0CDE2F,xn_msg_bad_zero_page,unobserved,data,neither seen
+memory,obj,0CDE2F,0CDE33,internal_check_failed,visible,data,2 object-1 references (read 2)
+memory,obj,0CDE33,0CDE37,xn_line_err_step_neg,unobserved,data,neither seen
+memory,obj,0CDE37,0CDE3B,xn_line_err_step_pos,unobserved,data,neither seen
+memory,obj,0CDE3B,0CDE3F,xn_line_step_routine,unobserved,data,neither seen
+memory,obj,0CDE3F,0CDE43,xn_line_x1,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,0CDE43,0CDE47,xn_line_y1,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0CDE47,0CDE4B,xn_line_x2,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,0CDE4B,0CDE4F,xn_line_y2,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,0CDE4F,0CE300,xn_zero_page_copy,unobserved,data,neither seen
+memory,obj,0CE300,0CE31C,xn_str_copy_line,private,code,code
+memory,obj,0CE31C,0CE3E3,xn_draw_copy_rect_stride_bytes,unobserved,data,neither seen
+memory,obj,0CE3E3,0CE66C,xn_str_copy_word .. xn_str_fill_ascending,private,code,code
+memory,obj,0CE66C,0CE69A,xn_mem_align_up,unobserved,data,neither seen
+memory,obj,0CE69A,0CE957,xn_mouse_set_range_320x200 .. xn_mouse_ps2_set_sample_rate,private,code,code
+memory,obj,0CE957,0CEA20,xn_kbd_numlock_off,unobserved,data,neither seen
+memory,obj,0CEA20,0CEA24,xn_cam_near_z,visible,data,1 object-1 references (write 1)
+memory,obj,0CEA24,0CEA28,xn_cam_far_z,visible,data,"14 object-1 references (read 5, write 9); the game reads 4 bytes it wrote itself; the game writes 4 bytes"
+memory,obj,0CEA28,0CEA2C,xn_cam_half_width,unobserved,data,neither seen
+memory,obj,0CEA2C,0CEA30,xn_cam_half_height,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0CEA30,0CEA34,xn_cam_centre_x,visible,data,7 object-1 references (read 7)
+memory,obj,0CEA34,0CEA38,xn_cam_centre_y,visible,data,7 object-1 references (read 7); the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0CEA38,0CEA3C,xn_cam_focal_x,unobserved,data,neither seen
+memory,obj,0CEA3C,0CEA40,xn_cam_inv_focal_x,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0CEA40,0CEA44,xn_cam_focal_y,unobserved,data,neither seen
+memory,obj,0CEA44,0CEA48,xn_cam_inv_focal_y,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0CEA48,0CEA4C,xn_render_mode,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0CEA4C,0CEA54,xn_render_poly_count,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0CEA54,0CEA58,xn_render_unused_54,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0CEA58,0CEA5C,xn_render_span_hook,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0CEA5C,0CEA60,xn_render_frame_flags,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0CEA60,0CEA64,xn_render_span_next,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0CEA64,0CEA68,xn_render_poly_next,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,0CEA68,0CEA6C,xn_render_light_list_next,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0CEA6C,0CEA70,xn_render_row_y,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,0CEA70,0CEA78,xn_render_matrix_next,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,0CEA78,0CEA7C,xn_cam_scale_x,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0CEA7C,0CEA80,xn_cam_inv_scale_x,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0CEA80,0CEA84,xn_cam_scale_y,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0CEA84,0CEA88,xn_cam_inv_scale_y,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0CEA88,0CEA8C,xn_cam_hfov_cos,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0CEA8C,0CEA90,xn_cam_hfov_sin,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,0CEA90,0CEA94,xn_cam_vfov_cos,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0CEA94,0CEA98,xn_cam_vfov_sin,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,0CEA98,0CEA99,xn_pick_skip_flats,unobserved,data,neither seen
+memory,obj,0CEA99,0CEA9D,xn_cam_flat_scale_x,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,0CEA9D,0CEAA5,xn_cam_flat_scale_y,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,0CEAA5,0CEAC0,xn_render_recip_table,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,0CEAC0,0D1AC0,xn_vert_cam,private,data,the engine writes 12288 bytes (surveys) / 9597 (records)
+memory,obj,0D1AC0,0D4AC0,xn_vert_screen,private,data,the engine writes 7284 bytes (surveys) / 1753 (records)
+memory,obj,0D4AC0,0D7AC0,xn_vert_flags,private,data,the engine writes 3072 bytes (surveys) / 2153 (records)
+memory,obj,0D7AC0,0DB320,xn_render_matrix_pool,private,data,the engine writes 1440 bytes (surveys) / 950 (records)
+memory,obj,0DB320,0DB328,"xn_render_poly_pool (face, handle)",visible,data every=64*1000,"1000 polygons of 100 bytes (struct xn_poly): the game reads only offsets 0..7 of each (face, handle: the pick's) in every survey flow (build/xn_canon/boundary/survey/*.pkl, checked by group C); the rest is the rasteriser's"
+memory,obj,0DB328,0DB384,xn_render_poly_pool (the rest),private,data every=64*1000,"1000 polygons of 100 bytes (struct xn_poly): the game reads only offsets 0..7 of each (face, handle: the pick's) in every survey flow (build/xn_canon/boundary/survey/*.pkl, checked by group C); the rest is the rasteriser's"
+memory,obj,0F39C0,0F39E0,xn_render_poly_pool (tail),visible,data,the 32 bytes after the 1000 polygons: the game reads 44 bytes the engine wrote; the engine writes 32004 bytes (surveys) / 13234 (records)
+memory,obj,0F39E0,0F39F0,xn_render_span_sentinel,private,data,the engine writes 12 bytes (surveys) / 0 (records)
+memory,obj,0F39F0,116C80,xn_render_span_rows,private,data,the engine writes 51232 bytes (surveys) / 23904 (records)
+memory,obj,116C80,120280,xn_render_light_list_pool,private,data,the engine writes 992 bytes (surveys) / 543 (records)
+memory,obj,120280,120284,xn_render_light_list_pool_start,unobserved,data,neither seen
+memory,obj,120284,120288,xn_render_light_list_pool_end,unobserved,data,neither seen
+memory,obj,120288,12028C,xn_scratch_vecs,visible,data,1 object-1 references (read 1); the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,12028C,120290,xn_pick_view_y,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,120290,120294,pick_distance,visible,data,13 object-1 references (read 13); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,120294,1202A0,xn_scratch_vec_b,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,1202A0,1202A4,xn_pick_flat_x,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,1202A4,1202A8,xn_pick_flat_y,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,1202A8,1202AC,xn_pick_flat_z,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,1202AC,1202B0,xn_model_uv_len2,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,1202B0,1202C0,xn_model_uv_t,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,1202C0,120AC0,xn_cam_dir_x_table,private,data,the engine writes 0 bytes (surveys) / 2018 (records)
+memory,obj,120AC0,1212C0,xn_cam_dir_x_mid,private,data,the engine writes 0 bytes (surveys) / 1454 (records)
+memory,obj,1212C0,1218C0,xn_cam_dir_y_table,private,data,the engine writes 0 bytes (surveys) / 1520 (records)
+memory,obj,1218C0,121EC0,xn_cam_dir_y_mid,private,data,the engine writes 0 bytes (surveys) / 1089 (records)
+memory,obj,121EC0,125EC0,xn_squares_table,private,data,the engine writes 0 bytes (surveys) / 11739 (records)
+memory,obj,125EC0,129EC0,xn_squares_table_mid,private,data,the engine writes 0 bytes (surveys) / 11739 (records)
+memory,obj,129EC0,129FC1,xn_tex_size_mask,private,data,the engine writes 0 bytes (surveys) / 255 (records)
+memory,obj,129FC1,129FCD,xn_render_mode_tables,unobserved,data,neither seen
+memory,obj,129FCD,129FE1,xn_render_mode0_setups,unobserved,data,neither seen
+memory,obj,129FE1,129FF5,xn_render_mode4_setups,unobserved,data,neither seen
+memory,obj,129FF5,12A009,xn_render_mode8_setups,unobserved,data,neither seen
+memory,obj,12A009,12A019,xn_render_span_setups,unobserved,data,neither seen
+memory,obj,12A019,12A01D,xn_render_span_setup_terrain_ptr,unobserved,data,neither seen
+memory,obj,12A01D,12A029,xn_render_solid_span_fns,unobserved,data,neither seen
+memory,obj,12A029,12A041,xn_render_tmap_span_fns,unobserved,data,neither seen
+memory,obj,12A041,12A100,xn_render_terrain_span_fns,unobserved,data,neither seen
+memory,obj,12A100,12AA04,xn_render_init .. xn_render_fill_background,private,code,code; the engine writes 8 bytes (surveys) / 2 (records)
+memory,obj,12AA04,12AC00,xn_timer_fps,visible,data,"2 object-1 references (read 1, write 1); the engine writes 4 bytes (surveys) / 1 (records)"
+memory,obj,12AC00,12AC01,mouse_buttons,visible,data,"258 object-1 references (read 243, write 15); the game reads 1 bytes the engine wrote; the engine writes 1 bytes (surveys) / 0 (records); the game writes 1 bytes"
+memory,obj,12AC01,12AC02,xn_mouse_buttons_prev,private,data,the engine writes 1 bytes (surveys) / 0 (records)
+memory,obj,12AC02,12AC04,mouse_double_click,visible,data,"9 object-1 references (read 5, write 4); the game reads 1 bytes the engine wrote; the engine writes 2 bytes (surveys) / 0 (records)"
+memory,obj,12AC04,12AC06,mouse_x,visible,data,"179 object-1 references (read 178, write 1); the game reads 2 bytes the engine wrote; the engine writes 2 bytes (surveys) / 1 (records)"
+memory,obj,12AC06,12AC08,mouse_y,visible,data,"200 object-1 references (read 199, write 1); the game reads 2 bytes the engine wrote; the engine writes 2 bytes (surveys) / 1 (records)"
+memory,obj,12AC08,12AC0C,xn_mouse_cursor_x,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,12AC0C,12AC10,xn_mouse_cursor_y,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,12AC10,12AD10,xn_mouse_cursor_under,private,data,the engine writes 256 bytes (surveys) / 256 (records)
+memory,obj,12AD10,12AE10,xn_mouse_cursor_clipped,private,data,the engine writes 256 bytes (surveys) / 49 (records)
+memory,obj,12AE10,12AF14,xn_mouse_cursor_image,private,data,the engine writes 0 bytes (surveys) / 49 (records)
+memory,obj,12AF14,12AF16,xn_mouse_cursor_w,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,12AF16,12AF18,xn_mouse_cursor_h,private,data,the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,12AF18,12AF1A,xn_mouse_hotspot_x,unobserved,data,neither seen
+memory,obj,12AF1A,12AF1C,xn_mouse_hotspot_y,unobserved,data,neither seen
+memory,obj,12AF1C,12AF20,xn_mouse_under_x,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,12AF20,12AF24,xn_mouse_under_y,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,12AF24,12AF28,xn_mouse_left_press_tick,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,12AF28,12AF2A,xn_mouse_left_press_x,private,data,the engine writes 2 bytes (surveys) / 0 (records)
+memory,obj,12AF2A,12AF2C,xn_mouse_left_press_y,private,data,the engine writes 2 bytes (surveys) / 0 (records)
+memory,obj,12AF2C,12AF30,xn_mouse_right_press_tick,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,12AF30,12AF32,xn_mouse_right_press_x,private,data,the engine writes 2 bytes (surveys) / 0 (records)
+memory,obj,12AF32,12AF34,xn_mouse_right_press_y,private,data,the engine writes 2 bytes (surveys) / 0 (records)
+memory,obj,12AF34,12AF36,mouse_x_min,visible,data,1 object-1 references (write 1)
+memory,obj,12AF36,12AF38,mouse_x_max,visible,data,1 object-1 references (write 1)
+memory,obj,12AF38,12AF3A,mouse_y_min,visible,data,1 object-1 references (write 1)
+memory,obj,12AF3A,12B100,mouse_y_max,visible,data,1 object-1 references (write 1)
+memory,obj,12B100,12B49E,xn_mouse_init .. xn_mouse_read_motion,private,code,code
+memory,obj,12B49E,12B500,xn_mouse_set_position,unobserved,data,neither seen
+memory,obj,12B500,12B504,xn_pal_current,visible,data,2 object-1 references (read 2); the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,12B504,12B508,text_shadow_colour,visible,data,"11 object-1 references (read 4, write 7); the game reads 1 bytes the engine wrote; the game writes 1 bytes"
+memory,obj,12B508,12B80C,text_colour,visible,data,"144 object-1 references (read 24, write 120); the game reads 1 bytes it wrote itself; the game writes 1 bytes"
+memory,obj,12B80C,12B812,xn_pal_hsv_target,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,12B812,12B822,xn_pal_ega16_map,private,data,the engine writes 0 bytes (surveys) / 16 (records)
+memory,obj,12B822,12B852,xn_pal_ega16_rgb,unobserved,data,neither seen
+memory,obj,12B852,12B856,xn_pal_best_dist,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,12B856,12B85A,xn_pal_best_index,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,12B85A,12B878,xn_pal_hsv_scratch,private,data,the engine writes 0 bytes (surveys) / 7 (records)
+memory,obj,12B878,12BB78,xn_pal_black,unobserved,data,neither seen
+memory,obj,12BB78,12C778,xn_pal_fade_rgb,private,data,the engine writes 0 bytes (surveys) / 1449 (records)
+memory,obj,12C778,12D40E,xn_pal_fade_step,private,data,the engine writes 0 bytes (surveys) / 3004 (records)
+memory,obj,12D40E,12D970,xn_pal_find_nearest .. xn_pal_fade_write_entry,private,code,code
+memory,obj,12D970,12DA00,xn_pal_build_ega16_map,unobserved,data,neither seen
+memory,obj,12DA00,12DA0D,xn_font_filename,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,12DA0D,12DA38,xn_font_msg_no_font,unobserved,data,neither seen
+memory,obj,12DA38,12DA3C,xn_font_text_x0,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,12DA3C,12DA40,xn_font_text_y0,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,12DA40,12DA44,font_space_width,visible,data,2 object-1 references (read 2); the game reads 2 bytes the engine wrote; the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,12DA44,12DA48,font_height,visible,data,52 object-1 references (read 52); the game reads 2 bytes the engine wrote; the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,12DA48,12DA4C,font_char_spacing,visible,data,2 object-1 references (read 2); the game reads 2 bytes the engine wrote
+memory,obj,12DA4C,12DA50,xn_font_line_gap,unobserved,data,neither seen
+memory,obj,12DA50,12DA54,xn_font_current,visible,data,1 object-1 references (read 1); the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,12DA54,12DA74,xn_font_table,private,data,the engine writes 0 bytes (surveys) / 32 (records)
+memory,obj,12DA74,12DB00,font_glyphs,visible,data,2 object-1 references (read 2); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,12DB00,12DD1C,xn_font_init .. xn_font_glyph_step,private,code,code; the engine writes 5 bytes (surveys) / 3 (records)
+memory,obj,12DD1C,12DE00,xn_font_glyph_width,unobserved,data,neither seen
+memory,obj,12DE00,12DE04,dungeon_water_level,visible,data,"34 object-1 references (addr 2, read 27, write 5); the game reads 4 bytes the engine wrote; the game writes 4 bytes"
+memory,obj,12DE04,12DE10,xn_water_span_fn,unobserved,data,neither seen
+memory,obj,12DE10,12DE14,xn_water_row,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,12DE14,12DE18,xn_water_row_jitter,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,12DE18,12E618,xn_water_jitter,private,data,the engine writes 0 bytes (surveys) / 1643 (records)
+memory,obj,12E618,12E938,xn_water_row_velocity,private,data,the engine writes 0 bytes (surveys) / 689 (records)
+memory,obj,12E938,12EC58,xn_water_row_phase,private,data,the engine writes 0 bytes (surveys) / 704 (records)
+memory,obj,12EC58,12EF78,xn_water_row_base,private,data,the engine writes 0 bytes (surveys) / 200 (records)
+memory,obj,12EF78,12F47A,xn_water_unroll_offsets,unobserved,data,neither seen
+memory,obj,12F47A,12F48A,xn_water_line_p0,private,data,the engine writes 0 bytes (surveys) / 13 (records)
+memory,obj,12F48A,12F49A,xn_water_line_p1,private,data,the engine writes 0 bytes (surveys) / 15 (records)
+memory,obj,12F49A,12F500,xn_water_quadrant_dirs,unobserved,data,neither seen
+memory,obj,12F500,132E80,xn_water_init .. xn_water_span_unrolled,private,code,code; the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,132E80,132F00,xn_water_stub_ret,unobserved,data,neither seen
+memory,obj,132F00,132F16,xn_tex_msg_out_of_memory,unobserved,data,neither seen
+memory,obj,132F16,132F3B,xn_tex_msg_no_room,unobserved,data,neither seen
+memory,obj,132F3B,132F58,xn_tex_msg_unpack_full,unobserved,data,neither seen
+memory,obj,132F58,132F5C,xn_tex_cache_full,visible,data,"6 object-1 references (read 3, write 3); the game reads 1 bytes the engine wrote; the engine writes 1 bytes (surveys) / 1 (records)"
+memory,obj,132F5C,132F60,xn_tex_cur_archive,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,132F60,132F64,xn_tex_cur_record,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,132F64,132F6C,xn_tex_cur_frame,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,132F6C,133F6C,xn_tex_archives,visible,data,3 object-1 references (read 3); the engine writes 2048 bytes (surveys) / 300 (records)
+memory,obj,133F6C,13436C,xn_tex_archive_use,private,data,the engine writes 1024 bytes (surveys) / 76 (records)
+memory,obj,13436C,134378,xn_tex_filename,private,data,the engine writes 3 bytes (surveys) / 3 (records)
+memory,obj,134378,1343B9,xn_tex_path,visible,data,the game reads 22 bytes the engine wrote; the engine writes 21 bytes (surveys) / 21 (records)
+memory,obj,1343B9,1343C0,xn_tex_file_size,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,1343C0,1343C4,xn_anim_ticks,visible,data,19 object-1 references (read 19); the game reads 4 bytes the engine wrote; the game writes 4 bytes
+memory,obj,1343C4,1343C8,xn_tex_heap_size,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,1343C8,1343D0,xn_tex_heap_request,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,1343D0,1343DC,xn_tex_unpack_buffer,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,1343DC,1343E0,xn_tex_heap_base,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,1343E0,1343E4,xn_tex_heap_free_bytes,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,1343E4,1343FA,xn_tex_heap_head,private,data,the engine writes 6 bytes (surveys) / 5 (records)
+memory,obj,1343FA,134BFA,xn_tex_unpack_strips,private,data,the engine writes 40 bytes (surveys) / 24 (records)
+memory,obj,134BFA,134BFE,xn_tex_unpack_strip_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,134BFE,134C02,xn_tex_unpack_used,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,134C02,135402,xn_tex_unpack_entries,private,data,the engine writes 136 bytes (surveys) / 70 (records)
+memory,obj,135402,135D00,xn_tex_record_offsets,unobserved,data,neither seen
+memory,obj,135D00,13641D,xn_tex_cache_lookup .. xn_tex_heap_sum_free,private,code,code
+memory,obj,13641D,136500,xn_tex_decode_to_big_buffer,unobserved,data,neither seen
+memory,obj,136500,136525,xn_light_msg_no_memory,unobserved,data,neither seen
+memory,obj,136525,13652F,xn_shade_filename,unobserved,data,neither seen
+memory,obj,13652F,136540,xn_light_filename,unobserved,data,neither seen
+memory,obj,136540,1368FD,xn_light_table,private,data,the engine writes 416 bytes (surveys) / 192 (records)
+memory,obj,1368FD,136901,xn_light_next,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,136901,136905,xn_light_falloff,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,136905,136909,xn_light_falloff_alloc,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,136909,13690D,xn_light_code_next,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,13690D,136911,xn_light_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,136911,136915,xn_light_ambient,visible,data,"16 object-1 references (read 5, write 11); the game reads 4 bytes the engine wrote; the game writes 4 bytes"
+memory,obj,136915,136919,xn_shade_table,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,136919,13691D,xn_shade_table_alloc,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,13691D,136921,xn_shade_table_last_row,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,136921,136925,xn_shade_blend_tables,unobserved,data,neither seen
+memory,obj,136925,13695D,xn_shade_translucent_table,visible,data,"2 object-1 references (read 1, write 1)"
+memory,obj,13695D,136A00,xn_water_tint_table,visible,data,"2 object-1 references (read 1, write 1)"
+memory,obj,136A00,136DD3,xn_light_init .. xn_light_t3_max_a,private,code,code; the engine writes 132 bytes (surveys) / 164 (records)
+memory,obj,136DD3,136E00,xn_light_t3_max_b,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,136E00,136E18,xn_cam_rotation,visible,data,28 object-1 references (addr 28); the engine writes 24 bytes (surveys) / 16 (records)
+memory,obj,136E18,136E1C,xn_cam_forward_x,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,136E1C,136E20,xn_cam_forward_y,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,136E20,136E24,xn_cam_forward_z,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,136E24,136E48,xn_cam_view_matrix,visible,data,7 object-1 references (addr 7); the engine writes 36 bytes (surveys) / 24 (records)
+memory,obj,136E48,136E54,xn_terrain_step_x,private,data,the engine writes 12 bytes (surveys) / 9 (records)
+memory,obj,136E54,136E60,xn_terrain_step_y,private,data,the engine writes 12 bytes (surveys) / 6 (records)
+memory,obj,136E60,136E84,xn_terrain_step_z,private,data,the engine writes 12 bytes (surveys) / 9 (records)
+memory,obj,136E84,137000,xn_mat_scaled_axes_in,private,data,the engine writes 12 bytes (surveys) / 0 (records)
+memory,obj,137000,13719F,xn_mat_from_angles,private,code,code
+memory,obj,13719F,1371AB,xn_mat_from_angles_tmp,private,data,the engine writes 12 bytes (surveys) / 8 (records)
+memory,obj,1371AB,137804,xn_math_asin_coarse .. xn_cam_unscale_matrix,private,code,code
+memory,obj,137804,137900,xn_mat_multiply,unobserved,data,neither seen
+memory,obj,137900,137D00,xn_terrain_height_cam_x,private,data,the engine writes 1024 bytes (surveys) / 0 (records)
+memory,obj,137D00,138100,xn_terrain_height_cam_y,private,data,the engine writes 1024 bytes (surveys) / 0 (records)
+memory,obj,138100,138500,xn_terrain_height_cam_z,private,data,the engine writes 1024 bytes (surveys) / 0 (records)
+memory,obj,138500,138520,xn_terrain_tex_scale,unobserved,data,neither seen
+memory,obj,138520,13852C,xn_terrain_u_axis,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,13852C,138538,xn_terrain_v_axis,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,138538,138558,xn_terrain_u_axis_fns,unobserved,data,neither seen
+memory,obj,138558,138578,xn_terrain_v_axis_fns,unobserved,data,neither seen
+memory,obj,138578,13B578,xn_terrain_vert_x,private,data,the engine writes 4096 bytes (surveys) / 2715 (records)
+memory,obj,13B578,13E600,xn_terrain_vert_y,private,data,the engine writes 4096 bytes (surveys) / 2267 (records)
+memory,obj,13E600,13F608,xn_terrain_draw .. xn_terrain_v_axis_neg_z,private,code,code; the engine writes 80 bytes (surveys) / 34 (records)
+memory,obj,13F608,13F700,xn_terrain_v_axis_neg_x,unobserved,data,neither seen
+memory,obj,13F700,13F728,xn_model_msg_too_many_verts,unobserved,data,neither seen
+memory,obj,13F728,13F748,xn_model_msg_corrupted,unobserved,data,neither seen
+memory,obj,13F748,13F76C,xn_model_rot_matrix,private,data,the engine writes 36 bytes (surveys) / 16 (records)
+memory,obj,13F76C,13F770,xn_model_queue_count,visible,data,2 object-1 references (read 2); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,13F770,13F780,xn_model_drawn_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,13F780,13F784,xn_model_queue_ptr,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,13F784,13FDC5,xn_model_queue,private,data,the engine writes 240 bytes (surveys) / 123 (records)
+memory,obj,13FDC5,13FDC9,xn_model_bounds_x0,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,13FDC9,13FDCD,xn_model_bounds_y0,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,13FDCD,13FDD1,xn_model_bounds_x1,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,13FDD1,13FE15,xn_model_bounds_y1,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,13FE15,142300,xn_model_prepare .. xn_model_clear_vert_flags,private,code,code; the engine writes 136 bytes (surveys) / 89 (records)
+memory,obj,142300,142304,xn_kbd_old_int9_offset,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,142304,142306,xn_kbd_old_int9_selector,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,142306,142307,xn_kbd_installed,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,142307,142308,xn_kbd_last_scancode,visible,data,2 object-1 references (read 2); the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,142308,142309,key_down,visible,data,"14 object-1 references (addr 3, read 11)"
+memory,obj,142309,142314,key_down_esc,visible,data,"53 object-1 references (read 52, write 1); the game reads 2 bytes the engine wrote; the engine writes 0 bytes (surveys) / 1 (records)"
+memory,obj,142314,142315,key_down_minus,visible,data,"3 object-1 references (read 2, write 1); the game reads 1 bytes the engine wrote"
+memory,obj,142315,14231D,key_down_equals,visible,data,"3 object-1 references (read 2, write 1); the game reads 7 bytes the engine wrote; the engine writes 0 bytes (surveys) / 1 (records)"
+memory,obj,14231D,142324,key_down_y,visible,data,1 object-1 references (read 1); the game reads 5 bytes the engine wrote; the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,142324,142325,key_down_enter,visible,data,"14 object-1 references (read 13, write 1); the game reads 1 bytes the engine wrote; the engine writes 0 bytes (surveys) / 1 (records)"
+memory,obj,142325,142326,key_down_ctrl,visible,data,7 object-1 references (read 7); the game reads 1 bytes the engine wrote
+memory,obj,142326,142332,key_down_a,visible,data,1 object-1 references (read 1); the game reads 6 bytes the engine wrote; the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,142332,142333,key_down_lshift,visible,data,3 object-1 references (read 3); the game reads 1 bytes the engine wrote
+memory,obj,142333,142335,key_down_backslash,visible,data,2 object-1 references (read 2); the game reads 1 bytes the engine wrote
+memory,obj,142335,142336,key_down_x,visible,data,3 object-1 references (read 3)
+memory,obj,142336,142338,key_down_c,visible,data,1 object-1 references (read 1)
+memory,obj,142338,142339,key_down_b,visible,data,2 object-1 references (read 2)
+memory,obj,142339,142340,key_down_n,visible,data,1 object-1 references (read 1); the game reads 2 bytes the engine wrote; the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,142340,14234F,key_down_alt,visible,data,2 object-1 references (read 2); the game reads 8 bytes the engine wrote; the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,14234F,142350,key_down_home,visible,data,1 object-1 references (read 1); the game reads 1 bytes the engine wrote
+memory,obj,142350,142351,key_down_up,visible,data,6 object-1 references (read 6); the game reads 1 bytes the engine wrote; the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,142351,142353,key_down_pgup,visible,data,1 object-1 references (read 1); the game reads 1 bytes the engine wrote; the engine writes 1 bytes (surveys) / 0 (records)
+memory,obj,142353,142355,key_down_left,visible,data,3 object-1 references (read 3); the game reads 1 bytes the engine wrote; the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,142355,142357,key_down_right,visible,data,3 object-1 references (read 3); the game reads 1 bytes the engine wrote; the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,142357,142358,key_down_end,visible,data,1 object-1 references (read 1)
+memory,obj,142358,142359,key_down_down,visible,data,6 object-1 references (read 6); the game reads 1 bytes the engine wrote; the engine writes 1 bytes (surveys) / 0 (records)
+memory,obj,142359,142388,key_down_pgdn,visible,data,1 object-1 references (read 1); the game reads 3 bytes the engine wrote; the engine writes 1 bytes (surveys) / 0 (records)
+memory,obj,142388,142393,xn_kbd_shift_flags,unobserved,data,neither seen
+memory,obj,142393,142397,xn_kbd_keymap,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,142397,142700,xn_kbd_ascii_table,unobserved,data,neither seen
+memory,obj,142700,1428EC,xn_kbd_install .. xn_kbd_int9_pop_ds,private,code,code
+memory,obj,1428EC,14291B,xn_kbd_int9_iret,unobserved,data,neither seen
+memory,obj,14291B,14291F,xn_gfx_mode,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,14291F,142923,xn_gfx_saved_mode,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,142923,142928,xn_gfx_driver,unobserved,data,neither seen
+memory,obj,142928,14292C,pen_x,visible,data,"23 object-1 references (code 1, read 5, write 17); the engine writes 0 bytes (surveys) / 2 (records); the game writes 4 bytes"
+memory,obj,14292C,142930,pen_y,visible,data,"26 object-1 references (code 1, read 14, write 11); the engine writes 0 bytes (surveys) / 1 (records); the game writes 4 bytes"
+memory,obj,142930,142934,xn_gfx_width,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,142934,142938,xn_gfx_height,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,142938,14293C,xn_gfx_screen_size,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,14293C,142940,xn_gfx_page_count,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,142940,142944,xn_gfx_clip_left,visible,data,"10 object-1 references (read 6, write 4); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 0 (records)"
+memory,obj,142944,142948,xn_gfx_clip_top,visible,data,"7 object-1 references (read 5, write 2); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 0 (records)"
+memory,obj,142948,14294C,xn_gfx_clip_right,visible,data,"11 object-1 references (read 5, write 6); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 0 (records)"
+memory,obj,14294C,142950,xn_gfx_clip_bottom,visible,data,"17 object-1 references (read 6, write 11); the game reads 4 bytes the engine wrote; the engine writes 4 bytes (surveys) / 0 (records); the game writes 2 bytes"
+memory,obj,142950,143550,xn_gfx_row_offset,visible,data,3 object-1 references (read 3); the game reads 348 bytes the engine wrote; the engine writes 0 bytes (surveys) / 1903 (records)
+memory,obj,143550,143554,screen_buffer,visible,data,"157 object-1 references (read 151, write 6); the game reads 4 bytes the engine wrote; the engine writes 0 bytes (surveys) / 4 (records); the game writes 4 bytes"
+memory,obj,143554,143558,xn_gfx_buffer_base,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,143558,14355C,xn_gfx_buffer_alloc,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,14355C,14355D,xn_gfx_present_mode,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,14355D,143561,xn_gfx_fill_scratch,unobserved,data,neither seen
+memory,obj,143561,143565,xn_gfx_copy_clear_fn,unobserved,data,neither seen
+memory,obj,143565,143569,xn_gfx_drv_shutdown,unobserved,data,neither seen
+memory,obj,143569,14356D,xn_gfx_drv_present,unobserved,data,neither seen
+memory,obj,14356D,143600,xn_gfx_drv_clear,unobserved,data,neither seen
+memory,obj,143600,143A3F,xn_gfx_set_mode .. xn_gfx_get_cursor_pos,private,code,code
+memory,obj,143A3F,143B80,xn_gfx_set_cursor_pos,unobserved,data,neither seen
+memory,obj,143B80,1443D0,xn_gfx_copy_and_clear .. xn_gfx_copy_and_clear_unrolled,private,code,code
+memory,obj,1443D0,144BFC,xn_gfx_copy_and_clear_fpu,unobserved,data,neither seen
+memory,obj,144BFC,144C0D,xn_gfx_copy_rows,private,code,code
+memory,obj,144C0D,144D00,xn_gfx_drv0_shutdown,unobserved,data,neither seen
+memory,obj,144D00,144E00,xn_draw_fill_rect,unobserved,data,neither seen
+memory,obj,144E00,147858,xn_draw_clip_rect .. xn_draw_remap_rect,private,code,code; the engine writes 22 bytes (surveys) / 0 (records)
+memory,obj,147858,147900,xn_draw_remap_rect_regs,unobserved,data,neither seen
+memory,obj,147900,147926,xn_mem_msg_alloc_failed,unobserved,data,neither seen
+memory,obj,147926,147950,xn_mem_msg_lock_failed,unobserved,data,neither seen
+memory,obj,147950,147952,xn_sel_bios_data,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,147952,147954,xn_sel_vga,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,147954,147958,big_buffer,visible,data,86 object-1 references (read 86); the game reads 4 bytes the engine wrote; the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,147958,14795C,xn_mem_work_block,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,14795C,147960,xn_sys_cmd_tail,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,147960,147964,xn_sys_psp_addr,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,147964,147980,xn_mouse_cursor_drawn,visible,data,15 object-1 references (read 15); the engine writes 2 bytes (surveys) / 1 (records)
+memory,obj,147980,148980,xn_recip16_table,private,data,the engine writes 0 bytes (surveys) / 1279 (records)
+memory,obj,148980,149980,xn_recip32_table,private,data,the engine writes 0 bytes (surveys) / 3312 (records)
+memory,obj,149980,149D80,xn_colour_fill_table,private,data,the engine writes 0 bytes (surveys) / 1020 (records)
+memory,obj,149D80,149D84,xn_sys_old_div_handler_offset,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,149D84,149D86,xn_sys_old_div_handler_selector,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,149D86,149E00,xn_sys_div_handler_installed,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,149E00,14A0CF,xn_mem_init .. xn_sys_divfault_skip2,private,code,code
+memory,obj,14A0CF,14A100,xn_sys_divfault_return,unobserved,data,neither seen
+memory,obj,14A100,14A13C,xn_collide_work,private,data,the engine writes 36 bytes (surveys) / 2 (records)
+memory,obj,14A13C,14A148,xn_collide_flat_normal,unobserved,data,neither seen
+memory,obj,14A148,14A16C,xn_collide_model_matrix,private,data,the engine writes 36 bytes (surveys) / 4 (records)
+memory,obj,14A16C,14A190,xn_collide_model_matrix_inv,private,data,the engine writes 36 bytes (surveys) / 5 (records)
+memory,obj,14A190,14A194,xn_collide_model,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,14A194,14A198,xn_collide_spheres,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,14A198,14A19C,xn_collide_seg_end,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,14A19C,14A1A0,xn_collide_seg_start,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,14A1A0,14A1AC,xn_collide_local_end,private,data,the engine writes 12 bytes (surveys) / 9 (records)
+memory,obj,14A1AC,14A1B8,xn_collide_local_start,private,data,the engine writes 12 bytes (surveys) / 9 (records)
+memory,obj,14A1B8,14A1BC,xn_collide_hit_t,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14A1BC,14A1C0,xn_collide_mode,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,14A1C0,14A1CC,xn_collide_local_pos,private,data,the engine writes 12 bytes (surveys) / 11 (records)
+memory,obj,14A1CC,14A1F0,xn_collide_rel_matrix,private,data,the engine writes 36 bytes (surveys) / 5 (records)
+memory,obj,14A1F0,14A1F4,xn_collide_build_cell,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,14A1F4,14A1F8,xn_collide_build_radius,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,14A1F8,14A204,xn_collide_build_cells,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,14A204,14A210,xn_collide_build_first,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,14A210,14A21C,xn_collide_build_centre,private,data,the engine writes 0 bytes (surveys) / 5 (records)
+memory,obj,14A21C,14A220,xn_collide_build_cell_list,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,14A220,14A22C,xn_collide_build_left,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,14A22C,14A230,xn_collide_build_out,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,14A230,14A23C,xn_collide_build_min,unobserved,data,neither seen
+memory,obj,14A23C,14A249,xn_collide_build_max,private,data,the engine writes 0 bytes (surveys) / 5 (records)
+memory,obj,14A249,14A300,xn_collide_flat_anchor_shift,unobserved,data,neither seen
+memory,obj,14A300,14A68F,xn_collide_segment_model,private,code,code
+memory,obj,14A68F,14A693,xn_collide_seg,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,14A693,14A697,xn_collide_seg_normals,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,14A697,14A69B,xn_collide_seg_model,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,14A69B,14A69F,xn_collide_seg_normal,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,14A69F,14A6A3,xn_collide_seg_list,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,14A6A3,14A6A7,xn_collide_seg_list_next,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,14A6A7,14A6AB,xn_collide_seg_plane_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,14A6AB,14A6AF,xn_collide_seg_hits,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14A6AF,14A6C0,xn_collide_seg_hit_next,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,14A6C0,14AA66,xn_collide_model_model .. xn_collide_model_model_detail,private,code,code
+memory,obj,14AA66,14AA92,xn_collide_detail,unobserved,data,neither seen
+memory,obj,14AA92,14AF0C,xn_collide_spheres_model,private,code,code
+memory,obj,14AF0C,14AF10,xn_collide_sph_points,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF10,14AF14,xn_collide_sph_normals,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF14,14AF18,xn_collide_sph_model,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF18,14AF1C,xn_collide_sph_hits,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF1C,14AF20,xn_collide_sph_hit_next,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF20,14AF24,xn_collide_sph_list,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF24,14AF28,xn_collide_sph_list_next,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF28,14AF2C,xn_collide_sph_list_count,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF2C,14AF30,xn_collide_sph_probe_count,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14AF30,14B193,xn_collide_segment_spheres .. xn_collide_spheres_spheres,private,code,code
+memory,obj,14B193,14B197,xn_collide_ss_hits,unobserved,data,neither seen
+memory,obj,14B197,14B19B,xn_collide_ss_hit_next,unobserved,data,neither seen
+memory,obj,14B19B,14B453,xn_collide_miss_stk .. xn_collide_segment_flat,private,code,code
+memory,obj,14B453,14B457,xn_collide_flat_height,unobserved,data,neither seen
+memory,obj,14B457,14B45B,xn_collide_flat_width,unobserved,data,neither seen
+memory,obj,14B45B,14BA7D,xn_terrain_height_at .. xn_collide_build_model_spheres,private,code,code
+memory,obj,14BA7D,14BB00,xn_collide_build,private,data,the engine writes 0 bytes (surveys) / 20 (records)
+memory,obj,14BB00,14BB24,xn_math_tri_edges,private,data,the engine writes 36 bytes (surveys) / 7 (records)
+memory,obj,14BB24,14BB3C,xn_collide_mid,private,data,the engine writes 12 bytes (surveys) / 14 (records)
+memory,obj,14BB3C,14BB48,xn_collide_normal,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,14BB48,14BB54,xn_collide_vec_a,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,14BB54,14BB60,xn_collide_vec_b,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,14BB60,14BC00,xn_vec_blend_weights,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,14BC00,14C6FD,xn_math_isqrt .. xn_collide_plane_plane_line,private,code,code
+memory,obj,14C6FD,14C701,xn_collide_ppl_axis,unobserved,data,neither seen
+memory,obj,14C701,14C705,xn_collide_ppl_n1,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,14C705,14C709,xn_collide_ppl_p1,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,14C709,14C70D,xn_collide_ppl_n2,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,14C70D,14C711,xn_collide_ppl_p2,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,14C711,14CB78,xn_collide_sphere_plane .. xn_collide_point_in_cube,private,code,code
+memory,obj,14CB78,14CC00,xn_math_rotate_xz,unobserved,data,neither seen
+memory,obj,14CC00,14CC0C,xn_haze_filename,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,14CC0C,14CC10,xn_fog_table_last,visible,data,5 object-1 references (write 5); the engine writes 0 bytes (surveys) / 2 (records); the game writes 4 bytes
+memory,obj,14CC10,14CC14,xn_fog_start,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14CC14,14CC18,xn_fog_step,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14CC18,14CC1C,xn_fog_min_inv_z,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,14CC1C,14D200,xn_fog_unroll_offsets,unobserved,data,neither seen
+memory,obj,14D200,14D300,xn_shade_load_haze .. xn_shade_set_fog,private,code,code
+memory,obj,14D300,14D320,xn_shade_fog_span_off,unobserved,data,neither seen
+memory,obj,14D320,15011C,xn_shade_fog_pixels .. xn_fog_start_step_b,private,code,code; the engine writes 300 bytes (surveys) / 0 (records)
+memory,obj,15011C,150200,xn_fog_table_last_b,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,150200,150A00,xn_sin_table,visible,data,4 object-1 references (read 4); the game reads 268 bytes the engine wrote
+memory,obj,150A00,152A00,xn_cos_table,visible,data,4 object-1 references (read 4); the game reads 1884 bytes the engine wrote
+memory,obj,152A00,152A01,xn_joy_axis_mask,unobserved,data,neither seen
+memory,obj,152A01,152A02,xn_joy_installed,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,152A02,152A04,joystick_status,visible,data,"6 object-1 references (read 2, write 4)"
+memory,obj,152A04,152A0C,xn_joy_calibration,visible,data,2 object-1 references (addr 2)
+memory,obj,152A0C,152A10,xn_joy_dead_zone,visible,data,3 object-1 references (write 3)
+memory,obj,152A10,152A20,xn_joy_min_x,visible,data,4 object-1 references (write 4); the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,152A20,152A24,joystick_x,visible,data,12 object-1 references (read 12); the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,152A24,152A28,joystick_y,visible,data,13 object-1 references (read 13); the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,152A28,152A30,xn_joy_raw_x,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,152A30,152A31,joystick_button1,visible,data,4 object-1 references (read 4); the engine writes 1 bytes (surveys) / 0 (records)
+memory,obj,152A31,152A34,joystick_button2,visible,data,2 object-1 references (read 2); the engine writes 1 bytes (surveys) / 0 (records)
+memory,obj,152A34,152A40,xn_joy2_center_x,unobserved,data,neither seen
+memory,obj,152A40,152A50,xn_joy2_min_x,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,152A50,152A58,xn_joy2_x,private,data,the engine writes 8 bytes (surveys) / 0 (records)
+memory,obj,152A58,152A60,xn_joy2_raw_x,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,152A60,152A62,xn_joy_button3,private,data,the engine writes 2 bytes (surveys) / 0 (records)
+memory,obj,152A62,152A64,xn_joy_old_int1c_sel,unobserved,data,neither seen
+memory,obj,152A64,152B00,xn_joy_old_int1c_off,unobserved,data,neither seen
+memory,obj,152B00,152F40,xn_joy_init .. xn_joy_timer_isr_pop_ds,private,code,code
+memory,obj,152F40,153000,xn_joy_timer_isr_iret,unobserved,data,neither seen
+memory,obj,153000,153004,xn_draw_line_dx,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,153004,15310C,xn_draw_line_dy,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,15310C,153400,xn_draw_hline .. xn_draw_line_clip,private,code,code
+memory,obj,153400,153404,xn_helmet_port,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,153404,153408,cfg_helmet,visible,data,"3 object-1 references (read 2, write 1); the engine writes 0 bytes (surveys) / 4 (records)"
+memory,obj,153408,153409,xn_helmet_active,visible,data,1 object-1 references (read 1); the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,153409,15340D,xn_helmet_smoothing,visible,data,1 object-1 references (write 1)
+memory,obj,15340D,153411,xn_helmet_pitch,visible,data,1 object-1 references (read 1)
+memory,obj,153411,153415,xn_helmet_yaw,visible,data,1 object-1 references (read 1)
+memory,obj,153415,153419,xn_helmet_roll,unobserved,data,neither seen
+memory,obj,153419,153425,xn_helmet_drv_open,unobserved,data,neither seen
+memory,obj,153425,153431,xn_helmet_drv_close,unobserved,data,neither seen
+memory,obj,153431,15343D,xn_helmet_drv_read,unobserved,data,neither seen
+memory,obj,15343D,153461,xn_helmet_drv_request,unobserved,data,neither seen
+memory,obj,153461,153465,xn_helmet_ring_pos,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,153465,153500,xn_helmet_ring,private,data,the engine writes 0 bytes (surveys) / 6 (records)
+memory,obj,153500,153728,xn_helmet_open .. xn_str_copy,private,code,code
+memory,obj,153728,15372C,xn_str_nop,unobserved,data,neither seen
+memory,obj,15372C,153798,xn_str_insert_char .. xn_str_find_char,private,code,code
+memory,obj,153798,153800,xn_font_string_width_n,unobserved,data,neither seen
+memory,obj,153800,153804,xn_rand_seed,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,153804,153900,xn_pow10_table,unobserved,data,neither seen
+memory,obj,153900,153990,xn_str_from_int .. xn_rand_seed_from_ticks,private,code,code
+memory,obj,153990,153A00,xn_rand_next,unobserved,data,neither seen
+memory,obj,153A00,153B00,xn_terrain_corner_tile,unobserved,data,neither seen
+memory,obj,153B00,153C00,xn_terrain_corner_flip,unobserved,data,neither seen
+memory,obj,153C00,153C44,xn_flat_quad_table,unobserved,data,neither seen
+memory,obj,153C44,154C44,xn_flat_sort_list,private,data,the engine writes 1192 bytes (surveys) / 739 (records)
+memory,obj,154C44,154C48,xn_flat_sort_end,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,154C48,154C4C,xn_flat_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,154C4C,154C50,xn_flat_drawn_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,154C50,154C54,xn_flat_half_w,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,154C54,154C58,xn_flat_tex_w,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,154C58,154C5C,xn_flat_half_h,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,154C5C,154C60,xn_flat_tex_h,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,154C60,154C61,xn_flat_ignore_pitch,unobserved,data,neither seen
+memory,obj,154C61,154C85,xn_flat_matrix,private,data,the engine writes 36 bytes (surveys) / 16 (records)
+memory,obj,154C85,154D00,xn_flat_proj_matrix,private,data,the engine writes 36 bytes (surveys) / 13 (records)
+memory,obj,154D00,154FD4,xn_flat_add .. xn_flat_quad_centred,private,code,code
+memory,obj,154FD4,154FD8,xn_flat_quad_none,unobserved,data,neither seen
+memory,obj,154FD8,1550BC,xn_flat_quad_standing,private,code,code
+memory,obj,1550BC,1550C0,xn_flat_quad_none_8,unobserved,data,neither seen
+memory,obj,1550C0,1550E0,xn_flat_quad_none_16,unobserved,data,neither seen
+memory,obj,1550E0,155860,xn_flat_setup_gradients .. xn_span_solid_shaded_setup,private,code,code; the engine writes 76 bytes (surveys) / 37 (records)
+memory,obj,155860,155880,xn_span_solid_lit_tail_offsets,unobserved,data,neither seen
+memory,obj,155880,155911,xn_span_solid_lit_tail,private,code,the engine writes 15 bytes (surveys) / 0 (records)
+memory,obj,155911,155920,xn_span_solid_lit_shade,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,155920,155A4B,xn_span_solid_lit .. xn_span_solid_lit_end,private,code,code; the engine writes 17 bytes (surveys) / 10 (records)
+memory,obj,155A4B,155B00,xn_span_solid_lit_ray_c,private,data,the engine writes 4 bytes (surveys) / 0 (records)
+memory,obj,155B00,155B04,xn_span_tex_u_num,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,155B04,155B08,xn_span_tex_v_num,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,155B08,155B0C,xn_span_tex_u_prev,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,155B0C,155C00,xn_span_tex_v_prev,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,155C00,1561AD,xn_span_tex_tail .. xn_span_tex16_end,private,code,code; the engine writes 55 bytes (surveys) / 57 (records)
+memory,obj,1561AD,156300,xn_span_tex16_recip_c,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,156300,156304,xn_span_tex_shaded_u_num,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156304,156308,xn_span_tex_shaded_v_num,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156308,15630C,xn_span_tex_shaded_u_prev,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,15630C,156310,xn_span_tex_shaded_v_prev,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156310,156320,xn_span_tex_shaded_row,private,data,the engine writes 4 bytes (surveys) / 3 (records)
+memory,obj,156320,156A00,xn_span_tex_shaded_tail .. xn_span_texsh16_recip_c,private,code,code; the engine writes 55 bytes (surveys) / 44 (records)
+memory,obj,156A00,156A40,xn_tmap_ret_offsets,unobserved,data,neither seen
+memory,obj,156A40,156A44,xn_span_tex_lit_tmap,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A44,156A48,xn_span_tex_lit_shader,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A48,156A4C,xn_span_tex_lit_shade,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A4C,156A50,xn_span_tex_lit_shade_end,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A50,156A54,xn_span_tex_lit_v_num,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A54,156A58,xn_span_tex_lit_u_num,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A58,156A5C,xn_span_tex_lit_v_prev,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A5C,156A60,xn_span_tex_lit_u_prev,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A60,156A80,xn_span_tex_lit_ray_x,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,156A80,156D20,xn_span_tex_lit_setup .. xn_span_texlit_ray_c,private,code,code; the engine writes 32 bytes (surveys) / 35 (records)
+memory,obj,156D20,156D40,xn_span_tail_offsets_17,unobserved,data,neither seen
+memory,obj,156D40,1574B1,xn_span_tex64_tail .. xn_span_tex64sh_end,private,code,code; the engine writes 70 bytes (surveys) / 49 (records)
+memory,obj,1574B1,157600,xn_span_tex64sh_recip_c,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,157600,157620,xn_span_tail_offsets_19,unobserved,data,neither seen
+memory,obj,157620,157960,xn_span_flat_transparent .. xn_span_flat_shaded_rem,private,code,code; the engine writes 11 bytes (surveys) / 13 (records)
+memory,obj,157960,157B00,xn_span_flat_transparent_shaded_tail,private,data,the engine writes 7 bytes (surveys) / 0 (records)
+memory,obj,157B00,157B02,xn_span_tail_offsets_23,unobserved,data,neither seen
+memory,obj,157B02,157E00,xn_span_tail_offsets_23_entry1 .. xn_span_flat_lit_fogged_tail,private,code,code; the engine writes 0 bytes (surveys) / 9 (records)
+memory,obj,157E00,157E02,xn_span_tail_offsets_25,unobserved,data,neither seen
+memory,obj,157E02,15811C,xn_span_tail_offsets_25_entry1 .. xn_render_sort_pairs,private,code,code; the engine writes 0 bytes (surveys) / 6 (records)
+memory,obj,15811C,158200,xn_render_sort_pairs_range,unobserved,data,neither seen
+memory,obj,158200,158204,xn_poly_clip_src,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,158204,158208,xn_poly_clip_dst,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,158208,15820C,xn_poly_clip_src_end,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,15820C,158210,xn_poly_clip_intersect_fn,private,data,the engine writes 4 bytes (surveys) / 2 (records)
+memory,obj,158210,158211,xn_poly_clip_outcode_and,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,158211,158300,xn_poly_clip_outcode_or,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,158300,1585B3,xn_poly_outcode_eax .. xn_poly_face_cy,private,code,code; the engine writes 0 bytes (surveys) / 22 (records)
+memory,obj,1585B3,1585C0,xn_poly_clc_stub,unobserved,data,neither seen
+memory,obj,1585C0,158C00,xn_poly_project_terrain .. xn_poly_clip_intersect_far,private,code,code; the engine writes 0 bytes (surveys) / 11 (records)
+memory,obj,158C00,158C0C,xn_light_terrain_dispatch,unobserved,data,neither seen
+memory,obj,158C0C,158C18,xn_light_dispatch,unobserved,data,neither seen
+memory,obj,158C18,158C28,xn_light_shader_builders,unobserved,data,neither seen
+memory,obj,158C28,158C34,xn_light_point_intensity,private,data,the engine writes 12 bytes (surveys) / 8 (records)
+memory,obj,158C34,158C40,xn_light_point_falloff,private,data,the engine writes 12 bytes (surveys) / 9 (records)
+memory,obj,158C40,158C4C,xn_light_point_x,private,data,the engine writes 12 bytes (surveys) / 9 (records)
+memory,obj,158C4C,158C58,xn_light_point_y,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,158C58,158C64,xn_light_point_z,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,158C64,158D04,xn_light_shade_row,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,158D04,158EA0,xn_span_insert,private,code,code
+memory,obj,158EA0,1590A0,xn_poly_vertex_buf_a,private,data,the engine writes 343 bytes (surveys) / 231 (records)
+memory,obj,1590A0,159294,xn_poly_vertex_buf_b,private,data,the engine writes 336 bytes (surveys) / 195 (records)
+memory,obj,159294,1592FC,xn_poly_ring_a,unobserved,data,neither seen
+memory,obj,1592FC,159380,xn_poly_ring_b,unobserved,data,neither seen
+memory,obj,159380,15B980,xn_poly_ring_tables,unobserved,data,neither seen
+memory,obj,15B980,15B984,xn_span_dzdx,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,15B984,15B9A0,xn_poly_vertex_count,private,data,the engine writes 1 bytes (surveys) / 1 (records)
+memory,obj,15B9A0,15C100,xn_poly_rasterize .. xn_light_terrain_add_directional,private,code,code; the engine writes 41 bytes (surveys) / 37 (records)
+memory,obj,15C100,15C14C,xn_tmap_msg_no_memory,unobserved,data,neither seen
+memory,obj,15C14C,15C150,xn_tmap_pool_block,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,15C150,15C154,xn_tmap_pool,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,15C154,15C158,xn_tmap_pool_end,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,15C158,15C200,xn_tmap_pool_count,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,15C200,15C495,xn_tmap_pool_alloc .. xn_tmap_tmpl_mask_b7,private,code,code; the engine writes 124 bytes (surveys) / 108 (records)
+memory,obj,15C495,15C500,xn_tmap_tmpl_base_b7,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,15C500,15C50C,xn_collide_edge_v0,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,15C50C,15C518,xn_collide_edge_v1,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,15C518,15C524,xn_collide_test_point,private,data,the engine writes 12 bytes (surveys) / 12 (records)
+memory,obj,15C524,15C588,xn_face_edge_tables,unobserved,data,neither seen
+memory,obj,15C588,15CB00,xn_face_edge_slots,unobserved,data,neither seen
+memory,obj,15CB00,15CC2E,xn_collide_point_in_face,private,code,code
+memory,obj,15CC2E,15CC32,xn_collide_face_normal_ptr,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,15CC32,15CC36,xn_collide_face_points,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,15CC36,15CE76,xn_collide_point_in_face_v2 .. xn_collide_face_area,private,code,code
+memory,obj,15CE76,15CE7A,xn_collide_area_points,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,15CE7A,15CE7E,xn_collide_area_last,private,data,the engine writes 0 bytes (surveys) / 4 (records)
+memory,obj,15CE7E,15CED6,xn_collide_face_test_edges,private,code,code
+memory,obj,15CED6,15CEDA,xn_collide_edge_first,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,15CEDA,15CEDE,xn_collide_edge_points,private,data,the engine writes 4 bytes (surveys) / 4 (records)
+memory,obj,15CEDE,15CF11,xn_collide_face_test_vertices,private,code,code
+memory,obj,15CF11,15CF18,xn_collide_vertex_points,unobserved,data,neither seen
+memory,obj,15CF18,15D05C,xn_cam_cull_sphere .. xn_cam_sphere_dist_x,private,code,code
+memory,obj,15D05C,15D100,xn_cam_sphere_dist_y,unobserved,data,neither seen
+memory,obj,15D100,15D165,xn_mat_mul_int .. xn_mat_dot_int,private,code,code
+memory,obj,15D165,15D170,xn_mat_int_strides,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,15D170,15D1E9,xn_mat_mul_fixed .. xn_mat_dot_fixed,private,code,code
+memory,obj,15D1E9,15D1F1,xn_mat_fixed_strides,private,data,the engine writes 8 bytes (surveys) / 2 (records)
+memory,obj,15D1F1,15D1F8,xn_mat_fixed_shift,private,data,the engine writes 4 bytes (surveys) / 1 (records)
+memory,obj,15D1F8,15D27C,xn_mat_mul_fixed64 .. xn_mat_dot_fixed64,private,code,code
+memory,obj,15D27C,15D284,xn_mat_fixed64_strides,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,15D284,15D288,xn_mat_fixed64_shift,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,15D288,15D2EC,xn_mat_identity .. xn_mat_identity64,private,code,code
+memory,obj,15D2EC,15DC00,xn_mat_transpose_copy3,unobserved,data,neither seen
+memory,obj,15DC00,15E400,xn_math_asin_table,unobserved,data,neither seen
+memory,obj,15E400,15E500,xn_draw_clip_rect_xyxy .. xn_draw_fill_rect_clipped,private,code,code
+memory,obj,15E500,15F50C,xn_math_sqrt_table,unobserved,data,neither seen
+memory,obj,15F50C,15F604,xn_math_isqrt_lookup,unobserved,data,neither seen
+memory,obj,15F604,15F605,xn_timer_zen_saved_flags,unobserved,data,neither seen
+memory,obj,15F605,15F607,xn_timer_zen_count,unobserved,data,neither seen
+memory,obj,15F607,15F609,xn_timer_zen_overhead,unobserved,data,neither seen
+memory,obj,15F609,15F60A,xn_timer_zen_overflow,unobserved,data,neither seen
+memory,obj,15F60A,15F62E,xn_timer_zen_msg_count,unobserved,data,neither seen
+memory,obj,15F62E,15FA00,xn_timer_zen_msg_overflow,unobserved,data,neither seen
+memory,obj,15FA00,15FA04,xn_gfx_vesa_dos_selector,unobserved,data,neither seen
+memory,obj,15FA04,15FA08,xn_gfx_vesa_dos_buffer,private,data,the engine writes 0 bytes (surveys) / 3 (records)
+memory,obj,15FA08,15FA3A,xn_gfx_vesa_rm_regs,private,data,the engine writes 0 bytes (surveys) / 14 (records)
+memory,obj,15FA3A,15FA3C,xn_gfx_vesa_bank_step,unobserved,data,neither seen
+memory,obj,15FA3C,15FA5C,xn_gfx_vesa_bank_table,unobserved,data,neither seen
+memory,obj,15FA5C,15FA60,xn_gfx_vesa_copy_fn,unobserved,data,neither seen
+memory,obj,15FA60,15FA61,xn_gfx_vesa_present,unobserved,data,neither seen
+memory,obj,15FA61,15FA65,xn_gfx_vesa_page,unobserved,data,neither seen
+memory,obj,15FA65,15FA69,xn_gfx_vesa_lfb,unobserved,data,neither seen
+memory,obj,15FA69,15FA6D,xn_gfx_vesa_bank,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,15FA6D,15FC00,xn_gfx_vesa_mode_info,unobserved,data,neither seen
+memory,obj,15FC00,160000,xn_gfx_vesa_init .. xn_vesa_blit_skip,private,code,code
+memory,obj,160000,160004,xn_serial_port_active,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,160004,160014,xn_serial_port_base,unobserved,data,neither seen
+memory,obj,160014,160024,xn_serial_port_vector,unobserved,data,neither seen
+memory,obj,160024,160028,xn_serial_port_pic_mask,unobserved,data,neither seen
+memory,obj,160028,160038,xn_serial_old_vector_off,private,data,the engine writes 0 bytes (surveys) / 2 (records)
+memory,obj,160038,160040,xn_serial_old_vector_sel,private,data,the engine writes 0 bytes (surveys) / 1 (records)
+memory,obj,160040,160050,xn_serial_irq_handlers,unobserved,data,neither seen
+memory,obj,160050,160850,xn_serial_rx_buffers,unobserved,data,neither seen
+memory,obj,160850,160860,xn_serial_rx_head,unobserved,data,neither seen
+memory,obj,160860,160870,xn_serial_rx_tail,unobserved,data,neither seen
+memory,obj,160870,160900,xn_serial_rx_count,unobserved,data,neither seen
+memory,obj,160900,160AE0,xn_serial_open .. xn_serial_rx_get,private,code,code
+memory,obj,160AE0,160D00,xn_serial_irq_com1,unobserved,data,neither seen
+memory,obj,160D00,160D04,xn_helmet_a_port,unobserved,data,neither seen
+memory,obj,160D04,160D1C,xn_helmet_a_record,unobserved,data,neither seen
+memory,obj,160D1C,160E00,xn_helmet_a_angles,unobserved,data,neither seen
+memory,obj,160E00,160F08,xn_helmet_a_open .. xn_helmet_b_str_version,private,code,code
+memory,obj,160F08,160F11,xn_helmet_b_str_mode,unobserved,data,neither seen
+memory,obj,160F11,160F13,xn_helmet_b_str_start,private,code,code
+memory,obj,160F13,160F18,xn_helmet_b_str_bang,unobserved,data,neither seen
+memory,obj,160F18,161000,xn_helmet_b_yaw_sign,unobserved,data,neither seen
+memory,obj,161000,161110,xn_helmet_b_open .. xn_helmet_b_request_version,private,code,code
+memory,obj,161110,161114,xn_helmet_b_stub,unobserved,data,neither seen
+memory,obj,161114,16126C,xn_helmet_b_parse_version .. xn_helmet_b_wait_ok,private,code,code
+memory,obj,16126C,161300,xn_helmet_b_wait_rx,unobserved,data,neither seen
+memory,obj,161300,161332,xn_helmet_c_rm_regs,private,data,the engine writes 0 bytes (surveys) / 7 (records)
+memory,obj,161332,161336,xn_helmet_c_dos_selector,unobserved,data,neither seen
+memory,obj,161336,161400,xn_helmet_c_dos_buffer,unobserved,data,neither seen
+memory,obj,161400,1614E4,xn_helmet_c_open .. xn_helmet_c_close,private,code,code
+memory,obj,1614E4,1614E8,xn_helmet_c_reset_noop,unobserved,data,neither seen
+memory,obj,1614E8,1614EC,xn_helmet_c_request_noop,unobserved,data,neither seen
+memory,obj,1614EC,1614F0,xn_helmet_c_cmd2_noop,unobserved,data,neither seen
+memory,obj,1614F0,161568,xn_helmet_c_read .. xn_helmet_c_int33,private,code,code
+memory,low,000000,000400,real-mode interrupt vectors,private,region,"the game reads 0 bytes (0 the engine wrote, 0 from before); the engine writes 0 bytes (surveys) / 754 (records)"
+memory,low,000400,000500,BIOS data area,visible,region,"the game reads 4 bytes (0 the engine wrote, 4 from before); the engine writes 0 bytes (surveys) / 0 (records)"
+memory,low,000500,000800,low DOS memory,unobserved,region,"the game reads 0 bytes (0 the engine wrote, 0 from before); the engine writes 0 bytes (surveys) / 0 (records)"
+memory,low,000800,001000,descriptor table (GDT),private,region,"the game reads 24 bytes (0 the engine wrote, 24 from before); the engine writes 0 bytes (surveys) / 47 (records); the CPU sets descriptors' accessed bits when the code loads selectors"
+memory,low,001000,001800,PSP and environment,private,region,"the game reads 0 bytes (0 the engine wrote, 0 from before); the engine writes 0 bytes (surveys) / 384 (records)"
+memory,low,001800,002000,the emulator's interrupt stubs,private,region,"the game reads 0 bytes (0 the engine wrote, 0 from before); the engine writes 0 bytes (surveys) / 1027 (records)"
+memory,low,002000,09F000,DOS memory (DPMI 0100h blocks),private,region,"the game reads 0 bytes (0 the engine wrote, 0 from before); the engine writes 0 bytes (surveys) / 410 (records)"
+memory,low,09F000,0A0000,the extender's transfer buffer,private,region,"the game reads 0 bytes (0 the engine wrote, 0 from before); the engine writes 0 bytes (surveys) / 1 (records)"
+memory,low,0A0000,0B0000,VGA memory (the screen),visible,region,"the screen; the game reads 2000 bytes (2000 the engine wrote, 0 from before); the engine writes 64000 bytes (surveys) / 64001 (records)"
+memory,low,0B0000,110000,upper memory and the HMA,private,region,"the game reads 0 bytes (0 the engine wrote, 0 from before); the engine writes 0 bytes (surveys) / 39 (records)"
+memory,obj,170000,1B5520,the game's data (object 3),visible,region,game memory: compared
+memory,alloc,0,19020,xn_mem_work_block,visible,ptr=147958 size=19020,"malloc at 149E10 (xn_mem_init+10), 102432 bytes; 36 surveys saw it: of its 401 256-byte chunks the engine writes 251, the game reads what the engine wrote in 249"
+memory,alloc,F900,FB00,xn_mem_work_block (engine part),private,ptr=147958 size=19020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,0,FA20,xn_gfx_buffer_alloc,visible,ptr=143558 size=FA20,"malloc at 143692 (xn_gfx_set_mode+92), 64032 bytes; 36 surveys saw it: of its 251 256-byte chunks the engine writes 251, the game reads what the engine wrote in 251"
+memory,alloc,0,40004,xn_span_tex8_recip_a,unobserved,ptr=155D34 size=40004,"malloc at 12A17C (xn_render_init+7C), 262148 bytes; 36 surveys saw it: of its 1025 256-byte chunks the engine writes 0, the game reads what the engine wrote in 0"
+memory,alloc,0,10018,xn_light_t3_tab2,unobserved,ptr=136DA0 size=10018,"malloc at 136A2D (xn_light_init+2D), 65568 bytes; 36 surveys saw it: of its 257 256-byte chunks the engine writes 0, the game reads what the engine wrote in 0"
+memory,alloc,0,40020,xn_world_layers_alloc,visible,ptr=0C28CC size=40020,"malloc at 0C2D06 (xn_world_init+6), 262176 bytes; 36 surveys saw it: of its 1025 256-byte chunks the engine writes 1025, the game reads what the engine wrote in 65"
+memory,alloc,0,3700,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,4F00,13700,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,14F00,23800,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,23900,24400,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,24500,2B800,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,2B900,2BA00,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,2C100,2C700,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,2CB00,2CC00,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,2CD00,2D000,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,2D200,40020,xn_world_layers_alloc (engine part),private,ptr=0C28CC size=40020,the engine writes these chunks and the game never reads what it wrote there (36 surveys)
+memory,alloc,0,21C4,xn_font_table+4,unobserved,ptr=12DA58 size=21C4,"malloc at 0C0E4E (xn_dos_load_file+2A), 8644 bytes; 36 surveys saw it: of its 34 256-byte chunks the engine writes 0, the game reads what the engine wrote in 0"
+memory,alloc,0,21C4,xn_font_table+8,unobserved,ptr=12DA5C size=21C4,"malloc at 0C0E4E (xn_dos_load_file+2A), 8644 bytes; 36 surveys saw it: of its 34 256-byte chunks the engine writes 0, the game reads what the engine wrote in 0"
+memory,alloc,0,21C4,xn_font_table+C,unobserved,ptr=12DA60 size=21C4,"malloc at 0C0E4E (xn_dos_load_file+2A), 8644 bytes; 36 surveys saw it: of its 34 256-byte chunks the engine writes 0, the game reads what the engine wrote in 0"
+memory,alloc,0,21C4,xn_font_table+10,visible,ptr=12DA64 size=21C4,"malloc at 0C0E4E (xn_dos_load_file+2A), 8644 bytes; 36 surveys saw it: of its 34 256-byte chunks the engine writes 0, the game reads what the engine wrote in 2"
+memory,alloc,0,36B000,xn_tex_heap_base,visible,ptr=1343DC size=36B000,"malloc at 136038 (xn_tex_cache_init+12), 3584000 bytes; 36 surveys saw it: of its 14000 256-byte chunks the engine writes 9236, the game reads what the engine wrote in 115; its layout follows its contents (a cache): classified whole"
+memory,alloc,0,C0000,xn_tex_unpack_buffer,private,ptr=1343D0 size=C0000,"malloc at 136074 (xn_tex_cache_init+4E), 786432 bytes; 36 surveys saw it: of its 3072 256-byte chunks the engine writes 501, the game reads what the engine wrote in 0"
+memory,alloc,0,4E620,xn_tmap_pool_block,private,ptr=15C14C size=4E620,"malloc at 15C206 (xn_tmap_pool_alloc+6), 321056 bytes; 36 surveys saw it: of its 1255 256-byte chunks the engine writes 107, the game reads what the engine wrote in 0"
+memory,alloc,0,1800,xn_mem_work_block,writer-private,ptr=147958 size=19020 writers=C0700 C094A,"the scaled image's row compiler (xn_draw_image_scaled_compile_row, called by xn_draw_image_scaled) writes a row of machine code at big_buffer (block +8..+0x438 in the inventory scenario, +8..+0x3A5 in its 48 records; at most about 0x1500 bytes for a 320-pixel row); the game never reads a byte whose last writer is that code: build/xn_canon/group_b/tools/codegen_flow.py over inventory (1072 bytes written, 0 read), charsheet, spellbook, options, travelmap, enter_tavern. The chunks are visible because collision (xn_collide_segment_model, 14A300) writes its hit list at big_buffer+0.. for the game (enter_tavern: block +8..+0x29)"
+memory,alloc,0,4E620,xn_tmap_pool_block,writer-private,ptr=15C14C size=4E620 writers=15C274 15C2DC 156A94 135EAB 135D00 12A870 1403AF 140284 154E20,"the texture mapper's pool: the asm compiled each texture's mapper into it (418-byte slots); the game reads none of it (the boundary survey: 0 chunks); canonical C keeps no code there (groups C and D: the compiler, rebase, the span routines that ran the copies, the texture cache and the model and flat draws that wrote slot pointers)"

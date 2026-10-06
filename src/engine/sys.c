@@ -1,25 +1,29 @@
-/* sys.c: XnGine's system services as readable C (xsys.h; see xngine.h). */
+/* sys.c: XnGine's system services (canonical C; the interface and the module's documentation
+   are in xsys.h). */
 #include "xsys.h"
+#include "xsysutil.h"
+#include "xpc.h"
 #include "xmem.h"
 
-void xn_sys_crit_error_handler_r(xn_regs *r)
+#define CRIT_ERROR_LOCK_BYTES   0x1006  /* the int 24h handler's module, from its entry */
+#define CRIT_ERROR_RETRY        1       /* int 24h's answers: 0 ignore, 1 retry, 2 abort */
+
+/* ---- the critical error handler --------------------------------------------------------- */
+
+void xn_sys_crit_error_handler(xn_int_frame *f)
 {
-    r->eax = 1;
+    f->eax = CRIT_ERROR_RETRY;
 }
 
 void xn_sys_install_crit_error_handler(void)
 {
     u32 flags = xn_save_flags();
-    xn_regs v;
 
     if (xn_sys_int24_installed != 1) {
-        dpmi_lock_region(asm_xn_sys_crit_error_handler, 0x1006);
+        dpmi_lock_region((void *)xn_sys_crit_error_entry, CRIT_ERROR_LOCK_BYTES);
         xn_cli();
-        v.eax = 0x24;
-        xn_asmcall(func_000A1272, &v);      /* _dos_getvect(24h): DX:EAX */
-        xn_sys_old_int24_sel = (u16)v.edx;
-        xn_sys_old_int24_offset = v.eax;
-        func_000A12A6(0x24, asm_xn_sys_crit_error_handler, xn_cs());
+        xn_pc_get_vector(0x24, &xn_sys_old_int24_offset, &xn_sys_old_int24_sel);
+        xn_pc_install_vector(0x24, xn_sys_crit_error_entry);
         xn_sys_int24_installed = 1;
         xn_sti();
     }
@@ -32,35 +36,80 @@ void xn_sys_restore_crit_error_handler(void)
 
     if (xn_sys_int24_installed != 0) {
         xn_cli();
-        func_000A12A6(0x24, (void *)xn_sys_old_int24_offset, xn_sys_old_int24_sel);
+        xn_pc_set_vector(0x24, xn_sys_old_int24_offset, xn_sys_old_int24_sel);
         xn_sti();
-        dpmi_unlock_region(asm_xn_sys_crit_error_handler, 0x1006);
+        dpmi_unlock_region((void *)xn_sys_crit_error_entry, CRIT_ERROR_LOCK_BYTES);
+        /* Quirk Q-SYS-03: xn_sys_int24_installed is not cleared */
     }
     xn_restore_flags(flags);
 }
 
-void xn_sys_yield_r(xn_regs *r)
+/* ---- the divide-error handler ------------------------------------------------------------ */
+
+void xn_sys_install_divide_handler(void)
 {
-    r->eax = (r->eax & 0xFFFF0000) | 0x1680;
-    xn_int2f(r);
+    if (xn_sys_div_handler_installed == 1)
+        return;
+    xn_sys_div_handler_installed = 1;
+    xn_dpmi_get_exception(0, &xn_sys_old_div_handler_offset, &xn_sys_old_div_handler_selector);
+    xn_dpmi_install_exception(0, xn_sys_divide_error_entry);
+    xn_mem_lock_region((void *)xn_sys_divide_error_entry,
+                       xn_sys_divide_error_end - (u8 *)xn_sys_divide_error_entry);
+}
+
+void xn_sys_remove_divide_handler(void)
+{
+    if (xn_sys_div_handler_installed == 0)
+        return;
+    xn_sys_div_handler_installed = 0;
+    if (xn_sys_old_div_handler_selector != 0)
+        xn_dpmi_set_exception(0, xn_sys_old_div_handler_offset,
+                              xn_sys_old_div_handler_selector);
+}
+
+/* The length of the faulting divide (F6/F7 /6 or /7: div or idiv) by its ModRM byte, as far
+   as the asm knows the forms: a disp32 operand 6, [reg + disp8] 3, [reg + disp32] 6, anything
+   else 2 (a register operand, or [reg]). Quirk Q-SYS-02: the SIB forms (ModRM 34h, 3Ch, 74h,
+   7Ch, B4h, BCh) count as 2, and a register operand's ModRM is not checked to be one. */
+static u32 divide_length(u8 modrm)
+{
+    if (modrm == 0x35 || modrm == 0x3D)
+        return 6;
+    if (modrm >= 0x70 && modrm <= 0x7F && modrm != 0x74 && modrm != 0x7C)
+        return 3;
+    if (modrm >= 0xB0 && modrm <= 0xBF && modrm != 0xB4 && modrm != 0xBC)
+        return 6;
+    return 2;
+}
+
+void xn_sys_divide_error_handler(xn_int_frame *f)
+{
+    /* the host's frame starts above the EFLAGS the entry stub pushed first */
+    xn_dpmi_exc_frame *x = (xn_dpmi_exc_frame *)(f->esp + 4);
+
+    x->eip += divide_length(((const u8 *)x->eip)[1]);
+    f->eax = 0;                         /* Quirk Q-SYS-01: the quotient and remainder are 0 */
+    f->edx = 0;
+}
+
+/* ---- the rest ------------------------------------------------------------------------------- */
+
+void xn_sys_yield(void)
+{
+    xn_pc_yield();
 }
 
 void xn_sys_set_dos_transfer_buffer(void)
 {
-    xn_regs d;
+    u16 segment, selector;
 
-    d.eax = 0x100;
-    d.ebx = 0xFFF;
-    xn_int31(&d);
-    if (d.eflags & XN_CF)
+    if (!xn_dpmi_dos_alloc(0xFFF, &segment, &selector))
         return;
-    xn_sys_dos_transfer_selector = (u16)d.edx;
-    d.ebx = (d.ebx & 0xFFFF0000) | (u16)d.eax;     /* its real-mode segment */
-    d.ecx = 0xFFF0;
-    d.eax = (d.eax & 0xFFFF0000) | 0xFF26;
-    xn_int31(&d);
+    xn_sys_dos_transfer_selector = selector;
+    xn_cw_set_transfer_buffer(segment, selector, 0xFFF0);
 }
 
+/* (linear 0: the real-mode interrupt vectors, which CauseWay maps at address 0) */
 void xn_sys_zero_page_save(void)
 {
     const volatile u32 *zero = 0;
@@ -77,73 +126,11 @@ void xn_sys_zero_page_check(void)
 
     for (k = 0; k < 256; k++) {
         if (zero[k] == xn_zero_page_copy[k] || k == 0 || k == 1 || k == 8)
-            continue;                       /* (the divide, single step and timer vectors) */
+            continue;
         internal_check_failed = 4 * k;
         for (k = 0; k < 256; k++)
             zero[k] = xn_zero_page_copy[k];
         fatal_error(xn_msg_bad_zero_page);
         return;
     }
-}
-
-void xn_sys_install_divide_handler(void)
-{
-    xn_regs d;
-
-    if (xn_sys_div_handler_installed == 1)
-        return;
-    xn_sys_div_handler_installed = 1;
-    d.eax = 0x202;                          /* get exception 0's handler: CX:EDX */
-    d.ebx = 0;
-    xn_int31(&d);
-    xn_sys_old_div_handler_selector = (u16)d.ecx;
-    xn_sys_old_div_handler_offset = d.edx;
-    d.eax = 0x203;                          /* set it */
-    d.ebx = 0;
-    d.ecx = (d.ecx & 0xFFFF0000) | xn_cs();
-    d.edx = (u32)asm_xn_sys_divide_error_handler;
-    xn_int31(&d);
-    xn_mem_lock_region(asm_xn_sys_divide_error_handler,
-                       xn_code_14A0E5 - (u8 *)asm_xn_sys_divide_error_handler);
-}
-
-void xn_sys_remove_divide_handler(void)
-{
-    xn_regs d;
-
-    if (xn_sys_div_handler_installed == 0)
-        return;
-    xn_sys_div_handler_installed = 0;
-    if (xn_sys_old_div_handler_selector == 0)
-        return;
-    d.eax = 0x203;
-    d.ebx = 0;
-    d.ecx = xn_sys_old_div_handler_selector;
-    d.edx = xn_sys_old_div_handler_offset;
-    xn_int31(&d);
-}
-
-/* The length of the faulting divide by its ModRM byte, as far as the asm knows forms */
-static u32 divide_length(u8 modrm)
-{
-    if (modrm == 0x35 || modrm == 0x3D)                     /* [disp32] */
-        return 6;
-    if (modrm >= 0x70 && modrm <= 0x7F && modrm != 0x74 && modrm != 0x7C)
-        return 3;                                           /* [reg + disp8] */
-    if (modrm >= 0xB0 && modrm <= 0xBF && modrm != 0xB4 && modrm != 0xBC)
-        return 6;                                           /* [reg + disp32] */
-    return 2;                                               /* a register (or SIB: wrong) */
-}
-
-void xn_sys_divide_error_handler(xn_dpmi_exc_frame *f)
-{
-    f->eip += divide_length(((u8 *)f->eip)[1]);
-}
-
-void xn_sys_divide_error_handler_r(xn_regs *r)
-{
-    /* the stub's pushfd sits on the frame: it starts 4 bytes above the saved ESP */
-    xn_sys_divide_error_handler((xn_dpmi_exc_frame *)(r->esp + 4));
-    r->eax = 0;
-    r->edx = 0;
 }

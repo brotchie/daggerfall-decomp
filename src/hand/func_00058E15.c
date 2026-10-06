@@ -22,7 +22,7 @@ extern struct record *player_entity;
 extern iptr D_00195B64;
 extern char *paperdoll_mask;
 extern char *hud_portrait;
-extern iptr D_00195B80;
+extern iptr color_remap;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern char *scratch_buffer;
@@ -153,6 +153,6 @@ void paperdoll_draw(int x, int y)
         strip = (struct image *)0x97979797;
     }
     xn_draw_get_rect(x + 192, y + 1, 125, 197, D_00195B64, 0);
-    D_00195B80 = color_remap_tables;
+    color_remap = color_remap_tables;
     character_update_armor_values(player_entity);
 }

@@ -1,21 +1,18 @@
-/* vid.c: XnGine's VID movie player as readable C (xvid.h; see xngine.h and
-   docs/xngine_readable.md).
-
-   The player calls the game's code (Watcom C in object 1: the DPMI locks, malloc and free,
-   the SOS timer and sample calls) through game_call, with the registers its arguments arrive
-   in, and keeps EDX as the calls leave it: the asm unlocks with whatever EDX holds (see
-   xvid.h). Code that makes DOS or BIOS calls without saving registers (xn_dos_file_exists,
-   xn_kbd_read_key) is called with a register file too. */
+/* vid.c: XnGine's VID movie player (canonical C; the interface and the module's documentation
+   are in xvid.h). */
 #include "xvid.h"
 #include "xgfx.h"
 #include "xpal.h"
+#include "xdos.h"
 
 #define VGA_DAC_WRITE_INDEX 0x3C8
 #define VGA_DAC_DATA        0x3C9
 
-#define VID_BUFFER          0xFA00      /* the read buffer: 64000 bytes */
+#define VID_BUFFER          0xFA00      /* the read buffer: 64000 bytes of big_buffer */
 #define VID_REFILL_MARGIN   0x81        /* a delta or RLE command refills this near the end */
 #define VID_AUDIO_BUFFER    0x4000
+#define VID_DATA_SIZE       0x4F1       /* the player's data: xn_vid_header .. xn_vid_skippable */
+#define VID_TIMER_HZ        60
 
 /* chunk types */
 #define VID_RAW         0
@@ -26,57 +23,42 @@
 #define VID_AUDIO_HEAD  0x7C
 #define VID_AUDIO       0x7D
 
-extern s32 D_0018DD5C;      /* the SOS digital device: -1 none */
-extern s32 D_0018DD60;      /* the SOS digital driver's handle */
+/* ---- the game's (object 1, Watcom C: the boundary's exits) ---------------------------------- */
+int dpmi_lock_region(int address, int size);
+int dpmi_unlock_region(int address, int size);
+int sound_timer_add(void (*callback)(void), int rate);     /* its handle, -1 when it failed */
+void sound_timer_remove(int handle);
+int func_000A2504(int driver, xn_vid_sos_sample *sample);  /* SOS: start a sample: its handle */
+void func_000A2687(int driver, int handle);                 /* SOS: stop a sample */
+#define sos_start_sample func_000A2504
+#define sos_stop_sample  func_000A2687
+extern s32 D_0018DD5C;                  /* the SOS digital device: -1 none */
+extern s32 D_0018DD60;                  /* the SOS digital driver's handle */
 #define sound_digi_device D_0018DD5C
 #define sound_digi_driver D_0018DD60
-
 extern u8 mouse_buttons;
 
-/* asm entries: the game's functions, and the player's own code addresses it hands out */
-extern void asm_dpmi_lock_region(void);
-extern void asm_dpmi_unlock_region(void);
-extern void asm_sound_timer_add(void);
-extern void asm_sound_timer_remove(void);
-extern void asm_func_000A10A8(void);        /* malloc */
-extern void asm_func_000A117E(void);        /* free */
-extern void asm_func_000A2504(void);        /* SOS: start a sample (driver, sample) */
-extern void asm_func_000A2687(void);        /* SOS: stop a sample (driver, handle) */
-extern void asm_xn_dos_file_exists(void);
-extern void asm_xn_kbd_read_key(void);
-extern void asm_xn_vid_play(void);
-extern void asm_xn_vid_timer_cb(void);
-extern void asm_xn_vid_audio_done_cb(void);
-
+/* ---- other groups' (group A's: xstr.h, xmouse.h, xkbd.h) ------------------------------------ */
 void xn_str_copy(const char *src, char *dst);
 void xn_mouse_poll_clamped(void);
+u16 xn_kbd_read_key(void);              /* the last key (AH scan code, AL ASCII), 0 when none */
 
-/* Calls the game's code at fn with EAX and EDX (its first two arguments); *edx comes back as
-   the call leaves EDX. Returns EAX. */
-static u32 game_call(void (*fn)(void), u32 eax, u32 *edx)
+/* The player's code, locked with its data while a movie plays: the timer and sample callbacks
+   run under interrupts. It runs from here to vid_code_end, at the end of this file. */
+static void vid_code_start(void)
 {
-    xn_regs r;
-
-    r.eax = eax;
-    r.edx = *edx;
-    r.ebx = 0;
-    r.ecx = 0;
-    r.esi = 0;
-    r.edi = 0;
-    r.ebp = 0;
-    xn_asmcall(fn, &r);
-    *edx = r.edx;
-    return r.eax;
 }
 
-/* ---- the player ------------------------------------------------------------------------- */
+static void vid_code_end(void);
+#define VID_CODE_SIZE ((u8 *)vid_code_end - (u8 *)vid_code_start)
+
+/* ---- the player ------------------------------------------------------------------------------- */
 
 /* Shows the opened movie in the clip window until it ends (or a button or key, when it is
-   skippable), then sets its palette. Returns EDX as the asm leaves it. */
-static u32 vid_show(u32 edx)
+   skippable), then sets its palette */
+static void vid_show(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
-    xn_regs r;
 
     xn_gfx_clip_left = v->x;
     xn_gfx_clip_right = v->x + xn_vid_header.width;
@@ -88,21 +70,16 @@ static u32 vid_show(u32 edx)
             xn_mouse_poll_clamped();
             if (mouse_buttons & 3)
                 break;
-            r.eax = 1;                  /* (what the asm has in EAX: present's argument) */
-            r.edx = edx;
-            xn_asmcall(asm_xn_kbd_read_key, &r);
-            edx = r.edx;
-            if ((u8)r.eax != 0)
+            if ((u8)xn_kbd_read_key() != 0)
                 break;
         }
-        xn_vid_update(edx);
+        xn_vid_update();
         xn_gfx_present(1);
         if (v->done == 1)
             break;
     }
-    edx = xn_vid_finish(edx);
+    xn_vid_finish();
     xn_pal_set(v->palette);
-    return edx;
 }
 
 int xn_vid_play(const char *path, s32 x, s32 y, s32 skippable)
@@ -111,34 +88,27 @@ int xn_vid_play(const char *path, s32 x, s32 y, s32 skippable)
     s32 left = xn_gfx_clip_left, right = xn_gfx_clip_right;
     s32 top = xn_gfx_clip_top, bottom = xn_gfx_clip_bottom;
     int played = 0;
-    u32 edx;
-    xn_regs r;
 
     /* the timer and sample callbacks run under interrupts: lock the player's data and code */
-    edx = 0x4F1;
-    game_call(asm_dpmi_lock_region, (u32)&xn_vid_header, &edx);
-    edx = 0x907;
-    game_call(asm_dpmi_lock_region, (u32)asm_xn_vid_play, &edx);
+    dpmi_lock_region((int)&xn_vid_header, VID_DATA_SIZE);
+    dpmi_lock_region((int)vid_code_start, VID_CODE_SIZE);
     v->skippable = skippable;
     xn_str_copy(path, v->path);
-    r.edx = (u32)v->path;
-    xn_asmcall(asm_xn_dos_file_exists, &r);
-    edx = r.edx;
-    if (!(r.eflags & XN_CF)) {
-        edx = y;
+    if (xn_dos_file_exists(v->path)) {
         xn_vid_open(x, y, v->path);
         if (v->timer != -1) {
-            edx = vid_show(v->y);
+            vid_show();
             played = 1;
         }
     }
     if (!played) {
         /* (the buffers' pointers: 0 since the last movie, unless the timer failed) */
-        game_call(asm_func_000A117E, (u32)v->audio_buf_a, &edx);
-        game_call(asm_func_000A117E, (u32)v->audio_buf_b, &edx);
+        game_free(v->audio_buf_a);
+        game_free(v->audio_buf_b);
     }
-    game_call(asm_dpmi_unlock_region, (u32)&xn_vid_header, &edx);
-    game_call(asm_dpmi_unlock_region, (u32)asm_xn_vid_play, &edx);
+    /* Deviation D-VID-01: the asm's unlocks got a size it never set (a leftover register) */
+    dpmi_unlock_region((int)&xn_vid_header, VID_DATA_SIZE);
+    dpmi_unlock_region((int)vid_code_start, VID_CODE_SIZE);
     xn_gfx_clip_bottom = bottom;
     xn_gfx_clip_top = top;
     xn_gfx_clip_right = right;
@@ -146,17 +116,12 @@ int xn_vid_play(const char *path, s32 x, s32 y, s32 skippable)
     return played;
 }
 
-void xn_vid_play_r(xn_regs *r)
-{
-    r->eax = xn_vid_play((const char *)r->eax, r->edx, r->ebx, r->ecx);
-    XN_SETFLAG(r, XN_CF, r->eax == 0);
-}
-
 void xn_vid_open(s32 x, s32 y, const char *path)
 {
     struct xn_vid_player *v = &xn_vid_state;
-    u32 edx;
-    xn_regs r;
+    s32 handle;
+    u8 *p;
+    u32 i;
 
     v->file_pos = 0;
     v->x = x;
@@ -166,41 +131,27 @@ void xn_vid_open(s32 x, s32 y, const char *path)
     v->buf = big_buffer;
     v->buf_end = v->buf + VID_BUFFER;
     v->refill_mark = v->buf_end - VID_REFILL_MARGIN;
-    edx = VID_AUDIO_BUFFER;
-    v->audio_buf_a = (u8 *)game_call(asm_func_000A10A8, VID_AUDIO_BUFFER, &edx);
-    edx = VID_AUDIO_BUFFER;
-    game_call(asm_dpmi_lock_region, (u32)v->audio_buf_a, &edx);
-    v->audio_buf_b = (u8 *)game_call(asm_func_000A10A8, VID_AUDIO_BUFFER, &edx);
-    edx = VID_AUDIO_BUFFER;
-    game_call(asm_dpmi_lock_region, (u32)v->audio_buf_b, &edx);
+    v->audio_buf_a = game_malloc(VID_AUDIO_BUFFER);
+    dpmi_lock_region((int)v->audio_buf_a, VID_AUDIO_BUFFER);
+    v->audio_buf_b = game_malloc(VID_AUDIO_BUFFER);
+    dpmi_lock_region((int)v->audio_buf_b, VID_AUDIO_BUFFER);
     v->audio_buffer = 0;
     v->sample_done = 0;
     v->sample_restart = 0;
-    {
-        u8 *p = (u8 *)&xn_vid_sample;
-        u32 i;
-
-        for (i = 0; i < sizeof(xn_vid_sample); i++)
-            p[i] = 0;
-    }
+    p = (u8 *)&xn_vid_sample;
+    for (i = 0; i < sizeof(xn_vid_sample); i++)
+        p[i] = 0;
     v->audio_ticks = 0;
     v->frame_ticks = 0;
-    edx = 60;                           /* Hz */
-    v->timer = game_call(asm_sound_timer_add, (u32)asm_xn_vid_timer_cb, &edx);
+    v->timer = sound_timer_add(xn_vid_timer_cb, VID_TIMER_HZ);
 
     v->file = 0;
-    r.eax = 0x3D00;                     /* open, read only (no error check) */
-    r.edx = (u32)v->path_arg;
-    xn_int21(&r);
-    v->file = (u16)r.eax;
-    r.ebx = v->file;
-    r.ecx = sizeof(xn_vid_header);
-    r.edx = (u32)&xn_vid_header;
-    r.eax = 0x3F00;                     /* read the header */
-    xn_int21(&r);
+    xn_dos_open_mode(v->path_arg, 0, &handle);     /* Quirk Q-VID-03: not checked */
+    v->file = (u16)handle;
+    xn_dos_read(v->file, &xn_vid_header, sizeof(xn_vid_header));
 
     v->dest_offset = xn_gfx_row_offset[v->y] + v->x;
-    /* (a 16-bit subtraction: the width's top half stays) */
+    /* Quirk Q-VID-02: a 16-bit subtraction: the width's upper half stays */
     v->dest_skip = (xn_gfx_width & 0xFFFF0000) | (u16)(xn_gfx_width - xn_vid_header.width);
     v->flags = xn_vid_header.flags;
     v->frames_left = xn_vid_header.frames;
@@ -213,10 +164,10 @@ void xn_vid_open(s32 x, s32 y, const char *path)
     xn_vid_fill();
     v->done = 0;
     v->frame_ticks = 0;
-    xn_vid_decode_chunk((u32)v->buf);   /* (EDX: the buffer, from the fill) */
+    xn_vid_decode_chunk();
 }
 
-void xn_vid_update(u32 edx)
+void xn_vid_update(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
 
@@ -236,32 +187,31 @@ void xn_vid_update(u32 edx)
         v->frame_waits = 0;
         v->sample_done = 0;
         v->audio_buffer = 0;
-        edx = xn_vid_audio_stop(edx);
+        xn_vid_audio_stop();
     }
-    xn_vid_decode_chunk(edx);
+    xn_vid_decode_chunk();
 }
 
-u32 xn_vid_finish(u32 edx)
+void xn_vid_finish(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
     u8 *p;
 
-    edx = xn_vid_audio_stop(edx);
-    game_call(asm_dpmi_unlock_region, (u32)v->audio_buf_a, &edx);   /* (size: EDX) */
-    game_call(asm_dpmi_unlock_region, (u32)v->audio_buf_b, &edx);
+    xn_vid_audio_stop();
+    dpmi_unlock_region((int)v->audio_buf_a, VID_AUDIO_BUFFER);     /* (D-VID-01) */
+    dpmi_unlock_region((int)v->audio_buf_b, VID_AUDIO_BUFFER);
     p = v->audio_buf_a;
     v->audio_buf_a = 0;
     if (p != 0)
-        game_call(asm_func_000A117E, (u32)p, &edx);
+        game_free(p);
     p = v->audio_buf_b;
     v->audio_buf_b = 0;
     if (p != 0)
-        game_call(asm_func_000A117E, (u32)p, &edx);
+        game_free(p);
     if (!(v->flags & 1))
         xn_vid_close_file();
     v->done = 1;
-    game_call(asm_sound_timer_remove, v->timer, &edx);
-    return edx;
+    sound_timer_remove(v->timer);
 }
 
 /* ---- decoding ----------------------------------------------------------------------------- */
@@ -273,7 +223,7 @@ static void copy_bytes(u8 *dst, const u8 *src, u32 n)
         *dst++ = *src++;
 }
 
-/* Copies n bytes, dwords then the rest (rep movsd; rep movsb) */
+/* Copies n bytes, dwords then the rest */
 static void copy_dwords(u8 *dst, const u8 *src, u32 n)
 {
     u32 k;
@@ -287,14 +237,11 @@ static void copy_dwords(u8 *dst, const u8 *src, u32 n)
 static void audio_header(u8 *p)
 {
     struct xn_vid_player *v = &xn_vid_state;
-    xn_s64 million;
 
     v->audio_delay = *(u16 *)p;
     p += 2;
     v->rate_byte = *p++;
-    million.lo = 1000000;
-    million.hi = 0;
-    v->sample_rate = (u16)xn_u64_div(&million, 0x100 - v->rate_byte);
+    v->sample_rate = (u16)(1000000u / (0x100 - v->rate_byte));
     xn_vid_read_audio(p);
     v->audio_state = 1;
     v->audio_ticks = v->audio_delay;
@@ -389,8 +336,8 @@ static u8 *delta(u8 *p, u8 *dst, u32 w, int refill_first)
 }
 
 /* An RLE frame's commands: a byte 80h + n, then a colour, fills n pixels; n < 80h copies the
-   next n bytes (0 does nothing); runs carry over row ends; the frame ends after its last
-   row (no end byte). Returns where it stopped. */
+   next n bytes (0 does nothing); runs carry over row ends; the frame ends after its last row
+   (no end byte). Returns where it stopped. */
 static u8 *rle(u8 *p, u8 *dst, u32 w)
 {
     struct xn_vid_player *v = &xn_vid_state;
@@ -443,11 +390,11 @@ static u8 *rle(u8 *p, u8 *dst, u32 w)
     }
 }
 
-void xn_vid_decode_chunk(u32 edx)
+void xn_vid_decode_chunk(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
     u8 *p, *dst, next;
-    u32 w;
+    u32 w, next_w;
     u16 start;
     u8 type;
 
@@ -477,10 +424,15 @@ void xn_vid_decode_chunk(u32 edx)
         case VID_RAW:
             xn_vid_schedule_frame(*(u16 *)p);
             p += 2;
+            next_w = w;
             do {
-                w = v->row_width;
-                if (v->buf_end - w < p)
+                w = next_w;
+                if (v->buf_end - v->row_width < p) {
                     p = xn_vid_refill(p);
+                    /* Quirk Q-VID-04: the refill leaves the file handle in BX, from which the
+                       asm reloads the width of the rows after this one */
+                    next_w = (v->row_width & 0xFFFF0000) | v->file;
+                }
                 copy_bytes(dst, p, w);
                 dst += w + v->dest_skip;
                 p += w;
@@ -496,7 +448,7 @@ void xn_vid_decode_chunk(u32 edx)
             palette(p);
             return;
         default:
-            xn_vid_finish(edx);
+            xn_vid_finish();
             return;
         }
 
@@ -506,7 +458,7 @@ void xn_vid_decode_chunk(u32 edx)
         v->read_ptr = p;
         v->frames_done++;
         if (--v->frames_left == 0) {
-            xn_vid_finish(edx);
+            xn_vid_finish();
             return;
         }
         if ((s8)next < VID_AUDIO_HEAD) {
@@ -521,14 +473,11 @@ void xn_vid_decode_chunk(u32 edx)
 void xn_vid_close_file(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
-    xn_regs r;
 
     v->audio_state = 0;
     if (v->file == 0)
         return;
-    r.ebx = v->file;
-    r.eax = 0x3E00;                     /* close */
-    xn_int21(&r);
+    xn_dos_close(v->file);
     v->file = 0;
 }
 
@@ -536,46 +485,22 @@ u8 *xn_vid_refill(u8 *p)
 {
     struct xn_vid_player *v = &xn_vid_state;
     u32 left;
-    xn_regs r;
 
     if (p == v->buf)
         return p;
     left = v->buf_end - p;
     v->file_pos += p - v->buf;
     copy_dwords(v->buf, p, left);
-    r.edx = (u32)(v->buf + left);
-    r.ecx = v->buf_end - (v->buf + left);
-    r.ebx = v->file;
-    r.eax = 0x3F00;                     /* read the rest of the buffer */
-    xn_int21(&r);
+    xn_dos_read(v->file, v->buf + left, v->buf_end - (v->buf + left));
     return v->buf;
-}
-
-void xn_vid_refill_r(xn_regs *r)
-{
-    if ((u8 *)r->esi != xn_vid_state.buf)
-        r->ebx = (r->ebx & 0xFFFF0000) | xn_vid_state.file;
-    r->esi = (u32)xn_vid_refill((u8 *)r->esi);
 }
 
 void xn_vid_fill(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
-    xn_regs r;
 
     v->read_ptr = v->buf;
-    r.ecx = VID_BUFFER;
-    r.edx = (u32)v->buf;
-    r.ebx = v->file;
-    r.eax = 0x3F00;
-    xn_int21(&r);
-}
-
-void xn_vid_fill_r(xn_regs *r)
-{
-    xn_vid_fill();
-    r->edx = (u32)xn_vid_state.buf;
-    r->ebx = (r->ebx & 0xFFFF0000) | xn_vid_state.file;
+    xn_dos_read(v->file, v->buf, VID_BUFFER);
 }
 
 void xn_vid_schedule_frame(u16 delay)
@@ -612,8 +537,7 @@ void xn_vid_read_audio(u8 *p)
         if (n > (u32)v->audio_left)
             n = v->audio_left;
         v->audio_left -= n;
-        /* each pass copies to the buffer's start (a chunk bigger than the read buffer's rest
-           would overwrite its own start: kept) */
+        /* Quirk Q-VID-01: each pass copies to the buffer's start */
         if (v->audio_buffer == 0) {
             dst = v->audio_buf_a;
             v->audio_len_a = v->audio_size;
@@ -637,7 +561,7 @@ void xn_vid_timer_cb(void)
         v->audio_waiting = 0;
 }
 
-void xn_vid_audio_done_cb(xn_vid_sos_sample *s)
+void __cdecl xn_vid_audio_done_cb(xn_vid_sos_sample *s)
 {
     struct xn_vid_player *v = &xn_vid_state;
 
@@ -655,28 +579,20 @@ void xn_vid_audio_done_cb(xn_vid_sos_sample *s)
     v->sample_done = 1;
 }
 
-void xn_vid_audio_done_cb_r(xn_regs *r)
-{
-    xn_vid_audio_done_cb((xn_vid_sos_sample *)XN_STACK_ARG(r, 0));
-}
-
-u32 xn_vid_audio_stop(u32 edx)
+void xn_vid_audio_stop(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
 
     if (v->audio_state == 0)
-        return edx;
+        return;
     v->audio_state = 0;
-    edx = v->sample_handle;
-    game_call(asm_func_000A2687, sound_digi_driver, &edx);
-    return edx;
+    sos_stop_sample(sound_digi_driver, v->sample_handle);
 }
 
 void xn_vid_audio_start(void)
 {
     struct xn_vid_player *v = &xn_vid_state;
     xn_vid_sos_sample *s = &xn_vid_sample;
-    u32 edx;
 
     if (v->audio_buffer == 0) {
         s->data = v->audio_buf_b;
@@ -693,7 +609,10 @@ void xn_vid_audio_start(void)
     s->volume = 0x7F007F00;
     s->loop = 0;
     s->length2 = s->length;
-    s->done = asm_xn_vid_audio_done_cb;
-    edx = (u32)s;
-    v->sample_handle = game_call(asm_func_000A2504, sound_digi_driver, &edx);
+    s->done = xn_vid_audio_done_cb;
+    v->sample_handle = sos_start_sample(sound_digi_driver, s);
+}
+
+static void vid_code_end(void)
+{
 }

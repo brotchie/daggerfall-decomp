@@ -1,17 +1,6 @@
-/* drawline.c: XnGine's lines and clipped rectangles as readable C (xdraw.h; see xngine.h and
-   docs/xngine_readable.md). */
+/* drawline.c: XnGine's lines and clipped rectangles (canonical C; the interface and the
+   module's documentation are in xdraw.h). */
 #include "xdraw.h"
-
-/* xn_draw_line_text_colour's state, in the asm's order */
-extern s32 xn_line_err_step_neg;        /* 2 minor: the error's step after a major-axis step */
-extern s32 xn_line_err_step_pos;        /* 2 minor - 2 major: after a minor-axis step too */
-extern u32 xn_line_step_routine;        /* the loop the asm jumps to (CE61E or CE63F) */
-extern s32 xn_line_x1;
-extern s32 xn_line_y1;
-extern s32 xn_line_x2;
-extern s32 xn_line_y2;
-extern u8 asm_xn_draw_line_text_colour_step_x[];
-extern u8 asm_xn_draw_line_text_colour_step_y[];
 
 static void swap(s32 *a, s32 *b)
 {
@@ -28,22 +17,6 @@ static void swap_ends(xn_line *l)
     swap(&l->y1, &l->y2);
 }
 
-static void regs_to_line(const xn_regs *r, xn_line *l)
-{
-    l->x1 = r->eax;
-    l->y1 = r->edx;
-    l->x2 = r->ebx;
-    l->y2 = r->ecx;
-}
-
-static void line_to_regs(const xn_line *l, xn_regs *r)
-{
-    r->eax = l->x1;
-    r->edx = l->y1;
-    r->ebx = l->x2;
-    r->ecx = l->y2;
-}
-
 void xn_draw_hline(s32 x1, s32 y, s32 x2)
 {
     if (y < xn_gfx_clip_top || y >= xn_gfx_clip_bottom)
@@ -58,7 +31,7 @@ void xn_draw_hline(s32 x1, s32 y, s32 x2)
         x2 = xn_gfx_clip_right;
     if (x2 - x1 <= 0)
         return;
-    xn_fill_bytes(XN_SCREEN(x1, y), text_colour, x2 - x1);
+    xn_fill_bytes(XN_SCREEN(x1, y), text_colour, x2 - x1);     /* Quirk Q-DRAW-07: [x1, x2) */
 }
 
 void xn_draw_vline_keep_regs(s32 x, s32 y1, s32 y2)
@@ -81,7 +54,7 @@ void xn_draw_vline(s32 x, s32 y1, s32 y2)
         y1 = xn_gfx_clip_top;
     if (y2 > xn_gfx_clip_bottom)
         y2 = xn_gfx_clip_bottom;
-    rows = y2 - y1;
+    rows = y2 - y1;                     /* Quirk Q-DRAW-07: [y1, y2) */
     if (rows <= 0)
         return;
     row = screen_buffer + xn_gfx_row_offset[y1];
@@ -112,7 +85,7 @@ void xn_draw_line_unclipped(s32 x1, s32 y1, s32 x2, s32 y2)
 {
     s32 dx = x2 - x1, dy = y2 - y1;
     s32 adx, ady, n, step;
-    u32 pos;                    /* the minor axis in 16.16 */
+    u32 pos;                            /* the minor axis in 16.16 */
     u8 *p;
 
     if (dx == 0) {
@@ -126,7 +99,7 @@ void xn_draw_line_unclipped(s32 x1, s32 y1, s32 x2, s32 y2)
     adx = dx < 0 ? -dx : dx;
     ady = dy < 0 ? -dy : dy;
     if (adx >= ady) {
-        /* x-major: left to right, a row from the 16.16 y per column */
+        /* x-major: left to right, a row from the 16.16 y per column (Q-DRAW-07: x2 not drawn) */
         if (x1 > x2) {
             swap(&x1, &x2);
             swap(&y1, &y2);
@@ -165,50 +138,39 @@ void xn_draw_line_to(s32 x, s32 y)
 
 int xn_draw_line_clip(xn_line *l)
 {
+    s32 dx = l->x2 - l->x1, dy = l->y2 - l->y1;
+
     pen_x = l->x2;
     pen_y = l->y2;
-    xn_draw_line_dx = l->x2 - l->x1;
-    xn_draw_line_dy = l->y2 - l->y1;
     if (l->x1 > l->x2)
         swap_ends(l);
     if (l->x1 >= xn_gfx_clip_right || l->x2 < xn_gfx_clip_left)
         return 0;
-    if (xn_draw_line_dx != 0) {
+    if (dx != 0) {
         if (l->x1 < xn_gfx_clip_left) {
-            l->y1 -= xn_muldiv(l->x1 - xn_gfx_clip_left, xn_draw_line_dy, xn_draw_line_dx);
+            l->y1 -= xn_muldiv(l->x1 - xn_gfx_clip_left, dy, dx);
             l->x1 = xn_gfx_clip_left;
         }
         if (l->x2 > xn_gfx_clip_right) {
-            l->y2 -= xn_muldiv(l->x2 - xn_gfx_clip_right, xn_draw_line_dy, xn_draw_line_dx);
-            l->x2 = xn_gfx_clip_right - 1;
+            l->y2 -= xn_muldiv(l->x2 - xn_gfx_clip_right, dy, dx);
+            l->x2 = xn_gfx_clip_right - 1;      /* Quirk Q-DRAW-08 */
         }
     }
     if (l->y1 > l->y2)
         swap_ends(l);
-    if (l->y1 >= xn_gfx_clip_bottom || l->y2 <= xn_gfx_clip_top)
+    if (l->y1 >= xn_gfx_clip_bottom || l->y2 <= xn_gfx_clip_top)     /* (Q-DRAW-08: <=) */
         return 0;
-    if (xn_draw_line_dy != 0) {
+    if (dy != 0) {
         if (l->y1 < xn_gfx_clip_top) {
-            l->x1 -= xn_muldiv(l->y1 - xn_gfx_clip_top, xn_draw_line_dx, xn_draw_line_dy);
+            l->x1 -= xn_muldiv(l->y1 - xn_gfx_clip_top, dx, dy);
             l->y1 = xn_gfx_clip_top;
         }
         if (l->y2 > xn_gfx_clip_bottom) {
-            l->x2 -= xn_muldiv(l->y2 - xn_gfx_clip_bottom, xn_draw_line_dx, xn_draw_line_dy);
-            l->y2 = xn_gfx_clip_bottom;
+            l->x2 -= xn_muldiv(l->y2 - xn_gfx_clip_bottom, dx, dy);
+            l->y2 = xn_gfx_clip_bottom;         /* Quirk Q-DRAW-08 */
         }
     }
     return 1;
-}
-
-void xn_draw_line_clip_r(xn_regs *r)
-{
-    xn_line l;
-    int ok;
-
-    regs_to_line(r, &l);
-    ok = xn_draw_line_clip(&l);
-    line_to_regs(&l, r);
-    XN_SETFLAG(r, XN_CF, !ok);
 }
 
 int xn_draw_clip_rect_xyxy(xn_line *r)
@@ -225,17 +187,6 @@ int xn_draw_clip_rect_xyxy(xn_line *r)
     if (r->y2 > xn_gfx_clip_bottom)
         r->y2 = xn_gfx_clip_bottom;
     return 1;
-}
-
-void xn_draw_clip_rect_xyxy_r(xn_regs *r)
-{
-    xn_line l;
-    int ok;
-
-    regs_to_line(r, &l);
-    ok = xn_draw_clip_rect_xyxy(&l);
-    line_to_regs(&l, r);
-    XN_SETFLAG(r, XN_CF, !ok);
 }
 
 /* the corners of (x1, y1)-(x2, y2) in order, clipped; 0 when outside */
@@ -274,7 +225,7 @@ void xn_draw_fill_rect_clipped(s32 x1, s32 y1, s32 x2, s32 y2)
         return;
     row = XN_SCREEN(r.x1, r.y1);
     w = r.x2 - r.x1;
-    rows = r.y2 - r.y1;                 /* 0 rows (y1 == y2) loop 2^32 times, as the asm */
+    rows = r.y2 - r.y1;                 /* Quirk Q-DRAW-06: 0 rows run 2^32 times */
     fill = xn_colour_fill_table[text_colour];
     do {
         xn_fill_dwords(row, fill, w >> 2);
@@ -285,24 +236,19 @@ void xn_draw_fill_rect_clipped(s32 x1, s32 y1, s32 x2, s32 y2)
 
 void xn_draw_line_text_colour(s32 x1, s32 y1, s32 x2, s32 y2)
 {
-    s32 dx, dy, major, minor, err, row_step = 320;
+    s32 dx, dy, major, minor, err, step_neg, step_pos, row_step = 320;
     u32 n;
     u8 *p;
 
-    xn_line_x1 = x1;
-    xn_line_y1 = y1;
-    xn_line_x2 = x2;
-    xn_line_y2 = y2;
-    dx = xn_line_x2 - xn_line_x1;
+    dx = x2 - x1;
     if (dx == 0) {
-        /* vertical: down from the upper end */
-        dy = xn_line_y2 - xn_line_y1;
-        y1 = xn_line_y1;
+        /* vertical: down from the upper end, both ends drawn */
+        dy = y2 - y1;
         if (dy < 0) {
             dy = -dy;
-            y1 = xn_line_y2;
+            y1 = y2;
         }
-        p = screen_buffer + xn_gfx_row_offset[y1] + xn_line_x1;
+        p = screen_buffer + xn_gfx_row_offset[y1] + x1;
         for (n = dy + 1; n != 0; n--) {
             *p = text_colour;
             p += 320;
@@ -312,11 +258,11 @@ void xn_draw_line_text_colour(s32 x1, s32 y1, s32 x2, s32 y2)
     if (dx < 0) {
         /* left to right */
         dx = -dx;
-        swap(&xn_line_x1, &xn_line_x2);
-        swap(&xn_line_y1, &xn_line_y2);
+        swap(&x1, &x2);
+        swap(&y1, &y2);
     }
-    dy = xn_line_y2 - xn_line_y1;
-    p = screen_buffer + xn_gfx_row_offset[xn_line_y1] + xn_line_x1;
+    dy = y2 - y1;
+    p = screen_buffer + xn_gfx_row_offset[y1] + x1;
     if (dy == 0) {
         xn_fill_bytes(p, text_colour, dx + 1);
         return;
@@ -325,45 +271,38 @@ void xn_draw_line_text_colour(s32 x1, s32 y1, s32 x2, s32 y2)
         dy = -dy;
         row_step = -320;
     }
-    xn_line_step_routine = (u32)asm_xn_draw_line_text_colour_step_x;
     major = dx;
     minor = dy;
     if (dy > dx) {
-        xn_line_step_routine = (u32)asm_xn_draw_line_text_colour_step_y;
         major = dy;
         minor = dx;
     }
-    xn_line_err_step_neg = 2 * minor;
+    step_neg = 2 * minor;               /* the error's step after a major-axis step */
+    step_pos = 2 * minor - 2 * major;   /* after a minor-axis step too */
     err = 2 * minor - major;
-    xn_line_err_step_pos = 2 * minor - 2 * major;
     n = major + 1;
     if (dy <= dx) {
-        /* x-major (CE61E): a pixel per column, down or up a row when the error is >= 0 */
+        /* x-major: a pixel per column, a row on when the error is >= 0 */
         do {
             *p++ = text_colour;
             if (err < 0) {
-                err += xn_line_err_step_neg;
+                err += step_neg;
             } else {
-                err += xn_line_err_step_pos;
+                err += step_pos;
                 p += row_step;
             }
         } while (--n != 0);
     } else {
-        /* y-major (CE63F): a pixel per row, right a column when the error is >= 0 */
+        /* y-major: a pixel per row, a column right when the error is >= 0 */
         do {
             *p = text_colour;
             p += row_step + 1;
             if (err < 0) {
-                err += xn_line_err_step_neg;
+                err += step_neg;
                 p--;
             } else {
-                err += xn_line_err_step_pos;
+                err += step_pos;
             }
         } while (--n != 0);
     }
-}
-
-void xn_draw_line_text_colour_r(xn_regs *r)
-{
-    xn_draw_line_text_colour(r->eax, r->edx, r->ebx, r->ecx);
 }

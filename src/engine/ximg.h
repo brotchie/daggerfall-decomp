@@ -1,18 +1,30 @@
-/* ximg.h: XnGine's image records and decoders (src/engine/img.c; see xngine.h): IMG and CIF
-   records, the row-compressed images of the inventory, the RLE rows of CEL files and weapon
-   CIFs.
+/* ximg.h: XnGine's image records and decoders (src/engine/img.c). Canonical C: plain
+   prototypes, Watcom's own calling convention; docs/xngine_canonical.md.
 
-   Each declaration keeps the function's asm interface (config/xngine_abi.csv): no pragma is
-   Watcom's own convention; a pragma names the registers; NAME_r is the glue for a function
-   whose asm callers read several registers or flags. */
+   What it does
+     Walks IMG and CIF records, finds a weapon CIF's RLE frame groups, and decodes the row
+     formats of the game's images: the row-compressed images of the inventory (a dword offset
+     per row, each row raw or RLE), the RLE rows of CEL files and the RLE frames of weapon
+     CIFs.
+
+   Formats
+     IMG/CIF      a 12-byte header (xn_img), then width x height pixels; a CIF's next image
+                  follows data_size bytes of pixels
+     RLE row      a word: the row's length; then words n: n > 0, n literal bytes follow;
+                  n < 0, -n copies of the next byte; until the length is used up
+     RLE frame    per row, bytes c: c < 80h, c + 1 literal pixels follow; else (c & 7Fh) + 1
+                  copies of the next byte; until the group's width is used up
+     row-compressed  a table of dwords (one per row) counted from 1Ch bytes before the table:
+                  bit 31 set, an RLE row at that offset; else the raw row there
+
+   Pixels are palette indices; 0 is transparent where the drawing routines say so (xdraw.h).
+   Quirk kept: Q-IMG-01 (the EGA remap reads past its 16-entry map). */
 #ifndef XIMG_H
 #define XIMG_H
 
 #include "xngine.h"
 
-/* An IMG file, or one image of a CIF file (the game's struct image, include/structs.h): a
-   12-byte header, then width x height pixels; a CIF's next image follows data_size bytes of
-   pixels. */
+/* An IMG file, or one image of a CIF file (the game's struct image, include/structs.h) */
 typedef struct xn_img {
     u16 x;                  /* +00 where it is drawn */
     u16 y;                  /* +02 */
@@ -23,8 +35,7 @@ typedef struct xn_img {
     u8 pixels[1];           /* +0C */
 } xn_img;
 
-/* A group of RLE frames in a weapon CIF (after its first, plain image): the frames' rows are
-   runs (a byte < 80h: n+1 literal pixels follow; else (n & 7Fh)+1 copies of the next byte) */
+/* A group of RLE frames in a weapon CIF (after its first, plain image) */
 typedef struct xn_rle_group {
     u16 width;              /* +00 */
     u16 height;             /* +02 */
@@ -36,8 +47,8 @@ typedef struct xn_rle_group {
     u16 size;               /* +4A bytes from this group to the next */
 } xn_rle_group;
 
-/* A CEL animation (MAGE.CEL, ROGUE.CEL): a 14-byte header, then per frame a dword per row:
-   the row's pixels from the file's start, bit 31 set for an RLE row (xn_img_rle_decode) */
+/* A CEL animation (MAGE.CEL, ROGUE.CEL): a 14-byte header, then per frame a dword per row: the
+   row's pixels from the file's start, bit 31 set for an RLE row (xn_img_rle_decode) */
 #pragma pack(1)
 typedef struct xn_cel {
     u16 frames;             /* +00 */
@@ -48,38 +59,28 @@ typedef struct xn_cel {
 } xn_cel;
 #pragma pack()
 
-/* The image xn_draw_image_scaled and xn_draw_paperdoll_item unpack (word-sized statics, as the
-   asm keeps them) */
-extern u16 xn_draw_scaled_src_w;        /* columns (and the unpacked row's bytes) */
-extern u16 xn_draw_scaled_src_h;        /* rows */
-extern u8 *xn_draw_scaled_src;          /* the image: dword row offsets (bit 31: RLE) */
+/* The row-compressed image whose row table is `rows_table` (rows entries) unpacked into dst,
+   rows 256 bytes apart, w bytes each. xn_draw_image_scaled and xn_draw_paperdoll_item. rows of
+   0 runs 2^32 times (the asm's dword count; never passed). */
+void xn_img_unpack_rows(const u8 *rows_table, u32 w, u32 rows, u8 *dst);
 
-/* The row-compressed image xn_draw_scaled_src (src_h rows; per row a dword offset from 1Ch
-   bytes before the image, bit 31 set for an RLE row) unpacked into scratch_buffer, rows 256
-   bytes apart (src_w bytes each). Keeps every register. */
-void xn_img_unpack_rows(void);
+/* Decodes one RLE row from src to dst. */
+void xn_img_rle_decode(const u8 *src, u8 *dst);
 
-/* Decodes one RLE row from src to dst: a word, the row's length; then words n: n > 0, n
-   literal bytes follow; n < 0, -n copies of the next byte; until the length is used up.
-   Returns 0 in ECX, the asm's spent counts (xn_draw_cel_frame's row loop, which keeps only CX
-   across the call, goes on with its top half). */
-u32 xn_img_rle_decode(const u8 *src, u8 *dst);
-#pragma aux xn_img_rle_decode parm [eax] [edx] value [ecx] modify exact [eax ecx edx];
-
-/* The group-th RLE group of a weapon CIF: past its first image, then group sizes. */
+/* The group-th RLE group of a weapon CIF: past its first image, then group sizes. Two game
+   sites. */
 xn_rle_group *xn_img_cif_group(const xn_img *cif, s32 group);
 
 /* Dead: frame `frame` of an RLE group unpacked into dst (rows width bytes apart). Returns 1.
-   (Its failure exit 0xCB54C, `xor eax, eax` and CB4D7's epilogue, is never reached and stays
-   asm: it pops a frame it did not push.) */
+   (Its failure exit 0xCB54C, `xor eax, eax` and CB4D7's epilogue, is no function: nothing jumps
+   to it.) */
 s32 xn_img_rle_frame_unpack(const xn_rle_group *g, s32 frame, u8 *dst);
 
-/* Dead: the k-th image of a CIF (k images skipped by their data sizes). */
+/* Dead: the k-th image of a CIF (k images skipped by their data sizes; k = 0: img). */
 const xn_img *xn_img_skip_records(const xn_img *img, s32 k);
 
-/* Dead: an IMG's opaque pixels remapped in place through xn_pal_ega16_map (an identity map of
-   the 16 EGA colours: indices above 15 read past it). Keeps every register. */
+/* Dead: an IMG's opaque pixels remapped in place through xn_pal_ega16_map. Quirk Q-IMG-01: an
+   identity map of the 16 EGA colours, read past its end for pixels above 15. */
 void xn_img_remap_colours(xn_img *img);
-#pragma aux xn_img_remap_colours parm [eax] modify exact [eax];
 
 #endif

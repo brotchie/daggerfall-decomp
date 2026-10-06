@@ -3,8 +3,8 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C010F,xn_anim_reset,anim,watcom,eax,0,eax,,,0,known,called from the game's C (2 sites)
 0C0131,xn_anim_reset_with_rate,anim,reg,eax dx,0,eax,,,0,unknown,no caller: every register it may change is an output
 0C013B,xn_anim_update,anim,reg,eax edx,0,,,eax ecx dx bx esi,0,known,called from the game's C (1 sites)
-0C019C,xn_anim_tick,anim,reg,eax edx,0,dx,CF,eax ecx ebx esi,0,known,
-0C01EB,xn_anim_run_opcodes,anim,reg,dx esi edi,0,dx edi,,eax ecx ebx,0,known,
+0C019C,xn_anim_tick,anim,reg,eax edx,0,,CF,eax ecx ebx esi,0,known,
+0C01EB,xn_anim_run_opcodes,anim,reg,dx esi edi,0,edi,,eax ecx ebx,0,known,
 0C020A,xn_anim_op_loop_start,anim,reg,dx edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: its count, chosen in AL"
 0C0221,xn_anim_op_loop_end,anim,reg,esi edi,0,edi,CF,eax ebx,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the loop start's address and offset"
 0C023B,xn_anim_op_set_events,anim,reg,esi edi,0,edi,CF,eax,0,partial,"outputs overridden: live: an ASCR opcode handler; its only caller is xn_anim_run_opcodes' call through xn_anim_opcodes, which reads EDI (and CF, DX) after it (xn_abi.py clobber); clobber overridden: EAX/EBX: the event bits"
@@ -110,7 +110,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0C524A,xn_rand_noise_fade_init,rand,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 0C5280,xn_rand_noise_2d,rand,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (6 sites)
 0C5304,xn_rand_noise_empty,rand,reg,,0,,,,0,unknown,no caller: every register it may change is an output
-0C7F00,xn_sys_yield,sys,reg,eax.u ecx edx ebx esi edi,0,ecx ebx esi edi,,eax edx,0,known,called from the game's C (1 sites)
+0C7F00,xn_sys_yield,sys,watcom,eax.u,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
 0C7F07,xn_model_set_angles,model,watcom,ax ecx dx bx,0,,,eax ecx edx ebx,0,known,called from the game's C (3 sites)
 0C7F14,xn_model_compose_angles,model,watcom,eax ecx edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
 0C7F98,xn_model_set_angles_yaw_offset,model,watcom,eax edx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
@@ -165,9 +165,9 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0CD20E,xn_draw_spell_icon,draw,watcom,eax edx bx,0,,,eax edx ebx,0,known,called from the game's C (4 sites)
 0CD262,xn_draw_paperdoll_mask,draw,reg,eax ecx edx ebx,4,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
 0CD291,xn_draw_paperdoll_item,draw,watcom,eax ecx edx ebx,4,,,eax ecx edx ebx esi edi,4,known,called from the game's C (1 sites)
-0CD308,xn_gfx_wait_vretrace_start,gfx,reg,ax dx,0,ax dx,,,0,known,called from the game's C (3 sites)
-0CD31A,xn_gfx_wait_vretrace_end,gfx,reg,ax dx,0,ax dx,,,0,known,called from the game's C (3 sites)
-0CD32C,xn_gfx_wait_vretraces,gfx,reg,eax dx,0,eax dx,,,0,unknown,no caller: every register it may change is an output
+0CD308,xn_gfx_wait_vretrace_start,gfx,reg,,0,,,,0,known,called from the game's C (3 sites)
+0CD31A,xn_gfx_wait_vretrace_end,gfx,reg,,0,,,,0,known,called from the game's C (3 sites)
+0CD32C,xn_gfx_wait_vretraces,gfx,watcom,eax,0,eax,,,0,unknown,no caller: every register it may change is an output
 0CD33A,xn_pal_set_range_8bit,pal,reg,eax dx bx,0,,,ax edx ebx,0,known,called from the game's C (9 sites)
 0CD367,xn_pal_set_all_8bit,pal,watcom,eax,0,,,eax ecx edx ebx,0,known,called from the game's C (5 sites)
 0CD37B,xn_img_skip_records,img,watcom,eax edx,0,eax,,edx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): returns the k-th record in EAX; EDX is the spent count; clobber overridden: dead (no caller): Watcom's convention for (img, k)"
@@ -181,7 +181,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0CDCE5,xn_draw_remap_masked_rect,draw,reg,eax ecx edx ebx,8,,,eax ecx edx ebx,0,unknown,"no caller: every register it may change is an output; outputs overridden: dead (no caller): EAX ECX EDX are its bounds and loop leftovers; clobber overridden: dead (no caller): Watcom's argument registers (x, y, w, h); the caller pops the 8 stack bytes"
 0CDD49,xn_draw_zoom4x,draw,watcom,eax edx ebx,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0CDD6C,xn_draw_mark_matching,draw,watcom,eax ecx edx bl,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
-0CDD81,xn_gfx_present_inclusive,gfx,reg,eax ecx edx esi edi,0,,,,0,known,called from the game's C (28 sites)
+0CDD81,xn_gfx_present_inclusive,gfx,reg,eax ecx edx esi edi,0,,,al,0,known,called from the game's C (28 sites)
 0CDDA8,xn_timer_tick_callback,timer,reg,,0,,,,0,unknown,address escapes (escape): every register it may change is an output
 0CE300,xn_str_copy_line,str,watcom,eax edx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
 0CE31C,xn_draw_copy_rect_stride_bytes,draw,reg,eax ecx edx ebx,4,ecx,,eax edx ebx,4,known,called from the game's C (7 sites)
@@ -214,14 +214,14 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 0CE790,xn_str_skip_fields,str,watcom,eax dl ebx,0,eax,,ecx edx ebx,0,known,called from the game's C (1 sites)
 0CE7A7,xn_str_find_byte_pair,str,watcom,eax dx ebx,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0CE7B3,xn_timer_add_25,timer,reg,,0,,,,0,unknown,no caller: every register it may change is an output
-0CE7BB,xn_timer_fps_update,timer,watcom,,0,,,eax edx,0,known,called from the game's C (1 sites)
+0CE7BB,xn_timer_fps_update,timer,watcom,,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
 0CE808,xn_model_max_y,model,watcom,eax,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (1 sites)
 0CE828,xn_model_xz_extent,model,reg,eax edx ebx,0,,,,0,unknown,no caller: every register it may change is an output
 0CE87B,xn_str_find_nonzero,str,watcom,eax edx,0,eax,,edx ebx,0,known,called from the game's C (1 sites)
 0CE88D,xn_mouse_set_sensitivity,mouse,watcom,eax edx,0,,,eax edx ebx,0,known,called from the game's C (4 sites)
-0CE8A0,xn_mouse_get_sensitivity,mouse,reg,eax ecx edx ebx esi edi,0,,,eax edx,0,known,called from the game's C (3 sites)
+0CE8A0,xn_mouse_get_sensitivity,mouse,watcom,eax edx,0,,,eax edx,0,known,called from the game's C (3 sites)
 0CE8B2,xn_timer_read_pit,timer,watcom,eax.u,0,eax,,ecx edx ebx esi edi,0,known,called from the game's C (2 sites)
-0CE8C4,xn_sys_zero_page_save,sys,watcom,,0,,,eax edx,0,known,called from the game's C (1 sites)
+0CE8C4,xn_sys_zero_page_save,sys,watcom,,0,,,eax edx ebx,0,known,called from the game's C (1 sites)
 0CE8D5,xn_sys_zero_page_check,sys,watcom,,0,,,eax edx,0,known,called from the game's C (1 sites)
 0CE918,xn_timer_wait_ticks,timer,watcom,eax,0,,,eax edx,0,known,called from the game's C (1 sites)
 0CE92C,xn_kbd_wait_all_released,kbd,watcom,,0,,,eax ecx edx ebx esi edi,0,known,called from the game's C (3 sites)
@@ -258,7 +258,7 @@ va,name,subsystem,convention,inputs,stack_args,outputs,flags_out,clobber,ret_pop
 12B326,xn_mouse_cursor_clip,mouse,watcom,,0,,,eax ecx edx ebx ebp esi edi,0,known,
 12B3ED,xn_mouse_cursor_draw,mouse,reg,,0,,,dl,0,known,called from the game's C (9 sites)
 12B45B,xn_mouse_set_cursor_image,mouse,watcom,eax dx bx,0,,,eax ecx edx ebx ebp esi edi,0,known,called from the game's C (1 sites)
-12B47E,xn_mouse_read_motion,mouse,reg,eax edx,0,fs,,eax edx,0,known,called from the game's C (2 sites)
+12B47E,xn_mouse_read_motion,mouse,reg,eax edx,0,fs,,eax edx ebx,0,known,called from the game's C (2 sites)
 12B49E,xn_mouse_set_position,mouse,reg,eax edx,0,fs,,eax ecx edx ebx esi edi,0,known,called from the game's C (3 sites)
 12D40E,xn_pal_find_nearest,pal,watcom,cl dl bl,0,al,,ah eax.u ecx edx ebx,0,known,
 12D481,xn_pal_find_nearest_hsv,pal,watcom,cx dx bx,0,eax,,ecx edx ebx,0,unknown,no caller: every register it may change is an output; outputs overridden: dead (no caller): the nearest index; BX CX DX are the last entry's HSV from xn_pal_rgb_to_hsv; clobber overridden: dead (no caller): BX CX DX are the last entry's HSV from xn_pal_rgb_to_hsv

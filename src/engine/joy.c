@@ -1,7 +1,13 @@
-/* joy.c: XnGine's joystick as readable C (xjoy.h; see xngine.h). */
+/* joy.c: XnGine's joystick (canonical C; the interface and the module's documentation are in
+   xjoy.h). */
 #include "xjoy.h"
+#include "xsysutil.h"
+#include "xpc.h"
 #include "xmem.h"
-#include "xtimer.h"
+
+#define RANGE_NONE      32000           /* a minimum before anything is seen */
+#define AXIS_MAX        4095
+#define COUNT_MAX       0x800           /* port reads per tick, at most */
 
 /* Busy-waits for the next BIOS tick */
 static void next_tick(void)
@@ -14,8 +20,7 @@ static void next_tick(void)
 
 void xn_joy_init(void)
 {
-    xn_regs v;
-    u8 seen;
+    u8 zero;
     s32 k;
 
     if (xn_joy.installed == 1)
@@ -25,19 +30,17 @@ void xn_joy_init(void)
     xn_outb(XN_JOY_PORT, 0xFF);             /* fire the one-shots */
     next_tick();
     xn_cli();
-    seen = 0xFF;                            /* the bits that read 0 every time */
+    zero = 0xFF;                            /* the bits that read 0 every time */
     for (k = 0; k < 64; k++)
-        seen &= ~xn_inb(XN_JOY_PORT);
-    xn_joy.axis_mask = seen;                /* (see xjoy.h) */
+        zero &= ~xn_inb(XN_JOY_PORT);
+    /* Quirk Q-JOY-01: the asm's tests meant to pair the axes OR in bits the mask has */
+    xn_joy.axis_mask = zero;
     xn_joy.status = XN_JOY_OFF;
     xn_sti();
-    v.eax = 0x1C;
-    xn_asmcall(func_000A1272, &v);          /* _dos_getvect(1Ch): DX:EAX */
-    xn_joy.old_int1c_sel = (u16)v.edx;
-    xn_joy.old_int1c_off = v.eax;
-    func_000A12A6(0x1C, asm_xn_joy_timer_isr, xn_cs());
-    xn_mem_lock_region(asm_xn_joy_timer_isr, xn_code_152F41 - (u8 *)asm_xn_joy_timer_isr);
-    xn_mem_lock_region(&xn_joy, sizeof(struct xn_joy_state));
+    xn_pc_get_vector(0x1C, &xn_joy.old_int1c_off, &xn_joy.old_int1c_sel);
+    xn_pc_install_vector(0x1C, xn_joy_timer_entry);
+    xn_mem_lock_region((void *)xn_joy_timer_entry, xn_joy_timer_end - (u8 *)xn_joy_timer_entry);
+    xn_mem_lock_region(&xn_joy, sizeof xn_joy);
 }
 
 void xn_joy_shutdown(void)
@@ -47,22 +50,24 @@ void xn_joy_shutdown(void)
     xn_joy.installed = 0;
     xn_joy.status = XN_JOY_OFF;
     xn_cli();
-    func_000A12A6(0x1C, (void *)xn_joy.old_int1c_off, xn_joy.old_int1c_sel);
+    xn_pc_set_vector(0x1C, xn_joy.old_int1c_off, xn_joy.old_int1c_sel);
     xn_sti();
+}
+
+/* The four buttons released */
+static void release_buttons(void)
+{
+    xn_joy.button1 = xn_joy.button2 = 0;
+    xn_joy.button3 = xn_joy.button4 = 0;
 }
 
 void xn_joy_reset_range(void)
 {
-    xn_joy.min_x = 32000;
-    xn_joy.min_y = 32000;
-    xn_joy.max_x = 0;
-    xn_joy.max_y = 0;
-    xn_joy.min_x_b = 32000;
-    xn_joy.min_y_b = 32000;
-    xn_joy.max_x_b = 0;
-    xn_joy.max_y_b = 0;
-    *(u16 *)&xn_joy.button1 = 0;            /* buttons 1 and 2 (a word) */
-    *(u16 *)&xn_joy.button3 = 0;            /* 3 and 4 */
+    xn_joy.min_x = xn_joy.min_y = RANGE_NONE;
+    xn_joy.max_x = xn_joy.max_y = 0;
+    xn_joy.min_x_b = xn_joy.min_y_b = RANGE_NONE;
+    xn_joy.max_x_b = xn_joy.max_y_b = 0;
+    release_buttons();
 }
 
 void xn_joy_calibrate(void)
@@ -72,10 +77,8 @@ void xn_joy_calibrate(void)
     if (xn_joy.status == XN_JOY_OFF || xn_joy.installed == 0)
         return;
     xn_joy_reset_range();
-    xn_joy.center.center_x = 0;
-    xn_joy.center.center_y = 0;
-    xn_joy.center_b.center_x = 0;
-    xn_joy.center_b.center_y = 0;
+    xn_joy.center.center_x = xn_joy.center.center_y = 0;
+    xn_joy.center_b.center_x = xn_joy.center_b.center_y = 0;
     for (k = 0; k < 4; k++) {
         next_tick();
         xn_joy.center.center_x += xn_joy.raw_x;
@@ -98,7 +101,7 @@ static void widen(s32 v, s32 *lo, s32 *hi)
         *hi = v;
 }
 
-/* One axis: the count's distance from the centre, over the range on its side (min - centre
+/* One axis: the count's distance from the centre over the range on its side (min - centre
    below, max - centre above), times -4096 (the asm negates the distance above the centre,
    then the quotient), within -4095..4095; 0 inside the dead zone */
 static s32 joy_axis(s32 raw, s32 center, s32 lo, s32 hi)
@@ -116,32 +119,28 @@ static s32 joy_axis(s32 raw, s32 center, s32 lo, s32 hi)
     if ((d < 0 ? -d : d) <= xn_joy.dead_zone)
         return 0;
     xn_s64_set(&n, d << 12);
-    v = -xn_s64_div(&n, range);             /* a range of 0: the divide handler's 0 */
-    if (v < -4095)
-        v = -4095;
-    else if (v > 4095)
-        v = 4095;
+    v = -xn_s64_div_or0(&n, range);         /* Quirk Q-SYS-01: a range of 0 gives 0 */
+    if (v < -AXIS_MAX)
+        v = -AXIS_MAX;
+    else if (v > AXIS_MAX)
+        v = AXIS_MAX;
     return v;
 }
 
 void xn_joy_poll(void)
 {
-    s32 x, y, xb, yb;
+    s32 x, y;
 
-    xn_joy.x = 0;
-    xn_joy.y = 0;
-    xn_joy.x_b = 0;
-    xn_joy.y_b = 0;
+    xn_joy.x = xn_joy.y = 0;
+    xn_joy.x_b = xn_joy.y_b = 0;
     if (xn_joy.status == XN_JOY_OFF || xn_joy.installed == 0)
         return;
     x = xn_joy.raw_x;
     y = xn_joy.raw_y;
-    xb = xn_joy.raw_x_b;
-    yb = xn_joy.raw_y_b;
     widen(x, &xn_joy.min_x, &xn_joy.max_x);
     widen(y, &xn_joy.min_y, &xn_joy.max_y);
-    widen(xb, &xn_joy.min_x_b, &xn_joy.max_x_b);
-    widen(yb, &xn_joy.min_y_b, &xn_joy.max_y_b);
+    widen(xn_joy.raw_x_b, &xn_joy.min_x_b, &xn_joy.max_x_b);
+    widen(xn_joy.raw_y_b, &xn_joy.min_y_b, &xn_joy.max_y_b);
     xn_joy.x += joy_axis(x, xn_joy.center.center_x, xn_joy.min_x, xn_joy.max_x);
     xn_joy.y += joy_axis(y, xn_joy.center.center_y, xn_joy.min_y, xn_joy.max_y);
 }
@@ -152,12 +151,11 @@ void xn_joy_timer_isr(void)
     s32 k;
     u8 bits;
 
-    *(u16 *)&xn_joy.button1 = 0;
-    *(u16 *)&xn_joy.button3 = 0;
+    release_buttons();
     if (xn_joy.status == XN_JOY_OFF)
         return;
     xn_outb(XN_JOY_PORT, 0x0F);             /* fire the one-shots */
-    for (k = 0x800; k != 0; k--) {          /* count while each axis bit stays up */
+    for (k = COUNT_MAX; k != 0; k--) {      /* count while any axis bit stays up */
         bits = xn_inb(XN_JOY_PORT);
         if (bits == 0)
             break;

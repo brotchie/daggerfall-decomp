@@ -1,66 +1,59 @@
-/* mem.c: XnGine's memory as readable C (xmem.h; see xngine.h). */
+/* mem.c: XnGine's memory (canonical C; the interface and the module's documentation are in
+   xmem.h). */
 #include "xmem.h"
+#include "xdos.h"
+#include "xpc.h"
 #include "xkbd.h"
 #include "xjoy.h"
+#include "xgfx.h"
+
+#define WORK_MIN        0x10000         /* the work buffer's least size */
+#define WORK_ALIGN      0x20
 
 u32 xn_mem_align_up(u32 p, u32 align)
 {
     return (p + align - 1) & ~(align - 1);
 }
 
-/* 'SYSTEM:' errors: the message (AX's AH = 9 put into eax), then exit with AX = 4C00h */
-static void sys_fatal(u32 eax, const char *msg)
+/* The 'SYSTEM:' fatal error: msg ('$'-terminated) printed and the program ended */
+static void sys_fatal(const char *msg)
 {
-    xn_regs d;
-
-    d.eax = (eax & 0xFFFF00FF) | 0x0900;
-    d.edx = (u32)msg;
-    xn_int21(&d);
-    d.eax = (d.eax & 0xFFFF0000) | 0x4C00;
-    xn_int21(&d);
+    xn_dos_print(msg);
+    xn_dos_exit(0);
 }
 
 void xn_mem_init(u32 size)
 {
-    xn_regs d;
     u8 *block;
     u32 k;
 
-    size += 0x20;
-    if ((s32)size < 0x10000)
-        size = 0x10000;
+    size += WORK_ALIGN;
+    if ((s32)size < WORK_MIN)
+        size = WORK_MIN;
     block = func_000A10A8(size);
     if (block == 0) {
         xn_kbd_remove();
         xn_joy_shutdown();
-        asm_xn_gfx_restore_mode();
-        sys_fatal(0, xn_mem_msg_alloc_failed);
+        xn_gfx_restore_mode();
+        sys_fatal(xn_mem_msg_alloc_failed);
         return;                         /* (not reached) */
     }
     xn_mem_work_block = block;
-    big_buffer = (u8 *)(((u32)block + 0x1F) & ~0x1Fu);
-    /* DPMI 0002h, segment to selector; the upper half of EAX: what it held before */
-    d.eax = ((u32)big_buffer & 0xFFFF0000) | 2;
-    d.ebx = 0x40;
-    xn_int31(&d);
-    xn_sel_bios_data = (u16)d.eax;
-    d.eax = (d.eax & 0xFFFF0000) | 2;
-    d.ebx = (d.ebx & 0xFFFF0000) | 0xA000;
-    xn_int31(&d);
-    xn_sel_vga = (u16)d.eax;
-    d.eax = (d.eax & 0xFFFF00FF) | 0x5100;  /* the PSP's segment in BX */
-    xn_int21(&d);
-    xn_sys_psp_addr = (u16)d.ebx << 4;
+    big_buffer = (u8 *)xn_mem_align_up((u32)block, WORK_ALIGN);
+    xn_dpmi_segment_selector(0x40, &xn_sel_bios_data);
+    xn_dpmi_segment_selector(0xA000, &xn_sel_vga);
+    xn_sys_psp_addr = (u32)xn_dos_psp() << 4;
     xn_sys_cmd_tail = xn_sys_psp_addr + 0x80;
+    /* Quirk Q-MEM-01: entry 3FFh of both tables is left as it is */
     xn_recip16_table[0] = 0xFFFF;
-    for (k = 1; k < 0x3FF; k++)         /* (the last entry, 3FFh, is left as it is) */
+    for (k = 1; k < 0x3FF; k++)
         xn_recip16_table[k] = 0xFFFF / k;
     xn_recip32_table[0] = 0xFFFFFFFF;
     for (k = 1; k < 0x3FF; k++)
         xn_recip32_table[k] = 0xFFFFFFFF / k;
     for (k = 0; k < 256; k++)
         xn_colour_fill_table[k] = k * 0x01010101;
-    xn_mem_lock_region(xn_code_0A12B8, 0x400);
+    xn_mem_lock_region(xn_mem_game_lock_start, 0x400);
 }
 
 void xn_mem_shutdown(void)
@@ -69,21 +62,13 @@ void xn_mem_shutdown(void)
         func_000A117E(xn_mem_work_block);
 }
 
-void xn_mem_lock_region(void *addr, u32 size)
+void xn_mem_lock_region(const void *addr, u32 size)
 {
-    xn_regs d;
-
-    d.eax = 0x600;
-    d.ebx = (u32)addr >> 16;
-    d.ecx = (u32)addr & 0xFFFF;
-    d.esi = size >> 16;
-    d.edi = size & 0xFFFF;
-    xn_int31(&d);
-    if (!(d.eflags & XN_CF))
+    if (xn_dpmi_lock(addr, size))
         return;
-    xn_kbd_remove();                    /* (these keep AL and the upper half of EAX) */
+    xn_kbd_remove();
     xn_joy_shutdown();
-    asm_xn_gfx_restore_mode();
+    xn_gfx_restore_mode();
     xn_mem_shutdown();
-    sys_fatal(d.eax, xn_mem_msg_lock_failed);
+    sys_fatal(xn_mem_msg_lock_failed);
 }

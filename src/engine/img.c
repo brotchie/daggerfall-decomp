@@ -1,16 +1,14 @@
-/* img.c: XnGine's image records and decoders as readable C (ximg.h; see xngine.h and
-   docs/xngine_readable.md). */
+/* img.c: XnGine's image records and decoders (canonical C; the interface and the module's
+   documentation are in ximg.h). */
 #include "ximg.h"
 #include "xdrawhlp.h"
 
-extern u8 xn_pal_ega16_map[16];         /* a palette index per EGA colour */
+extern u8 xn_pal_ega16_map[16];         /* a palette index per EGA colour (xpal.h) */
 
-void xn_img_unpack_rows(void)
+void xn_img_unpack_rows(const u8 *rows_table, u32 w, u32 rows, u8 *dst)
 {
-    const u32 *offset = (const u32 *)xn_draw_scaled_src;
-    const u8 *file = xn_draw_scaled_src - 0x1C;     /* the offsets count from the header */
-    u8 *dst = scratch_buffer;
-    u32 rows = xn_draw_scaled_src_h;
+    const u32 *offset = (const u32 *)rows_table;
+    const u8 *file = rows_table - 0x1C;     /* the offsets count from the header */
 
     do {
         u32 at = *offset++;
@@ -18,8 +16,6 @@ void xn_img_unpack_rows(void)
         if (at & 0x80000000u) {
             xn_img_rle_decode(file + (at & 0x7FFFFFFF), dst);
         } else {
-            u32 w = xn_draw_scaled_src_w;
-
             xn_copy_dwords(dst, file + at, w >> 2);
             xn_copy_bytes(dst + (w & ~3), file + at + (w & ~3), w & 3);
         }
@@ -27,7 +23,7 @@ void xn_img_unpack_rows(void)
     } while (--rows != 0);
 }
 
-u32 xn_img_rle_decode(const u8 *src, u8 *dst)
+void xn_img_rle_decode(const u8 *src, u8 *dst)
 {
     u16 left = *(const u16 *)src;
 
@@ -49,7 +45,6 @@ u32 xn_img_rle_decode(const u8 *src, u8 *dst)
             src += n;
         }
     }
-    return 0;
 }
 
 xn_rle_group *xn_img_cif_group(const xn_img *cif, s32 group)
@@ -107,7 +102,7 @@ void xn_img_remap_colours(xn_img *img)
 
     do {
         if (*p != 0)
-            *p = xn_pal_ega16_map[*p];
+            *p = xn_pal_ega16_map[*p];  /* Quirk Q-IMG-01: unmasked */
         p++;
     } while (--n != 0);
 }

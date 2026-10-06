@@ -1,58 +1,36 @@
-/* model.c: XnGine's ARCH3D models as readable C (xmodel.h; see xngine.h and
-   docs/xngine_readable.md). */
+/* model.c: XnGine's ARCH3D models (canonical C; the interface and the module's documentation
+   are in xmodel.h). */
 #include "xmodel.h"
-#include "xrender.h"
+#include "xcam.h"
 #include "xpoly.h"
 #include "xtex.h"
-#include "xcam.h"
 #include "xvec.h"
 #include "xmat.h"
 #include "xmath.h"
+#include "xdraw.h"
+#include "xrender.h"
+#include "xdos.h"
+#include "xkbd.h"
+#include "xjoy.h"
+#include "xgfx.h"
+#include "xmem.h"
 
 extern s32 xn_model_angle_or_bits;
 extern xn_mat3 xn_model_base_matrix, xn_model_object_matrix, xn_model_combined_matrix;
 extern xn_mat3 xn_model_rot_matrix;             /* the model being drawn */
 extern u8 *player_object;                       /* x, y, z ints at +7, +0Bh, +0Fh */
-extern xn_vec3 xn_scratch_vec_b;
-extern s32 xn_model_uv_len2, xn_model_uv_t;
+extern struct xn_scratch xn_scratch_vecs;       /* the shared scratch vectors (a: the pick) */
 extern s32 xn_model_drawn_count;
 extern s32 xn_model_queue_count;
 extern struct xn_sort_pair *xn_model_queue_ptr;
 extern struct xn_vert_cam xn_vert_cam[1024];   /* indexed by byte offset (index * 12) */
 extern struct xn_vert_screen xn_vert_screen[1024];
 extern struct xn_vert_flags xn_vert_flags[1024];
-extern s32 xn_span_dzdx;
-extern xn_routine xn_render_span_setups[5];
+extern s32 xn_span_dzdx;                        /* the S-buffer's 1/z step of the polygon */
 extern struct xn_light xn_light_table[33];
-extern s32 xn_model_bounds_x0, xn_model_bounds_y0, xn_model_bounds_x1, xn_model_bounds_y1;
 extern char xn_model_msg_too_many_verts[], xn_model_msg_corrupted[];
 
-/* patch fields (smc/model.md) */
-extern struct xn_model_handle *xn_model_draw_handle;   /* 140497, read as data by 140606 */
-extern s32 xn_model_eye_bf_x, xn_model_eye_bf_y, xn_model_eye_bf_z;   /* back-face test */
-extern s32 xn_model_eye_x, xn_model_eye_y, xn_model_eye_z;            /* added to vertices */
-extern s32 xn_model_depth_x, xn_model_depth_y, xn_model_depth_z;      /* 1/z gradient row */
-extern s32 xn_model_depth_scale;                       /* 14030A (12A3AC) */
-extern xn_mat3 *xn_model_matrix_slot;                  /* 14053E */
-extern u8 *xn_model_points_x, *xn_model_points_y, *xn_model_points_z;  /* 14051C/522/528 */
-extern xn_vec3 *xn_model_faces_end;                    /* 1404EB: the normals' end */
-extern s32 xn_model_vert_sx, xn_model_vert_cx, xn_model_vert_sy, xn_model_vert_cy;
-extern s32 xn_model_light_pos_x, xn_model_light_pos_y, xn_model_light_pos_z; /* 140666.. */
-extern s32 xn_model_light_r2;                          /* 14068B */
-extern s32 xn_model_scale_inv_x, xn_model_scale_inv_y;     /* 1406DD 14072A (12A3AC) */
-extern s32 xn_model_scale_focal_x, xn_model_scale_focal_y; /* 1406E2 14072F (12A274) */
-
-/* other groups' functions, through their asm entries */
-extern void asm_xn_draw_clip_rect_xyxy(void);
-extern void asm_xn_kbd_remove(void);
-extern void asm_xn_joy_shutdown(void);
-extern void asm_xn_gfx_restore_mode(void);
-extern void asm_xn_mem_shutdown(void);
-extern void asm_xn_model_clear_vert_flags(void);    /* the body the asm plants its ret in */
-
-/* the shared scratch vector a (struct xn_scratch at 0x120288): xn_pick_view_x, _y and
-   pick_distance */
-#define SCRATCH_A ((xn_vec3 *)&xn_pick_view_x)
+#define VERT_FLAGS_MAX  1024            /* the vertex arrays' entries */
 
 /* the handle whose angles the game passes (&handle->pad_0c) */
 #define HANDLE_OF(angles) ((struct xn_model_handle *)((u8 *)(angles) - 0x0C))
@@ -66,27 +44,21 @@ extern void asm_xn_model_clear_vert_flags(void);    /* the body the asm plants i
 #define POINT_AT(pts, off) ((const xn_vec3 *)((const u8 *)(pts) + (off)))
 #define NEXT_FACE(f) ((struct xn_model_face *)((u8 *)(f) + 8 + 8 * (f)->point_count))
 
-/* The models' fatal exit (13FEC3, 13FEEB): the engine shut down, the message printed, the
-   program ended; the too-many-vertices exit does not shut the joystick down */
-static void fatal(char *msg, int joy)
+/* The models' fatal exit (13FEC3, 13FEEB): the engine shut down, msg printed, the game ended;
+   the too-many-vertices exit does not shut the joystick down */
+static void fatal(const char *msg, int joy)
 {
-    xn_regs r;
-
-    xn_call_asm(asm_xn_kbd_remove);
+    xn_kbd_remove();
     if (joy)
-        xn_call_asm(asm_xn_joy_shutdown);
+        xn_joy_shutdown();
     xn_render_shutdown();
-    xn_call_asm(asm_xn_gfx_restore_mode);
-    xn_call_asm(asm_xn_mem_shutdown);
-    r.eax = 0x0900;
-    r.edx = (u32)msg;
-    r.ecx = r.ebx = r.ebp = r.esi = r.edi = 0;
-    xn_int21(&r);
-    r.eax = 0x4C00;
-    xn_int21(&r);
+    xn_gfx_restore_mode();
+    xn_mem_shutdown();
+    xn_dos_print(msg);
+    xn_dos_exit(0);
 }
 
-/* ---- angles ---------------------------------------------------------------------------------- */
+/* ---- a placement's angles ------------------------------------------------------------------ */
 
 void xn_model_set_angles(s32 pitch, s32 yaw, s32 roll, s16 *angles)
 {
@@ -125,39 +97,7 @@ void xn_model_set_angles_yaw_offset(s16 *angles, s32 yaw_offset)
     h->angle_z = (u16)angles[3];
 }
 
-/* the sum of the model's vertices into *sum; their count (dec; jne: 0 runs 2^32 times) */
-static void sum_points(const struct xn_model *m, xn_vec3 *sum)
-{
-    const xn_vec3 *p = POINTS(m);
-    u32 n = m->point_count;
-
-    sum->x = sum->y = sum->z = 0;
-    do {
-        sum->x += p->x;
-        sum->y += p->y;
-        sum->z += p->z;
-        p++;
-    } while (--n != 0);
-}
-
-/* v / d, the asm's cdq; idiv */
-static s32 sdiv(s32 v, s32 d)
-{
-    xn_s64 t;
-
-    xn_s64_set(&t, v);
-    return xn_s64_div(&t, d);
-}
-
-void xn_model_centroid_to_pick(const struct xn_model_handle *h)
-{
-    xn_vec3 sum;
-
-    sum_points(h->model, &sum);
-    xn_pick_view_x = sdiv(sum.x, h->model->point_count);
-    xn_pick_view_y = sdiv(sum.y, h->model->point_count);
-    pick_distance = sdiv(sum.z, h->model->point_count);
-}
+/* ---- the game's helpers ----------------------------------------------------------------- */
 
 void xn_model_push_player_from_pick(const struct xn_poly *pick)
 {
@@ -180,7 +120,7 @@ s32 xn_model_max_y(const struct xn_model *m)
     u32 n = m->point_count;
     s32 top = -100000;
 
-    do {
+    do {                                /* Quirk Q-MODEL-02: a count of 0 runs 2^32 times */
         if (top <= p->y)
             top = p->y;
         p++;
@@ -192,7 +132,7 @@ void xn_model_xz_extent(const struct xn_model *m, u32 *dx, u32 *dz)
 {
     const xn_vec3 *p = POINTS(m);
     u32 n = m->point_count;
-    s32 x0 = -100000, x1 = 100000, z0 = -100000, z1 = 100000;  /* sic: min and max swapped */
+    s32 x0 = -100000, x1 = 100000, z0 = -100000, z1 = 100000;  /* Quirk Q-MODEL-01 */
 
     do {
         if (x0 >= p->x)
@@ -209,9 +149,38 @@ void xn_model_xz_extent(const struct xn_model *m, u32 *dx, u32 *dz)
     *dx = (u32)(x1 - x0) >> 8;
 }
 
+/* the mean of the model's vertices (cdq; idiv) into the pick's point */
+static void centroid(const struct xn_model *m)
+{
+    const xn_vec3 *p = POINTS(m);
+    u32 n = m->point_count;
+    xn_vec3 sum;
+
+    sum.x = sum.y = sum.z = 0;
+    do {
+        sum.x += p->x;
+        sum.y += p->y;
+        sum.z += p->z;
+        p++;
+    } while (--n != 0);
+    xn_pick_view_x = xn_idiv64_or0(sum.x >> 31, sum.x, m->point_count);
+    xn_pick_view_y = xn_idiv64_or0(sum.y >> 31, sum.y, m->point_count);
+    pick_distance = xn_idiv64_or0(sum.z >> 31, sum.z, m->point_count);
+}
+
+void xn_model_calc_centroid(const struct xn_model *m)
+{
+    centroid(m);
+}
+
+void xn_model_centroid_to_pick(const struct xn_model_handle *h)
+{
+    centroid(h->model);
+}
+
 /* ---- preparing a model ------------------------------------------------------------------------ */
 
-void xn_model_prepare(struct xn_model *m)
+struct xn_model *xn_model_prepare(struct xn_model *m)
 {
     struct xn_model_face *f;
     u32 nf;
@@ -219,11 +188,11 @@ void xn_model_prepare(struct xn_model *m)
     if (m->version < 0x362E3276) {      /* before "v2.6": vertex offsets are index * 4 */
         if ((u32)m->point_count >= 0x400) {
             fatal(xn_model_msg_too_many_verts, 0);
-            return;
+            return m;
         }
         f = FACES(m);
         nf = m->face_count;
-        do {                            /* loop: counts of 0 run 2^32 times */
+        do {                            /* Quirk Q-MODEL-02 (`loop`) */
             struct xn_model_face_point *p = f->points;
             u32 np = f->point_count;
 
@@ -244,7 +213,7 @@ void xn_model_prepare(struct xn_model *m)
         f->points[0].uv_packed <<= 4;
         if (f->point_count > 0x18) {
             fatal(xn_model_msg_too_many_verts, 0);
-            return;
+            return m;
         }
         f = NEXT_FACE(f);
     } while (--nf != 0);
@@ -258,17 +227,13 @@ void xn_model_prepare(struct xn_model *m)
         do {
             if ((u32)p->vertex % 12 != 0 || (s32)((u32)p->vertex / 12) >= m->point_count) {
                 fatal(xn_model_msg_corrupted, 1);
-                return;
+                return m;
             }
             p++;
         } while (--np != 0);
         f = (struct xn_model_face *)p;
     } while (--nf != 0);
-}
-
-void xn_model_prepare_r(xn_regs *r)
-{
-    xn_model_prepare((struct xn_model *)r->eax);
+    return m;
 }
 
 void xn_model_calc_uv_axes(struct xn_model *m)
@@ -300,7 +265,7 @@ void xn_model_calc_uv_axes(struct xn_model *m)
     } while (++k < m->frame_count);
 }
 
-/* the 64-bit sum of squares of v, >> 8 (bits 8..39) */
+/* the 64-bit sum of squares of v, bits 8..39 */
 static s32 len2(const xn_vec3 *v)
 {
     xn_s64 t;
@@ -311,20 +276,20 @@ static s32 len2(const xn_vec3 *v)
     return xn_s64_shr(&t, 8);
 }
 
-/* (v << 25) / d, 64-bit */
+/* (v << 25) / d, 64-bit, or 0 */
 static s32 scale25(s32 v, s32 d)
 {
     xn_s64 t;
 
     xn_s64_set(&t, v);
     xn_s64_shl(&t, 25);
-    return xn_s64_div(&t, d);
+    return xn_s64_div_or0(&t, d);
 }
 
 /* one texture axis: d1 e1 + d2' e2, d2' = d2 - (d1 t >> 16); 32-bit products */
-static void uv_axis(s32 d1, s32 d2, const xn_vec3 *e1, const xn_vec3 *e2, xn_vec3 *out)
+static void uv_axis(s32 d1, s32 d2, s32 t, const xn_vec3 *e1, const xn_vec3 *e2, xn_vec3 *out)
 {
-    d2 -= xn_mulshr(d1, xn_model_uv_t, 16);
+    d2 -= xn_mulshr(d1, t, 16);
     out->x = d1 * e1->x + d2 * e2->x;
     out->y = d1 * e1->y + d2 * e2->y;
     out->z = d1 * e1->z + d2 * e2->z;
@@ -337,42 +302,41 @@ void xn_model_calc_face_uv_axes(const struct xn_model *m, const struct xn_model_
     const xn_vec3 *p0 = POINT_AT(pts, face->points[0].vertex);
     const xn_vec3 *p1 = POINT_AT(pts, face->points[1].vertex);
     const xn_vec3 *p2 = POINT_AT(pts, face->points[2].vertex);
-    xn_vec3 *e1 = SCRATCH_A;
-    xn_vec3 *e2 = &xn_scratch_vec_b;
-    xn_s64 t;
-    s32 l2;
+    xn_vec3 *e1 = &xn_scratch_vecs.a;   /* Quirk Q-MODEL-03: the pick's scratch point */
+    xn_vec3 e2;
+    xn_s64 n;
+    s32 l1, l2, t;
 
     e1->x = p1->x - p0->x;
     e1->y = p1->y - p0->y;
     e1->z = p1->z - p0->z;
-    l2 = len2(e1);
-    if (l2 == 0)
+    l1 = len2(e1);
+    if (l1 == 0)
         return;
-    xn_model_uv_len2 = l2;
-    e2->x = p2->x - p1->x;
-    e2->y = p2->y - p1->y;
-    e2->z = p2->z - p1->z;
+    e2.x = p2->x - p1->x;
+    e2.y = p2->y - p1->y;
+    e2.z = p2->z - p1->z;
     /* t = (e1 . e2 << 8) / |e1|^2: e2's part along e1, 16.16 */
-    xn_s64_mul(&t, e1->x, e2->x);
-    xn_s64_mac(&t, e1->y, e2->y);
-    xn_s64_mac(&t, e1->z, e2->z);
-    xn_s64_shl(&t, 8);
-    xn_model_uv_t = xn_s64_div(&t, xn_model_uv_len2);
-    e2->x -= xn_mulshr(e1->x, xn_model_uv_t, 16);
-    e2->y -= xn_mulshr(e1->y, xn_model_uv_t, 16);
-    e2->z -= xn_mulshr(e1->z, xn_model_uv_t, 16);
-    e1->x = scale25(e1->x, xn_model_uv_len2);
-    e1->y = scale25(e1->y, xn_model_uv_len2);
-    e1->z = scale25(e1->z, xn_model_uv_len2);
-    l2 = len2(e2);
+    xn_s64_mul(&n, e1->x, e2.x);
+    xn_s64_mac(&n, e1->y, e2.y);
+    xn_s64_mac(&n, e1->z, e2.z);
+    xn_s64_shl(&n, 8);
+    t = xn_s64_div_or0(&n, l1);
+    e2.x -= xn_mulshr(e1->x, t, 16);
+    e2.y -= xn_mulshr(e1->y, t, 16);
+    e2.z -= xn_mulshr(e1->z, t, 16);
+    e1->x = scale25(e1->x, l1);
+    e1->y = scale25(e1->y, l1);
+    e1->z = scale25(e1->z, l1);
+    l2 = len2(&e2);
     if (l2 == 0)
         return;
-    e2->x = scale25(e2->x, l2);
-    e2->y = scale25(e2->y, l2);
-    e2->z = scale25(e2->z, l2);
+    e2.x = scale25(e2.x, l2);
+    e2.y = scale25(e2.y, l2);
+    e2.z = scale25(e2.z, l2);
     /* the file's u/v deltas of points 1 and 2 */
-    uv_axis(face->points[1].uv[0], face->points[2].uv[0], e1, e2, &out->u_axis);
-    uv_axis(face->points[1].uv[1], face->points[2].uv[1], e1, e2, &out->v_axis);
+    uv_axis(face->points[1].uv[0], face->points[2].uv[0], t, e1, &e2, &out->u_axis);
+    uv_axis(face->points[1].uv[1], face->points[2].uv[1], t, e1, &e2, &out->v_axis);
 }
 
 void xn_model_calc_face_planes(struct xn_model *m)
@@ -434,18 +398,17 @@ void xn_model_calc_face_normal(const struct xn_model *m, const struct xn_model_f
     const xn_vec3 *p0 = POINT_AT(pts, face->points[0].vertex);
     const xn_vec3 *p1 = POINT_AT(pts, face->points[1].vertex);
     const xn_vec3 *p2 = POINT_AT(pts, face->points[2].vertex);
-    xn_vec3 *e1 = SCRATCH_A;
-    xn_vec3 *e2 = &xn_scratch_vec_b;
-    xn_vec3 n;
+    xn_vec3 *e1 = &xn_scratch_vecs.a;   /* Quirk Q-MODEL-03: the pick's scratch point */
+    xn_vec3 e2, n;
     s32 shift;
 
     e1->x = p1->x - p0->x;
     e1->y = p1->y - p0->y;
     e1->z = p1->z - p0->z;
-    e2->x = p2->x - p1->x;
-    e2->y = p2->y - p1->y;
-    e2->z = p2->z - p1->z;
-    xn_vec_cross(e1, e2, &n);
+    e2.x = p2->x - p1->x;
+    e2.y = p2->y - p1->y;
+    e2.z = p2->z - p1->z;
+    xn_vec_cross(e1, &e2, &n);
     xn_vec_normalize(&n);
     shift = 16 - bits;
     if (shift > 0) {
@@ -456,17 +419,7 @@ void xn_model_calc_face_normal(const struct xn_model *m, const struct xn_model_f
     *out = n;
 }
 
-void xn_model_calc_centroid(const struct xn_model *m)
-{
-    xn_vec3 sum;
-
-    sum_points(m, &sum);
-    xn_pick_view_x = sdiv(sum.x, m->point_count);
-    xn_pick_view_y = sdiv(sum.y, m->point_count);
-    pick_distance = sdiv(sum.z, m->point_count);
-}
-
-/* ---- the queue ----------------------------------------------------------------------------- */
+/* ---- the frame's queue ----------------------------------------------------------------------- */
 
 void xn_model_submit(struct xn_model_handle *h, s32 frame)
 {
@@ -489,7 +442,7 @@ void xn_model_cull_and_queue(struct xn_model_handle *h, u8 frame)
     if ((u32)++xn_model_queue_count >= 200)
         return;
     pair = xn_model_queue_ptr;
-    /* the key: the distance (the culling left the centre in view space) less the radius */
+    /* the key: the distance (the sphere test left the centre in view space) less the radius */
     key = 0;
     if (pick_distance >= 0) {
         s32 x = xn_pick_view_x >> 8, y = xn_pick_view_y >> 8, z = pick_distance >> 8;
@@ -507,61 +460,55 @@ void xn_model_cull_and_queue(struct xn_model_handle *h, u8 frame)
 
 int xn_model_draw(struct xn_model_handle *h)
 {
-    const struct xn_model *m = h->model;
-    xn_mat3 *slot;
-    xn_vec3 eye;
+    struct xn_model *m = h->model;
+    struct xn_model_draw_state s;
+    struct xn_model_matrix_slot *slot;
+    s32 depth_scale;
 
     if (xn_model_is_occluded(m, h)) {
         h->flags |= 1;
         return 0;
     }
     xn_model_drawn_count++;
-    xn_model_draw_handle = h;
+    s.handle = h;
     xn_mat_from_angles(h->angle_x, h->yaw, h->angle_z, &xn_model_rot_matrix);
-    slot = (xn_mat3 *)xn_render_matrix_next;
-    xn_mat_multiply(&xn_cam_view_matrix, &xn_model_rot_matrix, slot);
+    slot = xn_render_matrix_next;
+    xn_mat_multiply(&xn_cam_view_matrix, &xn_model_rot_matrix, (xn_mat3 *)slot);
     /* the eye in object space (the object's origin seen from the eye) */
-    eye.x = h->rel_x;
-    eye.y = h->rel_y;
-    eye.z = h->rel_z;
-    xn_mat_transform_transposed(&eye, &xn_model_rot_matrix);
-    h->rel_x = eye.x;
-    h->rel_y = eye.y;
-    h->rel_z = eye.z;
-    xn_model_eye_bf_x = xn_model_eye_x = eye.x;
-    xn_model_eye_bf_y = xn_model_eye_y = eye.y;
-    xn_model_eye_bf_z = xn_model_eye_z = eye.z;
-    /* d(1/z)/dx per unit of a face's plane: the matrix's first row times the depth scale */
-    xn_model_depth_x = xn_mulhi(slot->m[0][0], xn_model_depth_scale);
-    xn_model_depth_y = xn_mulhi(slot->m[0][1], xn_model_depth_scale);
-    xn_model_depth_z = xn_mulhi(slot->m[0][2], xn_model_depth_scale);
-    h->matrix = (struct xn_model_matrix_slot *)slot;
-    xn_model_matrix_slot = slot;
+    s.rel.x = h->rel_x;
+    s.rel.y = h->rel_y;
+    s.rel.z = h->rel_z;
+    xn_mat_transform_transposed(&s.rel, &xn_model_rot_matrix);
+    h->rel_x = s.rel.x;
+    h->rel_y = s.rel.y;
+    h->rel_z = s.rel.z;
+    /* d(1/z) per unit of a face's plane: the matrix's first row times
+       2^48 / (scale_x * focal_x) (the product 32-bit) */
+    depth_scale = xn_udiv64_or0(0x10000, 0, xn_cam_scale_x * xn_cam_focal_x);
+    s.dz_row.x = xn_mulhi(slot->m[0][0], depth_scale);
+    s.dz_row.y = xn_mulhi(slot->m[0][1], depth_scale);
+    s.dz_row.z = xn_mulhi(slot->m[0][2], depth_scale);
+    h->matrix = slot;
+    s.matrix = slot;
     if (m->frame_count != 0)
-        xn_model_set_frame((struct xn_model *)m, h->frame);
-    if (xn_model_draw_faces(m))
+        xn_model_set_frame(m, h->frame);
+    if (xn_model_draw_faces(m, &s))
         return 1;
-    xn_model_build_light_list();
-    xn_model_scale_matrix();
+    xn_model_build_light_list(h);
+    xn_model_scale_matrix(slot);
     xn_render_matrix_next++;
     return 0;
 }
 
-void xn_model_draw_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, xn_model_draw((struct xn_model_handle *)r->edi));
-}
-
-/* the frame's lists into the model's header (frame clamped to the frames), then the planes */
-static void set_frame(struct xn_model *m, s32 frame, s32 count)
+void xn_model_set_frame(struct xn_model *m, s32 frame)
 {
     const struct xn_model_frame *fr;
+    s32 last = m->frame_count - 1;
 
-    count--;
     if (frame < 0)
         frame = 0;
-    else if (frame > count)
-        frame = count;
+    else if (frame > last)
+        frame = last;
     fr = (const struct xn_model_frame *)((u8 *)m + m->frame_table_offset + frame * 16);
     m->point_offset = fr->point_offset;
     m->normal_offset = fr->normal_offset;
@@ -569,101 +516,90 @@ static void set_frame(struct xn_model *m, s32 frame, s32 count)
     xn_model_calc_face_planes(m);
 }
 
-void xn_model_set_frame(struct xn_model *m, s32 frame)
+void xn_model_clear_vert_flags(struct xn_vert_flags *flags, int n, u8 value)
 {
-    set_frame(m, frame, m->frame_count);
+    int k;
+
+    for (k = 0; k < n && k < VERT_FLAGS_MAX; k++)     /* Q-MODEL-06 */
+        flags[k].done = value;
 }
 
-void xn_model_set_frame_regs_r(xn_regs *r)
+/* a + b < 0 for the true sum (the asm's last `add; jge`: SF != OF) */
+static int sum_negative(s32 a, s32 b)
 {
-    struct xn_model *m = (struct xn_model *)r->esi;
+    s32 s = (s32)((u32)a + (u32)b);
 
-    set_frame(m, r->eax, r->ebx);
-    r->eax = (u32)m;
-    r->edx = m->face_data_offset;
+    if (((a ^ s) & (b ^ s)) < 0)        /* the add overflowed: the true sum has a's sign */
+        return a < 0;
+    return s < 0;
 }
 
-void xn_model_set_frame_r(xn_regs *r)
-{
-    struct xn_model *m = (struct xn_model *)r->eax;
-
-    xn_model_set_frame(m, r->edx);
-    r->edx = m->face_data_offset;
-}
-
-int xn_model_draw_faces(const struct xn_model *m)
+int xn_model_draw_faces(const struct xn_model *m, struct xn_model_draw_state *s)
 {
     const struct xn_model_face *f;
-    const xn_vec3 *n;
+    const xn_vec3 *n, *end;
 
     xn_model_clear_vert_flags(xn_vert_flags, m->point_count, 0);
-    XN_KEEP(xn_model_points_x, (u8 *)m + m->point_offset);
-    XN_KEEP(xn_model_points_y, xn_model_points_x + 4);
-    XN_KEEP(xn_model_points_z, xn_model_points_x + 8);
+    s->points = (xn_vec3 *)POINTS(m);
     xn_render_poly_count += m->face_count;
     n = NORMALS(m);
-    XN_KEEP(xn_model_faces_end, (xn_vec3 *)n + m->face_count);
+    end = n + m->face_count;
     f = FACES(m);
-    do {
-        /* a front face: the eye on the normal's side of the plane */
-        s32 d = n->x * xn_model_eye_bf_x + n->y * xn_model_eye_bf_y +
-                n->z * xn_model_eye_bf_z + f->points[1].plane_d;
+    do {                                /* Quirk Q-MODEL-02: 0 faces runs on */
+        /* a front face: the eye on the normal's side of the plane (Quirk Q-MODEL-05: the
+           last add is compared without its wrap) */
+        s32 a = n->x * s->rel.x + f->points[1].plane_d;
+        s32 b = n->z * s->rel.z + n->y * s->rel.y;
 
-        if (d < 0) {
-            u32 codes = xn_model_transform_face_verts(f);
+        if (sum_negative(a, b)) {
+            u32 codes = xn_model_transform_face_verts(f, s);
 
             if ((codes & 0xFF) == 0) {  /* not wholly outside one plane */
                 struct xn_poly *poly = xn_render_poly_next;
                 const struct xn_vert_cam *c;
                 struct xn_tex_entry *e;
                 xn_s64 t;
-                s32 frame = -1;
                 u32 tex;
 
                 /* the face's 1/z gradient: n . depth row << 13 / d, 64-bit */
-                xn_s64_set(&t, n->x * xn_model_depth_x + n->z * xn_model_depth_z +
-                               n->y * xn_model_depth_y);
+                xn_s64_set(&t, n->x * s->dz_row.x + n->z * s->dz_row.z + n->y * s->dz_row.y);
                 xn_s64_shl(&t, 13);
-                poly->inv_z_step = xn_s64_div(&t, d);
+                poly->inv_z_step = xn_s64_div_or0(&t, (s32)((u32)a + (u32)b));
                 poly->normal = (int *)n;
                 poly->inv_z_dx = poly->inv_z_step >> 3;
                 xn_span_dzdx = poly->inv_z_dx;
                 if (xn_poly_project_face(f, codes)) {
                     xn_render_poly_next++;
                     poly->face = (struct xn_model_face *)f;
-                    poly->handle = xn_model_draw_handle;
+                    poly->handle = s->handle;
                     c = &XN_AT(struct xn_vert_cam, xn_vert_cam, f->points[0].vertex);
                     poly->cam_x = c->x;
                     poly->cam_y = c->y;
                     poly->cam_z = c->z;
                     /* (the vertex offset's high word stays above the texture word) */
                     tex = ((u32)f->points[0].vertex & 0xFFFF0000) | f->texture;
-                    e = xn_tex_cache_lookup(tex >> 7, tex & 0x7F, &frame);
+                    e = xn_tex_cache_lookup(tex >> 7, tex & 0x7F, -1);
                     if (e == 0)
                         return 1;
                     poly->tex = e;
-                    poly->span_fn = XN_AT(xn_routine, xn_render_span_setups, e->kind);
+                    poly->span_fn = xn_render_span_setup(e->kind);
                 }
             }
         }
         f = NEXT_FACE(f);
         n++;
-    } while (n != xn_model_faces_end);
+    } while (n != end);
     return 0;
 }
 
-void xn_model_draw_faces_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, xn_model_draw_faces((const struct xn_model *)r->esi));
-}
-
-u32 xn_model_transform_face_verts(const struct xn_model_face *face)
+u32 xn_model_transform_face_verts(const struct xn_model_face *face,
+                                  const struct xn_model_draw_state *s)
 {
     const struct xn_model_face_point *p = face->points;
     u32 n = face->point_count;
     u8 code_and = 0xFF, code_or = 0;
 
-    do {
+    do {                                /* Quirk Q-MODEL-02 */
         s32 vi = p->vertex;
         struct xn_vert_flags *fl = &XN_AT(struct xn_vert_flags, xn_vert_flags, vi);
         u8 code;
@@ -672,25 +608,25 @@ u32 xn_model_transform_face_verts(const struct xn_model_face *face)
             code = fl->outcode;
         } else {
             struct xn_vert_cam *c = &XN_AT(struct xn_vert_cam, xn_vert_cam, vi);
+            const xn_vec3 *pt = POINT_AT(s->points, vi);
             xn_vec3 v;
 
             fl->done = 1;
-            v.x = *(s32 *)(xn_model_points_x + vi) + xn_model_eye_x;
-            v.y = *(s32 *)(xn_model_points_y + vi) + xn_model_eye_y;
-            v.z = *(s32 *)(xn_model_points_z + vi) + xn_model_eye_z;
-            xn_mat_transform(&v, xn_model_matrix_slot);
+            v.x = pt->x + s->rel.x;
+            v.y = pt->y + s->rel.y;
+            v.z = pt->z + s->rel.z;
+            xn_mat_transform(&v, (const xn_mat3 *)s->matrix);
             c->x = v.x;
             c->y = v.y;
             c->z = v.z;
             code = (u8)xn_poly_outcode(v.x, v.y, v.z);
             fl->outcode = code;
             if (code == 0) {            /* inside: projected now */
-                struct xn_vert_screen *s = &XN_AT(struct xn_vert_screen, xn_vert_screen, vi);
-                u32 inv_z = xn_udiv64(0x100, 0, v.z);
+                struct xn_vert_screen *sc = &XN_AT(struct xn_vert_screen, xn_vert_screen, vi);
+                u32 inv_z;
 
-                s->inv_z = inv_z;
-                s->sx = (u32)(xn_mulhi(v.x * xn_model_vert_sx, inv_z) + xn_model_vert_cx) >> 3;
-                s->sy = (u32)(xn_mulhi(v.y * xn_model_vert_sy, inv_z) + xn_model_vert_cy) >> 8;
+                xn_cam_screen_point(v.x, v.y, v.z, &sc->sx, &sc->sy, &inv_z);
+                sc->inv_z = inv_z;
             }
         }
         code_or |= code;
@@ -700,24 +636,16 @@ u32 xn_model_transform_face_verts(const struct xn_model_face *face)
     return code_and | (u32)code_or << 8;
 }
 
-void xn_model_transform_face_verts_r(xn_regs *r)
+void xn_model_build_light_list(struct xn_model_handle *h)
 {
-    r->ebx = xn_model_transform_face_verts((const struct xn_model_face *)r->esi);
-}
-
-void xn_model_build_light_list(void)
-{
-    struct xn_model_handle *h = xn_model_draw_handle;  /* the patch field, read as data */
     struct xn_light_ref *ref;
     const struct xn_light *light;
+    s32 r2;
     xn_s64 t;
 
-    XN_KEEP(xn_model_light_pos_x, h->x);
-    XN_KEEP(xn_model_light_pos_y, h->y);
-    XN_KEEP(xn_model_light_pos_z, h->z);
     xn_s64_mul(&t, h->model->radius, h->model->radius);     /* radius^2 >> 16, rounded */
     xn_s64_addu(&t, 0x8000);
-    XN_KEEP(xn_model_light_r2, xn_s64_shr(&t, 16));
+    r2 = xn_s64_shr(&t, 16);
     ref = xn_render_light_list_next;
     h->lights = ref;
     for (light = xn_light_table; light->intensity > 0;
@@ -728,11 +656,11 @@ void xn_model_build_light_list(void)
         v.y = light->y;
         v.z = light->z;
         if (light->type != 8) {         /* a point light: in range of the model's sphere? */
-            s32 dx = v.x - xn_model_light_pos_x;
-            s32 dy = v.y - xn_model_light_pos_y;
-            s32 dz = v.z - xn_model_light_pos_z;
+            s32 dx = v.x - h->x;
+            s32 dy = v.y - h->y;
+            s32 dz = v.z - h->z;
 
-            if (dx * dx + dy * dy + dz * dz - xn_model_light_r2 - light->range_sq >= 0)
+            if (dx * dx + dy * dy + dz * dz - r2 - light->range_sq >= 0)
                 continue;
             v.x = dx << 8;
             v.y = dy << 8;
@@ -747,24 +675,26 @@ void xn_model_build_light_list(void)
         ref->range_sq = light->range_sq << 4;
         ref++;
     }
-    /* the end mark; the next list starts 4 bytes on (the asm's stosd) */
+    /* the end mark; the next list starts after it */
     *(s32 *)ref = -1;
     xn_render_light_list_next = (struct xn_light_ref *)((u8 *)ref + 4);
 }
 
-void xn_model_scale_matrix(void)
+void xn_model_scale_matrix(struct xn_model_matrix_slot *slot)
 {
-    s32 *m = &xn_render_matrix_next->m[0][0];
-    s32 *light = (s32 *)((u8 *)m + 0x1C20);     /* the slot in the pool's light half */
+    s32 *m = &slot->m[0][0];
+    s32 *light = (s32 *)((u8 *)m + sizeof(((struct xn_model_matrix_pool *)0)->view));
+    s32 focal_x = xn_udiv64_or0(0x10, 0, xn_cam_focal_x);      /* 2^36 / focal_x */
+    s32 focal_y = xn_udiv64_or0(0x2, 0, xn_cam_focal_y);       /* 2^33 / focal_y */
     int k;
 
     for (k = 0; k < 3; k++) {
-        light[k] = xn_mulhi(m[k], xn_model_scale_inv_x) * 2;
-        m[k] = xn_mulhi(light[k], xn_model_scale_focal_x);
+        light[k] = xn_mulhi(m[k], xn_cam_inv_scale_x) * 2;
+        m[k] = xn_mulhi(light[k], focal_x);
     }
     for (k = 3; k < 6; k++) {
-        light[k] = xn_mulhi(m[k], xn_model_scale_inv_y) * 2;
-        m[k] = xn_mulhi(light[k], xn_model_scale_focal_y);
+        light[k] = xn_mulhi(m[k], xn_cam_inv_scale_y) * 2;
+        m[k] = xn_mulhi(light[k], focal_y);
     }
     for (k = 6; k < 9; k++) {
         light[k] = m[k];
@@ -772,34 +702,11 @@ void xn_model_scale_matrix(void)
     }
 }
 
-void xn_model_scale_matrix_r(xn_regs *r)
-{
-    xn_model_scale_matrix();
-    r->edx = xn_render_matrix_next->m[1][2];
-}
-
-/* xn_draw_clip_rect_xyxy (asm, draw group): the rectangle clipped to the view; 0 when empty */
-static int clip_rect(s32 *x0, s32 *y0, s32 *x1, s32 *y1)
-{
-    xn_regs r;
-
-    r.eax = *x0;
-    r.edx = *y0;
-    r.ebx = *x1;
-    r.ecx = *y1;
-    r.ebp = r.esi = r.edi = 0;
-    xn_asmcall(asm_xn_draw_clip_rect_xyxy, &r);
-    *x0 = r.eax;
-    *y0 = r.edx;
-    *x1 = r.ebx;
-    *y1 = r.ecx;
-    return (r.eflags & XN_CF) == 0;
-}
-
 int xn_model_is_occluded(const struct xn_model *m, const struct xn_model_handle *h)
 {
     s32 x0, y0, x1, y1, inv_z;
     xn_vec3 c;
+    xn_line r;
     struct xn_span *row;
     u32 rows;
 
@@ -807,15 +714,19 @@ int xn_model_is_occluded(const struct xn_model *m, const struct xn_model_handle 
         return 0;
     if (!xn_model_project_bounds(m, h, &x0, &y0, &x1, &y1, &inv_z, &c))
         return 0;
-    if (!clip_rect(&x0, &y0, &x1, &y1))
+    r.x1 = x0;
+    r.y1 = y0;
+    r.x2 = x1;
+    r.y2 = y1;
+    if (!xn_draw_clip_rect_xyxy(&r))
         return 0;
-    rows = y1 - y0;
-    if (rows >= (u32)xn_gfx_height || (u32)(x1 - x0) >= (u32)xn_gfx_width)
+    rows = r.y2 - r.y1;
+    if (rows >= (u32)xn_gfx_height || (u32)(r.x2 - r.x1) >= (u32)xn_gfx_width)
         return 0;
-    row = &xn_render_span_rows[y0];
+    row = &xn_render_span_rows[r.y1];
     do {                                /* every row of the bounds covered by nearer spans */
         const struct xn_span *node = row;
-        s32 x = x0;
+        s32 x = r.x1;
 
         for (;;) {
             s32 z;
@@ -823,7 +734,7 @@ int xn_model_is_occluded(const struct xn_model *m, const struct xn_model_handle 
             node = node->next;
             if ((s16)node->x_end <= (s16)x)
                 continue;
-            /* `sub ax, x_start`: only the low word of x */
+            /* Quirk Q-MODEL-04: `sub ax, x_start` offsets only the low word of x */
             z = (x & 0xFFFF0000) | (u16)(x - node->x_start);
             if ((u16)z != 0) {
                 if ((s16)z < 0)
@@ -833,18 +744,12 @@ int xn_model_is_occluded(const struct xn_model *m, const struct xn_model_handle 
             if (z + node->inv_z < inv_z)
                 return 0;               /* the span is farther than the model's centre */
             x = node->x_end;
-            if (x >= x1)
+            if (x >= r.x2)
                 break;
         }
         row++;
-    } while (--rows != 0);
+    } while (--rows != 0);              /* Quirk Q-MODEL-02 */
     return 1;
-}
-
-void xn_model_is_occluded_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, xn_model_is_occluded((const struct xn_model *)r->esi,
-                                              (const struct xn_model_handle *)r->edi));
 }
 
 int xn_model_project_bounds(const struct xn_model *m, const struct xn_model_handle *h,
@@ -859,66 +764,12 @@ int xn_model_project_bounds(const struct xn_model *m, const struct xn_model_hand
     if (c->z <= xn_cam_near_z)
         return 0;
     r = m->radius;
-    xn_cam_project(c->x - r, c->y - r, c->z, &xn_model_bounds_x0, &xn_model_bounds_y0);
-    xn_model_bounds_x0 += xn_cam_centre_x;
-    xn_model_bounds_y0 += xn_cam_centre_y;
-    xn_cam_project(c->x + r, c->y + r, c->z, &xn_model_bounds_x1, &xn_model_bounds_y1);
-    xn_model_bounds_x1 += xn_cam_centre_x;
-    xn_model_bounds_y1 += xn_cam_centre_y;
-    *inv_z = xn_udiv64(0x100, 0, c->z);
-    *x0 = xn_model_bounds_x0;
-    *y0 = xn_model_bounds_y0;
-    *x1 = xn_model_bounds_x1;
-    *y1 = xn_model_bounds_y1;
+    xn_cam_project(c->x - r, c->y - r, c->z, x0, y0);
+    *x0 += xn_cam_centre_x;
+    *y0 += xn_cam_centre_y;
+    xn_cam_project(c->x + r, c->y + r, c->z, x1, y1);
+    *x1 += xn_cam_centre_x;
+    *y1 += xn_cam_centre_y;
+    *inv_z = xn_udiv64_or0(0x100, 0, c->z);
     return 1;
-}
-
-void xn_model_project_bounds_r(xn_regs *r)
-{
-    s32 x0, y0, x1, y1, inv_z;
-    xn_vec3 c;
-
-    if (xn_model_project_bounds((const struct xn_model *)r->esi,
-                                (const struct xn_model_handle *)r->edi,
-                                &x0, &y0, &x1, &y1, &inv_z, &c)) {
-        r->eax = x0;
-        r->edx = y0;
-        r->ebx = x1;
-        r->ecx = y1;
-        r->edi = inv_z;
-        XN_SETFLAG(r, XN_CF, 0);
-    } else {                            /* the asm leaves the centre and the matrix */
-        r->eax = c.x;
-        r->edx = c.y;
-        r->ebx = c.z;
-        r->ecx = (u32)&xn_cam_rotation;
-        XN_SETFLAG(r, XN_CF, 1);
-    }
-}
-
-void xn_model_clear_vert_flags(struct xn_vert_flags *flags, int n, u8 value)
-{
-    int k;
-
-    for (k = 0; k < n; k++)
-        flags[k].done = value;
-}
-
-/* the count a planted ret gives a body of `max` steps of `stride` bytes (or `max` if none) */
-static int planted_count(const u8 *body, int stride, int max)
-{
-    int n;
-
-    for (n = 0; n < max; n++)
-        if (body[n * stride] == 0xC3)
-            return n;
-    return max;
-}
-
-void xn_model_clear_vert_flags_r(xn_regs *r)
-{
-    /* the asm body's own entry: the planted ret is the count; edi + 100h the flags */
-    xn_model_clear_vert_flags((struct xn_vert_flags *)(r->edi + 0x100),
-                              planted_count((const u8 *)asm_xn_model_clear_vert_flags, 6, 1024),
-                              (u8)r->eax);
 }

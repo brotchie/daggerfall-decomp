@@ -1,88 +1,68 @@
-/* light.c: XnGine's lights as readable C (xlight.h; see xngine.h and
-   docs/engine/smc/light.md). */
+/* light.c: XnGine's lights (xlight.h). */
 #include "xlight.h"
 #include "xnsmc.h"
 #include "xmat.h"
+#include "xcam.h"
+#include "xrender.h"
+#include "xdos.h"
+#include "xkbd.h"
+#include "xgfx.h"
+#include "xmem.h"
 
-void *func_000A10A8(u32 size);                  /* the game's malloc and free */
-void func_000A117E(void *block);
-#define xn_game_malloc  func_000A10A8
-#define xn_game_free    func_000A117E
+/* the light types: byte offsets into the asm's dispatch tables */
+#define LIGHT_POINT         0
+#define LIGHT_IGNORED       4
+#define LIGHT_DIRECTIONAL   8
 
-/* other groups' functions, by their asm entries */
-u8 *asm_xn_dos_load_file(const char *name, void *buf);
-#pragma aux asm_xn_dos_load_file parm [eax] [edx] value [eax] modify exact [eax edx];
-void asm_xn_kbd_remove(void);
-#pragma aux asm_xn_kbd_remove modify exact [eax];
-void asm_xn_render_shutdown(void);
-#pragma aux asm_xn_render_shutdown modify exact [eax];
-void asm_xn_gfx_restore_mode(void);
-#pragma aux asm_xn_gfx_restore_mode modify exact [eax];
-void asm_xn_mem_shutdown(void);
-#pragma aux asm_xn_mem_shutdown modify exact [eax edx];
-extern void asm_xn_cam_cull_sphere(void);       /* eax ecx edx ebx in; eax and CF out */
+/* a light list ends at a -1 light */
+#define LIST_END(ref)       ((s32)(ref)->light == -1)
 
-extern s32 xn_cam_x, xn_cam_y, xn_cam_z;
-extern xn_mat3 xn_cam_rotation;
-extern char xn_light_msg_no_memory[];           /* "ENGINE: Out of memory for shaders.$" */
+/* a model face's plane distance (its arch3d_plane header's +14h) */
+#define FACE_PLANE_D(face)  (*(const s32 *)((const u8 *)(face) + 0x14))
 
-/* the light templates' falloff-table and last-row operands (light.md) */
-extern u16 *xn_light_t1_tab, *xn_light_t2_tab1, *xn_light_t2_tab2;
-extern u16 *xn_light_t3_tab1, *xn_light_t3_tab2, *xn_light_t3_tab3;
+#define XN_RENDER_POLYS     1000        /* polygons a frame (xn_render_poly_pool) */
+
+u8 *xn_light_ambient_row;
+
+/* the frame's shaders: one at most for each polygon of the frame */
+static struct xn_light_shader shader_pool[XN_RENDER_POLYS];
+static s32 shader_count;
 
 /* ---- the frame's lights -------------------------------------------------------------------- */
 
 void xn_light_init(void)
 {
     u8 *block;
-    xn_regs r;
 
     xn_light_reset();
-    block = xn_game_malloc(0x8000);
+    block = func_000A10A8(0x8000);
     if (block != 0) {
         xn_shade_table_alloc = block;
         xn_shade_table = (u8 *)(((u32)block + 0x3FFF) & ~0x3FFFu);
-        block = xn_game_malloc(0x10020);
+        block = func_000A10A8(0x10020);
         if (block != 0) {
             xn_light_falloff_alloc = block;
             xn_light_falloff = (u16 *)(((u32)block + 0x1F) & ~0x1Fu);
-            xn_light_t1_tab = xn_light_t2_tab1 = xn_light_t2_tab2 = xn_light_falloff;
-            xn_light_t3_tab1 = xn_light_t3_tab2 = xn_light_t3_tab3 = xn_light_falloff;
-            asm_xn_dos_load_file(xn_light_filename, xn_light_falloff);
+            xn_dos_load_file(xn_light_filename, xn_light_falloff);
             return;
         }
     }
-    /* out of memory: never in the records (the game exits) */
-    asm_xn_kbd_remove();
-    asm_xn_render_shutdown();
-    asm_xn_gfx_restore_mode();
-    asm_xn_mem_shutdown();
-    r.eax = 0x0900;
-    r.edx = (u32)xn_light_msg_no_memory;
-    xn_int21(&r);
-    r.eax = 0x4C00;
-    xn_int21(&r);
-}
-
-/* the rows' outputs are FS and GS (unchanged): glue, which keeps every register */
-void xn_light_init_r(xn_regs *r)
-{
-    (void)r;
-    xn_light_init();
+    /* out of memory: the engine shut down and the program ended (the asm's exit code is its
+       caller's AL, a leftover; 0 here) */
+    xn_kbd_remove();
+    xn_render_shutdown();
+    xn_gfx_restore_mode();
+    xn_mem_shutdown();
+    xn_dos_print(xn_light_msg_no_memory);
+    xn_dos_exit(0);
 }
 
 void xn_light_free(void)
 {
     if (xn_shade_table_alloc != 0) {
-        xn_game_free(xn_shade_table_alloc);
-        xn_game_free(xn_light_falloff_alloc);
+        func_000A117E(xn_shade_table_alloc);
+        func_000A117E(xn_light_falloff_alloc);
     }
-}
-
-void xn_light_free_r(xn_regs *r)
-{
-    (void)r;
-    xn_light_free();
 }
 
 void xn_light_reset(void)
@@ -96,18 +76,13 @@ void xn_light_reset(void)
 
 s32 xn_light_add(s32 x, s32 y, s32 z, s32 intensity, s32 radius, s32 type)
 {
-    return xn_light_add_regs(x, y, z, intensity, radius, type);
-}
-
-s32 xn_light_add_regs(s32 x, s32 y, s32 z, s32 intensity, s32 radius, s32 type)
-{
     struct xn_light *l;
-    xn_regs r;
 
     if (intensity <= 0)
         return x;
+    /* Quirk Q-LIGHT-02: the count goes up before the full test and stays up */
     if ((u32)++xn_light_count >= XN_LIGHTS)
-        return x;                               /* full (the count stays one up) */
+        return x;
     l = xn_light_next;
     if (intensity > 32)
         intensity = 32;
@@ -116,30 +91,23 @@ s32 xn_light_add_regs(s32 x, s32 y, s32 z, s32 intensity, s32 radius, s32 type)
     l->x = x;
     l->y = y;
     l->z = z;
-    if (type != 8) {                            /* a point light: culled by its sphere */
+    if (type != LIGHT_DIRECTIONAL) {            /* a point light: culled by its sphere */
+        s32 residue;
+
         if (radius > 0x200)
             radius = 0x200;
         l->reach = (s32)((u32)intensity >> 1) * radius;
         l->range_sq = radius * radius * (s32)((u32)intensity >> 1);
-        r.eax = (x - xn_cam_x) << 8;
-        r.edx = (y - xn_cam_y) << 8;
-        r.ebx = (z - xn_cam_z) << 8;
-        r.ecx = l->reach << 6;
-        xn_asmcall(asm_xn_cam_cull_sphere, &r);
-        if (r.eflags & XN_CF) {
+        /* Quirk Q-LIGHT-01: what the cull leaves is the result (the game keeps it) */
+        if (xn_cam_cull_sphere((x - xn_cam_x) << 8, (y - xn_cam_y) << 8, (z - xn_cam_z) << 8,
+                               l->reach << 6, &residue)) {
             xn_light_count--;                   /* not seen: the slot is not used */
-            return r.eax;
+            return residue;
         }
-        x = r.eax;
+        x = residue;
     }
-    xn_light_next = (struct xn_light *)((u8 *)l + sizeof(struct xn_light));
+    xn_light_next = l + 1;
     return x;
-}
-
-/* asm: eax, edx, ebx = x, y, z; ecx = intensity; ebp = radius; esi = type */
-void xn_light_add_regs_r(xn_regs *r)
-{
-    r->eax = xn_light_add_regs(r->eax, r->edx, r->ebx, r->ecx, r->ebp, r->esi);
 }
 
 void xn_light_to_view(void)
@@ -164,164 +132,153 @@ void xn_light_to_view(void)
     } while (--n != 0);
 }
 
-/* ---- the shader templates ------------------------------------------------------------------ */
+/* ---- the shaders ------------------------------------------------------------------------------ */
 
-/* Where a template's operands are (offsets from its start; docs/engine/smc/
-   patch_fields.csv, group LIGHT-SHADERS). Per light i: the three squares-table bases
-   (&SQ[light x], y, z: the shader reads base[pixel x]), the falloff operand (the address of
-   the polygon's shader_falloff[i]), the falloff table, and the intensity. Then the base row
-   and the clamp's two operands (compared, then stored). */
-typedef struct xn_shader_layout {
-    u8 size;                            /* bytes the builder copies */
-    u8 nlights;
+void xn_light_begin_frame(void)
+{
+    shader_count = 0;
+}
+
+/* Quirk Q-LIGHT-07: the asm compiled each shader into big_buffer (at xn_light_code_next, which
+   the frame's start resets to big_buffer), and the game reads big_buffer back through a stale
+   pointer (player_movement_update copies a collision hit that the frame's shaders have
+   overwritten since), so the shaders' bytes are game-visible. They are written as the asm
+   wrote them: its template for 1, 2 or 3 lights (the bytes below, with its operands 0) and
+   the shader's operands. Nothing runs them. */
+static const u8 tmpl_1[0x54] = {
+    0xF7, 0xE9, 0x8B, 0xDA, 0x8B, 0xC5, 0xF7, 0xE9, 0x8B, 0x04, 0x9D, 0x00, 0x00, 0x00, 0x00, 0xC1,
+    0xE9, 0x0E, 0x03, 0x04, 0x95, 0x00, 0x00, 0x00, 0x00, 0xBD, 0x00, 0x00, 0x00, 0x00, 0x03, 0x04,
+    0x8D, 0x00, 0x00, 0x00, 0x00, 0xF7, 0x25, 0x00, 0x00, 0x00, 0x00, 0xF7, 0xC2, 0x00, 0x80, 0xFF,
+    0xFF, 0x75, 0x20, 0x66, 0x8B, 0x14, 0x55, 0x00, 0x00, 0x00, 0x00, 0x69, 0xD2, 0x00, 0x00, 0x00,
+    0x00, 0xC1, 0xEA, 0x0C, 0x03, 0xEA, 0x81, 0xFD, 0x00, 0x00, 0x00, 0x00, 0x7E, 0x05, 0xBD, 0x00,
+    0x00, 0x00, 0x00, 0xC3,
+};
+static const u8 tmpl_2[0x8C] = {
+    0xF7, 0xE9, 0x8B, 0xC5, 0x8B, 0xDA, 0xF7, 0xE9, 0xC1, 0xE9, 0x0E, 0x8B, 0x04, 0x9D, 0x00, 0x00,
+    0x00, 0x00, 0x03, 0x04, 0x95, 0x00, 0x00, 0x00, 0x00, 0x03, 0x04, 0x8D, 0x00, 0x00, 0x00, 0x00,
+    0x8B, 0x0C, 0x8D, 0x00, 0x00, 0x00, 0x00, 0x03, 0x0C, 0x9D, 0x00, 0x00, 0x00, 0x00, 0x03, 0x0C,
+    0x95, 0x00, 0x00, 0x00, 0x00, 0xF7, 0x25, 0x00, 0x00, 0x00, 0x00, 0xBD, 0x00, 0x00, 0x00, 0x00,
+    0x8B, 0xC1, 0xF7, 0xC2, 0x00, 0x80, 0xFF, 0xFF, 0x75, 0x13, 0x66, 0x8B, 0x14, 0x55, 0x00, 0x00,
+    0x00, 0x00, 0x69, 0xD2, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xEA, 0x0C, 0x03, 0xEA, 0xF7, 0x25, 0x00,
+    0x00, 0x00, 0x00, 0xF7, 0xC2, 0x00, 0x80, 0xFF, 0xFF, 0x75, 0x13, 0x66, 0x8B, 0x14, 0x55, 0x00,
+    0x00, 0x00, 0x00, 0x69, 0xD2, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xEA, 0x0C, 0x03, 0xEA, 0x81, 0xFD,
+    0x00, 0x00, 0x00, 0x00, 0x7E, 0x05, 0xBD, 0x00, 0x00, 0x00, 0x00, 0xC3,
+};
+static const u8 tmpl_3[0xCC] = {
+    0xF7, 0xE9, 0x8B, 0xC5, 0x8B, 0xDA, 0xF7, 0xE9, 0xC1, 0xE9, 0x0E, 0x8B, 0x04, 0x9D, 0x00, 0x00,
+    0x00, 0x00, 0x03, 0x04, 0x95, 0x00, 0x00, 0x00, 0x00, 0x03, 0x04, 0x8D, 0x00, 0x00, 0x00, 0x00,
+    0x8B, 0x2C, 0x8D, 0x00, 0x00, 0x00, 0x00, 0x03, 0x2C, 0x9D, 0x00, 0x00, 0x00, 0x00, 0x03, 0x2C,
+    0x95, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x0C, 0x8D, 0x00, 0x00, 0x00, 0x00, 0x03, 0x0C, 0x9D, 0x00,
+    0x00, 0x00, 0x00, 0x03, 0x0C, 0x95, 0x00, 0x00, 0x00, 0x00, 0xF7, 0x25, 0x00, 0x00, 0x00, 0x00,
+    0x8B, 0xC5, 0x8B, 0xDA, 0xF7, 0x25, 0x00, 0x00, 0x00, 0x00, 0x8B, 0xC1, 0x8B, 0xCA, 0xF7, 0x25,
+    0x00, 0x00, 0x00, 0x00, 0xBD, 0x00, 0x00, 0x00, 0x00, 0xF7, 0xC3, 0x00, 0x80, 0xFF, 0xFF, 0x75,
+    0x13, 0x66, 0x8B, 0x1C, 0x5D, 0x00, 0x00, 0x00, 0x00, 0x69, 0xDB, 0x00, 0x00, 0x00, 0x00, 0xC1,
+    0xEB, 0x0C, 0x03, 0xEB, 0xF7, 0xC1, 0x00, 0x80, 0xFF, 0xFF, 0x75, 0x13, 0x66, 0x8B, 0x0C, 0x4D,
+    0x00, 0x00, 0x00, 0x00, 0x69, 0xC9, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xE9, 0x0C, 0x03, 0xE9, 0xF7,
+    0xC2, 0x00, 0x80, 0xFF, 0xFF, 0x75, 0x13, 0x66, 0x8B, 0x14, 0x55, 0x00, 0x00, 0x00, 0x00, 0x69,
+    0xD2, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xEA, 0x0C, 0x03, 0xEA, 0x81, 0xFD, 0x00, 0x00, 0x00, 0x00,
+    0x7E, 0x05, 0xBD, 0x00, 0x00, 0x00, 0x00, 0xC3, 0x00, 0x00, 0x00, 0x00,
+};
+
+/* each template's operands: per light the squares-table bases of the foot point (x, y, z),
+   the address of the polygon's falloff field, the falloff table and the intensity; then the
+   base row and the clamp (compared, then stored) */
+typedef struct asm_image {
+    const u8 *code;
+    u8 size;                            /* the bytes the asm copied */
     u8 sq_x[3], sq_y[3], sq_z[3];
     u8 falloff_p[3], tab[3], intensity[3];
     u8 row, max_a, max_b;
-} xn_shader_layout;
+} asm_image;
 
-static const xn_shader_layout shader_layout[3] = {
-    { 0x54, 1, { 0x15 }, { 0x0B }, { 0x21 }, { 0x27 }, { 0x37 }, { 0x3D }, 0x1A, 0x48, 0x4F },
-    { 0x8C, 2, { 0x15, 0x31 }, { 0x0E, 0x2A }, { 0x1C, 0x23 }, { 0x37, 0x5F }, { 0x4E, 0x6F },
+static const asm_image images[3] = {
+    { tmpl_1, 0x54, { 0x15 }, { 0x0B }, { 0x21 }, { 0x27 }, { 0x37 }, { 0x3D }, 0x1A, 0x48, 0x4F },
+    { tmpl_2, 0x8C, { 0x15, 0x31 }, { 0x0E, 0x2A }, { 0x1C, 0x23 }, { 0x37, 0x5F }, { 0x4E, 0x6F },
       { 0x54, 0x75 }, 0x3C, 0x80, 0x87 },
-    { 0xCC, 3, { 0x15, 0x31, 0x46 }, { 0x0E, 0x2A, 0x3F }, { 0x1C, 0x23, 0x38 },
+    { tmpl_3, 0xCC, { 0x15, 0x31, 0x46 }, { 0x0E, 0x2A, 0x3F }, { 0x1C, 0x23, 0x38 },
       { 0x4C, 0x56, 0x60 }, { 0x75, 0x90, 0xAB }, { 0x7B, 0x96, 0xB1 }, 0x65, 0xBC, 0xC3 },
 };
 
-static u8 *shader_template(int nlights)
-{
-    return nlights == 1 ? xn_light_tmpl_1 : nlights == 2 ? xn_light_tmpl_2 : xn_light_tmpl_3;
-}
+#define PUT32(p, v)     (*(u32 *)(p) = (u32)(v))
 
-/* a template's dword operand at offset off */
-#define OPERAND(code, off)  (*(u32 *)((code) + (off)))
-
-s32 xn_light_build_shader(struct xn_poly *poly, int nlights)
+/* the shader's bytes as the asm compiled them, at xn_light_code_next (Q-LIGHT-07) */
+static void write_asm_image(const struct xn_poly *poly, const struct xn_light_shader *s)
 {
-    const xn_shader_layout *l = &shader_layout[nlights - 1];
-    u8 *t = shader_template(nlights);
-    u8 *copy = xn_light_code_next;
+    const asm_image *im = &images[s->nlights - 1];
+    u8 *out = xn_light_code_next;
     int i;
 
-    for (i = 0; i < nlights; i++) {
-        OPERAND(t, l->sq_x[i]) = (u32)&xn_squares_table_mid[xn_light_point_x[i]];
-        OPERAND(t, l->sq_y[i]) = (u32)&xn_squares_table_mid[xn_light_point_y[i]];
-        OPERAND(t, l->sq_z[i]) = (u32)&xn_squares_table_mid[xn_light_point_z[i]];
-        OPERAND(t, l->intensity[i]) = xn_light_point_intensity[i];
-        poly->shader_falloff[i] = xn_light_point_falloff[i];
-        OPERAND(t, l->falloff_p[i]) = (u32)&poly->shader_falloff[i];
+    for (i = 0; i < im->size; i++)
+        out[i] = im->code[i];
+    for (i = 0; i < s->nlights; i++) {
+        PUT32(out + im->sq_x[i], &xn_squares_table_mid[s->light[i].x]);
+        PUT32(out + im->sq_y[i], &xn_squares_table_mid[s->light[i].y]);
+        PUT32(out + im->sq_z[i], &xn_squares_table_mid[s->light[i].z]);
+        PUT32(out + im->falloff_p[i], &poly->shader_falloff[i]);
+        PUT32(out + im->tab[i], xn_light_falloff);
+        PUT32(out + im->intensity[i], s->light[i].intensity);
     }
-    OPERAND(t, l->row) = (u32)xn_light_shade_row;
-    poly->shader = (void (*)(void))copy;
-    for (i = 0; i < l->size; i++)
-        copy[i] = t[i];
-    xn_light_code_next = copy + l->size;
-    return 8;
+    PUT32(out + im->row, s->row);
+    PUT32(out + im->max_a, xn_shade_table_last_row);
+    PUT32(out + im->max_b, xn_shade_table_last_row);
+    xn_light_code_next = out + im->size;
 }
 
-s32 xn_light_build_shader_1(struct xn_poly *poly)
+s32 xn_light_shade(const struct xn_light_shader *shader, s32 ray_y, s32 ray_x, s32 z)
 {
-    return xn_light_build_shader(poly, 1);
-}
-
-s32 xn_light_build_shader_2(struct xn_poly *poly)
-{
-    return xn_light_build_shader(poly, 2);
-}
-
-s32 xn_light_build_shader_3(struct xn_poly *poly)
-{
-    return xn_light_build_shader(poly, 3);
-}
-
-/* asm: edi = poly; the flags come back as they were (the stub keeps them). The other
-   registers come back as the asm leaves them: ECX 0 and ESI the template's end (rep movsd),
-   EDX the copy, EBX the last falloff operand's value. */
-static void build_shader_r(xn_regs *r, int nlights)
-{
-    struct xn_poly *poly = (struct xn_poly *)r->edi;
-    u8 *copy = xn_light_code_next;
-
-    r->eax = xn_light_build_shader(poly, nlights);
-    r->ecx = 0;
-    r->edx = (u32)copy;
-    r->ebx = (u32)&poly->shader_falloff[nlights - 1];
-    r->esi = (u32)shader_template(nlights) + shader_layout[nlights - 1].size;
-}
-
-void xn_light_build_shader_1_r(xn_regs *r)
-{
-    build_shader_r(r, 1);
-}
-
-void xn_light_build_shader_2_r(xn_regs *r)
-{
-    build_shader_r(r, 2);
-}
-
-void xn_light_build_shader_3_r(xn_regs *r)
-{
-    build_shader_r(r, 3);
-}
-
-s32 xn_light_shade_eval(const u8 *shader, s32 ray_y, s32 ray_x, s32 z)
-{
-    const xn_shader_layout *l;
     s32 y = xn_mulhi(ray_y, z), x = xn_mulhi(ray_x, z);
     u32 zz = (u32)z >> 14;
-    u32 h[3];
-    s32 shade, added = 0;
+    u32 h[XN_LIGHT_POINTS];
+    s32 shade = (s32)shader->row;
     int i;
 
-    /* which template the copy is: its third instruction (mov ebx, edx in the one-light one),
-       and the 2- and 3-light ones by the register of their second sum at +20h */
-    if (shader[2] == 0x8B && shader[3] == 0xDA)
-        l = &shader_layout[0];
-    else
-        l = &shader_layout[shader[0x21] == 0x0C ? 1 : 2];
-    for (i = 0; i < l->nlights; i++) {
-        u32 d2 = ((const u32 *)OPERAND(shader, l->sq_y[i]))[y] +
-                 ((const u32 *)OPERAND(shader, l->sq_x[i]))[x] +
-                 ((const u32 *)OPERAND(shader, l->sq_z[i]))[zz];
-        h[i] = xn_umulhi(d2, *(const u32 *)OPERAND(shader, l->falloff_p[i]));
+    /* d^2 from the squares table at the foot point less the pixel's point (Quirk Q-LIGHT-04:
+       not bounded) */
+    for (i = 0; i < shader->nlights; i++) {
+        const struct xn_light_point *p = &shader->light[i];
+        u32 d2 = (u32)xn_squares_table_mid[p->y + y] + (u32)xn_squares_table_mid[p->x + x] +
+                 (u32)xn_squares_table_mid[p->z + (s32)zz];
+
+        h[i] = xn_umulhi(d2, (u32)p->falloff);
     }
-    shade = OPERAND(shader, l->row);
-    for (i = 0; i < l->nlights; i++) {
-        if ((h[i] & 0xFFFF8000u) == 0) {
-            u16 f = ((const u16 *)OPERAND(shader, l->tab[i]))[h[i]];
-            shade += (s32)((f * OPERAND(shader, l->intensity[i])) >> 12);
-            added = 1;
-        }
-    }
-    if ((l->nlights > 1 || added) && shade > (s32)OPERAND(shader, l->max_a))
-        shade = OPERAND(shader, l->max_b);
+    for (i = 0; i < shader->nlights; i++)
+        if ((h[i] & 0xFFFF8000u) == 0)
+            shade += (s32)((xn_light_falloff[h[i]] * (u32)shader->light[i].intensity) >> 12);
+    /* clamped to the last row (the asm's one-light shader clamps only after its light adds
+       something: the base row is below the last row, so that is the same) */
+    if (shade > (s32)xn_shade_table_last_row)
+        shade = (s32)xn_shade_table_last_row;
     return shade;
 }
 
-/* ---- the per-polygon setup ----------------------------------------------------------------- */
-
-/* the light types: a byte offset into the dispatch tables */
-#define LIGHT_POINT         0
-#define LIGHT_IGNORED       4
-#define LIGHT_DIRECTIONAL   8
-
-/* a model face's plane distance (its arch3d_plane header's +14h) */
-#define FACE_PLANE_D(face)  (*(const s32 *)((const u8 *)(face) + 0x14))
-
-s32 xn_light_shade_constant(struct xn_poly *poly)
+s32 xn_light_build_shader(struct xn_poly *poly, u8 *row, const struct xn_light_point *pts,
+                          int n)
 {
-    poly->shade_row = xn_light_shade_row;
+    struct xn_light_shader *s = &shader_pool[shader_count++];
+    int i;
+
+    s->nlights = n;
+    s->row = row;
+    for (i = 0; i < n; i++)
+        s->light[i] = pts[i];
+    poly->shader = s;
+    write_asm_image(poly, s);
+    return 8;
+}
+
+/* ---- the per-polygon lighting -------------------------------------------------------------- */
+
+s32 xn_light_shade_constant(struct xn_poly *poly, u8 *row)
+{
+    poly->shade_row = row;
     return 4;
 }
 
-void xn_light_shade_constant_r(xn_regs *r)
-{
-    r->eax = xn_light_shade_constant((struct xn_poly *)r->edi);
-}
-
-int xn_light_point_reaches(struct xn_poly *poly, const struct xn_light_ref *ref, int slot)
+int xn_light_add_point(const struct xn_poly *poly, const struct xn_light_ref *ref,
+                       struct xn_light_point *pt)
 {
     const s32 *n = poly->normal;
-    s32 d, hi, intensity, falloff, s;
+    s32 d, hi, s;
     xn_s64 d2;
     xn_vec3 foot;
     const struct xn_model_handle *h;
@@ -334,14 +291,12 @@ int xn_light_point_reaches(struct xn_poly *poly, const struct xn_light_ref *ref,
     hi = d2.hi;                                 /* d^2 >> 32 */
     if (hi >= ref->range_sq)
         return 0;                               /* out of range */
-    intensity = (s32)xn_udiv64(0, ref->range_sq, hi) * ref->intensity;
-    if (intensity <= 0x100)
+    pt->intensity = (s32)xn_udiv64_or0(0, ref->range_sq, hi) * ref->intensity;
+    if (pt->intensity <= 0x100)
         return 0;
-    xn_light_point_intensity[slot] = intensity;
-    falloff = (s32)xn_udiv64(0, 0x40000000, hi);
-    if (falloff <= 0x80)
+    pt->falloff = (s32)xn_udiv64_or0(0, 0x40000000, hi);
+    if (pt->falloff <= 0x80)
         return 0;
-    xn_light_point_falloff[slot] = falloff;
     /* the foot point: the light moved back along the normal by d, into view space */
     s = -d << 16;
     h = poly->handle;
@@ -350,111 +305,90 @@ int xn_light_point_reaches(struct xn_poly *poly, const struct xn_light_ref *ref,
     foot.z = xn_mulhi(n[2], s) - ref->z - h->rel_z;
     xn_mat_transform(&foot, (const xn_mat3 *)((const struct xn_model_matrix_slot *)h->matrix +
                                               200));    /* the pool's light[] copy */
-    xn_light_point_x[slot] = foot.x >> 8;
-    xn_light_point_y[slot] = foot.y >> 8;
-    xn_light_point_z[slot] = foot.z >> 8;
+    pt->x = foot.x >> 8;
+    pt->y = foot.y >> 8;
+    pt->z = foot.z >> 8;
     return 1;
 }
 
-int xn_light_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref)
+/* the row has reached the last one: lit no further (a signed compare, as the asm's jg) */
+#define FULLY_LIT(row)  ((s32)xn_shade_table_last_row <= (s32)(row))
+
+int xn_light_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref,
+                             u8 **row)
 {
     const s32 *n = poly->normal;
     s32 xy = ref->x * n[0] + ref->y * n[1], z = ref->z * n[2];
 
     if (!xn_add_lt0(xy, z))
         return 0;                               /* facing away (the add's sign, unwrapped) */
-    xn_light_shade_row += ((u32)(-(xy + z) * ref->intensity) >> 15) & ~0xFFu;
-    return (s32)xn_shade_table_last_row <= (s32)xn_light_shade_row;
+    *row += ((u32)(-(xy + z) * ref->intensity) >> 15) & ~0xFFu;
+    return FULLY_LIT(*row);
 }
 
-int xn_light_terrain_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref)
+int xn_light_terrain_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref,
+                                     u8 **row)
 {
     s32 xy = ref->x * poly->nx + ref->y * poly->ny, z = ref->z * poly->nz;
 
     if (!xn_add_lt0(xy, z))
         return 0;
-    xn_light_shade_row += ((xy + z) * ref->intensity >> 15) & ~0xFF;
-    return (s32)xn_shade_table_last_row <= (s32)xn_light_shade_row;
+    *row += ((xy + z) * ref->intensity >> 15) & ~0xFF;
+    return FULLY_LIT(*row);
 }
 
-/* asm: esi = the light ref, edi = the polygon, ebp = the point slots used * 4; CF and EBP 0
-   to stop */
-void xn_light_add_directional_r(xn_regs *r)
+/* 2^32 / the polygon's 1/z slope (+60h), 0 for a slope of 0 (Quirk Q-LIGHT-06: the asm's idiv
+   faulted, Q-SYS-01); the fog interpolates with it */
+static void set_inverse_slope(struct xn_poly *poly)
 {
-    int stop = xn_light_add_directional((const struct xn_poly *)r->edi,
-                                        (const struct xn_light_ref *)r->esi);
-
-    if (stop)
-        r->ebp = 0;
-    XN_SETFLAG(r, XN_CF, stop);
+    poly->dx_per_inv_z = xn_idiv64_or0(1, 0, poly->inv_z_dx);
 }
-
-void xn_light_terrain_add_directional_r(xn_regs *r)
-{
-    int stop = xn_light_terrain_add_directional((const struct xn_poly *)r->edi,
-                                                (const struct xn_light_ref *)r->esi);
-
-    if (stop)
-        r->ebp = 0;
-    XN_SETFLAG(r, XN_CF, stop);
-}
-
-void xn_light_add_type4_noop(void)
-{
-}
-
-void xn_light_terrain_add_point_noop(void)
-{
-}
-
-void xn_light_terrain_add_type4_noop(void)
-{
-}
-
-/* the end of a light list: a -1 light */
-#define LIST_END(ref)   ((s32)(ref)->light == -1)
 
 s32 xn_light_setup_poly(struct xn_poly *poly)
 {
     const struct xn_light_ref *ref;
+    struct xn_light_point pts[XN_LIGHT_POINTS];
     u8 *row;
     int npoints = 0;
 
     poly->handle->flags |= 2;                   /* the model reached the rasterizer */
-    poly->dx_per_inv_z = xn_idiv64(1, 0, poly->inv_z_dx);      /* 0 for 0: a divide error */
+    set_inverse_slope(poly);
     row = (u8 *)((u32)poly->face->shade << 8) + (u32)xn_light_ambient_row;
     if ((u32)row >= (u32)xn_shade_table_last_row)
         return 0;
-    xn_light_shade_row = row;
     for (ref = poly->handle->lights; !LIST_END(ref); ref++) {
         switch (ref->light->type) {
         case LIGHT_POINT:
-            if (xn_light_point_reaches(poly, ref, npoints) && ++npoints == 3)
-                return xn_light_build_shader(poly, 3);
+            /* Quirk Q-LIGHT-05: the third point light ends the list */
+            if (xn_light_add_point(poly, ref, &pts[npoints]) && ++npoints == XN_LIGHT_POINTS)
+                return xn_light_build_shader(poly, row, pts, npoints);
             break;
         case LIGHT_DIRECTIONAL:
-            if (xn_light_add_directional(poly, ref))
+            if (xn_light_add_directional(poly, ref, &row))
                 return 0;
             break;
         case LIGHT_IGNORED:
-            break;                              /* (the asm's dispatch table has only these
-                                                   three entries; the game adds no other type) */
+            break;                              /* (the game adds no other type) */
         }
     }
-    return npoints ? xn_light_build_shader(poly, npoints) : xn_light_shade_constant(poly);
+    return npoints ? xn_light_build_shader(poly, row, pts, npoints)
+                   : xn_light_shade_constant(poly, row);
 }
 
 s32 xn_light_setup_terrain(struct xn_poly *poly)
 {
     const struct xn_light_ref *ref;
+    u8 *row;
 
-    poly->dx_per_inv_z = xn_idiv64(1, 0, poly->inv_z_dx);
+    set_inverse_slope(poly);
+    /* the ambient level as it is (its fraction byte too; negative: unsigned, too high) */
     if ((u32)xn_light_ambient >= 0x3F00)
         return 0;
-    xn_light_shade_row = xn_shade_table + xn_light_ambient;
+    row = xn_shade_table + xn_light_ambient;
     /* the terrain's dispatch table ignores point lights and type 4 */
     for (ref = poly->light_list; !LIST_END(ref); ref++)
-        if (ref->light->type == LIGHT_DIRECTIONAL && xn_light_terrain_add_directional(poly, ref))
+        if (ref->light->type == LIGHT_DIRECTIONAL &&
+            xn_light_terrain_add_directional(poly, ref, &row))
             return 0;
-    return xn_light_shade_constant(poly);
+    return xn_light_shade_constant(poly, row);
 }

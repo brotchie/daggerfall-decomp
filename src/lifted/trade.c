@@ -37,7 +37,7 @@ extern int D_001A3ADC;
 extern struct character *D_001A3AE0;
 extern struct sound_channel sound_channels[];
 extern int D_001A3F3C;
-extern int D_001A3F40;
+extern int timer_tick_count;
 extern int midi_bsa;
 extern signed char sound_enabled;
 
@@ -127,7 +127,7 @@ int sound_init_music(void)
     sound_enabled = 1;
     dpmi_lock_region((iptr)sound_channels, 4 * REC_SIZEOF(struct sound_channel) + 4096);
     dpmi_lock_region((iptr)D_000CDDA8, 4096);
-    dpmi_lock_region((iptr)&D_001A3F40, 4096);
+    dpmi_lock_region((iptr)&timer_tick_count, 4096);
     D_001A3F3C = sound_timer_add((iptr)D_000CDDA8, 140);
     return 1;
 }
@@ -146,5 +146,5 @@ void sound_shutdown_music(void)
     sos_shutdown();
     dpmi_unlock_region((iptr)sound_channels, 4 * REC_SIZEOF(struct sound_channel) + 4096);
     dpmi_unlock_region((iptr)D_000CDDA8, 4096);
-    dpmi_unlock_region((iptr)&D_001A3F40, 4096);
+    dpmi_unlock_region((iptr)&timer_tick_count, 4096);
 }

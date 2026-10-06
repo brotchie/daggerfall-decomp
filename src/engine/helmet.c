@@ -1,27 +1,68 @@
-/* helmet.c: XnGine's head trackers as readable C (xhelmet.h; see xngine.h). */
+/* helmet.c: XnGine's head trackers (canonical C; the interface and the module's documentation
+   are in xhelmet.h). */
 #include "xhelmet.h"
 #include "xserial.h"
 #include "xstr.h"
-#include "xtimer.h"
+#include "xpc.h"
+
+#define BAUD_19200      6                   /* the UART divisor */
+#define LINE_8N1        3
+
+/* ---- the drivers, as the front end calls them ------------------------------------------- */
+
+/* Driver A's read: a sample when a record came, or when the read timed out with more than 6
+   bytes waiting (the asm's carry is its last compare: the count below 6) */
+static int a_read_sample(xn_vec3 *s)
+{
+    s32 r = xn_helmet_a_read();
+
+    if (r != 0 && xn_serial_rx_count[0] < 6)
+        return 0;
+    /* Quirk Q-HELMET-02: A decodes no angles. The asm's front end smooths its EAX (r) and the
+       EDX and EBX its own caller left; canonical C smooths 0 for those */
+    s->x = r;
+    s->y = 0;
+    s->z = 0;
+    return 1;
+}
+
+static void a_request(void)
+{
+    xn_helmet_a_request();
+}
+
+static int c_open(s32 port)
+{
+    return xn_helmet_c_open();
+}
+
+static void c_close(void)
+{
+    xn_helmet_c_close();
+}
+
+/* Quirk Q-HELMET-06: the asm passes its caller's EBX to int 33h 6005h; canonical C 0 */
+static int c_read_sample(xn_vec3 *s)
+{
+    return xn_helmet_c_read(0, s);
+}
+
+/* By cfg_helmet / 4 (the asm's tables at 0x153419: open, close, read, request) */
+static const xn_helmet_driver drivers[3] = {
+    { xn_helmet_a_open, xn_helmet_a_close, a_read_sample, a_request },
+    { xn_helmet_b_open, xn_helmet_b_close, xn_helmet_b_read, xn_helmet_b_start },
+    { c_open, c_close, c_read_sample, xn_helmet_c_request_noop },
+};
+
+#pragma off (unreferenced)
 
 /* ---- the front end ------------------------------------------------------------------------ */
 
-/* A driver's routine in one of the slot tables: cfg_helmet is a byte offset into them */
-static void (*drv_slot(void (**table)(void), s32 offset))(void)
-{
-    return *(void (**)(void))((u8 *)table + offset);
-}
-
 s32 xn_helmet_open(s32 port, s32 driver)
 {
-    xn_regs r;
-
     xn_helmet_port = port;
     cfg_helmet = driver;
-    r.eax = port;
-    r.edx = driver;
-    xn_asmcall(drv_slot(xn_helmet_drv_open, driver), &r);
-    if (r.eflags & XN_CF) {
+    if (!drivers[driver >> 2].open(port)) {
         cfg_helmet = -1;
         xn_helmet_active = 0;
         return 0;
@@ -30,60 +71,42 @@ s32 xn_helmet_open(s32 port, s32 driver)
     return 1;
 }
 
-void xn_helmet_open_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_open(r->eax, r->edx));
-}
-
 void xn_helmet_close(void)
 {
-    xn_regs r;
-
     if (xn_helmet_port == 0 || cfg_helmet < 0)
         return;
-    r.eax = xn_helmet_port;
-    r.edx = cfg_helmet;
-    xn_asmcall(drv_slot(xn_helmet_drv_close, cfg_helmet), &r);
-    xn_serial_close(r.eax);                 /* (driver C too: it has no serial port) */
+    drivers[cfg_helmet >> 2].close();
+    xn_serial_close(xn_helmet_port);        /* (driver C too: it has no serial port) */
 }
 
 void xn_helmet_request(void)
 {
-    xn_regs r;
-
     if (xn_helmet_active == 0 || cfg_helmet < 0)
         return;
-    r.eax = cfg_helmet;
-    xn_asmcall(drv_slot(xn_helmet_drv_request, cfg_helmet), &r);
+    drivers[cfg_helmet >> 2].request();
 }
 
-void xn_helmet_poll_r(xn_regs *r)
+void xn_helmet_poll(void)
 {
-    xn_regs d = *r;
     xn_vec3 s;
 
     if (xn_helmet_active == 0 || cfg_helmet == -1)
         return;
-    d.eax = cfg_helmet;
-    xn_asmcall(drv_slot(xn_helmet_drv_read, cfg_helmet), &d);
-    if (d.eflags & XN_CF)
+    if (!drivers[cfg_helmet >> 2].read(&s))
         return;
-    s.x = d.eax;
-    s.y = d.edx;
-    s.z = d.ebx;
     xn_helmet_smooth(&s);
     xn_helmet_pitch = s.x;
     xn_helmet_yaw = s.y;
     xn_helmet_roll = s.z;
 }
 
-/* sum / n, a 64-bit idiv (n = 0: the divide handler's 0) */
-static s32 idiv32(s32 sum, s32 n)
+/* sum / n (Q-SYS-01: 0 for n = 0) */
+static s32 div_or0(s32 sum, s32 n)
 {
     xn_s64 q;
 
     xn_s64_set(&q, sum);
-    return xn_s64_div(&q, n);
+    return xn_s64_div_or0(&q, n);
 }
 
 void xn_helmet_smooth(xn_vec3 *s)
@@ -96,10 +119,11 @@ void xn_helmet_smooth(xn_vec3 *s)
         return;
     if (xn_helmet_smoothing > 7)
         xn_helmet_smoothing = 7;
+    /* Quirk Q-HELMET-01: the sums are kept in the pick's scratch point */
     xn_pick_view_x = 0;
     xn_pick_view_y = 0;
     pick_distance = 0;
-    off = (xn_helmet_smoothing - 1) * 12;
+    off = (xn_helmet_smoothing - 1) * (s32)sizeof(xn_vec3);
     do {
         e = (const xn_vec3 *)((const u8 *)xn_helmet_ring + off);
         xn_pick_view_x += e->x;
@@ -111,28 +135,15 @@ void xn_helmet_smooth(xn_vec3 *s)
             y += s->y < 0 ? -0x8000 : 0x8000;
         xn_pick_view_y += y;
         pick_distance += e->z;
-        off -= 12;
+        off -= sizeof(xn_vec3);
     } while (off >= 0);
     n = xn_helmet_smoothing << 4;
-    s->x = idiv32(xn_pick_view_x, n);
-    s->y = idiv32(xn_pick_view_y, n);
-    s->z = idiv32(pick_distance, n);
-    xn_helmet_ring_pos += 12;
-    if (xn_helmet_ring_pos == ((u32)n >> 4) * 12)
+    s->x = div_or0(xn_pick_view_x, n);
+    s->y = div_or0(xn_pick_view_y, n);
+    s->z = div_or0(pick_distance, n);
+    xn_helmet_ring_pos += sizeof(xn_vec3);
+    if (xn_helmet_ring_pos == ((u32)n >> 4) * sizeof(xn_vec3))
         xn_helmet_ring_pos = 0;
-}
-
-void xn_helmet_smooth_r(xn_regs *r)
-{
-    xn_vec3 s;
-
-    s.x = r->eax;
-    s.y = r->edx;
-    s.z = r->ebx;
-    xn_helmet_smooth(&s);
-    r->eax = s.x;
-    r->edx = s.y;
-    r->ebx = s.z;
 }
 
 /* ---- driver A ----------------------------------------------------------------------------- */
@@ -142,18 +153,13 @@ s32 xn_helmet_a_open(s32 port)
     s32 sent;
 
     xn_helmet_a_port = port;
-    xn_serial_open(port, 6, 3);             /* 19200 baud, 8N1 */
+    xn_serial_open(port, BAUD_19200, LINE_8N1);
     xn_helmet_a_reset();
-    sent = xn_helmet_a_send('G') == 0;
+    sent = xn_helmet_a_send('G');
     xn_helmet_a_angles[0] = 0;
     xn_helmet_a_angles[1] = 0;
     xn_helmet_a_angles[2] = 0;
     return sent;
-}
-
-void xn_helmet_a_open_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_a_open(r->eax));
 }
 
 void xn_helmet_a_close(void)
@@ -162,22 +168,12 @@ void xn_helmet_a_close(void)
 
 s32 xn_helmet_a_reset(void)
 {
-    return xn_helmet_a_send('R') == 0;
-}
-
-void xn_helmet_a_reset_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_a_reset());
+    return xn_helmet_a_send('R');
 }
 
 s32 xn_helmet_a_send_h(void)
 {
-    return xn_helmet_a_send('H') == 0;
-}
-
-void xn_helmet_a_send_h_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_a_send_h());
+    return xn_helmet_a_send('H');
 }
 
 s32 xn_helmet_a_request(void)
@@ -185,14 +181,9 @@ s32 xn_helmet_a_request(void)
     return xn_helmet_a_send('G');
 }
 
-void xn_helmet_a_request_r(xn_regs *r)
-{
-    r->eax = xn_helmet_a_request();
-    XN_SETFLAG(r, XN_CF, r->eax);
-}
-
-/* Waits for n bytes in port 1's ring, polling it `loops` times; then reads n bytes into the
-   record (those the ring has), skipping CR and LF when text; 0, or -1 on the timeout */
+/* Waits for n bytes in port 1's ring (Quirk Q-HELMET-04: whatever the port), polling it
+   `loops` times; then reads n bytes into the record (those the ring has), skipping CR and LF
+   when text; 0, or -1 on the timeout */
 static s32 a_read_record(u32 loops, u32 n, s32 text)
 {
     char *p = xn_helmet_a_record;
@@ -223,13 +214,6 @@ s32 xn_helmet_a_read(void)
     return a_read_record(0xFFFF, 6, 0);
 }
 
-void xn_helmet_a_read_r(xn_regs *r)
-{
-    r->eax = xn_helmet_a_read();
-    /* the timeout's CF is its last compare's: the count below 6 */
-    XN_SETFLAG(r, XN_CF, r->eax != 0 && xn_serial_rx_count[0] < 6);
-}
-
 s32 xn_helmet_a_fail_stub(void)
 {
     return -1;
@@ -237,13 +221,7 @@ s32 xn_helmet_a_fail_stub(void)
 
 s32 xn_helmet_a_send(u8 byte)
 {
-    return xn_serial_send_byte(xn_helmet_a_port, byte);
-}
-
-void xn_helmet_a_send_r(xn_regs *r)
-{
-    r->eax = xn_helmet_a_send((u8)r->eax);
-    XN_SETFLAG(r, XN_CF, r->eax);
+    return xn_serial_send_byte(xn_helmet_a_port, byte) == 0;
 }
 
 /* ---- driver B ----------------------------------------------------------------------------- */
@@ -253,7 +231,7 @@ s32 xn_helmet_b_open(s32 port)
     s32 tries;
 
     xn_helmet_port = port;
-    xn_serial_open(port, 6, 3);
+    xn_serial_open(port, BAUD_19200, LINE_8N1);
     if (!xn_helmet_b_reset())
         goto fail;
     for (tries = 16;; ) {                   /* the mode, until it says 'O' */
@@ -271,28 +249,15 @@ s32 xn_helmet_b_open(s32 port)
     xn_helmet_b_send_bang();
     xn_serial_rx_reset(xn_helmet_port);
     xn_helmet_b_start();
-    return 0;
+    return 1;
 fail:
     xn_serial_close(xn_helmet_port);
-    return 1;
-}
-
-void xn_helmet_b_open_r(xn_regs *r)
-{
-    r->eax = xn_helmet_b_open(r->eax);
-    XN_SETFLAG(r, XN_CF, r->eax);
+    return 0;
 }
 
 void xn_helmet_b_close(void)
 {
     xn_helmet_b_send_str(xn_helmet_b_str_reset);
-}
-
-/* (sending a string leaves CF clear: its last compare finds the FFh) */
-void xn_helmet_b_close_r(xn_regs *r)
-{
-    xn_helmet_b_close();
-    XN_SETFLAG(r, XN_CF, 0);
 }
 
 s32 xn_helmet_b_reset(void)
@@ -307,31 +272,14 @@ s32 xn_helmet_b_reset(void)
     return 0;
 }
 
-void xn_helmet_b_reset_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_b_reset());
-}
-
 void xn_helmet_b_send_bang(void)
 {
     xn_helmet_b_send_str(xn_helmet_b_str_bang);
 }
 
-void xn_helmet_b_send_bang_r(xn_regs *r)
-{
-    xn_helmet_b_send_bang();
-    XN_SETFLAG(r, XN_CF, 0);
-}
-
 void xn_helmet_b_start(void)
 {
     xn_helmet_b_send_str(xn_helmet_b_str_start);
-}
-
-void xn_helmet_b_start_r(xn_regs *r)
-{
-    xn_helmet_b_start();
-    XN_SETFLAG(r, XN_CF, 0);
 }
 
 s32 xn_helmet_b_request_version(void)
@@ -349,19 +297,15 @@ s32 xn_helmet_b_request_version(void)
     }
 }
 
-void xn_helmet_b_request_version_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_b_request_version());
-}
-
 void xn_helmet_b_stub(void)
 {
 }
 
 s32 xn_helmet_b_parse_version(void)
 {
+    /* Quirk Q-HELMET-05: from the ring's start, 511 bytes */
     const u8 *p = xn_serial_rx_buffers[xn_helmet_port - 1] - 1;
-    const u8 *end = p + 0x200;
+    const u8 *end = p + XN_SERIAL_RING;
 
     do {
         if (++p == end)
@@ -374,13 +318,10 @@ s32 xn_helmet_b_parse_version(void)
     return xn_str_to_int((const char *)p + 1) * 1000 + xn_str_to_int((const char *)p + 5);
 }
 
-/* Driver B's packet search in the ring (see xhelmet.h): the packet's FFh index, or -1. *mark:
-   the byte value the search ended looking for (FFh, or the last bad checksum); *summed:
-   whether a checksum was computed (the asm's EDX is then 0) */
-static s32 b_find_packet(const u8 *ring, u32 i, u8 *mark, s32 *summed)
+s32 xn_helmet_b_find_packet(const u8 *ring, u32 start, u8 *mark, s32 *summed)
 {
     s32 left = 0x80;
-    u32 j;
+    u32 i = start, j;
     s32 k;
     u8 sum;
 
@@ -391,17 +332,17 @@ static s32 b_find_packet(const u8 *ring, u32 i, u8 *mark, s32 *summed)
             sum = *mark;
             j = i;
             for (k = 0; k < 6; k++) {
-                j = (j + 1) & 0x1FF;
+                j = (j + 1) & (XN_SERIAL_RING - 1);
                 sum += ring[j];
             }
-            j = (j + 1) & 0x1FF;
+            j = (j + 1) & (XN_SERIAL_RING - 1);
             *summed = 1;
             if (sum == ring[j])
                 return i;
-            *mark = sum;                    /* (sic) and the same byte again */
+            *mark = sum;                    /* Quirk Q-HELMET-03: the same byte again */
             continue;
         }
-        i = (i - 1) & 0x1FF;
+        i = (i - 1) & (XN_SERIAL_RING - 1);
         if (--left == 0)
             return -1;
     }
@@ -410,14 +351,16 @@ static s32 b_find_packet(const u8 *ring, u32 i, u8 *mark, s32 *summed)
 /* The big-endian word at ring index i (wrapping) */
 static s16 ring_word(const u8 *ring, u32 i)
 {
-    return (s16)(ring[i & 0x1FF] << 8 | ring[(i + 1) & 0x1FF]);
+    return (s16)(ring[i & (XN_SERIAL_RING - 1)] << 8 | ring[(i + 1) & (XN_SERIAL_RING - 1)]);
 }
 
-static s32 b_read(xn_vec3 *angles, u8 *mark, s32 *summed)
+s32 xn_helmet_b_read(xn_vec3 *angles)
 {
     const u8 *ring = xn_serial_rx_buffers[xn_helmet_port - 1];
-    s32 i = b_find_packet(ring, (xn_serial_rx_tail[xn_helmet_port - 1] - 8) & 0x1FF, mark,
-                          summed);
+    u32 start = (xn_serial_rx_tail[xn_helmet_port - 1] - 8) & (XN_SERIAL_RING - 1);
+    u8 mark;
+    s32 summed;
+    s32 i = xn_helmet_b_find_packet(ring, start, &mark, &summed);
 
     if (i < 0)
         return 0;
@@ -425,33 +368,6 @@ static s32 b_read(xn_vec3 *angles, u8 *mark, s32 *summed)
     angles->x = -ring_word(ring, i + 3);
     angles->z = -ring_word(ring, i + 5);
     return 1;
-}
-
-s32 xn_helmet_b_read(xn_vec3 *angles)
-{
-    u8 mark;
-    s32 summed;
-
-    return b_read(angles, &mark, &summed);
-}
-
-void xn_helmet_b_read_r(xn_regs *r)
-{
-    xn_vec3 a;
-    u8 mark;
-    s32 summed;
-
-    if (b_read(&a, &mark, &summed)) {
-        r->eax = a.x;
-        r->edx = a.y;
-        r->ebx = a.z;
-        XN_SETFLAG(r, XN_CF, 0);
-        return;
-    }
-    r->eax = (r->eax & 0xFFFFFF00) | mark;  /* the asm searched in AL */
-    if (summed)
-        r->edx = 0;                         /* its checksum loop's count */
-    XN_SETFLAG(r, XN_CF, 1);
 }
 
 void xn_helmet_b_send_str(const u8 *s)
@@ -465,12 +381,6 @@ void xn_helmet_b_send_str(const u8 *s)
     }
 }
 
-void xn_helmet_b_send_str_r(xn_regs *r)
-{
-    xn_helmet_b_send_str((const u8 *)r->eax);
-    XN_SETFLAG(r, XN_CF, 0);
-}
-
 s32 xn_helmet_b_wait_ok(void)
 {
     u8 c = 0;
@@ -479,11 +389,6 @@ s32 xn_helmet_b_wait_ok(void)
         return 0;
     xn_serial_rx_get(xn_helmet_port, &c);  /* (an empty ring reads as 0) */
     return c == 'O';
-}
-
-void xn_helmet_b_wait_ok_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_b_wait_ok());
 }
 
 s32 xn_helmet_b_wait_rx(void)
@@ -498,45 +403,39 @@ s32 xn_helmet_b_wait_rx(void)
     }
 }
 
-void xn_helmet_b_wait_rx_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_helmet_b_wait_rx());
-}
-
 /* ---- driver C ----------------------------------------------------------------------------- */
+
+#define TRACKER_DETECT  0x607F
+#define TRACKER_GET     0x6003              /* the configuration into the DOS block */
+#define TRACKER_SET     0x6004
+#define TRACKER_READ    0x6005
 
 s32 xn_helmet_c_open(void)
 {
     xn_dpmi_rm_regs *rm = &xn_helmet_c_rm_regs;
-    xn_regs d;
+    u16 segment, selector;
+    u32 base, len;
     u8 *p;
-    u32 sel, len;
 
-    xn_helmet_c_int33(0x607F, 0, 0, 0);     /* is the tracker there? */
+    xn_helmet_c_int33(TRACKER_DETECT, 0, 0, 0);
     if ((u16)rm->eax != 0x7F60 || (u8)(rm->ecx >> 8) != 1 || ((u16)rm->edx | (u16)rm->ebx))
-        return 1;
-    d.eax = 0x100;                          /* a DOS block of 80h paragraphs */
-    d.ebx = 0x80;
-    xn_int31(&d);
-    if (d.eflags & XN_CF)
-        return 1;
-    rm->ds = (u16)d.eax;
-    rm->es = (u16)d.eax;
-    sel = (u16)d.edx;
-    xn_helmet_c_dos_selector = sel;
-    d.ebx = sel;                            /* its linear base: CX:DX */
-    d.eax = 6;
-    xn_int31(&d);
-    xn_helmet_c_dos_buffer = (u8 *)(d.ecx << 16 | (u16)d.edx);
-    xn_helmet_c_int33(0x6003, d.ebx, 0, 0); /* the configuration into it */
+        return 0;
+    if (!xn_dpmi_dos_alloc(0x80, &segment, &selector))
+        return 0;
+    rm->ds = rm->es = segment;
+    xn_helmet_c_dos_selector = selector;
+    xn_dpmi_selector_base(selector, &base);
+    xn_helmet_c_dos_buffer = (u8 *)base;
+    /* (BX: the selector, as the asm's EBX still holds it) */
+    xn_helmet_c_int33(TRACKER_GET, selector, 0, 0);
     if ((u16)rm->eax != 0)
-        return 1;
+        return 0;
     for (p = xn_helmet_c_dos_buffer;; p += len) {   /* records: length, type */
         len = p[0];
         if (p[1] == 6)
             break;
         if (p[1] == 0)
-            return 1;
+            return 0;
     }
     p[0x0E] = 0x8A;
     p[0x16] = 0x88;
@@ -544,33 +443,15 @@ s32 xn_helmet_c_open(void)
     p += len;
     p[0x16] = 0x88;
     p[0x1E] = 0x88;
-    xn_helmet_c_int33(0x6004, rm->ebx, 0, 0);   /* and back */
-    if ((u16)rm->eax != 0)
-        return 1;
-    return 0;
-}
-
-void xn_helmet_c_open_r(xn_regs *r)
-{
-    r->eax = xn_helmet_c_open();
-    XN_SETFLAG(r, XN_CF, r->eax);
+    xn_helmet_c_int33(TRACKER_SET, rm->ebx, 0, 0);  /* (BX: the driver's last answer) */
+    return (u16)rm->eax == 0;
 }
 
 s32 xn_helmet_c_close(void)
 {
-    xn_regs d;
-
     if (xn_helmet_c_dos_selector == 0)
         return 0;
-    d.eax = 0x101;
-    d.edx = xn_helmet_c_dos_selector;
-    xn_int31(&d);
-    return (d.eflags & XN_CF) != 0;
-}
-
-void xn_helmet_c_close_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, xn_helmet_c_close());
+    return !xn_dpmi_dos_free((u16)xn_helmet_c_dos_selector);
 }
 
 void xn_helmet_c_reset_noop(void)
@@ -585,47 +466,25 @@ void xn_helmet_c_cmd2_noop(void)
 {
 }
 
-void xn_helmet_c_read_r(xn_regs *r)
+s32 xn_helmet_c_read(u32 bx, xn_vec3 *angles)
 {
     const s16 *a = (const s16 *)xn_helmet_c_dos_buffer;
     xn_dpmi_rm_regs *rm = &xn_helmet_c_rm_regs;
 
-    xn_helmet_c_int33(0x6005, r->ebx, 0, 0);
-    r->eax = rm->eax;
-    r->ebx = rm->ebx;
-    r->ecx = rm->ecx;
-    r->edx = rm->edx;
-    if ((u16)r->eax != 0 || r->ecx == 0) {
-        XN_SETFLAG(r, XN_CF, 1);
-        return;
-    }
-    r->esi = (u32)a;
-    r->edx = -(a[0] >> 1);
-    r->eax = -(a[1] >> 1);
-    r->ebx = a[2] >> 1;
-    XN_SETFLAG(r, XN_CF, 0);
+    xn_helmet_c_int33(TRACKER_READ, bx, 0, 0);
+    if ((u16)rm->eax != 0 || rm->ecx == 0)
+        return 0;
+    angles->y = -(a[0] >> 1);
+    angles->x = -(a[1] >> 1);
+    angles->z = a[2] >> 1;
+    return 1;
 }
 
 void xn_helmet_c_int33(u32 eax, u32 ebx, u32 ecx, u32 edx)
 {
-    xn_regs d;
-
     xn_helmet_c_rm_regs.eax = eax;
     xn_helmet_c_rm_regs.ebx = ebx;
     xn_helmet_c_rm_regs.ecx = ecx;
     xn_helmet_c_rm_regs.edx = edx;
-    d.eax = 0x300;                          /* simulate a real-mode interrupt */
-    d.ebx = 0x33;
-    d.ecx = 0;
-    d.edi = (u32)&xn_helmet_c_rm_regs;
-    xn_int31(&d);
-}
-
-void xn_helmet_c_int33_r(xn_regs *r)
-{
-    xn_helmet_c_int33(r->eax, r->ebx, r->ecx, r->edx);
-    r->eax = xn_helmet_c_rm_regs.eax;
-    r->ebx = xn_helmet_c_rm_regs.ebx;
-    r->ecx = xn_helmet_c_rm_regs.ecx;
-    r->edx = xn_helmet_c_rm_regs.edx;
+    xn_dpmi_real_int(0x33, &xn_helmet_c_rm_regs);
 }

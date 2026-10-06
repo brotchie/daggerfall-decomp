@@ -15,7 +15,7 @@ extern struct record *player_object;
 extern int frame_ticks;
 extern struct record *spell_ready_missile;
 extern struct image *hud_bar_image;
-extern iptr D_00195B80;
+extern iptr color_remap;
 extern struct character *player_character;
 extern struct settings *game_settings;
 extern signed char weapon_active_hand;
@@ -64,7 +64,7 @@ void weapon_player_update(void)
         return;
     }
     if (D_001A4A30[((int)(unsigned char)weapon_active_hand)] != 0) {
-        D_00195B80 = (iptr)((char *)color_remap_tables + (((int)(unsigned char)*(signed char *)((char *)D_001A4A30[((int)(unsigned char)weapon_active_hand)] + 127)) << 8));
+        color_remap = (iptr)((char *)color_remap_tables + (((int)(unsigned char)*(signed char *)((char *)D_001A4A30[((int)(unsigned char)weapon_active_hand)] + 127)) << 8));
     }
     if (((struct bf8_6_1 *)&D_001940D6)->f != 0 && D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 0) {
         cif = weapon_hand_cif[((int)(unsigned char)weapon_active_hand)];
@@ -81,7 +81,7 @@ void weapon_player_update(void)
             D_001A4A50[((int)(unsigned char)weapon_active_hand)] = 0;
         }
         weapon_start_swing((int)(unsigned char)weapon_active_hand);
-        D_00195B80 = (iptr)color_remap_tables;
+        color_remap = (iptr)color_remap_tables;
         return;
     }
     if (D_001A4A50[0] > 0) D_001A4A50[0] -= frame_ticks;
@@ -114,5 +114,5 @@ void weapon_player_update(void)
             fatigue_add(-11);
         }
     }
-    D_00195B80 = (iptr)color_remap_tables;
+    color_remap = (iptr)color_remap_tables;
 }

@@ -5,6 +5,11 @@ subsystem at a time. The pilot (vec, mat and math: 62 functions in `src/engine/`
 this way and is the worked example. The log and the numbers are in `docs/xngine.md`, "phase
 6: readable C".
 
+**Next: canonical C.** `docs/xngine_canonical.md` is the guide for the next pass: plain C
+modules shown equivalent at the engine's boundary with the game, through test shims. The
+pilot below (vec, mat, math) is canonical now; the "after" examples here show its readable
+form, which is the "before" there.
+
 **Status (2026-10-05): done.** All of XnGine is readable C in `src/engine/`: 648 of the 719
 functions run as C, and the other 71 are blocks inside other functions or data. Every record
 of the corpus passes with all of it routed at once, and lockstep frames of the game match the

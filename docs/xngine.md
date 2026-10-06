@@ -716,3 +716,46 @@ leftover registers, scratch globals, patched code bytes, the generated code, 16-
 the original bugs. Data stays at its addresses in the game. A next pass can drop each of those
 once nothing asm calls the engine, testing against the game's calls and the frames instead of
 each function's records.
+
+## 2026-10-05: canonical C, part 1: the boundary, the yardsticks, the pilot
+
+The next pass makes the engine **canonical C**: plain C modules, documented, with the
+original bugs kept and catalogued, shown equivalent to the asm at the engine's boundary with
+the game rather than function by function at the register level. `docs/xngine_canonical.md`
+is the guide; this part built the mechanism and proved it on vec, mat and math.
+
+- **The boundary** (`tools/xn_boundary.py`, `config/xngine_boundary.csv`): 181 entries (952
+  game call sites into 174 functions, 3 held pointers, run-time pointer calls traced in the
+  scenarios, 5 vectors), 15 game functions, 40 service forms and 13 port forms as exits, and
+  the memory the game can see. That is found dynamically: every scenario runs on the asm with
+  memory hooks, code attributed by EIP; a byte the game reads after the engine wrote it is a
+  flow. Object 2's items, low memory and the engine's allocations (found by a boot with
+  hooks on its malloc and free sites) are classified visible (compared), private (masked) or
+  unobserved (compared), with the evidence in each row.
+- **Boundary comparisons**: `xn_rc.py test --boundary` (the records of entries whose caller
+  is the game, compared on what the game reads, the game-visible memory and the I/O),
+  `frames --boundary` and the scenarios.
+- **Scenarios** (`tools/xn_scenarios.py`, `xn_rc.py scenarios`): 36: walking and turning in
+  all 18 saves, a large town, rain, snow, night, dungeon water above and below, the automap,
+  the inventory and paper doll, the character sheet, the spellbook, a cast, the travel map, a
+  fight, resting, the options, entering a tavern (the load), the main menu, and the logo VID
+  (started by a direct call: no save starts one). Input per frame goes through the game's own
+  int 9 handler and the mouse driver, at the same instruction in both machines; modal
+  screens sync on the game's screen update or a mouse poll. **1,605 / 1,605 frames
+  identical**, continuous lockstep.
+- **Coverage** (`tools/xn_cover.py`): the asm's static CFG (6,550 basic blocks), the corpus
+  replayed and the scenarios run with the patched Unicorn's coverage map: **68.6%** of blocks
+  executed, 90.8% executed or justified (dead, unrolled copies of executed blocks, hardware,
+  VESA, fatal paths); 605 blocks in 149 live functions not reached yet.
+- **Test shims** (`src/engine_test/`, `config/xngine_dropped.csv`): a canonical function's
+  asm interface lives in a shim the tools build in; record tests route the asm entry there
+  and excuse only the dropped memory (scratch, patch fields), registers and the CPU
+  exceptions; the game reaches canonical functions only through generated boundary routes.
+- **The pilot**: vec, mat and math canonical (no pragma, no `_r`, scratch in locals, the
+  general products' strides as parameters, checked divisions), with module and function
+  documentation and `docs/engine/quirks.md` (Q-SYS-01, Q-MATH-01..06, Q-MAT-01). 803 / 803
+  records through shims; 288 / 288 game-called records at the boundary; the whole corpus
+  (8,204) with everything routed; `tools/xn_equiv.py`: 33 helpers, 90 million samples (55
+  million exhaustive), no difference. One quirk needed the game's own registers:
+  `xn_math_isqrt(0)` depends on the caller's ECX (`bsr` of 0), and the game's site 080FFC
+  reaches it, so its boundary route is an adapter (`xn_math_isqrt_b`).

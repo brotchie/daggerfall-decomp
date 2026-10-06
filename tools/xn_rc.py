@@ -43,6 +43,28 @@ asm code by calling its address.
                records.
   play         the game with every converted function in C; --compare runs the asm too from
                the same snapshot and compares the screens pixel for pixel.
+  frames       lockstep frames from a snapshot (asm and C from the same machine, a pass of
+               main's loop each); --boundary compares as the boundary does (below).
+  scenarios    the scripted lockstep scenarios of tools/xn_scenarios.py (a save, a prelude, N
+               frames with per-frame input), compared at the boundary; per scenario: frames
+               identical / total. --continuous: the C machine keeps its own state.
+
+Canonical C (docs/xngine_canonical.md): a function is canonical when src/engine_test/ (the
+test shims, built into the image only for the tools) defines its shim NAME_r. Its C has a
+plain prototype; record tests route its asm entry to the shim (kind shim), which maps the
+asm's registers to the C call and back; config/xngine_dropped.csv excuses the memory (and
+registers) the canonical C no longer writes on purpose. In the game (frames, scenarios, play)
+a canonical function is reached only at the boundary: an entry the game calls
+(config/xngine_boundary.csv) goes straight to its C (kind boundary), or through a stub that
+keeps the registers the game reads after the call that the prototype may change (kind
+boundary-keep); every other canonical function has no route there (its callers are C).
+
+  test --boundary  the records of the boundary's entries whose caller is the game (the return
+               address in object 1, a direct call, or an interrupt), each entry routed as the
+               game reaches it: compared on the registers the game reads after the call (the
+               entry's game_reads), ESP, the game-visible memory written (engine-private memory
+               and the dead stack masked: tools/xn_boundary.py) and the port and DOS I/O in
+               order (with the bytes of DOS writes; CPU exceptions left out).
   report       build/xngine/rc_report.csv: per function, converted, records passed/total, all
                routed, diff passed/total, the clobber and input tests (tools/xn_abi.py).
   asm FUNC     the function's asm with names; abi FUNC: its ABI row.
@@ -55,9 +77,11 @@ ABI table. The coordinator merges finished work into src/engine and config/.
 usage: xn_rc.py skel SUBSYS [--force] [--out DIR]
        xn_rc.py build
        xn_rc.py route
-       xn_rc.py test [FUNC|SUBSYS ...] [--all] [--corpus] [-j N] [--max-per N] [-v]
+       xn_rc.py test [FUNC|SUBSYS ...] [--all] [--corpus] [--boundary] [-j N] [--max-per N] [-v]
        xn_rc.py diff [FUNC|SUBSYS ...] [--untested] [--trials N]
        xn_rc.py play SNAP [--ticks N] [--shot PNG] [--asm] [--compare] [--script INPUT]
+       xn_rc.py frames SNAP [--frames N] [--ticks N] [--script S] [--irqs N] [--boundary]
+       xn_rc.py scenarios [NAME ...] [-j N] [--continuous] [--frames N] [-v]
        xn_rc.py report
        xn_rc.py asm FUNC | abi FUNC
 """
@@ -78,6 +102,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src", "engine")
+TEST_SRC = os.path.join(ROOT, "src", "engine_test")     # the test shims (canonical C)
+DROPPED_CSV = os.path.join(ROOT, "config", "xngine_dropped.csv")
 BASE_OUT = os.path.join(ROOT, "build", "xn_readable")
 # A conversion agent works in a folder of its own: XN_RC_OUT holds its image, results and
 # report (and names.csv, its proposed names); XN_RC_SRC (folders separated by ':') adds its
@@ -192,22 +218,35 @@ def resolver():
 # --------------------------------------------------------------------------------------------
 # Build
 
-def _files(pattern):
+def _files(pattern, test=False):
     """src/engine's files matching pattern, those of the XN_RC_SRC folders replacing any of
-    the same name."""
+    the same name. test: src/engine_test's instead (and each XN_RC_SRC folder's test/)."""
     by = {}
-    for d in [SRC] + EXTRA_SRC:
+    dirs = [TEST_SRC] + [os.path.join(d, "test") for d in EXTRA_SRC] if test else [SRC] + EXTRA_SRC
+    for d in dirs:
         for p in glob.glob(os.path.join(d, pattern)):
             by[os.path.basename(p).lower()] = p
     return [by[k] for k in sorted(by)]
 
 
+def test_sources():
+    return _files("*.c", test=True) + _files("*.asm", test=True)
+
+
 def sources():
-    return _files("*.c") + _files("*.asm")
+    """The engine's sources, then the test shims (built into the image for the tools only)."""
+    eng = _files("*.c") + _files("*.asm")
+    names_ = {os.path.basename(p).lower() for p in eng}
+    tst = [p for p in test_sources()]
+    clash = [p for p in tst if os.path.basename(p).lower() in names_]
+    if clash:
+        raise SystemExit("test shim files named like engine files (8.3, one folder in DOSBox): %s"
+                         % " ".join(clash))
+    return eng + tst
 
 
 def headers():
-    hs = _files("*.h")
+    hs = _files("*.h") + _files("*.h", test=True)
     bad = [h for h in hs if not re.match(r"^[a-z0-9_]{1,8}\.h$", os.path.basename(h))]
     if bad:
         raise SystemExit("header names must be 8.3 (DOSBox): %s" % " ".join(bad))
@@ -329,13 +368,21 @@ def build(flags=None):
         return 1
     by_name, funcs = names()
     obj2 = {n: a for n, (k, a) in by_name.items() if k == "func" and 0xC0000 <= a < 0x161568}
+    # the symbols the test shims define (src/engine_test): NAME_r there is a shim
+    test_syms = set()
+    tsrc = set(test_sources())
+    for s_ in srcs:
+        if s_ in tsrc and objs[s_]:
+            test_syms |= set(xn_cload.Obj(objs[s_]).pubs)
     conv = {}
     for sym, addr in syms.items():
         if not sym.endswith("_"):
             continue
         n = sym[:-1]
         if n.endswith("_r") and n[:-2] in obj2:
-            conv.setdefault(obj2[n[:-2]], {})["glue"] = addr
+            conv.setdefault(obj2[n[:-2]], {})["shim" if sym in test_syms else "glue"] = addr
+        elif n.endswith("_b") and n[:-2] in obj2 and sym not in test_syms:
+            conv.setdefault(obj2[n[:-2]], {})["adapter"] = addr     # the game's registers
         elif n in obj2:
             conv.setdefault(obj2[n], {})["c"] = addr
     import xn_abi
@@ -343,24 +390,41 @@ def build(flags=None):
     stubs = bytearray()
     pos = RBASE + ((len(img) + 0xFF) & ~0xFF)
     routes = {}
+    problems = []
+
+    def glue_stub(target, rp):
+        a = pos + len(stubs)
+        b = b"\x9C\x60\x89\xE0\xE8" + struct.pack("<i", target - (a + 9)) + b"\x61\x9D"
+        b += b"\xC2" + struct.pack("<H", rp) if rp else b"\xC3"
+        stubs.extend(b + b"\x90" * (-len(b) % 16))
+        return a
     for va in sorted(conv):
         c = conv[va]
+        if "shim" in c and "glue" in c:
+            problems.append("%s (%06X): both a shim (src/engine_test) and engine glue NAME_r" % (
+                funcs.get(va, ("?",))[0], va))
         ret, sel = handler_entry(va) if va in abi and abi[va]["convention"] == "interrupt" \
             else (None, None)
         if ret is not None:
             # an interrupt or exception handler: its stub saves everything, loads the data
-            # segments the asm loads, and returns as the asm does (iretd / retf)
+            # segments the asm loads, and returns as the asm does (iretd / retf). A canonical
+            # handler's stub calls its C (the boundary: interrupt entry stays a stub)
             a = pos + len(stubs)
-            b = isr_stub(a, c.get("glue") or c["c"], ret, sel)
+            b = isr_stub(a, c.get("glue") or c.get("c") or c["shim"], ret, sel)
             stubs.extend(b + b"\x90" * (-len(b) % 16))
-            routes[va] = {"to": a, "kind": "isr", "c": c.get("c"), "glue": c.get("glue")}
-        elif "glue" in c:
-            a = pos + len(stubs)
+            routes[va] = {"to": a, "kind": "isr", "c": c.get("c"), "glue": c.get("glue"),
+                          "canonical": "shim" in c}
+        elif "shim" in c:
+            # canonical: the records reach the C through its test shim
             rp = abi[va]["ret_pop"] if va in abi else 0
-            b = b"\x9C\x60\x89\xE0\xE8" + struct.pack("<i", c["glue"] - (a + 9)) + b"\x61\x9D"
-            b += b"\xC2" + struct.pack("<H", rp) if rp else b"\xC3"
-            stubs.extend(b + b"\x90" * (-len(b) % 16))
-            routes[va] = {"to": a, "kind": "glue", "c": c.get("c"), "glue": c["glue"]}
+            routes[va] = {"to": glue_stub(c["shim"], rp), "kind": "shim", "c": c.get("c"),
+                          "glue": c["shim"], "canonical": True}
+            if "adapter" in c:
+                routes[va]["adapter"] = glue_stub(c["adapter"], rp)
+        elif "glue" in c:
+            rp = abi[va]["ret_pop"] if va in abi else 0
+            routes[va] = {"to": glue_stub(c["glue"], rp), "kind": "glue", "c": c.get("c"),
+                          "glue": c["glue"]}
         elif va in abi and keeps_eax(abi[va]) and not abi[va]["stack_args"]:
             # the callers need EAX kept, and Watcom's code never keeps it: a stub does
             a = pos + len(stubs)
@@ -373,21 +437,261 @@ def build(flags=None):
             routes[va] = {"to": a, "kind": "keep-eax", "c": c["c"]}
         else:
             routes[va] = {"to": c["c"], "kind": "direct", "c": c["c"]}
+    # the game's routes to canonical functions: only the boundary's entries, each straight to
+    # its C or through a stub that keeps what the game reads and the prototype may change
+    game_routes = {}
+    ents = boundary_entries()
+    decl, protos = declared_interfaces()
+    for va, r in sorted(routes.items()):
+        if not r.get("canonical"):
+            continue
+        name = funcs.get(va, ("?",))[0]
+        if name in decl:
+            problems.append("%s (%06X): canonical, but it has a #pragma aux" % (name, va))
+        if r["kind"] == "isr":
+            game_routes[va] = dict(r, kind="isr")
+            continue
+        e = ents.get(va)
+        if e is None:
+            continue                    # internal only: its callers are C
+        if r.get("adapter"):
+            # a boundary adapter NAME_b(xn_regs *): the game's registers, for an entry whose
+            # game-visible behaviour depends on more than the prototype passes (a quirk)
+            game_routes[va] = {"to": r["adapter"], "kind": "boundary-adapter", "c": r["c"]}
+            continue
+        gr = boundary_route(va, name, e, abi.get(va), protos, r["c"])
+        if gr.get("problem"):
+            problems.append(gr["problem"])
+        if gr.get("keep"):
+            a = pos + len(stubs)
+            regs = gr["keep"]
+            b = bytes(PUSH[x] for x in regs)
+            b += b"\xE8" + struct.pack("<i", r["c"] - (a + len(b) + 5))
+            b += bytes(POP[x] for x in reversed(regs))
+            b += b"\xC2" + struct.pack("<H", gr["ret_pop"]) if gr["ret_pop"] else b"\xC3"
+            stubs.extend(b + b"\x90" * (-len(b) % 16))
+            game_routes[va] = {"to": a, "kind": "boundary-keep", "c": r["c"], "keep": regs}
+            if gr.get("evidence"):
+                game_routes[va]["evidence"] = gr["evidence"]
+                print("  %s (%06X): boundary-keep %s; EAX: %s" % (name, va, " ".join(regs),
+                                                                 gr["evidence"]))
+        else:
+            game_routes[va] = {"to": r["c"], "kind": "boundary", "c": r["c"]}
     data = bytes(img) + b"\0" * (pos - RBASE - len(img)) + bytes(stubs)
     if len(data) > RSIZE:
         raise SystemExit("the image is bigger than the region (%d bytes)" % len(data))
     os.makedirs(OUT, exist_ok=True)
     with open(IMAGE, "wb") as f:
         pickle.dump({"base": RBASE, "bytes": data, "syms": syms, "routes": routes,
+                     "game_routes": game_routes, "test_syms": sorted(test_syms),
                      "flags": flags, "sources": [os.path.relpath(s, ROOT) for s in srcs]}, f)
     kinds = collections.Counter(r["kind"] for r in routes.values())
+    gk = collections.Counter(r["kind"] for r in game_routes.values())
+    ncan = sum(1 for r in routes.values() if r.get("canonical"))
     print("compiled %d files in %.0f s; image %d bytes; %d functions converted (%s) -> %s" % (
         len(srcs), time.time() - t0, len(data), len(routes),
         ", ".join("%d %s" % (n, k) for k, n in sorted(kinds.items())), os.path.relpath(IMAGE, ROOT)))
-    problems = check_routes(routes)
+    if ncan:
+        print("  %d canonical (test shims); the game reaches %d of them (%s)" % (
+            ncan, len(game_routes), ", ".join("%d %s" % (n, k) for k, n in sorted(gk.items()))))
+    problems += check_routes(routes)
+    problems += check_dropped()
     for p in problems:
         print("ROUTE", p)
     return 1 if problems else 0
+
+
+def check_dropped():
+    """Dropped memory (config/xngine_dropped.csv) must be engine-private in the boundary map:
+    canonical C may stop writing only what the game never reads."""
+    try:
+        import xn_boundary
+        rows = [r for r in xn_boundary.rows_csv() if r["kind"] == "memory" and r["space"] == "obj"]
+    except (ImportError, OSError):
+        return []
+    out = []
+    wp = None
+    for d in load_dropped()[3]:
+        if d["kind"].strip() != "memory":
+            continue
+        a = alloc_ref(d["start"])
+        if a is not None:
+            # relative to an allocation: the bytes must be writer-private there for this
+            # function (tools/xn_scenarios.py writer_private_rules: the game never reads what
+            # it wrote), whatever class their chunks have
+            import xn_scenarios
+            if wp is None:
+                wp = xn_scenarios.writer_private_rules(resolve_code=False)
+            b = alloc_ref(d["end"])
+            f = func_va(d["function"].strip())
+            if not any(w["alloc"] == a[0] and w["lo"] <= a[1] and b is not None and
+                       b[1] <= w["hi"] and f in w["writers"] for w in wp):
+                out.append("dropped %s (%s..%s, %s): not writer-private for %s in the boundary "
+                           "map (class writer-private, writers=...)" % (
+                               d["name"], d["start"], d["end"], d["function"], d["function"]))
+            continue
+        vis = [(rg, r) for r in rows if r["class"] == "visible" for rg in xn_boundary.row_ranges(r)]
+        for lo, hi in xn_boundary.row_ranges(d):
+            for (a, b), r in vis:
+                if a < hi and b > lo:
+                    out.append("dropped %s (%06X-%06X, %s) overlaps game-visible %s (%s)" % (
+                        d["name"], lo, hi, d["function"], r["name"], r["evidence"][:80]))
+    return out
+
+
+# x86 push/pop of the 32-bit registers
+PUSH = {"eax": 0x50, "ecx": 0x51, "edx": 0x52, "ebx": 0x53, "ebp": 0x55, "esi": 0x56, "edi": 0x57}
+POP = {k: v + 8 for k, v in PUSH.items()}
+
+
+def boundary_entries():
+    """{va: entry} of config/xngine_boundary.csv (tools/xn_boundary.py), or {} without it."""
+    try:
+        import xn_boundary
+        return xn_boundary.entries()
+    except (ImportError, OSError):
+        return {}
+
+
+def prototype(name, protos):
+    """(returns a value, number of parameters) of a plain prototype, or None."""
+    params = protos.get(name)
+    if params is None:
+        return None
+    n = 0 if params.strip() in ("", "void") else params.count(",") + 1
+    return protos.get("__ret_" + name, "s32") != "void", n
+
+
+def boundary_route(va, name, e, row, protos, c):
+    """How the game reaches a canonical entry: {"keep": [registers the stub keeps],
+    "ret_pop": N} or {"problem": text}. The game reads e["game_reads"] after its calls; a
+    plain Watcom prototype may change EAX and its argument registers and keeps the rest."""
+    import xn_abi
+    pr = prototype(name, protos)
+    if pr is None:
+        return {"problem": "%s (%06X): canonical entry without a prototype" % (name, va)}
+    returns, n = pr
+    ret_pop = 4 * max(0, n - 4)
+    gr = e["game_reads"]
+    if gr in ("all", "watcom"):
+        return {"ret_pop": ret_pop}     # a pointer the game calls: Watcom's convention itself
+    reads = xn_abi.mask_of(gr) if gr else 0
+    may = xn_abi.RMASK["eax"] | sum(xn_abi.RMASK[r] for r in xn_abi.WATCOM_ARGS[:min(n, 4)])
+    result = xn_abi.RMASK["eax"] if returns else 0
+    need = reads & may & ~result
+    keep = [r for r in ("eax", "ebx", "ecx", "edx", "esi", "edi", "ebp") if need & xn_abi.RMASK[r]]
+    out = {"ret_pop": ret_pop, "keep": keep}
+    row_out, row_clob = (row["out"], row["clob"]) if row is not None else (0, 0)
+    if row is not None and need & xn_abi.RMASK["eax"] & (row_out | row_clob):
+        # the parts of EAX the asm gives back as they came (push ax/pop ax, pushad/popad): an
+        # "output" there is the caller's value passing through, which push eax/pop eax keeps
+        kept, ev = eax_preserved(va)
+        if kept & need & xn_abi.RMASK["eax"]:
+            row_out &= ~kept
+            row_clob &= ~kept
+            out["evidence"] = ev
+    if row is not None and need & row_out:
+        out["problem"] = "%s (%06X): the game reads %s after the call, which the asm sets (an " \
+            "output the prototype does not return): a boundary adapter is needed" % (
+                name, va, xn_abi.names_of(need & row_out))
+    elif "eax" in keep and (row is None or
+                            need & xn_abi.RMASK["eax"] & (row_out | row_clob)):
+        # the game reads a part of EAX the asm changes, and the prototype returns nothing.
+        # (A part the asm keeps, the stub keeps too: push eax; call; pop eax.)
+        out["problem"] = "%s (%06X): the game reads EAX after the call and the prototype " \
+            "returns nothing" % (name, va)
+    elif keep and n > 4:
+        out["problem"] = "%s (%06X): stack arguments and registers to keep" % (name, va)
+    return out
+
+
+# What the asm keeps of EAX: tools/xn_abi.py's analysis (maydef: the register parts some path
+# may leave changed; push/pop pairs, 16-bit ones too, and pushad/popad leave a part as it came),
+# cross-checked on the records (exit EAX = entry EAX in every record of the function). Cached
+# by the analysis' source and inputs (XN_MAYDEF: another cache file).
+MAYDEF = os.environ.get("XN_MAYDEF") or os.path.join(ROOT, "build", "xn_canon", "boundary",
+                                                     "maydef.json")
+
+
+def _maydef_key():
+    import hashlib
+    import xn_abi
+    h = hashlib.sha1(open(xn_abi.__file__, "rb").read())
+    for p in (xn_abi.INDIRECT, os.path.join(ROOT, "config", "functions.csv")):
+        if os.path.exists(p):
+            h.update(open(p, "rb").read())
+    return h.hexdigest()
+
+
+_maydef = None
+
+
+def maydef_table():
+    """{va: (maydef mask, mustdef mask)} of every analysed function (cached)."""
+    global _maydef
+    if _maydef is not None:
+        return _maydef
+    key = _maydef_key()
+    if os.path.exists(MAYDEF):
+        with open(MAYDEF) as f:
+            d = json.load(f)
+        if d.get("key") == key:
+            _maydef = {int(k, 16): tuple(v) for k, v in d["maydef"].items()}
+            return _maydef
+    import xn_abi
+    print("tools/xn_abi.py analysis for the boundary routes' EAX (30 s, cached in %s)" %
+          os.path.relpath(MAYDEF, ROOT), flush=True)
+    an = xn_abi.Analysis()
+    an.run()
+    _maydef = {va: (s.maydef, s.mustdef) for va, s in an.summ.items()}
+    os.makedirs(os.path.dirname(MAYDEF), exist_ok=True)
+    with open(MAYDEF + ".tmp", "w") as f:
+        json.dump({"key": key, "maydef": {"%06X" % va: list(v) for va, v in _maydef.items()},
+                   "records": {}}, f)
+    os.replace(MAYDEF + ".tmp", MAYDEF)
+    return _maydef
+
+
+def eax_preserved(va):
+    """(the parts of EAX the asm leaves as its caller had them, evidence): every part outside
+    the analysis' maydef that also held its entry value at the exit of every record of the
+    function. (0, why) when the analysis says a part may change or a record shows it did."""
+    import xn_abi
+    md = maydef_table().get(va)
+    if md is None:
+        return 0, "not analysed"
+    kept = xn_abi.RMASK["eax"] & ~md[0]
+    if not kept:
+        return 0, "the analysis: EAX may change (maydef %s)" % xn_abi.names_of(md[0])
+    with open(MAYDEF) as f:
+        d = json.load(f)
+    files = files_with([va])
+    ck = "%06X" % va
+    got = d.get("records", {}).get(ck)
+    if got is None or got[0] != len(files):
+        import xn_cload
+        import xn_record
+        n, bad = 0, 0
+        for path in files:
+            for rec in xn_cload.read_records(xn_record, path):
+                if rec["func"] != va or not rec.get("exit"):
+                    continue
+                n += 1
+                x = (rec["entry"]["eax"] ^ rec["exit"]["eax"]) & 0xFFFFFFFF
+                for part, m in (("eaxL", 0xFF), ("eaxH", 0xFF00), ("eaxU", 0xFFFF0000)):
+                    if x & m:
+                        bad |= xn_abi.BIT[part]
+        got = [len(files), n, bad]
+        d.setdefault("records", {})[ck] = got
+        with open(MAYDEF + ".tmp", "w") as f:
+            json.dump(d, f)
+        os.replace(MAYDEF + ".tmp", MAYDEF)
+    _nf, n, bad = got
+    kept &= ~bad
+    if bad & xn_abi.RMASK["eax"] & ~md[0]:
+        return kept, "the analysis keeps %s, but a record changed %s" % (
+            xn_abi.names_of(xn_abi.RMASK["eax"] & ~md[0]), xn_abi.names_of(bad))
+    return kept, "the analysis keeps %s; %d records agree" % (xn_abi.names_of(kept), n)
 
 
 # --------------------------------------------------------------------------------------------
@@ -402,7 +706,14 @@ class RImage:
             d = pickle.load(f)
         self.bytes, self.syms = d["bytes"], d["syms"]
         self.routes = d["routes"]
+        self.game = d.get("game_routes", {})
         self.funcs = {va: r["to"] for va, r in self.routes.items()}
+        # how the game runs: every function on its route, but the canonical ones only at the
+        # boundary (their callers are C)
+        self.game_funcs = {va: r["to"] for va, r in self.routes.items() if not r.get("canonical")}
+        self.game_funcs.update({va: r["to"] for va, r in self.game.items()})
+        self.canonical = {va for va, r in self.routes.items() if r.get("canonical")}
+        self.mode = "test"
         self.hits = 0
         self.entered = set()
 
@@ -412,14 +723,78 @@ class RImage:
             uc.mem_map(RBASE, RSIZE)
             emu._xn_rc_mapped = True
         uc.mem_write(RBASE, self.bytes)         # the data and BSS as built, every time
+        self.adopt(emu)
+
+    def adopt(self, emu):
+        """Seed canonical C state from the asm's: config/xngine_adopt.csv (and the files in
+        XN_ADOPT) map a C variable to the asm's bytes that hold the same value (c_symbol,
+        asm_address, size, reason). A machine made from asm state (a record's, a snapshot's)
+        has run the asm's initialisation, not the C's: the C's own storage starts as built,
+        so state an earlier call set (the 1/z table, the view) is taken from where the asm
+        keeps it. A row's `kind` is `copy` (the default: the bytes as they are), `codeptr`
+        (a dword holding an asm entry's address becomes that function's C address) or
+        `codeptr-inplace` (asm entries in the asm's own structures become C addresses where
+        they are; `every` repeats it: _adopt_inplace). A
+        test-harness migration, never part of the engine."""
+        for r in adopt_rows():
+            if (r.get("kind") or "").strip() == "codeptr-inplace":
+                self._adopt_inplace(emu, r)
+                continue
+            name = r["c_symbol"].strip()
+            a = next((self.syms[n] for n in ("_" + name, name, name + "_") if n in self.syms), None)
+            if a is None:
+                continue                # not in this image (another group's, not built)
+            n = int(r["size"], 0)
+            data = bytes(emu.uc.mem_read(LOAD + int(r["asm_address"], 16), n))
+            if (r.get("kind") or "copy").strip() == "codeptr":
+                # a dword holding an asm entry's address (0: none) becomes the C address of
+                # that entry's function
+                v = struct.unpack("<I", data[:4])[0]
+                if v:
+                    rt = self.routes.get(v - LOAD)
+                    if rt is None or rt.get("c") is None:
+                        raise SystemExit("adopt %s: %08X is no converted function's entry" %
+                                         (name, v))
+                    v = rt["c"]
+                data = struct.pack("<I", v)
+            emu.uc.mem_write(a, data)
+
+    def _adopt_inplace(self, emu, r):
+        """codeptr-inplace: the dwords at asm_address (and, with `every=STRIDE*COUNT`, every
+        STRIDE bytes on) that hold a converted function's asm entry become its C address, in
+        place: records of pointers the asm left in its own structures (the polygons' span
+        routines) that the C will call. Any other value stays (0, an asm-only entry such as
+        the background polygon's 12A949, garbage in unused records)."""
+        import xn_boundary
+        lo = int(r["asm_address"], 16)
+        row = {"start": "%X" % lo, "end": "%X" % (lo + 4), "every": (r.get("every") or "").strip()}
+        for a, _b in xn_boundary.row_ranges(row):
+            v = struct.unpack("<I", bytes(emu.uc.mem_read(LOAD + a, 4)))[0]
+            rt = self.routes.get(v - LOAD) if v >= LOAD else None
+            if rt is not None and rt.get("c") is not None:
+                emu.uc.mem_write(LOAD + a, struct.pack("<I", rt["c"]))
+
+    def game_routes(self):
+        """The functions routed when the game runs (route_game)."""
+        return sorted(self.game_funcs)
+
+    def route_game(self, emu):
+        """Route as the game runs: the boundary routes of canonical functions, the others' as
+        in the tests."""
+        old, self.mode = self.mode, "game"
+        try:
+            return self.route(emu, self.game_routes())
+        finally:
+            self.mode = old
 
     def route(self, emu, funcs):
         from unicorn import UC_HOOK_CODE
         import fallemu
         hooks = []
         eip = fallemu.R["eip"]
+        table = self.game_funcs if self.mode == "game" else self.funcs
         for va in funcs:
-            to = self.funcs.get(va)
+            to = table.get(va)
             if to is None:
                 continue
 
@@ -460,8 +835,15 @@ def declared_interfaces():
             out[name] = (regs, value.group(1).strip() if value else None,
                          modify.group(1).split() if modify else [],
                          parm.group(1) if parm and parm.group(1) else "routine")
-        for m in re.finditer(r"^[\w\s\*]*?\b(\w+)\s*\(([^;{)]*)\)\s*;", text, re.M):
-            protos[m.group(1)] = m.group(2)
+        for m in re.finditer(r"^([\w\s\*]*?)\b(\w+)\s*\(([^;{)]*)\)\s*;", text, re.M):
+            ret = " ".join(m.group(1).split())
+            # a declaration has a type before the name (a call statement does not); the
+            # headers come first and win over the .c files
+            if not ret or ret.split()[0] in ("return", "else", "case", "goto", "do") or \
+                    m.group(2) in protos:
+                continue
+            protos[m.group(2)] = m.group(3)
+            protos["__ret_" + m.group(2)] = ret
     return out, protos
 
 
@@ -478,7 +860,7 @@ def check_routes(routes):
         name = funcs.get(va, ("?",))[0]
         if row is None:
             continue
-        if r["kind"] in ("glue", "isr"):
+        if r["kind"] in ("glue", "isr", "shim"):
             continue
         # segment registers are not the C's concern: Watcom's code never changes them (the
         # record test still sees a function whose asm does)
@@ -540,16 +922,477 @@ def route_table():
 # --------------------------------------------------------------------------------------------
 # Tests
 
-def comparer(abi):
+def load_dropped(path=DROPPED_CSV):
+    """config/xngine_dropped.csv (and the files in XN_DROPPED): what canonical C no longer
+    writes on purpose.
+    Returns (memory: a sorted list of linear (lo, hi), registers: {va: mask}, flags: {va: mask},
+    rows). Memory rows are excused in every record (a canonical function's scratch is
+    nobody's input); register and flag rows only in the records of their function."""
     import xn_abi
+    mem, regs, flags, rows = [], {}, {}, []
+    # XN_DROPPED=path[:path]: an agent's own rows, read after config/xngine_dropped.csv's
+    paths = [path] + ([q for q in os.environ.get("XN_DROPPED", "").split(os.pathsep) if q]
+                      if path == DROPPED_CSV else [])
+    for q in paths:
+        if os.path.exists(q):
+            with open(q, newline="") as f:
+                rows += list(csv.DictReader(f))
+    for r in rows:
+        kind = r["kind"].strip()
+        if kind == "memory-own":
+            continue                # excused only in their function's records (own_drops)
+        if kind == "memory":
+            if alloc_ref(r["start"]) is None:
+                import xn_boundary
+                mem += [(LOAD + lo, LOAD + hi) for lo, hi in xn_boundary.row_ranges(r)]
+            continue                # (ALLOC+0xOFF: relative to an allocation, alloc_drops)
+        if kind == "exceptions":
+            # CPU exceptions the engine's own handler took (a divide error and the return
+            # from its handler): flags[None] lists the vectors excused everywhere
+            flags.setdefault(None, set()).update(int(x, 16) for x in r["name"].split())
+            continue
+        va = func_va(r["function"].strip())
+        m = xn_abi.mask_of(r["name"])
+        if kind == "register":
+            regs[va] = regs.get(va, 0) | m
+        elif kind == "flags":
+            flags[va] = flags.get(va, 0) | m
+    return merge_ranges(mem), regs, flags, rows
+
+
+ADOPT_CSV = os.path.join(ROOT, "config", "xngine_adopt.csv")
+
+
+def adopt_rows():
+    """config/xngine_adopt.csv and the files in XN_ADOPT=path[:path] (RImage.adopt)."""
+    rows = []
+    for q in [ADOPT_CSV] + [q for q in os.environ.get("XN_ADOPT", "").split(os.pathsep) if q]:
+        if os.path.exists(q):
+            with open(q, newline="") as f:
+                rows += list(csv.DictReader(f))
+    return rows
+
+
+def merge_ranges(ranges):
+    """Sorted, with overlapping and touching (lo, hi) ranges merged, so that _in_ranges'
+    search by start finds every address (the rows' order and overlaps do not matter)."""
+    out = []
+    for lo, hi in sorted(ranges):
+        if out and lo <= out[-1][1]:
+            out[-1] = (out[-1][0], max(out[-1][1], hi))
+        else:
+            out.append((lo, hi))
+    return out
+
+
+# A dropped row's start and end can be relative to an engine allocation: ALLOC+0xOFF, ALLOC
+# named as config/xngine_boundary.csv names it (the global that holds its pointer, e.g.
+# xn_mem_work_block+0x8). Such rows are excused only in the records of their own function (a
+# shared buffer: the excuse must not hide another function's writes there).
+ALLOC_REF = re.compile(r"^\s*([A-Za-z_]\w*)\s*\+\s*(0x[0-9A-Fa-f]+|[0-9]+)\s*$")
+
+
+def alloc_ref(text):
+    """'ALLOC+0xOFF' -> (ALLOC, offset), or None (a plain object-2 address)."""
+    m = ALLOC_REF.match(text or "")
+    return (m.group(1), int(m.group(2), 0)) if m else None
+
+
+def alloc_pointer(name):
+    """The object-2 global holding the pointer of the allocation `name` (its boundary row's
+    rule ptr=VA), or the global of that name."""
+    import xn_boundary
+    for r in xn_boundary.rows_csv():
+        if r["kind"] == "memory" and r["space"] == "alloc" and r["name"] == name:
+            m = re.match(r"ptr=([0-9A-Fa-f]+)", r["rule"])
+            if m:
+                return int(m.group(1), 16)
+    e = names()[0].get(name)
+    if e is not None and e[0] == "global":
+        return e[1]
+    raise SystemExit("dropped row: no allocation or global named %s" % name)
+
+
+def alloc_drops(rows=None):
+    """{function va: [(pointer global va, lo, hi)]} of the allocation-relative dropped rows."""
+    out = {}
+    for r in (rows if rows is not None else load_dropped()[3]):
+        if r["kind"].strip() != "memory":
+            continue
+        a, b = alloc_ref(r["start"]), alloc_ref(r["end"])
+        if a is None:
+            continue
+        if b is None or b[0] != a[0]:
+            raise SystemExit("dropped row %s: start %s and end %s must name the same allocation" % (
+                r["name"], r["start"], r["end"]))
+        out.setdefault(func_va(r["function"].strip()), []).append((alloc_pointer(a[0]), a[1], b[1]))
+    return out
+
+
+def own_drops(rows=None):
+    """{function va: [(lo, hi)]} of the `memory-own` dropped rows: preferred addresses (any
+    object's), or linear ones written L:ADDR, excused only in the records of their function: what a deviation's own calls
+    change in memory nobody reads (D-VID-01: MemCheck's last-call record)."""
+    out = {}
+    for r in (rows if rows is not None else load_dropped()[3]):
+        if r["kind"].strip() == "memory-own":
+            import xn_boundary
+            if r["start"].strip().upper().startswith("L:"):
+                # a linear address (low memory, a probe's made-up pointer): as it is
+                out.setdefault(func_va(r["function"].strip()), []).append(
+                    (int(r["start"].strip()[2:], 16), int(r["end"].strip().lstrip("Ll:"), 16)))
+                continue
+            out.setdefault(func_va(r["function"].strip()), []).extend(
+                (LOAD + lo, LOAD + hi) for lo, hi in xn_boundary.row_ranges(r))
+    return out
+
+
+def code_pointers(img):
+    """{the C address of a boundary entry: its asm entry's linear address}: the code pointers
+    canonical C hands the game (a callback) count as the asm's when they name the same entry.
+    Only the boundary's entries (config/xngine_boundary.csv kind entry)."""
+    out = {}
+    ents = boundary_entries()
+    for va, r in getattr(img, "routes", {}).items():
+        if va in ents and r.get("c"):
+            out[r["c"]] = LOAD + va
+    return out
+
+
+def rec_byte(rec, lin, _cache={}):
+    """A byte of a record's memory before the call (its pages, else its base machine)."""
+    import xn_record
+    if _cache.get("rec") is not rec:        # the record itself, held (an id can be reused)
+        _cache.clear()
+        _cache["rec"] = rec
+        _cache["pages"] = pickle.loads(__import__("zlib").decompress(rec["pages"]))
+    pages = _cache["pages"]
+    pg = lin & ~0xFFF
+    if pg in pages:
+        return pages[pg][lin - pg]
+    _emu, (low, mem) = xn_record.base_machine(rec["base"])
+    return mem[lin - LOAD] if lin >= LOAD else low[lin]
+
+
+def translate_code_pointers(rec, gw, cps):
+    """The C's writes gw with each code pointer of cps (a dword written whole, any alignment)
+    put back as the asm entry's address it stands for, where the record shows the asm leaving
+    that entry's asm address there (so data that merely equals a C address, as WOODS.WLD's
+    cell bytes can, is not taken for a pointer); a byte that then holds what memory held
+    before the call is no write (the record lists only bytes that changed)."""
+    if not cps:
+        return gw
+    rw = rec.get("writes", {})
+    out = dict(gw)
+    for a in sorted(gw):
+        if a not in out or any((a + k) not in gw for k in range(4)):
+            continue
+        v = gw[a] | gw[a + 1] << 8 | gw[a + 2] << 16 | gw[a + 3] << 24
+        if v not in cps:
+            continue
+        want = struct.pack("<I", cps[v])
+        if any(rw.get(a + k, rec_byte(rec, a + k)) != want[k] for k in range(4)):
+            continue                # the asm did not leave the entry's address here: data
+        for k, byte in enumerate(struct.pack("<I", cps[v])):
+            if byte == rec_byte(rec, a + k):
+                out.pop(a + k, None)
+            else:
+                out[a + k] = byte
+    return out
+
+
+def rec_dword(rec, lin, _cache={}):
+    """A dword of a record's entry memory: from its own pages, else its base machine's."""
+    import xn_record
+    if _cache.get("rec") is not rec:        # the record itself, held (an id can be reused)
+        _cache.clear()
+        _cache["rec"] = rec
+    key = lin
+    if key in _cache:
+        return _cache[key]
+    pages = pickle.loads(__import__("zlib").decompress(rec["pages"]))
+    pg = lin & ~0xFFF
+    if pg in pages and lin - pg <= 0xFFC:
+        v = struct.unpack_from("<I", pages[pg], lin - pg)[0]
+    else:
+        _emu, (low, mem) = xn_record.base_machine(rec["base"])
+        v = struct.unpack_from("<I", mem, lin - LOAD)[0] if lin >= LOAD else \
+            struct.unpack_from("<I", low, lin)[0]
+    if len(_cache) > 64:
+        _cache.clear()
+        _cache["rec"] = rec
+    _cache[key] = v
+    return v
+
+
+def rec_alloc_ranges(rec, drops):
+    """The linear ranges of a record's function's allocation-relative dropped rows."""
+    return [(rec_dword(rec, LOAD + ptr) + lo, rec_dword(rec, LOAD + ptr) + hi)
+            for ptr, lo, hi in drops.get(rec["func"], ())]
+
+
+def _in_ranges(ranges, starts, a):
+    import bisect
+    k = bisect.bisect_right(starts, a) - 1
+    return k >= 0 and a < ranges[k][1]
+
+
+def drop_page_locks(log):
+    """The I/O log without DPMI page locking (int 31h 0600h/0601h and their returns): it has
+    no effect the game or the machine can see (D-VID-01: the asm VID player left its locks in
+    place, the canonical C unlocks them)."""
+    import fallemu
+    out, skip = [], False
+    for e in log:
+        if skip and e[0] == "int-ret":
+            skip = False
+            continue
+        skip = False
+        if e[0] == "int" and fallemu.is_page_lock(e[1], e[2]):
+            skip = True
+            continue
+        out.append(e)
+    return out
+
+
+def service_ax(e):
+    """An I/O log entry as compared: a service call ("int", vector, eax) by AX, or by AH alone
+    for a service whose AL is no input (xn_services.AH_ONLY). Every DOS, DPMI, BIOS and mouse
+    service the engine and the game call takes its function in AH or AX (tools/xn_services.py
+    keys on them), so EAX's upper half is whatever the caller left there, which canonical C
+    keeps differently from the asm."""
+    if e[0] != "int":
+        return e
+    import xn_services
+    return (e[0], e[1], e[2] & xn_services.eax_mask(e[1], e[2]))   # AH alone when AL is no input
+
+
+def comparer(abi, dropped=None, img=None):
+    """compare(rec, got) per function: tools/xn_abi.py's abi_compare by the record's function's
+    row, with config/xngine_dropped.csv's excuses (memory everywhere; registers and flags in
+    their function's records)."""
+    import xn_abi
+    mem, regs, flags, _rows = dropped if dropped is not None else load_dropped()
+    starts = [lo for lo, _hi in mem]
+    excs = flags.get(None, set())
+    adrops = alloc_drops(_rows)
+    odrops = own_drops(_rows)
+    cps = code_pointers(img) if img is not None else {}
+
+    def drop(writes):
+        return {a: v for a, v in writes.items() if not _in_ranges(mem, starts, a)}
+
+    def io(log):
+        return [service_ax(e) for e in drop_page_locks(log)
+                if not (e[0] == "exc" and e[1] in excs)]
 
     def for_func(va):
         row = abi.get(va)
 
         def cmp(rec, got, row=row):
-            return xn_abi.abi_compare(rec, got, abi.get(rec["func"], row))
+            r = abi.get(rec["func"], row)
+            x, fl = regs.get(rec["func"], 0), flags.get(rec["func"], 0)
+            if r is not None and (x or fl):
+                r = dict(r, clob=r["clob"] | x, out=r["out"] & ~x, fout=r["fout"] & ~fl)
+            if mem and "writes" in got:
+                rec = dict(rec, writes=drop(rec["writes"]))
+                got = dict(got, writes=drop(got["writes"]))
+            if cps and "writes" in got:
+                got = dict(got, writes=translate_code_pointers(rec, got["writes"], cps))
+            if rec["func"] in odrops and "writes" in got:
+                own = odrops[rec["func"]]
+
+                def odrop(ws, own=own):
+                    return {a: v for a, v in ws.items() if not any(lo <= a < hi for lo, hi in own)}
+                rec = dict(rec, writes=odrop(rec["writes"]))
+                got = dict(got, writes=odrop(got["writes"]))
+            if rec["func"] in adrops and "writes" in got:
+                ar = rec_alloc_ranges(rec, adrops)
+
+                def adrop(ws, ar=ar):
+                    return {a: v for a, v in ws.items() if not any(lo <= a < hi for lo, hi in ar)}
+                rec = dict(rec, writes=adrop(rec["writes"]))
+                got = dict(got, writes=adrop(got["writes"]))
+            if "io" in got:
+                rec = dict(rec, io=io(rec["io"]))
+                got = dict(got, io=io(got["io"]))
+            return xn_abi.abi_compare(rec, got, r)
         return cmp
     return for_func
+
+
+# ---- the boundary ------------------------------------------------------------------------------
+OBJ1 = (0x10000, 0xBB27F)
+OBJ2 = (0xC0000, 0x161568)
+TRAP = 0xBBF00
+
+
+def record_return(rec):
+    """The return address a record's call was made with (its entry ESP's dword)."""
+    import xn_record
+    esp = rec["entry"]["esp"]
+    pages = pickle.loads(__import__("zlib").decompress(rec["pages"]))
+    pg = esp & ~0xFFF
+    if pg in pages and esp - pg <= 0xFFC:
+        return struct.unpack_from("<I", pages[pg], esp - pg)[0]
+    _emu, (low, mem) = xn_record.base_machine(rec["base"])
+    if esp >= LOAD:
+        return struct.unpack_from("<I", mem, esp - LOAD)[0]
+    return struct.unpack_from("<I", low, esp)[0]
+
+
+def caller_kind(rec):
+    """"game" (a return into object 1), "direct" (a call from the safe point: the game's
+    side), "vector" (an interrupt or exception frame), "engine" (object 2) or "other"."""
+    if rec.get("via") in ("handler", "interrupt"):
+        return "vector"
+    ret = (record_return(rec) - LOAD) & 0xFFFFFFFF
+    if ret == TRAP:
+        return "direct"
+    if OBJ1[0] <= ret < OBJ1[1]:
+        return "game"
+    if OBJ2[0] <= ret < OBJ2[1] or ret >= 0x200000:
+        return "engine"
+    return "other"
+
+
+def install_dos_write_log():
+    """Log the bytes of each DOS write (int 21h AH=40h) in the I/O log: what a file gets is
+    game-visible. (Process-wide: the boundary tests' workers.)"""
+    import fallemu
+    if getattr(fallemu.Emu, "_dos_write_logged", False):
+        return
+    orig = fallemu.Emu.on_int
+
+    def on_int(self, uc, intno, user, _orig=orig):
+        if self.io_log is not None and intno == 0x21 and self.r("ah") == 0x40:
+            n = self.r("ecx")
+            self.io_log.append(("dos-write", self.r("bx"), bytes(self.read(self.ds_edx(), n))))
+        return _orig(self, uc, intno, user)
+    fallemu.Emu.on_int = on_int
+    fallemu.Emu._dos_write_logged = True
+
+
+def boundary_compare(rec, got, entry, priv, row, ref_io=None):
+    """The differences the game can see: the registers it reads after the call (entry's
+    game_reads; all of them for an interrupt or exception handler; EAX when the row outputs it
+    and ESI EDI EBP for a call through a pointer), ESP, the memory written but the dead stack
+    and the engine's private memory, the I/O but CPU exceptions."""
+    import xn_abi
+    diffs = []
+    if not got["returned"]:
+        diffs.append("did not return")
+    gr = entry["game_reads"]
+    if gr == "all":
+        # an interrupt or exception handler: the interrupted code gets every register back;
+        # its flags come from the frame (iretd, or the DPMI host after a retf), not from what
+        # the handler leaves
+        masks = {r: 0xFFFFFFFF for r in xn_abi.EXIT_REGS}
+        fm = 0
+    else:
+        if gr == "watcom":
+            m = xn_abi.mask_of("esi edi ebp") | (row["out"] & xn_abi.RMASK["eax"] if row else 0)
+        else:
+            m = xn_abi.mask_of(gr) if gr else 0
+        masks = {r: xn_abi.value_mask(r, m) for r in xn_abi.EXIT_REGS[:-1]}
+        masks["esp"] = 0xFFFFFFFF
+        fm = 0
+    for r, mk in masks.items():
+        if (got["exit"][r] ^ rec["exit"][r]) & mk:
+            diffs.append("%s %08X != %08X (the game reads it)" % (r, got["exit"][r], rec["exit"][r]))
+    if fm and (got["exit"]["eflags"] ^ rec["exit"]["eflags"]) & fm:
+        diffs.append("flags %03X != %03X" % (got["exit"]["eflags"] & fm, rec["exit"]["eflags"] & fm))
+    lo, hi = rec["exit"]["esp"] - xn_abi.STACK_DEAD, rec["exit"]["esp"]
+
+    def vis(ws):
+        return {a: v for a, v in ws.items() if not lo <= a < hi and not (priv and priv.contains(a))}
+    gw, rw = vis(got["writes"]), vis(rec["writes"])
+    if gw != rw:
+        extra = set(gw) ^ set(rw)
+        wrong = [a for a in set(gw) & set(rw) if gw[a] != rw[a]]
+        first = min(extra | set(wrong))
+        diffs.append("game-visible writes: %d addresses differ in the set, %d in value (first %#x)"
+                     % (len(extra), len(wrong), first))
+    io_g = [service_ax(e) for e in drop_page_locks(got["io"]) if e[0] != "exc"]
+    io_r = [service_ax(e) for e in drop_page_locks(ref_io if ref_io is not None else rec["io"])
+            if e[0] != "exc"]
+    if io_g != io_r:
+        diffs.append("port or DOS I/O differs")
+    return diffs
+
+
+def _rc_boundary_task(files, sp):
+    """Replay the records of the boundary's entries whose caller is the game, each entry routed
+    as the game reaches it (all of them with sp["together"])."""
+    import xn_abi
+    import xn_boundary
+    import xn_cload
+    import xn_record
+    xn_cload.longer_calls(xn_record)
+    install_dos_write_log()
+    abi = xn_abi.read_abi()
+    ents = boundary_entries()
+    masks = xn_boundary.load_masks()
+    img = RImage()
+    img.mode = "game"
+    want = set(sp["funcs"]) if sp.get("funcs") else None
+    every = img.game_routes()
+    stats, callers = {}, collections.Counter()
+    adrops = alloc_drops()
+    odrops = own_drops()
+    cps = code_pointers(img)
+    for path in files:
+        for rec in xn_cload.read_records(xn_record, path):
+            va = rec["func"]
+            if va not in ents or (want is not None and va not in want) or va not in img.game_funcs:
+                continue
+            if sp.get("max_per") and stats.get(va, [0, 0])[1] >= sp["max_per"]:
+                continue
+            try:
+                kind = caller_kind(rec)
+            except Exception:       # noqa: BLE001
+                kind = "other"
+            callers[kind] += 1
+            if kind in ("engine", "other"):
+                continue
+            ref_io = None
+            if any(e[0] == "int" and e[1] == 0x21 and (e[2] >> 8) & 0xFF == 0x40 for e in rec["io"]):
+                got_a = xn_record.replay_run(rec)       # the asm: what its DOS writes wrote
+                ref_io = got_a.get("io")
+            route = every if sp.get("together") else [va]
+            hooks = []
+
+            def patch(emu, route=route):
+                img.install(emu)
+                hooks.extend(img.route(emu, route))
+            try:
+                got = xn_record.replay_run(rec, patch=patch)
+                emu = xn_cload.machine_of(xn_record, rec["base"])
+                priv = masks.resolve(emu) if masks is not None and emu is not None else None
+                if va in adrops or va in odrops:
+                    # the dropped bytes of this function's own rows (allocation-relative,
+                    # memory-own)
+                    priv = xn_boundary.Private((list(priv.ranges) if priv is not None else []) +
+                                               rec_alloc_ranges(rec, adrops) + odrops.get(va, []))
+                if cps and "writes" in got:
+                    got = dict(got, writes=translate_code_pointers(rec, got["writes"], cps))
+                diffs = [got["stopped"]] if "stopped" in got else                     boundary_compare(rec, got, ents[va], priv, abi.get(va), ref_io)
+            except Exception as e:      # noqa: BLE001
+                diffs = ["error: %r" % e]
+                xn_cload.drop_machine(xn_record, rec["base"])
+            finally:
+                emu = xn_cload.machine_of(xn_record, rec["base"])
+                if emu is not None:
+                    img.unroute(emu, hooks)
+            st = stats.setdefault(va, [0, 0, [], 0])
+            st[1] += 1
+            if not diffs:
+                st[0] += 1
+            elif len(st[2]) < 3:
+                st[2].append(["%s@%d" % (rec.get("job", ""), rec.get("tick", 0))] + diffs[:4])
+            if diffs and sp.get("verbose"):
+                print("FAIL %06X: %s" % (va, "; ".join(diffs[:4])), flush=True)
+    return {"stats": stats, "hits": img.hits, "callers": dict(callers)}
 
 
 def _rc_test_task(files, sp):
@@ -564,7 +1407,7 @@ def _rc_test_task(files, sp):
     want = set(sp["funcs"]) if sp.get("funcs") else None
     every = sorted(img.funcs)
     stats, seen = {}, collections.Counter()
-    cmp = comparer(abi)
+    cmp = comparer(abi, img=img)
     for path in files:
         for rec in xn_cload.read_records(xn_record, path):
             va = rec["func"]
@@ -590,9 +1433,10 @@ def _rc_test_task(files, sp):
 
 def files_with(funcs):
     """The record files holding records of these functions (the job summaries list them)."""
+    import xn_cload
     want = {"%X" % f for f in funcs}
     out = []
-    for sp in sorted(glob.glob(os.path.join(ROOT, "build", "xngine", "records", "*.json"))):
+    for sp in sorted(p for d in xn_cload.record_dirs() for p in glob.glob(os.path.join(d, "*.json"))):
         try:
             sm = json.load(open(sp))
         except (OSError, ValueError):
@@ -602,10 +1446,13 @@ def files_with(funcs):
     return out
 
 
-def test(funcs, together=False, corpus=False, jobs=None, max_per=0, verbose=False):
+def test(funcs, together=False, corpus=False, jobs=None, max_per=0, verbose=False,
+         boundary=False):
     import xn_cload
     t0 = time.time()
     img = RImage()
+    if boundary:
+        return test_boundary(funcs, together, jobs, max_per, verbose)
     if corpus:
         files = xn_cload.record_files(None)
         funcs = None
@@ -644,6 +1491,50 @@ def test(funcs, together=False, corpus=False, jobs=None, max_per=0, verbose=Fals
         missing = [f for f in funcs if f not in stats]
         if missing:
             print("  no records: %s (run diff)" % " ".join("%06X" % f for f in missing))
+    write_report()
+    return 0 if npass == len(stats) else 1
+
+
+def test_boundary(funcs, together=False, jobs=None, max_per=0, verbose=False):
+    """`test --boundary`: the boundary's entries, as the game calls them."""
+    import xn_cload
+    t0 = time.time()
+    img = RImage()
+    ents = boundary_entries()
+    if not ents:
+        print("no boundary map: run tools/xn_boundary.py (static, survey, write)")
+        return 1
+    cand = [va for va in (funcs or sorted(ents)) if va in ents and va in img.game_funcs]
+    if not cand:
+        print("none of these functions is a converted boundary entry")
+        return 1
+    files = files_with(cand)
+    spec = {"funcs": cand, "together": together, "max_per": max_per, "verbose": verbose}
+    res = xn_cload.parallel("xn_rc:_rc_boundary_task", files, spec, jobs)
+    stats, callers = {}, collections.Counter()
+    for r in res:
+        callers.update(r.get("callers", {}))
+        for k, v in r["stats"].items():
+            st = stats.setdefault(int(k), [0, 0, [], 0])
+            st[0] += v[0]
+            st[1] += v[1]
+            st[2] += v[2]
+    save_results("boundary", stats)
+    _b, names_ = names()
+    npass = sum(1 for s_ in stats.values() if s_[0] == s_[1])
+    print("boundary: %d / %d entries pass all their game-called records (%d / %d records) in "
+          "%.0f s" % (npass, len(stats), sum(s_[0] for s_ in stats.values()),
+                      sum(s_[1] for s_ in stats.values()), time.time() - t0))
+    print("  records by caller: %s (only the game's are the boundary's)" % ", ".join(
+        "%s %d" % kv for kv in sorted(callers.items())))
+    for va, s_ in sorted(stats.items()):
+        kind = img.game.get(va, img.routes.get(va, {})).get("kind", "?")
+        if s_[0] != s_[1] or verbose:
+            print("  %06X %-34s %-13s %d/%d  %s" % (va, names_.get(va, ("?",))[0], kind, s_[0], s_[1],
+                                                   " | ".join("; ".join(d) for d in s_[2][:2])[:300]))
+    missing = [f for f in cand if f not in stats]
+    if missing and verbose:
+        print("  no game-called records: %s" % " ".join("%06X" % f for f in missing))
     write_report()
     return 0 if npass == len(stats) else 1
 
@@ -732,6 +1623,70 @@ def play(snap, ticks, shot=None, asm=False, compare=False, script=""):
         return 0 if same and ok1 and ok2 else 1
     return xn_cload.play(snap, ticks, all_c=not asm, shot=shot, script=script,
                          img=None if asm else RImage(), what="the readable C")
+
+
+def frames_boundary(snap, n, ticks=0, script="", irqs=0, continuous=False):
+    """`frames --boundary`: the same run through tools/xn_scenarios.py's lockstep, compared at
+    the boundary (the screen, the game-visible memory, the frame's port and int log); the
+    game's routes (canonical functions only at the boundary). Timer interrupts are given one
+    at a time, each run to completion, at the frame's start."""
+    import xn_boundary
+    import xn_scenarios
+    spec = {"name": os.path.basename(snap).replace(".snap", ""), "snap": snap, "ticks": ticks,
+            "script": script, "frames": n, "irqs": irqs, "input": ""}
+    r = xn_scenarios.run(spec, img=RImage(), masks=xn_boundary.load_masks(),
+                         continuous=continuous)
+    for f in r["frames"]:
+        print("frame %d: asm %d M insns, C %d M (C entered %d times): %s%s" % (
+            f["frame"], f["asm_insns"] // 1000000, f["c_insns"] // 1000000, f.get("c_entered", 0),
+            "identical" if f.get("boundary") else "DIFFERS", "" if f.get("full") else
+            " (all of memory: %d bytes differ, %d of them game-visible)" % (
+                f.get("diff_bytes", 0), f.get("visible_bytes", 0))))
+    print("%s: %d / %d frames identical at the boundary (%d in all of memory)" % (
+        spec["name"], r["identical"], r["total"], r["full_identical"]))
+    return 0 if r["identical"] == r["total"] == n else 1
+
+
+def scenarios(names_=None, jobs=None, continuous=None, frames=None, verbose=False,
+              coverage=False):
+    """Run the scripted lockstep scenarios (tools/xn_scenarios.py), compared at the boundary;
+    $XN_RC_OUT/scenarios.json."""
+    import xn_cload
+    import xn_scenarios
+    t0 = time.time()
+    names_ = names_ or [s_["name"] for s_ in xn_scenarios.SCENARIOS]
+    for n_ in names_:
+        xn_scenarios.get(n_)
+    spec = {"image": IMAGE, "continuous": continuous, "frames": frames, "verbose": verbose,
+            "coverage": coverage}
+    res = xn_cload.parallel("xn_scenarios:_task", names_, spec, jobs)
+    out = [r for rs in res for r in rs]
+    by = {r["name"]: r for r in out}
+    tot = ok = 0
+    print("%-14s %-6s %-11s %s" % ("scenario", "frames", "identical", "covers"))
+    for n_ in names_:
+        r = by.get(n_)
+        if r is None:
+            print("%-14s (no result)" % n_)
+            continue
+        tot += r["total"]
+        ok += r["identical"]
+        note = r.get("error") or ("" if r.get("complete") else "incomplete: " + "; ".join(
+            f.get("note", "") for f in r["frames"] if f.get("note"))[:80])
+        print("%-14s %6d %5d / %-3d %s%s" % (n_, r["total"], r["identical"], r["total"],
+                                           r.get("covers", ""), "  " + note if note else ""))
+        bad = [f for f in r["frames"] if not f.get("boundary")]
+        for f in bad[:3]:
+            print("    frame %d: %s" % (f["frame"], f.get("note") or "%s%s%s %d game-visible bytes "
+                                          "differ (%s)" % ("" if f.get("screen") else "screen, ",
+                                                            "" if f.get("io") else "I/O, ", "memory",
+                                                            f.get("visible_bytes", 0),
+                                                            " ".join(f.get("first", [])))))
+    print("%d / %d frames identical over %d scenarios in %.0f s" % (ok, tot, len(out), time.time() - t0))
+    os.makedirs(OUT, exist_ok=True)
+    with open(os.path.join(OUT, "scenarios.json"), "w") as f:
+        json.dump([{k: v for k, v in r.items() if k != "coverage"} for r in out], f, indent=0)
+    return 0 if ok == tot and all(by.get(n_, {}).get("complete") for n_ in names_) else 1
 
 
 def frames(snap, n, ticks=0, script="", irqs=0):
@@ -835,16 +1790,17 @@ def frames(snap, n, ticks=0, script="", irqs=0):
 COLUMNS = ("function", "name", "subsystem", "convention", "converted", "records_passed",
            "records_total", "first_difference", "together_passed", "together_total",
            "corpus_passed", "corpus_total", "diff_passed", "diff_total", "clobber_test",
-           "inputs_test")
+           "inputs_test", "game_route", "boundary_passed", "boundary_total")
 
 
 def write_report():
     import xn_abi
     abi = xn_abi.read_abi()
     res = load_results()
-    routes = {}
+    routes, game = {}, {}
     if os.path.exists(IMAGE):
-        routes = RImage().routes
+        im = RImage()
+        routes, game = im.routes, im.game
     clob = {}
     inp = {}
     for kind, d in (("clobber", clob), ("inputs", inp)):
@@ -874,6 +1830,11 @@ def write_report():
         d = res.get("diff", {}).get(k)
         if d:
             row["diff_passed"], row["diff_total"] = d[0], d[1]
+        if va in game:
+            row["game_route"] = game[va]["kind"]
+        bnd = res.get("boundary", {}).get(k)
+        if bnd:
+            row["boundary_passed"], row["boundary_total"] = bnd[0], bnd[1]
         if k in clob or k in clob.get("_fired", {}):
             fired = clob.get("_fired", {}).get(k, 0)
             st = clob.get(k)
@@ -1084,6 +2045,8 @@ def main():
     t.add_argument("funcs", nargs="*")
     t.add_argument("--all", action="store_true", help="every converted function routed at once")
     t.add_argument("--corpus", action="store_true", help="every record, all converted routed")
+    t.add_argument("--boundary", action="store_true",
+                   help="the boundary's entries as the game calls them (game-visible compare)")
     t.add_argument("-j", "--jobs", type=int, default=None)
     t.add_argument("--max-per", type=int, default=0)
     t.add_argument("-v", action="store_true")
@@ -1105,6 +2068,17 @@ def main():
     fr.add_argument("--ticks", type=int, default=0, help="play this many ticks (asm) first")
     fr.add_argument("--script", default="")
     fr.add_argument("--irqs", type=int, default=0, help="timer interrupts at each frame's start")
+    fr.add_argument("--boundary", action="store_true",
+                    help="compare at the boundary (game-visible memory, the screen, the I/O)")
+    fr.add_argument("--continuous", action="store_true",
+                    help="(--boundary) the C machine keeps its own state between frames")
+    sc = sub.add_parser("scenarios")
+    sc.add_argument("names", nargs="*")
+    sc.add_argument("-j", "--jobs", type=int, default=None)
+    sc.add_argument("--continuous", action="store_true", default=None)
+    sc.add_argument("--resync", action="store_true", help="each frame from the asm's state")
+    sc.add_argument("--frames", type=int, default=None)
+    sc.add_argument("-v", action="store_true")
     sub.add_parser("report")
     for n in ("asm", "abi"):
         q = sub.add_parser(n)
@@ -1118,13 +2092,18 @@ def main():
         return route_table()
     if a.cmd == "test":
         return test(expand(a.funcs), together=a.all, corpus=a.corpus, jobs=a.jobs,
-                    max_per=a.max_per, verbose=a.v)
+                    max_per=a.max_per, verbose=a.v, boundary=a.boundary)
     if a.cmd == "diff":
         return diff(expand(a.funcs), untested=a.untested, trials=a.trials, verbose=a.v)
     if a.cmd == "play":
         return play(a.snap, a.ticks, a.shot, a.asm, a.compare, a.script)
     if a.cmd == "frames":
+        if a.boundary:
+            return frames_boundary(a.snap, a.frames, a.ticks, a.script, a.irqs, a.continuous)
         return frames(a.snap, a.frames, a.ticks, a.script, a.irqs)
+    if a.cmd == "scenarios":
+        cont = False if a.resync else a.continuous
+        return scenarios(a.names, a.jobs, cont, a.frames, a.v)
     if a.cmd == "report":
         return report()
     if a.cmd == "asm":

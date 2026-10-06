@@ -2,7 +2,7 @@
 #include "records.h"
 
 extern iptr paperdoll_mask;
-extern iptr D_00195B80;
+extern iptr color_remap;
 extern char *scratch_buffer;
 extern unsigned char *color_remap_tables;
 extern void xn_draw_image_scaled(int, int, int, int, int, int, int, char *);
@@ -23,7 +23,7 @@ void paperdoll_draw_item(struct item *item, int x, int y, int mask_value)
     short mask_x;
     short mask_y;
 
-    D_00195B80 = (iptr)((char *)color_remap_tables + (item->color << 8));
+    color_remap = (iptr)((char *)color_remap_tables + (item->color << 8));
     texture = (char *)xn_tex_cache_lookup(item->inventory_image >> 7, (int)(unsigned short)(item->inventory_image & 127), (int *)(iptr)-1);
     if (texture == 0) {
         xn_tex_cache_flush();

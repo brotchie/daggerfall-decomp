@@ -1,19 +1,15 @@
-/* font.c: XnGine's fonts as readable C (xfont.h; see xngine.h, docs/xngine_readable.md and
-   docs/engine/smc/font.md, FONT-GLYPH). */
+/* font.c: XnGine's fonts (canonical C; the interface and the module's documentation are in
+   xfont.h). */
 #include "xfont.h"
+#include "xgfx.h"
+#include "xdos.h"
 #include "xdrawhlp.h"
 
-/* other groups' functions, still asm: their interfaces (config/xngine_abi.csv) */
+/* other groups' functions (group A's: xstr.h, xdos.h, xkbd.h, xmem.h) */
 void xn_str_from_int(s32 v, char *buf, s32 digits);
-#pragma aux xn_str_from_int parm [eax] [edx] [ebx] modify exact [eax edx];
 void *xn_dos_load_file(const char *name, void *dst);
-#pragma aux xn_dos_load_file parm [eax] [edx] value [eax] modify exact [eax ecx edx ebx esi edi];
-void xn_gfx_restore_mode(void);
-#pragma aux xn_gfx_restore_mode parm [] modify exact [eax];
 void xn_kbd_remove(void);
-#pragma aux xn_kbd_remove parm [] modify exact [eax];
 void xn_mem_shutdown(void);
-#pragma aux xn_mem_shutdown parm [] modify exact [eax edx];
 
 void xn_font_init(void)
 {
@@ -28,10 +24,12 @@ struct xn_fnt_file *xn_font_load(s32 number, s32 slot)
     return xn_font_table[slot] = xn_dos_load_file(xn_font_filename, 0);
 }
 
-void xn_font_load_r(xn_regs *r)
+/* The game's calls of xn_font_load (boundary adapter, Quirk Q-FONT-01): the asm left EBX = 4,
+   the digit count it gave xn_str_from_int, and init_game_data's next call reads it. */
+void xn_font_load_b(xn_regs *r)
 {
-    xn_font_load(r->eax, r->edx);
-    r->ebx = 4;                 /* the digit count it gave xn_str_from_int */
+    r->eax = (u32)xn_font_load(r->eax, r->edx);
+    r->ebx = 4;
 }
 
 s32 xn_font_select(s32 slot)
@@ -39,16 +37,11 @@ s32 xn_font_select(s32 slot)
     struct xn_fnt_file *f = xn_font_table[slot];
 
     if (f == 0) {
-        xn_regs r;
-
         xn_gfx_restore_mode();
         xn_kbd_remove();
         xn_mem_shutdown();
-        r.eax = ((u32)slot & ~0xFF00u) | 0x0900;        /* AH 9: print the message */
-        r.edx = (u32)xn_font_msg_no_font;
-        xn_int21(&r);
-        r.eax = (r.eax & 0xFFFF0000u) | 0x4C00;         /* exit to DOS */
-        xn_int21(&r);
+        xn_dos_print(xn_font_msg_no_font);
+        xn_dos_exit(0);
         return 0;
     }
     xn_font_current = slot;
@@ -58,11 +51,6 @@ s32 xn_font_select(s32 slot)
     return font_height;
 }
 
-void xn_font_select_r(xn_regs *r)
-{
-    r->eax = xn_font_select(r->eax);
-}
-
 s32 xn_font_draw_string(s32 x, s32 y, const u8 *text)
 {
     u8 c;
@@ -70,7 +58,7 @@ s32 xn_font_draw_string(s32 x, s32 y, const u8 *text)
     xn_font_text_x0 = x;
     xn_font_text_y0 = y;
     while ((c = *text++) != 0) {
-        if ((s8)c >= 0x21) {
+        if ((s8)c >= 0x21) {                    /* Quirk Q-FONT-04: 80h-FFh fall through */
             const struct xn_fnt_glyph *g = &font_glyphs->glyphs[c - 0x21];
 
             xn_font_draw_glyph(x, y, g->width, (const u16 *)((u8 *)font_glyphs + g->offset));
@@ -86,60 +74,58 @@ s32 xn_font_draw_string(s32 x, s32 y, const u8 *text)
     return x;
 }
 
-void xn_font_draw_string_r(xn_regs *r)
-{
-    r->eax = xn_font_draw_string(r->eax, r->edx, (const u8 *)r->ebx);
-}
-
 void xn_font_draw_glyph(s32 x, s32 y, s32 w, const u16 *rows)
 {
-    s32 h = font_height, cut;
-    u32 bits;                   /* EAX: a row's bits, shifted out at the top */
-    u8 skip = 0x10;             /* bits shifted out before the first pixel */
+    s32 h = font_height, cut, end;
+    u32 bits;
+    u8 skip = 0x10;             /* bits shifted out of a row before its first pixel */
     u8 colour, n;
     u8 *dst;
 
     if (x >= xn_gfx_clip_right || y >= xn_gfx_clip_bottom)
         return;
+    /* (each cut is tested as the asm's `sub; jle` does: a true compare of the two values) */
     if (y < xn_gfx_clip_top) {
         cut = xn_gfx_clip_top - y;
-        h -= cut;
-        if (h <= 0)
+        if (h <= cut)
             return;
+        h -= cut;
         rows += cut;
         y = xn_gfx_clip_top;
     }
-    cut = y + h - xn_gfx_clip_bottom;
-    if (cut > 0) {
-        h -= cut;
-        if (h <= 0)
+    end = y + h;
+    if (end > xn_gfx_clip_bottom) {
+        cut = end - xn_gfx_clip_bottom;
+        if (h <= cut)
             return;
+        h -= cut;
     }
-    XN_KEEP(xn_font_glyph_skip, skip);
     if (x < xn_gfx_clip_left) {
         cut = xn_gfx_clip_left - x;
-        w -= cut;
-        if (w <= 0)
+        if (w <= cut)
             return;
-        w = (w & ~0xFF) | (u8)(w + 0x10);       /* add bl, 10h: the bug (see xfont.h) */
-        skip = (u8)w;
-        XN_KEEP(xn_font_glyph_skip, skip);
+        w -= cut;
+        w = (w & ~0xFF) | (u8)(w + 0x10);       /* Quirk Q-FONT-02: 16 more columns, */
+        skip = (u8)w;                           /* and the shift is that width */
         x = xn_gfx_clip_left;
     }
-    cut = x + w - xn_gfx_clip_right;
-    if (cut > 0) {
-        w -= cut;
-        if (w <= 0)
+    end = x + w;
+    if (end > xn_gfx_clip_right) {
+        cut = end - xn_gfx_clip_right;
+        if (w <= cut)
             return;
+        w -= cut;
     }
     dst = XN_SCREEN(x, y);
-    XN_KEEP(xn_font_glyph_step, xn_gfx_width - w);
     colour = text_colour;
+    /* A row's bits go to the top of a dword, the leftmost pixel in bit 31. The upper half is
+       what the last row left there (x at first): it matters only for a shift under 16, after a
+       left-clipped width of 240 or more wrapped (Q-FONT-02). */
     bits = x;
     do {
-        bits = (bits & 0xFFFF0000u) | *rows++;  /* mov ax, row: the top half stays */
+        bits = (bits & 0xFFFF0000u) | *rows++;
         bits <<= skip & 31;
-        n = (u8)w;                              /* the low byte of w: 0 draws 256 */
+        n = (u8)w;                              /* Quirk Q-FONT-03: 0 draws 256 */
         do {
             if (bits & 0x80000000u)
                 *dst = colour;
@@ -152,7 +138,7 @@ void xn_font_draw_glyph(s32 x, s32 y, s32 w, const u16 *rows)
 
 s32 xn_font_glyph_width(s32 c)
 {
-    if (c <= 0x21)
+    if (c <= 0x21)                              /* Quirk Q-FONT-04: '!' too */
         return font_space_width - font_char_spacing;
     return font_glyphs->glyphs[c - 0x21].width;
 }

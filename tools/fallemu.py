@@ -309,6 +309,11 @@ def snapshot_memory(path):
         return zlib.decompress(pickle.load(fh)["mem"])
 
 
+def is_page_lock(vector, eax):
+    """int 31h AX=0600h or 0601h: DPMI's lock or unlock of a linear region (D-VID-01)."""
+    return vector == 0x31 and eax & 0xFFFF in (0x600, 0x601)
+
+
 class Emu:
     def machine(self, trace):
         """The CPU, its memory map and the hooks."""
@@ -319,6 +324,7 @@ class Emu:
         self.exc_reset = False  # a handled CPU exception to forget (clear_exception_state)
         self.int_replay = None  # recorded service results to give instead of running them
         self.int_replay_regs = None     # (vector, eax) -> registers a replayed service writes
+        self.int_replay_keys = None     # (vector, eax) of each int_replay entry's call
         self.in_replay = None   # recorded port reads, likewise
         self.uc = uc = Uc(UC_ARCH_X86, UC_MODE_32)
         uc.mem_map(0, LOW)
@@ -564,6 +570,22 @@ class Emu:
         int_replay_regs ((vector, eax) -> the register names the service defines, or None
         for all), only those are written back; the others keep what the replayed code holds
         (C may hold other stack addresses there than the recorded asm did)."""
+        keys = self.int_replay_keys
+        if keys is not None:
+            # DPMI page locking (int 31h 0600h/0601h) has no effect here and the code reads
+            # nothing back from it but CF: it is answered out of order. The record's own lock
+            # calls the replayed code does not make are skipped, and a lock call the record
+            # does not have succeeds (CF clear). (The canonical VID player unlocks what the asm
+            # left locked: D-VID-01.)
+            lock = intno == 0x31 and self.r("eax") & 0xFFFF in (0x600, 0x601)
+            while keys and not lock and is_page_lock(*keys[0]):
+                keys.pop(0)
+                self.int_replay.pop(0)
+            if lock and not (keys and is_page_lock(*keys[0])):
+                self.w("eflags", self.r("eflags") & ~1)
+                return tuple(self.r(r) for r in self.SVC_REGS), []
+            if keys:
+                keys.pop(0)
         regs, writes = self.int_replay.pop(0)
         keep = self.int_replay_regs(intno, self.r("eax")) if self.int_replay_regs else None
         for r, v in zip(self.SVC_REGS, regs):

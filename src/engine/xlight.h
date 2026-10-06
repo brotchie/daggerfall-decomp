@@ -1,16 +1,51 @@
-/* xlight.h: XnGine's lights (light.c; see xngine.h): the frame's light table, the per-polygon
-   light setup, and the per-pixel light shaders.
+/* xlight.h: XnGine's lights (src/engine/light.c): the frame's light table, the lighting of
+   each polygon on its first span, and the per-pixel light shaders. Canonical C: plain
+   prototypes, Watcom's own calling convention; docs/xngine_canonical.md.
 
-   A polygon lit by point lights gets a small piece of machine code, a shader returning the
-   shade at a view-space point: one of three templates (1, 2 or 3 lights) patched in place
-   with the lights' positions, intensities and the polygon's base shade row, and copied into a
-   pool in big_buffer (xn_light_code_next); its address goes into the polygon's +14h. The
-   builders stay byte-exact generators (the records see the template patches and the copies);
-   the shaders are evaluated in C from a copy's operands (xn_light_shade_eval, the design's
-   option B), so no generated code runs.
+   What it does
+     The game adds the frame's lights (xn_light_add: torches, spells, the sun) to a table of
+     32. When a model face or a terrain cell is first drawn, its setup lights it:
+       - its base shade row is the face's own shade plus the frame's ambient row;
+       - each directional light of its model's light list that faces it adds its intensity
+         times the cosine, in whole rows;
+       - each point light of the list that is in front of the face plane, near enough and
+         strong enough is collected (at most 3; the third ends the list).
+     A face lit to the last row is drawn unlit (kind 0); with no point light it is drawn
+     through its one shade row (kind 4, the row in the polygon's +14h); with point lights
+     it gets a light shader (kind 8): a record of the lights' foot points on the face plane,
+     their intensities and falloffs and the base row, which xn_light_shade evaluates at every
+     16th pixel of its spans (xspan.h). The asm compiled each shader into machine code (one
+     of three templates, patched and copied into big_buffer) and called it; canonical C keeps
+     the same numbers in a struct xn_light_shader from a pool of the frame's. The asm's
+     machine code still goes into big_buffer, as bytes nothing runs, because the game reads
+     big_buffer back through a stale pointer (Q-LIGHT-07).
 
-   Each declaration keeps the function's asm interface (config/xngine_abi.csv): no pragma is
-   Watcom's own convention; a pragma names the registers; NAME_r is the glue. */
+   Units and formats
+     positions      world units; xn_light_to_view moves them to view space << 8; a shader's
+                    foot points are view space >> 8 (indices into the squares table:
+                    xn_squares_table_mid[k] = k*k << 8).
+     intensity      1..32 at add; a point light at the face: (2^32 / d^2) * intensity, kept
+                    when above 100h; falloff: 2^30 / d^2, kept when above 80h (d: the
+                    light's distance from the face plane, d^2's high dword).
+     shade rows     addresses in xn_shade_table (64 rows of 256 colours, 16K-aligned): row k
+                    is xn_shade_table + k << 8, the last (k = 63) xn_shade_table_last_row; a
+                    shade is a row address plus an 8-bit fraction.
+     falloff table  xn_light_falloff: LIGHT.DAT, 32K words, the falloff by scaled squared
+                    distance (index < 8000h).
+     types          0 point, 4 ignored, 8 directional (byte offsets of the asm's dispatch
+                    tables).
+
+   Globals (in object 2, the engine's): xn_light_table, xn_light_next, xn_light_count,
+   xn_shade_table (+ _alloc, _last_row), xn_light_falloff (+ _alloc), xn_squares_table_mid.
+   The game's: xn_light_ambient (the ambient level, the game writes it). Canonical C's own:
+   xn_light_ambient_row (the frame's), the shader pool (the frame's).
+
+   Quirks kept (docs/engine/quirks.md): Q-LIGHT-01 (xn_light_add returns the camera cull's
+   leftover, which the game keeps as an object's draw handle), Q-LIGHT-02 (the light count
+   goes up before the full test), Q-LIGHT-04 (the squares-table index is not bounded), Q-LIGHT-05 (the
+   third point light ends the face's light list), Q-LIGHT-06 (the 1/z slope's inverse is 0
+   for a slope of 0: Q-SYS-01), Q-LIGHT-07 (the shaders' bytes in big_buffer reach the
+   game). */
 #ifndef XLIGHT_H
 #define XLIGHT_H
 
@@ -18,123 +53,116 @@
 #include "xnstruct.h"
 
 #define XN_LIGHTS       32              /* slots in xn_light_table (a 33rd ends the scans) */
+#define XN_LIGHT_POINTS 3               /* point lights a shader takes */
 
 extern struct xn_light xn_light_table[XN_LIGHTS + 1];
 extern struct xn_light *xn_light_next;  /* the next free slot */
-extern s32 xn_light_count;              /* lights added this frame (one more when a 33rd was
-                                           tried: the count goes up before the test) */
-extern s32 xn_light_ambient;            /* the ambient shade row's offset (row << 8) */
-extern u16 *xn_light_falloff;           /* light.dat: falloff by squared distance, 32-aligned */
+extern s32 xn_light_count;              /* lights added this frame (Q-LIGHT-02) */
+extern s32 xn_light_ambient;            /* the game's ambient level (row << 8; clamped at use) */
+extern u16 *xn_light_falloff;           /* LIGHT.DAT, 32-aligned */
 extern u8 *xn_light_falloff_alloc;
 extern char xn_light_filename[];        /* "LIGHT.DAT" */
-extern u8 *xn_shade_table;
+extern char xn_light_msg_no_memory[];   /* "ENGINE: Out of memory for shaders.$" */
+extern u8 *xn_shade_table;              /* 64 rows of 256 colours, 16K-aligned */
 extern u8 *xn_shade_table_alloc;
-extern u8 *xn_shade_table_last_row;
-extern u8 *xn_light_code_next;          /* where the next shader is copied (big_buffer) */
+extern u8 *xn_shade_table_last_row;     /* xn_shade_table + 3F00h */
 extern s32 xn_squares_table_mid[];      /* k*k << 8 at index k, k = -4096..4095 */
+extern u8 *xn_light_code_next;          /* where the next shader's asm image goes (Q-LIGHT-07;
+                                           xn_render_begin_frame: big_buffer) */
 
-/* The point lights that reach the polygon being set up, three slots
-   (struct xn_light_point_slots), and its shade row being accumulated */
-extern s32 xn_light_point_intensity[3];
-extern s32 xn_light_point_falloff[3];
-extern s32 xn_light_point_x[3], xn_light_point_y[3], xn_light_point_z[3];
-extern u8 *xn_light_shade_row;
-extern u8 *xn_light_ambient_row;        /* 15BC61: add ebx, AMBIENT_ROW (from
-                                           xn_render_begin_frame: xn_shade_table + ambient) */
+/* The frame's ambient shade row: xn_shade_table + the ambient level's whole rows (clamped to
+   0..3F00h), set by xn_render_begin_frame; the model faces' and the flats' base row. */
+extern u8 *xn_light_ambient_row;
 
-/* the three shader templates (code in object 2, patched in place, never run there) */
-extern u8 xn_light_tmpl_1[0x54], xn_light_tmpl_2[0x8C], xn_light_tmpl_3[0xCC];
+/* A point light as a shader takes it: its foot point on the face plane (view space >> 8),
+   its intensity at the face and its falloff. */
+struct xn_light_point {
+    s32 x, y, z;
+    s32 intensity;
+    s32 falloff;
+};
+
+/* A polygon's light shader (the polygon's +14h for lighting kind 8). */
+struct xn_light_shader {
+    s32 nlights;                        /* 1..3 */
+    u8 *row;                            /* the base shade row (with the directional lights) */
+    struct xn_light_point light[XN_LIGHT_POINTS];
+};
 
 /* ---- the frame's lights -------------------------------------------------------------------- */
 
-/* Allocates the shade table (16K-aligned) and the falloff table (32-aligned), loads
-   LIGHT.DAT into the latter and writes its address into the six falloff operands of the
-   shader templates; empties the light table. Without the memory, shuts the engine down and
-   exits to DOS with a message. Keeps every register (pushad). */
+/* Allocates the shade table (32K from the game's allocator, 16K-aligned) and the falloff
+   table (64K + 32, 32-aligned), loads LIGHT.DAT into the latter and empties the light table.
+   Without the memory, shuts the engine down and ends the program with a message. One game
+   site (the video set-up). */
 void xn_light_init(void);
-void xn_light_init_r(xn_regs *r);
 
 /* Frees the shade and falloff tables' blocks (when the shade table was allocated). */
 void xn_light_free(void);
-void xn_light_free_r(xn_regs *r);
 
-/* Empties the light table: every slot's intensity -1, the next slot the first. (The count is
-   left as it is.) */
+/* Empties the light table: every slot's intensity -1, the next slot the first (the count is
+   left: xn_render_begin_frame zeroes it). Three game sites. */
 void xn_light_reset(void);
 
-/* Adds a light of the frame at (x, y, z): intensity 1..32 (clamped), radius (clamped to 512)
-   and type (0 point, 4 ignored, 8 directional). A point light whose sphere the camera does
-   not see is dropped. Returns what the asm leaves in EAX: x, or the culling test's result. */
+/* Adds a light of the frame at (x, y, z): intensity (none when 0 or less; clamped to 32),
+   radius (clamped to 512) and type (0 point, 4 ignored, 8 directional). A point light whose
+   sphere (radius intensity / 2 * radius << 6) the camera does not see is not kept. At most 31
+   lights a frame (Q-LIGHT-02). Returns x, or for a point light what the camera cull leaves
+   (Q-LIGHT-01). Ten game sites. */
 s32 xn_light_add(s32 x, s32 y, s32 z, s32 intensity, s32 radius, s32 type);
 
-/* xn_light_add with the radius in EBP and the type in ESI: glue */
-s32 xn_light_add_regs(s32 x, s32 y, s32 z, s32 intensity, s32 radius, s32 type);
-void xn_light_add_regs_r(xn_regs *r);
-
-/* The lights' positions rewritten in view space << 8, in place, for the flats. */
+/* The lights' positions rewritten in view space << 8, in place (for the flats, which light
+   in view space). Called by xn_render_draw_flats, after the models. */
 void xn_light_to_view(void);
 
-/* ---- the per-polygon setup ----------------------------------------------------------------- */
+/* ---- the per-polygon lighting -------------------------------------------------------------- */
 
-/* A model face's lighting: its 1/z slope's inverse into +60h, its model marked as drawn, its
-   base shade row (face shade + ambient) lit by the directional lights of the model's light
-   list, and the point lights that reach the face plane collected (at most 3). Returns 0 when
-   the row runs past the last one (fully lit), 4 with the row in the polygon's +14h (no point
-   light), or 8 with a compiled shader there. */
+/* A model face's lighting, on its first span: marks its model drawn (the handle's flag 2),
+   stores its 1/z slope's inverse (+60h: 2^32 / +5Ch, 0 for 0, Q-LIGHT-06), and lights it
+   from its model's light list as the module header says (Q-LIGHT-05). Returns the lighting
+   kind: 0 (lit to the last row), 4 (the row in +14h) or 8 (a shader in +14h). */
 s32 xn_light_setup_poly(struct xn_poly *poly);
-#pragma aux xn_light_setup_poly parm [edi] value [eax] modify exact [eax ecx edx ebx esi];
 
-/* The same for a terrain polygon: its directional lights only (from its +14h); 0 or 4. */
+/* A terrain cell's: the 1/z slope's inverse, the ambient row (none when the ambient is at the
+   last row or beyond), and the directional lights of its list (+14h, in view space: their
+   directions negated). Returns 0 or 4. */
 s32 xn_light_setup_terrain(struct xn_poly *poly);
-#pragma aux xn_light_setup_terrain parm [edi] value [eax] modify exact [eax ecx edx ebx esi];
 
-/* No point light: the polygon's +14h is the shade row; 4. */
-s32 xn_light_shade_constant(struct xn_poly *poly);
-void xn_light_shade_constant_r(xn_regs *r);
+/* No point light: row becomes the polygon's shade row (+14h); 4. */
+s32 xn_light_shade_constant(struct xn_poly *poly, u8 *row);
 
-/* Compiles the polygon's shader for its 1, 2 or 3 point lights (the slots): the template's
-   operands patched in place, the template copied to xn_light_code_next, the polygon's +14h
-   pointed at the copy and its +08h.. holding the falloffs the copy reads. Returns 8. */
-s32 xn_light_build_shader(struct xn_poly *poly, int nlights);
-s32 xn_light_build_shader_1(struct xn_poly *poly);
-s32 xn_light_build_shader_2(struct xn_poly *poly);
-s32 xn_light_build_shader_3(struct xn_poly *poly);
-void xn_light_build_shader_1_r(xn_regs *r);
-void xn_light_build_shader_2_r(xn_regs *r);
-void xn_light_build_shader_3_r(xn_regs *r);
+/* The polygon's shader for n (1..3) point lights over the base row: a record of the frame's
+   pool into its +14h, and the asm's compiled form of it at xn_light_code_next (Q-LIGHT-07);
+   8. */
+s32 xn_light_build_shader(struct xn_poly *poly, u8 *row, const struct xn_light_point *pts,
+                          int n);
 
-/* A point light of a model's list (ref: in the model's axes): when it is in front of the face
-   plane, near enough, and strong enough, fills point slot `slot` with its intensity at the
-   plane, its falloff, and its foot point on the plane in view space (>> 8); returns 1 then. */
-int xn_light_point_reaches(struct xn_poly *poly, const struct xn_light_ref *ref, int slot);
-/* xn_light_add_point (15BF75), the point lights' dispatch entry: its asm interface is in
-   lglue.asm (a jump into xn_light_build_shader_3 that skips its own frame when the third slot
-   fills, which no C or route stub can do), around xn_light_point_reaches. */
+/* A point light of the face's model's list (ref: in the model's axes): when it is in front
+   of the face plane, within its range and strong enough (see the units), *pt gets its
+   intensity, falloff and foot point; returns 1 then, else 0. */
+int xn_light_add_point(const struct xn_poly *poly, const struct xn_light_ref *ref,
+                       struct xn_light_point *pt);
 
 /* A directional light of a model's list: when it faces the polygon, adds its intensity times
-   the cosine, in whole rows, to the shade row. Returns 1 (stop: fully lit) when the row
-   reaches the last one. The terrain's lights come negated, from view space. */
-int xn_light_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref);
-void xn_light_add_directional_r(xn_regs *r);
-int xn_light_terrain_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref);
-void xn_light_terrain_add_directional_r(xn_regs *r);
+   the cosine, in whole rows, to *row. Returns 1 (stop: fully lit) when the row reaches the
+   last one. */
+int xn_light_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref,
+                             u8 **row);
 
-/* The dispatch tables' empty entries (type 4, and the terrain's point lights) */
-void xn_light_add_type4_noop(void);
-#pragma aux xn_light_add_type4_noop parm [] modify exact [eax];
-void xn_light_terrain_add_point_noop(void);
-#pragma aux xn_light_terrain_add_point_noop parm [] modify exact [eax];
-void xn_light_terrain_add_type4_noop(void);
-#pragma aux xn_light_terrain_add_type4_noop parm [] modify exact [eax];
+/* The same for the terrain's lights (in view space, negated, with the cell's normal +50h). */
+int xn_light_terrain_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref,
+                                     u8 **row);
 
-/* ---- the shaders ---------------------------------------------------------------------------- */
+/* ---- the shaders ------------------------------------------------------------------------------ */
 
-/* The shade a compiled shader (a copy of one of the templates) gives at a view-space point:
-   the ray (ray_x, ray_y) of the pixel times its z. Each point light adds
-   (falloff[(d^2 * light falloff) >> 32] * intensity) >> 12 to the base row while that index is
-   below 8000h, d^2 from the squares table; the sum is clamped to the last row (the one-light
-   shader clamps only when its light added something). Reads the copy's operands; runs no
-   code. */
-s32 xn_light_shade_eval(const u8 *shader, s32 ray_y, s32 ray_x, s32 z);
+/* Empties the frame's shader pool (xn_render_begin_frame). */
+void xn_light_begin_frame(void);
+
+/* The shade a shader gives at the view-space point of a pixel: its ray (ray_x, ray_y: the
+   camera's rays of its column and row) times its z. Each light adds
+   (falloff[(d^2 * light falloff) >> 32] * intensity) >> 12 to the base row while that index
+   is below 8000h (d^2 from the squares table, Q-LIGHT-04); the sum is clamped to the last
+   row. */
+s32 xn_light_shade(const struct xn_light_shader *shader, s32 ray_y, s32 ray_x, s32 z);
 
 #endif

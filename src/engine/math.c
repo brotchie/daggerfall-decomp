@@ -1,6 +1,12 @@
-/* math.c: XnGine's math functions as readable C (xmath.h; see xngine.h and
-   docs/xngine_readable.md). Angles are 2048 steps to a turn; sines and cosines are 2.28 fixed
-   point (1.0 = 0x10000000). */
+/* math.c: XnGine's scalar math (canonical C; the interface and the module's documentation are
+   in xmath.h).
+
+   Angles are 2048 steps to a turn (11 bits; tables index them masked with 0x7FF). Sines,
+   cosines and other unit values are 2.28 fixed point (1.0 = 0x10000000). Products that need
+   64 bits use xngine.h's helpers (Watcom C32 10.0a has no 64-bit integer type); divisions that
+   the asm let fault use the _or0 helpers (arith.c), which give its results without the
+   exception. Quirks of the asm that callers can see are kept and marked "Quirk Q-..."
+   (docs/engine/quirks.md). */
 #include "xmath.h"
 
 s32 xn_math_approx_dist2d(s32 x1, s32 z1, s32 x2, s32 z2)
@@ -14,6 +20,7 @@ s32 xn_math_approx_dist2d(s32 x1, s32 z1, s32 x2, s32 z2)
     if (dz < 0)
         dz = -dz;
     small = dx < dz ? dx : dz;
+    /* Quirk Q-MATH-01: an unsigned halving (shr), and |most negative| stays negative */
     return dx + dz - (s32)((u32)small >> 1);
 }
 
@@ -33,44 +40,52 @@ u32 xn_math_diff_div(u32 a, u32 b, u32 d, u32 *rem)
 
     n.lo = a - b;
     n.hi = 0;
-    return xn_u64_divrem(&n, d, rem);
-}
-
-void xn_math_diff_div_r(xn_regs *r)
-{
-    u32 rem;
-
-    r->eax = xn_math_diff_div(r->eax, r->edx, r->ebx, &rem);
-    r->edx = rem;
+    return xn_u64_divrem_or0(&n, d, rem);
 }
 
 s32 xn_math_exp_series(s32 v)
 {
     s32 sq = v * v;
-    xn_s64 n;
 
-    /* The series' terms are lost to the register flow; only the first division by 6 is
-       left, and the divide error it can raise. */
-    n.lo = (s16)(v >> 1);
-    n.hi = v >> 1;
-    xn_s64_div(&n, 6);
+    /* Quirk Q-MATH-03: the series' terms were lost in the asm; what is left squares v twice
+       (its one division, by 6, only ever mattered for the divide error it could raise) */
     return sq * sq;
+}
+
+/* The asm's isqrt of 0: its `bsr` leaves the caller's ECX as the top bit (Quirk Q-MATH-02):
+   the bit-by-bit search then starts from bit (ecx - 1) (at most 15, the shift count masked to
+   5 bits) and accepts every bit whose square's low 32 bits are not above 0. */
+s32 xn_math_isqrt_zero(s32 ecx)
+{
+    s32 top = ecx - 1;
+    s32 root = 0, t;
+    u32 bit;
+
+    if (top > 15)
+        top = 15;
+    for (bit = 1u << (top & 31); bit != 0; bit >>= 1) {
+        t = root + (s32)bit;
+        if (t * t <= 0)
+            root = t;
+    }
+    return root;
 }
 
 s32 xn_math_angle_to_point(s32 x1, s32 z1, s32 x2, s32 z2)
 {
     s32 dx = x2 - x1;
     s32 dz = z2 - z1;
+    s32 sq = dx * dx + dz * dz;         /* 32 bits: far points wrap (Quirk Q-MATH-04) */
     s32 len, a;
     xn_s64 n;
 
-    /* the length; the low bits of dz << 28 are what the asm leaves in ECX for the root */
-    len = xn_math_isqrt(dx * dx + dz * dz, dz << 28);
+    /* the asm's register for isqrt's top bit holds the low dword of dz << 28 here */
+    len = sq != 0 ? xn_math_isqrt(sq) : xn_math_isqrt_zero(dz << 28);
     if ((u32)len <= 8)
         len = 8;
     xn_s64_set(&n, dz);
     xn_s64_shl(&n, 28);
-    a = xn_math_acos(xn_s64_div(&n, len));
+    a = xn_math_acos(xn_s64_div_or0(&n, len));
     if (dx >= 0)
         a = 0x7FF - a;
     return a;
@@ -92,16 +107,6 @@ void xn_math_angles_to_vector(s32 a, s32 b, s32 len, xn_vec3 *out)
     out->z = xn_mulhi(xn_cos_table[a], scale);
 }
 
-void xn_math_angles_to_vector_r(xn_regs *r)
-{
-    xn_vec3 v;
-
-    xn_math_angles_to_vector(r->eax, r->edx, r->ebx, &v);
-    r->eax = v.x;
-    r->edx = v.y;
-    r->ebx = v.z;
-}
-
 s32 xn_math_scale_110(s32 a, s32 b, s32 d, s32 *rem)
 {
     xn_s64 n;
@@ -109,20 +114,13 @@ s32 xn_math_scale_110(s32 a, s32 b, s32 d, s32 *rem)
 
     n.lo = xn_mulhi(0x6E - a, b);
     n.hi = 0;
-    q = xn_s64_divrem(&n, d, rem);
+    q = xn_s64_divrem_or0(&n, d, rem);
     return q != 0 ? q : 1;
-}
-
-void xn_math_scale_110_r(xn_regs *r)
-{
-    s32 rem;
-
-    r->eax = xn_math_scale_110(r->eax, r->edx, r->ebx, &rem);
-    r->edx = rem;
 }
 
 s32 xn_math_mul_sin(s32 a, s32 angle)
 {
+    /* Quirk Q-MATH-05: the angle is not masked */
     return xn_fixmul28(a, xn_sin_table[angle]);
 }
 
@@ -192,12 +190,19 @@ static s32 nearest_angle(const s32 *table, s32 a, s32 v)
     return d_lo > d_hi ? hi : lo;
 }
 
-s32 xn_math_asin(s32 v)
+/* v clamped to [-1.0, 1.0] (2.28) */
+static s32 clamp_unit(s32 v)
 {
     if (v < -XN_ONE28)
-        v = -XN_ONE28;
-    else if (v > XN_ONE28)
-        v = XN_ONE28;
+        return -XN_ONE28;
+    if (v > XN_ONE28)
+        return XN_ONE28;
+    return v;
+}
+
+s32 xn_math_asin(s32 v)
+{
+    v = clamp_unit(v);
     return nearest_angle(xn_sin_table, xn_math_asin_coarse(v) & XN_ANGLE_MASK, v);
 }
 
@@ -208,23 +213,23 @@ s32 xn_math_acos_coarse(s32 v)
 
 s32 xn_math_acos(s32 v)
 {
-    if (v < -XN_ONE28)
-        v = -XN_ONE28;
-    else if (v > XN_ONE28)
-        v = XN_ONE28;
+    v = clamp_unit(v);
     return nearest_angle(xn_cos_table, xn_math_acos_coarse(v), v);
 }
 
-s32 xn_math_isqrt(s32 v, s32 ecx)
+s32 xn_math_isqrt(s32 v)
 {
-    s32 top = xn_bsr(v, ecx) - 1;
-    s32 root = 0, t;
+    s32 root = 0, t, top;
     u32 bit;
 
+    if (v == 0)
+        return 0;                       /* (the asm: Q-MATH-02, xn_math_isqrt_zero) */
+    top = xn_bsr(v, 0) - 1;
     if (top > 15)
         top = 15;
+    /* Quirk Q-MATH-04: the squares are compared as signed 32-bit values (they wrap) */
     for (bit = 1u << (top & 31); bit != 0; bit >>= 1) {
-        t = root + bit;
+        t = root + (s32)bit;
         if (t * t <= v)
             root = t;
     }
@@ -279,30 +284,22 @@ s32 xn_math_angle_xy(s32 x, s32 y)
     len = xn_math_isqrt64(n.lo, n.hi);
     xn_s64_set(&n, x);
     xn_s64_shl(&n, 28);
-    return (xn_math_acos(xn_s64_div(&n, len)) + quadrant) & XN_ANGLE_MASK;
+    return (xn_math_acos(xn_s64_div_or0(&n, len)) + quadrant) & XN_ANGLE_MASK;
 }
+
+/* the collision tests' plane normal (xcollide.h): xn_math_plane_y_at leaves its normal there */
+extern xn_vec3 xn_collide_normal;
 
 s32 xn_math_plane_y_at(const xn_vec3 *n, const xn_vec3 *c, s32 x, s32 z)
 {
-    xn_tri_work *w = &xn_math_tri_edges;
     xn_s64 d;
 
     if (n->y == 0)
-        return n->x;
-    w->n = *n;
+        return n->x;                    /* Quirk Q-MATH-06: n.x, not a height */
+    xn_collide_normal = *n;
     xn_s64_mul(&d, x - c->x, n->x);
     xn_s64_mac(&d, z - c->z, n->z);
-    return c->y - xn_s64_div(&d, n->y);
-}
-
-void xn_math_plane_y_at_r(xn_regs *r)
-{
-    xn_vec3 n;
-
-    n.x = r->eax;
-    n.y = r->edx;
-    n.z = r->ebx;
-    r->eax = xn_math_plane_y_at(&n, (const xn_vec3 *)r->ecx, r->esi, r->edi);
+    return c->y - xn_s64_div_or0(&d, n->y);
 }
 
 /* (a*b - c*d) >> 8 with a 64-bit difference */
@@ -317,28 +314,26 @@ static s32 cross8(s32 a, s32 b, s32 c, s32 d)
 
 s32 xn_math_triangle_y_at(const xn_vec3 *tri, s32 x, s32 z)
 {
-    xn_tri_work *w = &xn_math_tri_edges;
-    s32 ny;
+    xn_vec3 e1, e2;
+    s32 qx, qz, ny, hx, hz;
     xn_s64 h;
 
-    w->e1.x = tri[1].x - tri[0].x;
-    w->e1.y = tri[1].y - tri[0].y;
-    w->e1.z = tri[1].z - tri[0].z;
-    w->e2.x = tri[2].x - tri[1].x;
-    w->e2.y = tri[2].y - tri[1].y;
-    w->e2.z = tri[2].z - tri[1].z;
-    w->q.x = x - tri[0].x;
-    w->q.z = z - tri[0].z;
-    w->q.y = tri[0].y;
-    ny = -cross8(w->e1.z, w->e2.x, w->e1.x, w->e2.z);
+    e1.x = tri[1].x - tri[0].x;
+    e1.y = tri[1].y - tri[0].y;
+    e1.z = tri[1].z - tri[0].z;
+    e2.x = tri[2].x - tri[1].x;
+    e2.y = tri[2].y - tri[1].y;
+    e2.z = tri[2].z - tri[1].z;
+    qx = x - tri[0].x;
+    qz = z - tri[0].z;
+    ny = -cross8(e1.z, e2.x, e1.x, e2.z);       /* the normal's y, (e1 x e2).y >> 8 */
     if (ny == 0)
-        return 0;                       /* edge-on */
-    w->ny = ny;
-    w->nq_x = -cross8(w->e1.z, w->q.x, w->e1.x, w->q.z);
-    w->nq_z = -cross8(w->q.z, w->e2.x, w->q.x, w->e2.z);
-    xn_s64_mul(&h, w->nq_z, w->e1.y);
-    xn_s64_mac(&h, w->nq_x, w->e2.y);
-    return xn_s64_div(&h, w->ny) + w->q.y;
+        return 0;                               /* edge-on */
+    hx = -cross8(e1.z, qx, e1.x, qz);
+    hz = -cross8(qz, e2.x, qx, e2.z);
+    xn_s64_mul(&h, hz, e1.y);
+    xn_s64_mac(&h, hx, e2.y);
+    return xn_s64_div_or0(&h, ny) + tri[0].y;
 }
 
 void xn_math_rotate_xz(s32 *x, s32 *z, s32 angle)
@@ -348,15 +343,6 @@ void xn_math_rotate_xz(s32 *x, s32 *z, s32 angle)
     angle &= XN_ANGLE_MASK;
     *x = xn_mulhi(x16, xn_cos_table[angle]) + xn_mulhi(z16, xn_sin_table[angle]);
     *z = xn_mulhi(z16, xn_cos_table[angle]) - xn_mulhi(x16, xn_sin_table[angle]);
-}
-
-void xn_math_rotate_xz_r(xn_regs *r)
-{
-    s32 x = r->eax, z = r->edx;
-
-    xn_math_rotate_xz(&x, &z, r->ebx);
-    r->eax = x;
-    r->edx = z;
 }
 
 s32 xn_math_isqrt_lookup(u32 v)
@@ -376,4 +362,14 @@ s32 xn_math_isqrt_lookup(u32 v)
     low = xn_bsf(v, 0) & ~1u;
     v >>= low;
     return (s32)(((u32)xn_math_sqrt_table[v] << (low / 2 + shift / 2)) >> 2);
+}
+
+/* ---- the game's calls (boundary adapters) ------------------------------------------------- */
+
+/* The game calls xn_math_isqrt at four sites. The asm's answer for 0 depends on the caller's
+   ECX (Q-MATH-02); the game's site 080FFC (intrface.c: the sine of a direction, x * x in ECX)
+   reaches 0 when x is 0x10000 and z is 0. This keeps what the game got. */
+void xn_math_isqrt_b(xn_regs *r)
+{
+    r->eax = r->eax != 0 ? xn_math_isqrt(r->eax) : xn_math_isqrt_zero(r->ecx);
 }

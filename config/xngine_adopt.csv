@@ -1,0 +1,4 @@
+c_symbol,asm_address,size,kind,reason,every
+xn_render_span_hook,0CEA58,4,codeptr,"the span hook xn_shade_set_fog chose (the fog or none): the asm keeps it in its own xn_render_span_hook, as the asm entry's address",
+xn_light_ambient_row,15BC61,4,copy,"the frame's ambient shade row xn_render_begin_frame set: the asm keeps it in xn_light_setup_poly's operand (add ebx, AMBIENT_ROW) and xn_flat_span_light_setup's (155636)",
+,0DB35C,4,codeptr-inplace,"the polygons' span routines the asm left (+3Ch; the flats' span is the same offset): the terrain's cells, which the game's xn_terrain_draw makes before xn_render_frame",64*1000
