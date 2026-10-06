@@ -947,7 +947,7 @@ Not quirks, and not listed here: the asm's private bookkeeping that canonical C 
   leaves the file handle in BX (`mov bx, [file]` for DOS).
 - **Behaviour:** the rows after a refill are as wide as the handle (5 or so): the frame is
   garbled and the chunks after it are misread.
-- **Visible:** no shipped movie has a raw frame (`build/xn_canon/group_b/tools/mkrec.py`
+- **Visible:** no shipped movie has a raw frame (`tools/xn_mkrec.py b`
   surveys them); a synthetic one shows it (`b_vid_synth_big`).
 - **Kept by:** `next_w` in the raw frame's loop.
 - **Status:** kept.

@@ -17,8 +17,10 @@
             -> build/xn_canon/coverage/scen_NAME.bin
   report    blocks executed / reachable, overall, per subsystem and per function; the blocks
             never executed, grouped by a likely reason: a dead function (no caller per the
-            ABI), helmet or serial hardware, an error or fatal path, VESA, debug and
-            benchmarks, the rest. -> build/xn_canon/coverage/report.md and functions.csv
+            ABI), a reason known by analysis (JUSTIFIED below: the conversion groups' block
+            ranges, and never-taken range clamps), helmet or serial hardware, an error or
+            fatal path, VESA, debug and benchmarks, the rest ("not reached").
+            -> build/xn_canon/coverage/report.md and functions.csv
 
 A block counts as executed when its first byte is in the map; instructions are counted too.
 
@@ -341,6 +343,79 @@ def dead_functions(d, abi):
 
 ERROR_SERVICES = {"int 0x21/09", "int 0x21/4C"}
 
+# Blocks never executed whose reason is known from analysis (the conversion groups' reports and
+# docs/engine/quirks.md), where the heuristics below cannot see it: (start, end) preferred
+# addresses (a block counts when it starts in [start, end)), the reason (a row of the report's
+# table) and why. A conversion group adds its own here; report.md lists them with their counts.
+UNREACHABLE = "unreachable (by analysis)"
+JUSTIFIED = [
+    # group A (system and input)
+    (0x0C0CB0, 0x0C0CBD, "error or fatal path",
+     "xn_dos_open: DOS refused the open: the 'DOS: File not found' fatal tail (Q-DOS-01)"),
+    (0x0C0E84, 0x0C0E8B, "error or fatal path",
+     "xn_dos_load_file: no memory for the file: the 'DOS: Out of memory loading file' fatal tail"),
+    (0x0C0EAF, 0x0C0EB7, "error or fatal path",
+     "the 'DOS:' fatal tail after its call of fatal_error (50069h), which does not return"),
+    # group B (screen and 2D)
+    (0x0C17E0, 0x0C1810, "hardware absent, shutdown or teardown",
+     "xn_vid_update's sound streaming (sound_digi_device != -1): no digital sound device in "
+     "the emulator"),
+    (0x0C1D12, 0x0C1D3C, "hardware absent, shutdown or teardown",
+     "xn_vid_audio_done_cb: the SOS driver's sample-done callback: no digital sound device"),
+    (0x0C1D83, 0x0C1D8E, "hardware absent, shutdown or teardown",
+     "xn_vid_audio_start's second audio buffer: only after a sample-done callback (no digital "
+     "sound device)"),
+    (0x12DBA9, 0x12DBCA, "dead function",
+     "the unlabelled glyph routine at 12DBA0 (docs/engine/structs.md): no caller; the walk "
+     "reaches it past xn_font_select's int 21h/4Ch"),
+    (0x143610, 0x143670, "VESA",
+     "xn_gfx_set_mode once xn_gfx_vesa_init (15FC00) found VBE: no VESA BIOS in the emulator"),
+    (0x14781C, 0x14781D, UNREACHABLE,
+     "xn_draw_transparent_row's own ret, after its 640 unrolled pixels: every row ends at the "
+     "ret planted after its width (smc DRAW-TRANSPARENT), at most 320"),
+    # group E (world and collision)
+    (0x14AEF2, 0x14AEF4, UNREACHABLE,
+     "xn_collide_spheres_model's mode-1 exit (Q-COLL-06): the game passes modes 0 and 2 only, "
+     "and it unbalances the stack (a crash): not recordable"),
+    (0x12F798, 0x12F79A, UNREACHABLE,
+     "xn_water_clip_extent's 'unseen' (CF): only when a cut end keeps a top or bottom bit, "
+     "which needs a cut point behind the eye, and the near cut comes first (Q-WATER-02)"),
+]
+# A random draw's range clamp, `and R, M; cmp R, M; jle ok; (shr R, 1; jmp back)`: R & M is
+# never above M, so the shift never runs (xn_rand_noise_init, xn_sky_init_stars, xn_water_init,
+# xn_world_rock_slopes)
+CLAMP = "a random draw's range clamp after `and R, M; cmp R, M; jle`: R & M is never above M"
+
+
+def _justified(blk, d):
+    """(reason, why) of an unexecuted block known by analysis, or None."""
+    for lo, hi, why_kind, why in JUSTIFIED:
+        if lo <= blk[0] < hi:
+            return why_kind, why
+    if _clamp(blk[0], d):
+        return UNREACHABLE, CLAMP
+    return None
+
+
+_addrs = {}
+
+
+def _clamp(a, d):
+    """Whether the block at a is a never-taken range clamp (see CLAMP)."""
+    text = d.get("text", {})
+    if id(d) not in _addrs:
+        _addrs.clear()
+        _addrs[id(d)] = sorted(int(k, 16) for k in text)
+    addrs = _addrs[id(d)]
+    k = bisect.bisect_left(addrs, a)
+    if k < 3 or addrs[k] != a or addrs[k - 1] + d["insns"]["%06X" % addrs[k - 1]] != a:
+        return False
+    t = [text["%06X" % addrs[k - j]] for j in (3, 2, 1)]
+    m_and = _re.match(r"^and (\w+), (\w+)$", t[0])
+    m_cmp = _re.match(r"^cmp (\w+), (\w+)$", t[1])
+    return bool(m_and and m_cmp and m_and.groups() == m_cmp.groups() and t[2].startswith("jle ")
+                and text["%06X" % a].startswith("shr %s, 1" % m_and.group(1)))
+
 
 def reasons_for(fs, blk, d, abi, names, calls, dead=(), copies=None):
     """A likely reason a block never ran."""
@@ -348,6 +423,9 @@ def reasons_for(fs, blk, d, abi, names, calls, dead=(), copies=None):
     rows = [abi.get(f, {}) for f in fs]
     if all(f in dead for f in fs):
         return "dead function"
+    j = _justified(blk, d)
+    if j is not None:
+        return j[0]
     if copies is not None and blk[0] in copies:
         return "unrolled copy of an executed block"
     subs = {r.get("subsystem", "") for r in rows}
@@ -398,6 +476,7 @@ def report(top=60):
     per = collections.defaultdict(lambda: [0, 0])
     per_sub = collections.defaultdict(lambda: [0, 0])
     missing = collections.defaultdict(list)
+    analysed = collections.Counter()        # (reason, why) of JUSTIFIED and CLAMP -> blocks
     dead = dead_functions(d, abi)
     text = d.get("text", {})
     # unrolled bodies: an unexecuted block whose instructions, numbers aside, are those of an
@@ -418,7 +497,11 @@ def report(top=60):
         per_sub[sub][1] += 1
         per_sub[sub][0] += h
         if not h:
-            missing[reasons_for(b[3], b, d, abi, names, calls, dead, copies)].append(b)
+            why = reasons_for(b[3], b, d, abi, names, calls, dead, copies)
+            missing[why].append(b)
+            j = _justified(b, d)
+            if j is not None and why == j[0]:
+                analysed[j] += 1
     lines = ["# XnGine asm coverage (tools/xn_cover.py report)", ""]
     lines.append("**%d / %d basic blocks executed (%.1f%%)**, %d / %d instructions (%.1f%%)." % (
         done, tot, 100.0 * done / tot, di, ni, 100.0 * di / ni))
@@ -443,6 +526,14 @@ def report(top=60):
     lines.append("Executed or justified: %d / %d blocks (%.1f%%)." % (
         done + justified, tot, 100.0 * (done + justified) / tot))
     lines.append("")
+    if analysed:
+        lines.append("## Justified by analysis (xn_cover.py JUSTIFIED)")
+        lines.append("")
+        lines.append("| blocks | reason | why |")
+        lines.append("|---|---|---|")
+        for (kind, why), n in sorted(analysed.items(), key=lambda kv: -kv[1]):
+            lines.append("| %d | %s | %s |" % (n, kind, why))
+        lines.append("")
     lines.append("## Per subsystem")
     lines.append("")
     lines.append("| subsystem | blocks executed | of | % |")

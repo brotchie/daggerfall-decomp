@@ -314,8 +314,16 @@ whatever the caller left. What a service returns is compared in the registers it
 | `tools/xn_rc.py frames SNAP --boundary` | the old frames command through the scenario runner, compared at the boundary |
 | `tools/xn_rc.py test --boundary [FUNC...]` | the game's calls of the boundary's entries |
 | `tools/xn_rc.py test FUNC/SUBSYS` | records through shims (canonical) or the old routes |
-| `tools/xn_cover.py cfg / corpus / scenarios / report` | asm basic-block coverage |
-| `tools/xn_equiv.py [FUNC...]` | pure helpers, asm against C, at scale |
+| `tools/xn_cover.py cfg / corpus / scenarios / report` | asm basic-block coverage; a block no input can reach is justified by its reason in the tool's `JUSTIFIED` table (a block range, the reason, why: from a group's analysis or a quirk), listed in `report.md` |
+| `tools/xn_equiv.py [FUNC...] [-j 2]` | pure helpers, asm against C, at scale: the pilot's, group A's, B's and E's specs (`--list`); a function's dropped register and flag outputs (`config/xngine_dropped.csv`, `XN_DROPPED`) are not compared, as in the record tests |
+| `tools/xn_mkrec.py a / b / e / all [CASE...]` | the groups' crafted records (direct calls with made-up inputs, for coverage), regenerated into the corpus (`build/xngine/records`: `grpa_*`, `b_*`, `group_e_*`); `check [a b e]` replays them on the asm, `--against DIR` compares them with another copy |
+
+The crafted records are part of the corpus (561: A 61, B 401, E 99): regenerate them with
+`.venv/bin/python tools/xn_mkrec.py all` (or `a`, `b`, `e`; a case or job name or prefix picks
+some; one machine at a time, about three minutes in all), then `tools/xn_mkrec.py check a b e`
+(every record replays exactly on the asm). Regenerated, they are identical to the groups' own
+(each record's entry state, pages, exit, writes and I/O). A new group's generator adds its
+cases there, beside A's, B's and E's, rather than in a folder of its own and `XN_RECORDS`.
 
 Scenario syntax (`tools/xn_scenarios.py`): a snapshot; a prelude, asm only (`poke`, `water`,
 `time`, `teleport`, `play`: tools/fallplay.py steps such as `["door", "13"]`, then `script`
