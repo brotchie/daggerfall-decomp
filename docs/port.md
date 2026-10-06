@@ -145,8 +145,9 @@ What it took, beyond the engine:
   (climate's categories from 223 bytes before them). The globals holding pointers are laid
   out natively out of line.
 - **Against the original.** `tools/port_compare.py` renders each classic save in the emulator
-  (FALL.EXE itself) and natively, and compares the frames pixel by pixel. All 18 saves score
-  0.84-1.00; the rest is random (rain, torch flicker, clouds, walking people).
+  (FALL.EXE itself) and natively, and compares the frames pixel by pixel (the best of nine native
+  shots a second apart: torch light and lightning move a single shot by up to 30%). All 18 saves
+  score 0.95-1.00, seven of them 0.995 or more; the rest is random (rain, clouds, walking people).
   - The comparison found two bugs: the sun's direction (three locals the asm took as a vector)
     and the weapon's colours (an offset counted from the 71-byte header).
 - **Random inputs and AddressSanitizer.** `PORT_SANITIZE=address` builds a folder with ASan

@@ -5,12 +5,13 @@ For each save of orig/saves (one zip each) that has an emulator snapshot of it l
 (build/emu/snap/save_NAME.snap in the main checkout):
   - the emulator runs the snapshot 10 ticks and saves the screen;
   - the native build (build/port/fall) loads the save from slot 0 of an overlay of its own
-    (a few seconds of play) and saves the screen;
-  - the two are compared pixel by pixel, colours within 4 of each other (the two screenshots
-    turn the VGA's 6-bit levels into 8 bits differently), by bands of 25 rows.
+    and saves the screen once a second from 34 s to 42 s (6 to 14 s after the load);
+  - each is compared with the emulator's pixel by pixel, colours within 4 of each other (the
+    two screenshots turn the VGA's 6-bit levels into 8 bits differently), by bands of 25 rows,
+    and the best is reported: flickering light (torches, lightning) moves one shot by up to 30%.
 Random effects (rain, the NPCs walking, the clouds) leave a few percent; a lower score is a
-difference to look at (build/port/compare/NAME/diff.bmp: the emulator, the native, the
-differing pixels in red).
+difference to look at (build/port/compare/NAME/diff.bmp: the emulator, the best native shot,
+the differing pixels in red).
 
 usage: port_compare.py [NAME ...]          (default: every save with a snapshot)
 One emulator at a time (docs: emulator memory). Takes a minute or two a save.
@@ -117,7 +118,7 @@ def emulator_shot(name, out):
     return p if r.returncode == 0 and os.path.exists(p) else None
 
 
-def native_shot(name, out):
+def native_shots(name, out):
     overlay = os.path.join(out, "overlay")
     save0 = os.path.join(overlay, "SAVE0")
     os.makedirs(save0, exist_ok=True)
@@ -133,24 +134,31 @@ def native_shot(name, out):
         dst = os.path.join(overlay, "ARENA2", a)
         if os.path.exists(src) and not os.path.exists(dst):
             os.link(src, dst)
-    shot = os.path.join(out, "native.bmp")
-    env = dict(os.environ, DAGGER_GAME=GAME, PORT_EXIT_AFTER="36",
-               PORT_SCRIPT="22 key L; 26 click 80 28; 28 click 160 10; 33 shot %s" % shot)
+    shots = [os.path.join(out, "native_%d.bmp" % t) for t in range(34, 43)]
+    # the shots a while after the load: some saves' skies are still settling at 33 s (ming)
+    env = dict(os.environ, DAGGER_GAME=GAME, PORT_EXIT_AFTER="44",
+               PORT_SCRIPT="22 key L; 26 click 80 28; 28 click 160 10; " +
+               "; ".join("%d shot %s" % (t, p) for t, p in zip(range(34, 43), shots)))
     subprocess.run(["timeout", "-k", "5", "80", FALL, "--game", GAME, "--overlay", overlay],
                    env=env, capture_output=True, timeout=120)
-    return shot if os.path.exists(shot) else None
+    return [p for p in shots if os.path.exists(p)]
 
 
 def compare(name):
     out = os.path.join(OUT, name)
     os.makedirs(out, exist_ok=True)
     e = emulator_shot(name, out)
-    n = native_shot(name, out)
-    if not e or not n:
+    shots = native_shots(name, out)
+    if not e or not shots:
         return name, None, "no %s screenshot" % ("emulator" if not e else "native")
     w, h, a = png(e)
-    _w, _h, b = bmp(n)
-    close = [all(abs(x - y) <= 4 for x, y in zip(p, q)) for p, q in zip(a, b)]
+    best = None
+    for n in shots:
+        _w, _h, b = bmp(n)
+        close = [all(abs(x - y) <= 4 for x, y in zip(p, q)) for p, q in zip(a, b)]
+        if best is None or sum(close) > sum(best[1]):
+            best = b, close
+    b, close = best
     bands = [sum(close[y * w:(y + 25) * w]) / (25 * w) for y in range(0, h, 25)]
     write_diff(os.path.join(out, "diff.bmp"), w, h, a, b, close)
     return name, sum(close) / len(close), " ".join("%.2f" % x for x in bands)
