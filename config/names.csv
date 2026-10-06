@@ -827,7 +827,7 @@ global,0x0015BB6E,xn_grad_v0_b,strong,"patch field (placeholder, 4 bytes, s32): 
 global,0x0015BBB9,xn_poly_subdiv_shift,strong,"patch field (operand, 1 bytes, u8): read by 15BB8C xn_poly_setup_textured (shr edx, 0x12), written at 12A4F0@12A600"
 global,0x0015BBDE,xn_poly_setup_sx,strong,"patch field (placeholder, 4 bytes, s32): read by 15BB8C xn_poly_setup_textured (imul esi, dword ptr [edi + 0x18], 0x186a0), written at 12A2D0@12A31F"
 global,0x0015BBE5,xn_poly_setup_sy,strong,"patch field (placeholder, 4 bytes, s32): read by 15BB8C xn_poly_setup_textured (imul ecx, dword ptr [edi + 0x1c], 0x186a0), written at 12A2D0@12A324"
-global,0x0015BC61,xn_light_ambient_row,strong,"patch field (placeholder, 4 bytes, s32): read by 15BC42 xn_light_setup_poly (add ebx, 0x186a0), written at 12A4F0@12A5E0"
+global,0x0015BC61,xn_light_ambient_row_op,strong,"the operand of xn_light_setup_poly that held the frame's ambient row (canonical C: the variable xn_light_ambient_row, adopted from here); patch field (placeholder, 4 bytes, s32): read by 15BC42 xn_light_setup_poly (add ebx, 0x186a0), written at 12A4F0@12A5E0"
 global,0x0015C100,xn_tmap_msg_no_memory,strong,"'XnGine: Out of memory for Shaders.' then 'XnGine: Out of space for Shaders.' ($-terminated), printed by 0x15C200"
 global,0x0015C14C,xn_tmap_pool_block,strong,Block returned by malloc for the instance pool (freed by 0x15C260)
 global,0x0015C150,xn_tmap_pool,strong,32-byte-aligned base of the compiled texture mapper instances (418 bytes each)

@@ -224,8 +224,10 @@ static void grid_vertex(u32 v, u16 pos, const xn_vec3 *p)
             n.hi = 0x100;
             inv_z = xn_u64_div_or0(&n, z);
             s->inv_z = inv_z;
-            s->sx = (u32)(xn_mulhi(c->x * xn_tgrid_sx, inv_z) + xn_tgrid_cx) >> 3;
-            s->sy = (u32)(xn_mulhi(c->y * xn_tgrid_sy, inv_z) + xn_tgrid_cy) >> 8;
+            s->sx = (u32)(xn_mulhi(c->x * xn_cam_half_width, inv_z) +
+                          (xn_cam_centre_x << 8) + 0x80) >> 3;
+            s->sy = (u32)(xn_mulhi(c->y * xn_cam_half_height, inv_z) +
+                          (xn_cam_centre_y << 8) + 0x80) >> 8;
         }
     }
     f->terrain_outcode = code;
@@ -339,7 +341,6 @@ static void draw_projected(u32 v, const u32 *corner, int n)
     s32 top_y = 0;
     int k, top = 0;
 
-    xn_poly_vertex_count = (u8)n;
     for (k = 0; k < n; k++) {
         s = &xn_vert_screen[v + corner[k]];
         xn_poly_vertex_buf_a[k].x = s->sx;
@@ -350,7 +351,7 @@ static void draw_projected(u32 v, const u32 *corner, int n)
             top = k;
         }
     }
-    xn_poly_rasterize(top_y, xn_poly_ring_a[n] + top);
+    xn_poly_rasterize(top_y, xn_poly_ring_a[n] + top, n);
     xn_render_poly_next++;
 }
 
@@ -368,7 +369,7 @@ static void draw_clipped(u32 v, const u32 *corner, int n)
         xn_poly_vertex_buf_a[k].z = c->z;
         xn_poly_vertex_buf_a[k].outcode = xn_vert_flags[v + corner[k]].terrain_outcode;
     }
-    xn_poly_project_terrain(n * sizeof(struct xn_poly_vertex));
+    xn_poly_project_terrain(n);
     xn_render_poly_next++;
 }
 
@@ -431,12 +432,11 @@ static struct xn_poly *cell_poly(u32 v, u32 setup, u32 archive, s32 u0, s32 v0)
     struct xn_poly *p = xn_render_poly_next;
     const struct xn_vert_flags *f = &xn_vert_flags[v];
     u32 rot = f->terrain_tile >> 6;
-    s32 frame = -1;
 
-    p->span_fn = (void (*)(void))setup;
+    p->span_fn = (xn_span_fn)setup;
     u_axis_fns[rot * 2 + (f->terrain_flat & 1)](p, u0, v0);
     v_axis_fns[rot * 2 + ((f->terrain_flat & 2) >> 1)](p, u0, v0);
-    p->tex = xn_tex_cache_lookup(archive, f->terrain_tile & 0x3F, &frame);
+    p->tex = xn_tex_cache_lookup(archive, f->terrain_tile & 0x3F, -1);
     return p;
 }
 
@@ -502,13 +502,13 @@ static void draw_cell(u32 v, u32 setup, u32 archive, s32 u0, s32 v0)
 int xn_terrain_draw_cells(void)
 {
     u32 archive, setup, v = 0;
-    s32 rows, cols, u0, v0, row_u0, frame = -1;
+    s32 rows, cols, u0, v0, row_u0;
 
     xn_terrain_setup_tex_gradients(&u0, &v0);
     archive = xn_world_ground_archive;
-    if (xn_tex_cache_lookup(archive, 0, &frame) == 0)
+    if (xn_tex_cache_lookup(archive, 0, -1) == 0)
         return 0;
-    setup = xn_render_span_setup_terrain_ptr;
+    setup = (u32)xn_render_span_setup(16);
     for (rows = XN_GRID_SIDE - 1; rows != 0; rows--) {
         row_u0 = u0;
         for (cols = XN_GRID_SIDE - 1; cols != 0; cols--) {

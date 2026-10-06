@@ -28,9 +28,8 @@
      (xn_terrain_vert_x/_y), the cell axis routines' tables (xn_terrain_u_axis_fns: Q-TERRAIN-
      01); the renderer's vertex arrays (xn_vert_cam, xn_vert_screen, xn_vert_flags), polygon
      pool (xn_render_poly_next), light lists and clipper buffer; the world's layers, eye and
-     archives. Reads xn_tgrid_sx/_cx/_sy/_cy, operands of its own code that the view window
-     (xn_cam_set_view_window, cam group) patches: the view's half width and height, and its
-     centre << 8 + 80h.
+     archives. Projects with the view globals (xn_cam_half_width/_height, and the centre
+     xn_cam_centre_x/_y << 8 + 80h: xn_cam_set_view_window, cam group, sets them).
 
    Quirks kept: Q-TERRAIN-01 (turned tiles ignore their u flip), Q-TERRAIN-02 (a face plane
    leaves pick_distance). docs/engine/quirks.md. */
@@ -54,9 +53,6 @@ extern s32 xn_terrain_height_cam_z[256];
 extern struct xn_terrain_vert_coord xn_terrain_vert_x[1024];  /* camera x, y before the view */
 extern struct xn_terrain_vert_coord xn_terrain_vert_y[1024];  /*   scales */
 
-/* The view's projection as xn_cam_set_view_window patches it into the grid's code: the half
-   width and height, and the centre << 8 + 80h (cam group: see this module's header) */
-extern s32 xn_tgrid_sx, xn_tgrid_cx, xn_tgrid_sy, xn_tgrid_cy;
 
 /* ---- the renderer's (render, poly, light, span groups) ------------------------------------ */
 extern struct xn_vert_cam xn_vert_cam[1024];
@@ -67,8 +63,7 @@ extern struct xn_light_ref *xn_render_light_list_next;
 extern struct xn_light xn_light_table[33];
 extern s32 xn_light_count;
 extern s32 xn_span_dzdx;                        /* the span routines' 1/z step per pixel */
-extern u32 xn_render_span_setup_terrain_ptr;    /* the terrain polygons' span setup */
-extern struct xn_poly_vertex **xn_poly_ring_a[];   /* the rasterizer's rings, by count */
+#include "xrender.h"                            /* xn_render_span_setup: the cells' setup */
 /* (the clipper's buffer, count and outcodes: xpoly.h) */
 
 /* A cell polygon's texture axis routine: the u (or v) gradient and origin of the polygon,

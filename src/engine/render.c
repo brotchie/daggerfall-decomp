@@ -1,20 +1,21 @@
-/* render.c: XnGine's renderer set-up and frame helpers as readable C (xrender.h; see xngine.h
-   and docs/xngine_readable.md). xn_render_frame (12A870) and its run-time blocks stay asm: they
-   belong to the rasteriser group. */
+/* render.c: XnGine's renderer set-up, the frame's start, the pick, the first-span setups and
+   the passes (xrender.h; the frame loop is rframe.c). */
 #include "xrender.h"
 #include "xcam.h"
 #include "xflat.h"
 #include "xmodel.h"
 #include "xtex.h"
+#include "xlight.h"
+#include "xworld.h"
+#include "xsys.h"
+#include "xnsmc.h"
+#include "xmem.h"
 
-extern s32 xn_squares_table[8192];      /* (k * k) << 8 for k = -4096..4095 */
-extern u8 xn_tex_size_mask[256];
-extern s32 *xn_render_recip_table;      /* 2^24 / k, k = 0..65536 */
-extern xn_routine *xn_render_mode_tables[3];   /* per render mode: 5 setups (unaligned) */
-extern xn_routine xn_render_span_setups[5];
-extern xn_routine xn_render_solid_span_fns[3];     /* by lighting kind 0/4/8 */
-extern xn_routine xn_render_terrain_span_fns[3];
-extern u32 xn_colour_fill_table[256];   /* the colour byte in all four bytes */
+/* group D's textured setup (xpoly.h): lights a textured model face, stores its span
+   routine (xn_render_tmap_span_fns) and draws the span */
+void xn_poly_setup_textured(struct xn_poly *poly, const struct xn_span *span, s32 xs, s32 n,
+                            u8 *pix);
+
 extern u8 text_colour, text_shadow_colour;
 extern xn_vec3 xn_scratch_vec_b;        /* xn_flat_pick leaves the pick point's x, y here */
 extern s32 xn_pick_flat_x, xn_pick_flat_y, xn_pick_flat_z;
@@ -26,46 +27,58 @@ extern s32 xn_model_queue_count, xn_model_drawn_count;
 extern struct xn_sort_pair xn_flat_sort_list[512];
 extern struct xn_sort_pair *xn_flat_sort_end;
 extern s32 xn_flat_count, xn_flat_drawn_count;
-extern s32 xn_light_count;
-extern s32 xn_render_unused_54;         /* 0xCEA54: zeroed here, never read */
-extern u8 *xn_light_code_next;
-extern s32 xn_light_ambient;
-extern u8 *xn_shade_table;
 
-/* patch fields */
-extern s32 xn_light_ambient_row, xn_flat_ambient_row;   /* 15BC61 155636 */
-extern u8 xn_poly_subdiv_shift;                         /* 15BBB9: a shift count byte */
-/* the 25 span-routine operands that address the 1/z table ([ecx*4 + TABLE]) */
-extern s32 *xn_span_tex64_recip_a, *xn_span_tex64_recip_b, *xn_span_tex64_recip_c;
-extern s32 *xn_span_tex64sh_recip_a, *xn_span_tex64sh_recip_b, *xn_span_tex64sh_recip_c;
-extern s32 *xn_span_tex8_recip_a, *xn_span_tex8_recip_b, *xn_span_tex8_recip_c;
-extern s32 *xn_span_tex16_recip_a, *xn_span_tex16_recip_b, *xn_span_tex16_recip_c;
-extern s32 *xn_span_texsh8_recip_a, *xn_span_texsh8_recip_b, *xn_span_texsh8_recip_c;
-extern s32 *xn_span_texsh16_recip_a, *xn_span_texsh16_recip_b, *xn_span_texsh16_recip_c;
-extern s32 *xn_span_texlit_recip_a, *xn_span_texlit_recip_b, *xn_span_texlit_recip_c;
-extern s32 *xn_span_flat_transparent_recip, *xn_span_flat_shaded_recip;
-extern s32 *xn_span_flat_fogged_recip, *xn_span_flat_translucent_recip;
+/* a * b / d with a 64-bit product, truncated; 0 when the quotient does not fit (the asm's
+   idiv faulted: Q-SYS-01) */
+static s32 muldiv_or0(s32 a, s32 b, s32 d)
+{
+    xn_s64 t;
 
-/* other groups' functions, through their asm entries (routed to their C when converted) */
-extern void asm_xn_sys_install_divide_handler(void);
-extern void asm_xn_sys_remove_divide_handler(void);
-extern void asm_xn_light_free(void);
-void xn_world_shutdown(void);              /* the world group's (xworld.h) */
-extern void asm_xn_light_to_view(void);
-extern void asm_xn_light_setup_poly(void);
-extern void asm_xn_light_setup_terrain(void);
-extern void asm_xn_render_frame_row_end(void);  /* the sentinel span routine (12A949) */
+    xn_s64_mul(&t, a, b);
+    return xn_s64_div_or0(&t, d);
+}
 
-/* the game's allocator (Watcom C, object 1) */
-void *func_000A10A8(u32 size);
-void func_000A117E(void *p);
+/* ---- the routine tables ------------------------------------------------------------------ */
+
+/* The first-span setups by render mode (0, 4, 8) and texture entry kind (0, 4, 8, 12, 16) */
+static xn_span_fn const mode_setups[3][5] = {
+    {   /* outlines */
+        xn_render_span_mark_ends, xn_render_span_mark_ends, xn_render_span_mark_ends,
+        xn_render_span_mark_ends, xn_render_span_mark_ends
+    },
+    {   /* solid colours */
+        xn_render_span_setup_solid, xn_render_span_setup_solid, xn_render_span_setup_solid,
+        xn_render_span_setup_solid, xn_render_span_setup_terrain_solid
+    },
+    {   /* textured */
+        xn_render_span_setup_solid, xn_poly_setup_textured, xn_render_span_mark_ends,
+        xn_render_span_mark_ends, xn_render_span_setup_terrain
+    }
+};
+
+/* The solid colour routines by lighting kind (0, 4, 8) */
+static xn_span_fn const solid_span_fns[3] = {
+    xn_span_solid, xn_span_solid_shaded_setup, xn_span_solid_lit
+};
+
+xn_span_fn const xn_render_tmap_span_fns[6] = {
+    xn_span_tex_8, xn_span_tex_shaded_8, xn_span_tex_lit_setup,
+    xn_span_tex_16_setup, xn_span_tex_shaded_16_setup, xn_span_tex_lit_setup
+};
+
+/* The terrain's by lighting kind (its setup gives 0 or 4) */
+static xn_span_fn const terrain_span_fns[3] = {
+    xn_span_tex64, xn_span_tex64_shaded, xn_span_tex64_shaded
+};
+
+/* ---- start-up, shutdown, the render mode ------------------------------------------------- */
 
 void xn_render_init(void)
 {
     s32 k;
     s32 *table;
 
-    xn_call_asm(asm_xn_sys_install_divide_handler);
+    xn_sys_install_divide_handler();
     xn_cam_set_view_window(xn_cam_half_width, xn_cam_half_height, xn_cam_centre_x,
                            xn_cam_centre_y);
     xn_cam_set_focal(200, 180);
@@ -77,38 +90,32 @@ void xn_render_init(void)
 
     table = (s32 *)func_000A10A8(0x40004);
     xn_render_recip_table = table;
-    xn_span_tex64_recip_a = xn_span_tex64_recip_b = xn_span_tex64_recip_c = table;
-    xn_span_tex64sh_recip_a = xn_span_tex64sh_recip_b = xn_span_tex64sh_recip_c = table;
-    xn_span_tex8_recip_a = xn_span_tex8_recip_b = xn_span_tex8_recip_c = table;
-    xn_span_tex16_recip_a = xn_span_tex16_recip_b = xn_span_tex16_recip_c = table;
-    xn_span_texsh8_recip_a = xn_span_texsh8_recip_b = xn_span_texsh8_recip_c = table;
-    xn_span_texsh16_recip_a = xn_span_texsh16_recip_b = xn_span_texsh16_recip_c = table;
-    xn_span_texlit_recip_a = xn_span_texlit_recip_b = xn_span_texlit_recip_c = table;
-    xn_span_flat_transparent_recip = xn_span_flat_shaded_recip = table;
-    xn_span_flat_fogged_recip = xn_span_flat_translucent_recip = table;
-    /* table[k] = 2^37 / (k << 13) = 2^24 / k, from k = 65536 down to 1; table[0] unwritten */
+    /* table[k] = 2^24 / k (the asm's 2^37 / (k << 13)), from k = 65536 down to 1; table[0]
+       is never written */
     for (k = 0x10000; k >= 1; k--)
-        table[k] = xn_udiv64(0x20, 0, (u32)k << 13);
+        table[k] = 0x1000000 / k;
 }
 
 void xn_render_shutdown(void)
 {
-    xn_call_asm(asm_xn_light_free);
+    xn_light_free();
     xn_tex_cache_free();
     xn_world_shutdown();
-    xn_call_asm(asm_xn_sys_remove_divide_handler);
+    xn_sys_remove_divide_handler();
     func_000A117E(xn_render_recip_table);
 }
 
 void xn_render_set_mode(s32 mode)
 {
-    xn_routine *setups = XN_AT(xn_routine *, xn_render_mode_tables, mode);
-    int k;
-
     xn_render_mode = mode;
-    for (k = 0; k < 5; k++)
-        xn_render_span_setups[k] = setups[k];
 }
+
+xn_span_fn xn_render_span_setup(s32 kind)
+{
+    return mode_setups[xn_render_mode >> 2][kind >> 2];
+}
+
+/* ---- the frame --------------------------------------------------------------------------- */
 
 void xn_render_begin_frame(void)
 {
@@ -123,9 +130,10 @@ void xn_render_begin_frame(void)
     xn_model_queue_ptr = xn_model_queue;
     xn_flat_sort_end = xn_flat_sort_list;
 
-    /* the background polygon and the sentinel span that ends every row */
+    /* the background polygon, and the sentinel span that ends every row (it is its own next;
+       the frame loop stops there, and no routine draws it) */
     background = xn_render_poly_next++;
-    background->span_fn = asm_xn_render_frame_row_end;
+    background->span_fn = 0;
     xn_render_span_sentinel.next = &xn_render_span_sentinel;
     xn_render_span_sentinel.x_start = (u16)xn_gfx_clip_right;
     xn_render_span_sentinel.x_end = (u16)(xn_gfx_clip_right + 1);
@@ -144,7 +152,7 @@ void xn_render_begin_frame(void)
     xn_flat_count = 0;
     xn_flat_drawn_count = 0;
     xn_render_poly_count = 0;
-    xn_render_unused_54 = 0;
+    xn_light_begin_frame();
     xn_light_code_next = big_buffer;
 
     ambient = xn_light_ambient & ~0xFF;
@@ -152,13 +160,10 @@ void xn_render_begin_frame(void)
         ambient = 0;
     else if (ambient > 0x3F00)
         ambient = 0x3F00;
-    ambient += (s32)xn_shade_table;
-    xn_light_ambient_row = ambient;
-    xn_flat_ambient_row = ambient;
-    xn_poly_subdiv_shift = xn_gfx_width == 320 ? 18 : 25;
+    xn_light_ambient_row = xn_shade_table + ambient;
 }
 
-void *xn_render_pick(s32 x, s32 y, s32 frame)
+void *xn_render_pick(s32 x, s32 y)
 {
     void *flat;
     struct xn_poly *poly = 0;
@@ -166,9 +171,9 @@ void *xn_render_pick(s32 x, s32 y, s32 frame)
 
     if (x < xn_gfx_clip_left || x >= xn_gfx_clip_right ||
         y < xn_gfx_clip_top || y >= xn_gfx_clip_bottom)
-        return 0;           /* the asm pops one register too many here and returns through a
-                               stack word: the game never asks outside the clip window */
-    flat = xn_flat_pick(x, y, frame);
+        return 0;           /* (the asm pops one register too many here and returns through a
+                               stack word: the game never asks outside the clip window) */
+    flat = xn_flat_pick(x, y);
     pick_distance = 0x8000;
     /* the point as xn_flat_pick left it */
     for (node = xn_render_span_rows[xn_scratch_vec_b.y].next; node != node->next;
@@ -176,18 +181,18 @@ void *xn_render_pick(s32 x, s32 y, s32 frame)
         s32 px = xn_scratch_vec_b.x;
         s32 inv_z;
 
-        /* signed 16-bit compares; x_end counts as covered (one pixel more than drawn) */
+        /* Quirk Q-RENDER-03: signed 16-bit compares, x_end counted as covered */
         if ((s16)px < (s16)node->x_start || (s16)node->x_end < (s16)px)
             continue;
         poly = node->poly;
-        /* `sub ax, x_start`: only the low word of x is offset */
+        /* (Q-RENDER-03: `sub ax, x_start`, only x's low word offset) */
         px = (px & 0xFFFF0000) | (u16)(px - node->x_start);
         inv_z = px * poly->inv_z_dx + node->inv_z;
-        pick_distance = xn_udiv64(1, 0, inv_z);         /* 2^32 / (1/z) */
-        xn_pick_view_x = xn_muldiv(xn_scratch_vec_b.x - xn_cam_centre_x, pick_distance,
-                                   xn_cam_focal_x);
-        xn_pick_view_y = xn_muldiv(xn_scratch_vec_b.y - xn_cam_centre_y, pick_distance,
-                                   xn_cam_focal_y);
+        pick_distance = xn_udiv64_or0(1, 0, inv_z);     /* 2^32 / (1/z) */
+        xn_pick_view_x = muldiv_or0(xn_scratch_vec_b.x - xn_cam_centre_x, pick_distance,
+                                     xn_cam_focal_x);
+        xn_pick_view_y = muldiv_or0(xn_scratch_vec_b.y - xn_cam_centre_y, pick_distance,
+                                     xn_cam_focal_y);
         break;
     }
     if (flat != 0 && xn_pick_flat_z < pick_distance) {
@@ -199,45 +204,55 @@ void *xn_render_pick(s32 x, s32 y, s32 frame)
     return poly;
 }
 
-void xn_render_span_setup_solid_r(xn_regs *r)
-{
-    struct xn_poly *poly = (struct xn_poly *)r->eax;
-    xn_routine fn;
+/* ---- the first-span setups ------------------------------------------------------------------ */
 
-    fn = XN_AT(xn_routine, xn_render_solid_span_fns, xn_call_light_setup(asm_xn_light_setup_poly, poly, r));
+void xn_render_span_setup_solid(struct xn_poly *poly, const struct xn_span *span, s32 xs,
+                                s32 n, u8 *pix)
+{
+    xn_span_fn fn = solid_span_fns[xn_light_setup_poly(poly) >> 2];
+
     poly->span_fn = fn;
     poly->colour4 = xn_colour_fill_table[poly->tex->solid_colour];
-    xn_run_span(fn, r);
+    fn(poly, span, xs, n, pix);
 }
 
-void xn_render_span_setup_terrain_r(xn_regs *r)
+void xn_render_span_setup_terrain(struct xn_poly *poly, const struct xn_span *span, s32 xs,
+                                  s32 n, u8 *pix)
 {
-    struct xn_poly *poly = (struct xn_poly *)r->eax;
     struct xn_tex_image *image = poly->tex->current;
-    xn_routine fn;
+    xn_span_fn fn;
 
     poly->texels = (u8 *)image + image->data_offset;
-    r->ecx = (u32)poly->texels;         /* the light setup gets it in ECX */
-    fn = XN_AT(xn_routine, xn_render_terrain_span_fns,
-               xn_call_light_setup(asm_xn_light_setup_terrain, poly, r));
+    fn = terrain_span_fns[xn_light_setup_terrain(poly) >> 2];
     poly->span_fn = fn;
-    poly->u_step = poly->u_dx << 4;     /* the 16-pixel steps */
+    poly->u_step = poly->u_dx << 4;     /* the 16-pixel steps (over the cell's normal, which
+                                           the lighting has read) */
     poly->v_step = poly->v_dx << 4;
     poly->inv_z_step = poly->inv_z_dx << 4;
-    xn_run_span(fn, r);
+    fn(poly, span, xs, n, pix);
 }
 
-void xn_render_span_setup_terrain_solid_r(xn_regs *r)
+void xn_render_span_setup_terrain_solid(struct xn_poly *poly, const struct xn_span *span,
+                                        s32 xs, s32 n, u8 *pix)
 {
-    struct xn_poly *poly = (struct xn_poly *)r->eax;
-    xn_routine fn;
+    xn_span_fn fn = solid_span_fns[xn_light_setup_terrain(poly) >> 2];
 
-    fn = XN_AT(xn_routine, xn_render_solid_span_fns,
-               xn_call_light_setup(asm_xn_light_setup_terrain, poly, r));
     poly->span_fn = fn;
     poly->colour4 = xn_colour_fill_table[poly->tex->solid_colour];
-    xn_run_span(fn, r);
+    fn(poly, span, xs, n, pix);
 }
+
+void xn_render_span_mark_ends(struct xn_poly *poly, const struct xn_span *span, s32 xs, s32 n,
+                              u8 *pix)
+{
+    (void)poly;
+    (void)span;
+    (void)xs;
+    pix[0] = text_colour;
+    pix[n] = text_colour;               /* Quirk Q-RENDER-01: one past the span */
+}
+
+/* ---- the passes ----------------------------------------------------------------------------- */
 
 int xn_render_draw_models(void)
 {
@@ -258,11 +273,6 @@ int xn_render_draw_models(void)
     return 0;
 }
 
-void xn_render_draw_models_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, xn_render_draw_models());
-}
-
 int xn_render_draw_flats(void)
 {
     struct xn_sort_pair *pair;
@@ -271,7 +281,7 @@ int xn_render_draw_flats(void)
     if (xn_flat_count == 0)
         return 0;
     xn_flat_begin_frame();
-    xn_call_asm(asm_xn_light_to_view);
+    xn_light_to_view();
     last = (u8 *)xn_flat_sort_end - (u8 *)xn_flat_sort_list - 8;
     xn_render_sort_pairs(xn_flat_sort_list, 0, last);
     pair = xn_flat_sort_list;
@@ -282,23 +292,6 @@ int xn_render_draw_flats(void)
         pair++;
     } while (--left >= 0);
     return 0;
-}
-
-void xn_render_draw_flats_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, xn_render_draw_flats());
-}
-
-u8 xn_render_span_mark_ends(u8 *dst, s32 n)
-{
-    dst[1] = text_colour;
-    dst[n + 1] = text_colour;
-    return text_colour;
-}
-
-void xn_render_span_mark_ends_r(xn_regs *r)
-{
-    r->eax = (r->eax & ~0xFFu) | xn_render_span_mark_ends((u8 *)r->edi, r->ebp);
 }
 
 void xn_render_fill_background(void)
@@ -331,33 +324,16 @@ void xn_render_fill_background(void)
     } while (--rows != 0);
 }
 
-void xn_render_sort_pairs_saveregs(struct xn_sort_pair *pairs, s32 lo, s32 hi)
-{
-    xn_render_sort_pairs(pairs, lo, hi);
-}
-
 void xn_render_sort_pairs(struct xn_sort_pair *pairs, s32 lo, s32 hi)
 {
-    s32 pivot;
-
     if (hi > lo)
-        xn_render_sort_pairs_range(pairs, lo, hi, &pivot);
-}
-
-void xn_render_sort_pairs_r(xn_regs *r)
-{
-    s32 pivot;
-
-    if ((s32)r->ebx > (s32)r->edx) {
-        r->esi = xn_render_sort_pairs_range((struct xn_sort_pair *)r->eax, r->edx, r->ebx, &pivot);
-        r->ebp = pivot;
-    }
+        xn_render_sort_pairs_range(pairs, lo, hi);
 }
 
 /* the pair `off` bytes into the list */
 #define PAIR(off) XN_AT(struct xn_sort_pair, pairs, off)
 
-s32 xn_render_sort_pairs_range(struct xn_sort_pair *pairs, s32 lo, s32 hi, s32 *pivot)
+s32 xn_render_sort_pairs_range(struct xn_sort_pair *pairs, s32 lo, s32 hi)
 {
     s32 i = lo;
     s32 j = hi;
@@ -377,20 +353,10 @@ s32 xn_render_sort_pairs_range(struct xn_sort_pair *pairs, s32 lo, s32 hi, s32 *
             j -= 8;
         }
     } while (i <= j);
-    *pivot = key;
-    /* the asm's recursive calls leave their own ESI (and EBP): the right part starts where the
-       left part's sort stopped scanning */
+    /* Quirk Q-RENDER-02: the right part starts where the left part's sort stopped scanning */
     if (lo < j)
-        i = xn_render_sort_pairs_range(pairs, lo, j, pivot);
+        i = xn_render_sort_pairs_range(pairs, lo, j);
     if (i < hi)
-        i = xn_render_sort_pairs_range(pairs, i, hi, pivot);
+        i = xn_render_sort_pairs_range(pairs, i, hi);
     return i;
-}
-
-void xn_render_sort_pairs_range_r(xn_regs *r)
-{
-    s32 pivot;
-
-    r->esi = xn_render_sort_pairs_range((struct xn_sort_pair *)r->eax, r->edx, r->ebx, &pivot);
-    r->ebp = pivot;
 }

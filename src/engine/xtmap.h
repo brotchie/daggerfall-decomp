@@ -1,59 +1,69 @@
-/* xtmap.h: XnGine's texture-mapper code generator (tmap.c; see xngine.h).
+/* xtmap.h: XnGine's texture mapper (src/engine/tmap.c). Canonical C: plain prototypes,
+   Watcom's own calling convention; docs/xngine_canonical.md.
 
-   XnGine compiles one copy of a 16-pixel texture-mapping loop per texture (the engine's
-   messages call them "Shaders"): the template xn_tmap_template (15C300, 8 two-pixel steps,
-   struct xn_tmap_copy) with the texture's wrap mask and texel base patched into every fetch,
-   copied into a slot of a 768-slot heap pool. xn_span_tex_lit runs them. The generator stays
-   byte-exact (the template's in-place patches and the slot copies are what the records see);
-   the runner is C that reads the copy's mask and texel fields (the design's option B). */
+   What it does
+     The lit textured spans (xn_span_tex_lit) draw 16 pixels at a time through the texture
+     mapper: texels at a packed coordinate that steps every pixel, wrapped by the texture's
+     size masks, each through the shade row of its pixel pair. The asm compiled one copy of
+     the mapper per texture (the engine's messages call them "Shaders": the template
+     xn_tmap_template patched with the texture's mask and texels, copied into a slot of a
+     768-slot pool in the game's heap) and ran the copies; canonical C is one routine that
+     takes the texels and the mask (xn_tmap_draw).
+
+     The pool stays as the texture cache sees it: xn_tmap_pool_alloc takes its block from
+     the game's allocator, xn_tmap_compile hands each texture record its slot's address (the
+     record keeps it, in the texture heap the game reads) and fails, setting
+     xn_tex_cache_full, once the pool is full; nothing is written into the slots.
+
+   Units and formats
+     uv       u in the high half and v in the low half, 8.8 each (the lit spans' order);
+              the texel is texels[(v_int & v mask) << 8 | (u_int & u mask)].
+     mask     v mask << 8 | u mask: each the texture's size - 1 (xn_tex_size_mask).
+     shade    a shade row's address with an 8-bit fraction; one row per pixel pair.
+
+   Globals (in object 2, the engine's): xn_tmap_pool_block, xn_tmap_pool, xn_tmap_pool_count,
+   xn_tex_cache_full (the texture cache's), xn_tmap_msg_no_memory.
+
+   Quirks kept (docs/engine/quirks.md): Q-TMAP-01 (the count goes up before the full test:
+   the 768th compile fails and slot 767 is never handed out). */
 #ifndef XTMAP_H
 #define XTMAP_H
 
 #include "xngine.h"
 #include "xnstruct.h"
 
-#define XN_TMAP_SLOTS   768             /* slots in the pool; the 768th compile fails */
+#define XN_TMAP_SLOTS       768         /* slots in the pool */
+#define XN_TMAP_SLOT_BYTES  418         /* the asm's compiled copy: 416 bytes of code, ret, 0 */
 
-extern struct xn_tmap_copy xn_tmap_template;    /* 15C300: code, patched in place */
 extern u8 *xn_tmap_pool_block;          /* the pool's block (game malloc) */
 extern u8 *xn_tmap_pool;                /* 32-aligned in it: the slots */
-extern u8 *xn_tmap_pool_end;            /* pool + 10000h; never read */
-extern u32 xn_tmap_pool_count;          /* slots used */
+extern u32 xn_tmap_pool_count;          /* slots handed out (Q-TMAP-01) */
 extern u8 xn_tex_cache_full;            /* set when a texture could not be placed */
 extern char xn_tmap_msg_no_memory[];    /* "XnGine: Out of memory for Shaders.$" */
-extern u32 xn_tmap_ret_offsets[16];     /* 0, 28, 52, 80...: pixel n's code in a copy */
 
-/* Allocates the pool (768 slots of 418 bytes, 32-aligned) with the game's malloc, and
-   empties it; without the memory, shuts the engine down and exits to DOS with a message.
-   Keeps every register (pushad). */
+/* Allocates the pool (768 slots of 418 bytes, 32-aligned) from the game's allocator and
+   empties it; without the memory, shuts the engine down and ends the program with a
+   message. The texture cache's start-up. */
 void xn_tmap_pool_alloc(void);
-void xn_tmap_pool_alloc_r(xn_regs *r);
 
-/* Frees the pool's block, if any. Keeps every register (pushad). */
+/* Frees the pool's block, if any. */
 void xn_tmap_pool_free(void);
-void xn_tmap_pool_free_r(xn_regs *r);
 
-/* Compiles a mapper for a texture record (its directory entry): patches the template's 8
-   steps with the wrap mask and the record's texels, and copies it into the next slot.
-   Returns the copy, or 0 (the asm's CF) with xn_tex_cache_full set when the pool is full.
-   The count goes up before the test and is not put back: the 768th compile and every later
-   one fail, and slot 767 is never used. */
-struct xn_tmap_copy *xn_tmap_compile(const struct xn_tex_entry *entry, u32 mask);
-void xn_tmap_compile_r(xn_regs *r);
+/* A texture record's mapper handle: the next slot's address, or 0 with xn_tex_cache_full set
+   when the pool is full (Q-TMAP-01). entry and mask: the record and its size masks (the
+   asm's copy baked them in; canonical C's mapper takes them from the polygon). */
+void *xn_tmap_compile(const struct xn_tex_entry *entry, u32 mask);
 
-/* A copy's 16 texel bases rewritten for a texture that moved in the heap (not its masks). */
-void xn_tmap_rebase(struct xn_tmap_copy *copy, u8 *texels);
+/* The asm rewrote a copy's texel bases when its texture's frame moved; canonical C's mapper
+   reads the polygon's texels, so there is nothing to do. */
+void xn_tmap_rebase(void *handle, u8 *texels);
 
 /* Empties the pool (the texture cache's flush). */
 void xn_tmap_pool_reset(void);
 
-/* What a copy computes, for n of its 16 pixels (n = 16, or 1..15 where the asm plants a ret
-   at xn_tmap_ret_offsets[n]): pixel k at pix[k] is the texel at uv (u in the high half, v
-   in the low half, 8.8 each; masked after the bytes are swapped), through the shade row of
-   its pixel pair (shade, with an 8-bit fraction, steps by shade_step every two pixels); uv
-   steps by step every pixel. Reads each step's own mask and texel fields of the copy and
-   writes no code (the design's option B). */
-void xn_tmap_run(const struct xn_tmap_copy *copy, u8 *pix, int n, u32 uv, u32 step, u32 shade,
-                 s32 shade_step);
+/* Draws pix[0..n-1] (n <= 16): pixel k is texels[uv's texel & mask] through the shade row of
+   its pair (shade, then shade + shade_step for pixels 2-3, ...); uv += step every pixel. */
+void xn_tmap_draw(u8 *pix, s32 n, u32 uv, u32 step, u32 shade, s32 shade_step,
+                  const u8 *texels, u32 mask);
 
 #endif

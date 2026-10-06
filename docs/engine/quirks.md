@@ -1255,3 +1255,541 @@ Not quirks, and not listed here: the asm's private bookkeeping that canonical C 
 - **Visible:** no.
 - **Kept by:** the same three tests in water.c (the bottom one without a clear).
 - **Status:** kept.
+
+## The rasteriser: spans (src/engine/span.c)
+
+### Q-SPAN-01: the lit solid span's shade carries never reach the row's high half
+
+- **Where:** `xn_span_solid_lit` (155920) and its tail `xn_span_solid_lit_tail` (155880);
+  `src/engine/span.c` (`xn_span_solid_lit`, `xn_span_solid_lit_tail`).
+- **Asm:** 1559B3 `mov eax, ecx` / 1559B8 `mov al, COLOUR` / 1559BA `mov ah, ch` / 1559BC
+  `add ecx, ebp`: the pixel's shade-row address takes only bits 8-15 of the running shade (CH);
+  its high half stays the block's start shade's. The tail (155880 `mov ah, ch`) is the same.
+- **Behaviour:** when the interpolated shade crosses a 64K boundary between two 16-pixel
+  samples, the pixels keep the start row's high half: a row 256 rows away (outside the shade
+  table, or its first rows) for the rest of the block.
+- **Visible:** to the game's screen through solid polygons lit by point lights (lighting
+  kind 8). The shade table is 16K-aligned in a 32K block, so the 64 rows never cross a 64K
+  boundary unless the table itself does; the records and scenarios show no crossing.
+- **Kept by:** `(base & 0xFFFF00FF) | (shade & 0xFF00)` in both loops; 155920's 24 records and
+  155880's 25 through their shims; the dungeon scenarios.
+- **Status:** kept.
+
+### Q-SPAN-02: the lit textured tail takes its shade at pixel n with the 1/z of pixel n - 1
+
+- **Where:** `xn_span_tex_lit` (156A94); `src/engine/span.c`.
+- **Asm:** 156C2B-156C5D: `lea eax, [ebp - 1]` (n - 1) times the polygon's d(1/z)/dx for the
+  tail's end depth, while the ray is the column n's (`xn_cam_dir_x_mid[n]`) and u, v are taken
+  at pixel n.
+- **Behaviour:** the shade interpolated over the last n < 16 pixels ends at a point one pixel
+  nearer in depth than its ray.
+- **Visible:** the screen, on every lit textured span with a tail (dungeons with torches).
+- **Kept by:** `z = Z_OF(inv_z + (n - 1) * poly->inv_z_dx)`; 156A94's 26 records; the scenarios.
+- **Status:** kept.
+
+### Q-SPAN-03: the S-buffer compares span ends as 16-bit values and offsets only a low word
+
+- **Where:** `xn_span_insert` (158D04); `src/engine/span.c`.
+- **Asm:** 158D0B `cmp dx, bp` and 158D1E `cmp bx, [esi+4]`: a span's end against the new
+  span's start and end, as words; on a split, `sub bx, ...` changes only BX's low word before
+  the 1/z offset is multiplied out with all of EBX.
+- **Behaviour:** ends beyond 32767 or negative ends compare wrongly; a split's depth offset
+  uses x1's high word as it was. Screen x is 0..319, so neither happens with the game's spans.
+- **Visible:** no in practice (x within the screen); kept for exactness.
+- **Kept by:** the `(s16)` compares and the low-word difference; 158D04's 30 records.
+- **Status:** kept.
+
+### Q-SPAN-04: a 1/z of 4000h or less gives a lit span z = 0
+
+- **Where:** `xn_span_solid_lit` (155938, 155990: `div ecx` of 2^46 by 1/z).
+- **Asm:** a 1/z at or below 4000h makes the quotient overflow: XnGine's divide-error handler
+  returns 0 (Q-SYS-01).
+- **Behaviour:** the shade is taken at the eye (z = 0) for points beyond 2^26 units.
+- **Visible:** no: the view distance is far smaller (the far plane's 1/z is well above 4000h).
+- **Kept by:** `xn_udiv64_or0` (src/engine/smc.c).
+- **Status:** kept.
+
+## Shade and fog (src/engine/shade.c)
+
+### Q-SHADE-01: with the fog off, the fog start becomes the view distance unshifted
+
+- **Where:** `xn_shade_set_fog` (14D23C); `src/engine/shade.c`.
+- **Asm:** 14D2D7 `mov eax, [xn_cam_far_z]` / 14D2DC `mov [xn_fog_start], eax`: the far
+  distance in z units, where the fog start is otherwise in z >> 8 units.
+- **Behaviour:** after `xn_shade_set_fog(-1)` (or a start at or beyond the view distance)
+  xn_fog_start is 256 times farther than any depth in its units.
+- **Visible:** to the flats, which fog from xn_fog_start (xn_flat_span_light_setup, 155610):
+  with the fog off they never fog. The game reads xn_fog_start nowhere.
+- **Kept by:** `xn_fog_start = xn_cam_far_z;`; 14D23C's 29 records and their --boundary test.
+- **Status:** kept.
+
+### Q-SHADE-02: a fog start of 0 or 1 gives the fog's inverse start 0
+
+- **Where:** `xn_shade_set_fog` (14D23C) and `xn_shade_fog_span` (150040).
+- **Asm:** 14D288-14D28F `div ebx` of 2^32 by the start: it overflows for 0 and 1, and the handler
+  makes it 0 (Q-SYS-01).
+- **Behaviour:** every span counts as starting beyond the fog start.
+- **Visible:** no: the game's starts are 4, 8 and the view distance - 512 (init.c).
+- **Kept by:** `xn_udiv64_or0(1, 0, xn_fog_start)` in `xn_shade_fog_span`.
+- **Status:** kept.
+
+### Q-SHADE-03: the fogged part of a span is cut by an unwrapped add
+
+- **Where:** `xn_shade_fog_span` (150040).
+- **Asm:** `add ebp, edx; jle`: the count plus the (negative) pixels before the fog, tested
+  by the flags of the add (SF != OF or ZF), not by the wrapped sum's sign.
+- **Behaviour:** a span whose count and offset overflow when added is still taken as empty
+  when the exact sum is not positive.
+- **Visible:** no in practice (counts are at most 320).
+- **Kept by:** `xn_add_lt0(n, h) || n + h == 0` (src/engine/smc.c `xn_add_lt0`, plain C).
+- **Status:** kept.
+
+## Lights (src/engine/light.c)
+
+### Q-LIGHT-01: a point light's handle is what the camera's sphere test leaves in EAX
+
+- **Where:** `xn_light_add` (136AD8) / `xn_light_add_regs` (136AF0); `src/engine/light.c`.
+- **Asm:** 136B6F `call xn_cam_cull_sphere`: the point light's culling call leaves its last
+  value in EAX, which 136AF0 returns; a directional light returns x.
+- **Behaviour:** the result is x, or for a point light the sphere test's residue: not a
+  handle of anything.
+- **Visible:** to the game: func_000830C7 (src/hand) stores it as `object->draw_handle`
+  (lines 169 and 175).
+- **Kept by:** `xn_light_add` returns the residue (`xn_cam_cull_sphere`'s *residue);
+  136AD8's 28 game-called records (`test --boundary`).
+- **Status:** kept.
+
+### Q-LIGHT-02: the light count goes up before the full test
+
+- **Where:** `xn_light_add_regs` (136AF0).
+- **Asm:** 136AF8 `inc [xn_light_count]` / 136AFE `cmp [xn_light_count], 20h` / 136B05 `jae`.
+- **Behaviour:** the 32nd and later adds of a frame fail and still count; a culled light
+  takes its count back.
+- **Visible:** to the engine's light scans (the count bounds xn_light_to_view); the game
+  reads xn_light_count nowhere.
+- **Kept by:** `if ((u32)++xn_light_count >= XN_LIGHTS) return x;`; 136AF0's 28 records.
+- **Status:** kept.
+
+### Q-LIGHT-04: the light shaders' squares-table index is not bounded
+
+- **Where:** the shader templates 136C30/136C84/136D10; `xn_light_shade` (light.c).
+- **Asm:** each template reads `[reg*4 + SQ]`, where SQ is &xn_squares_table_mid[foot point]
+  and reg the pixel's view-space coordinate >> 8 (z: z >> 14): no clamp to -4096..4095.
+- **Behaviour:** a light or a pixel more than 4096 units (>> 8) from the other reads past the
+  8192-entry table.
+- **Visible:** the screen, if it happens; the squares table sits before the texture size
+  masks and the render tables in object 2.
+- **Kept by:** the plain index in `xn_light_shade`; the lit spans' records; the scenarios.
+- **Status:** kept.
+
+### Q-LIGHT-05: the third point light ends the face's light list
+
+- **Where:** `xn_light_add_point` (15BF75), `xn_light_setup_poly` (15BC42).
+- **Asm:** 15C035 `add ebp, 4` / 15C038 `cmp ebp, 0Ch` / 15C03F `pop eax; jmp
+  xn_light_build_shader_3`: the handler leaves the dispatch loop for good.
+- **Behaviour:** the lights after the third point light that reaches the face, directional
+  ones included, do not light it.
+- **Visible:** the screen (faces near several torches).
+- **Kept by:** `return xn_light_build_shader(poly, row, pts, 3)` inside the loop; 15BF75's 28
+  records through its shim (test-only `lightp_t.asm`: the asm's frame skip), 15BC42's records.
+- **Status:** kept.
+
+### Q-LIGHT-06: a polygon with no depth slope gets an inverse slope of 0
+
+- **Where:** `xn_light_setup_poly` (15BC53), `xn_light_setup_terrain` (15BCA6).
+- **Asm:** `idiv ebx` of 2^32 by the polygon's d(1/z)/dx: 0 faults and the handler gives 0
+  (Q-SYS-01), about ten times a frame (walls facing the eye).
+- **Behaviour:** +60h is 0, which the fog takes as "the same depth along the span".
+- **Visible:** the screen, through the fog.
+- **Kept by:** `xn_idiv64_or0(1, 0, poly->inv_z_dx)`.
+- **Status:** kept.
+
+### Q-LIGHT-07: the compiled shaders' bytes in big_buffer reach the game
+
+- **Where:** the shader builders `xn_light_build_shader_1/2/3` (15BCF6, 15BD78, 15BE4D),
+  which copy a patched template to `xn_light_code_next` (big_buffer, reset every frame);
+  the game's `player_movement_update` (src/lifted/intrface.c line 648).
+- **Asm:** 15BD69 / 15BF66 `rep movsd` into big_buffer. The game keeps a pointer to a
+  collision hit in big_buffer (D_00195CD8, set in colstuff.c) and copies 30 bytes through it
+  every frame (`mc_memcpy(D_00195E30, D_00195CD8, 30)`), after the frame's shaders have
+  overwritten that part of big_buffer.
+- **Behaviour:** the game's copy of its ground hit (D_00195E30) holds 30 bytes of a light
+  shader's machine code.
+- **Visible:** to the game: in walk_mord every frame, 30 bytes at big_buffer + 4..+21h last
+  written by 15BF66 are read by the game's memcpy (build/xn_canon/group_c/tools/shader_flow.py,
+  who_reads.py).
+- **Kept by:** canonical C evaluates shaders from a C record, and still writes the asm's image
+  of each shader (the template's bytes, a const array in light.c, with its operands) at
+  xn_light_code_next as data that nothing runs (`write_asm_image`). The light builders'
+  records and the scenarios compare it.
+- **Status:** kept.
+
+### Q-LIGHT-08: the terrain's base row keeps the ambient level's fraction, and a negative level leaves cells unlit
+
+- **Where:** `xn_light_setup_terrain` (15BCAB-15BCBD); compare `xn_render_begin_frame`
+  (the model faces' and flats' ambient row).
+- **Asm:** 15BCAB `mov eax, [xn_light_ambient]` / 15BCB0 `cmp eax, 3F00h; jae` (unsigned) /
+  15BCB7 `add eax, [xn_shade_table]`: the level as the game set it, not masked to whole rows
+  or clamped as 12A4F0 does for the faces.
+- **Behaviour:** a terrain cell's row has the level's low byte as its fraction; a negative
+  level is "fully lit" (kind 0) for the terrain while the faces clamp it to row 0.
+- **Visible:** the screen outdoors, when the game's ambient level has a fraction or is below
+  0.
+- **Kept by:** `xn_light_setup_terrain`; 15BC9C's 26 records; the outdoor scenarios.
+- **Status:** kept.
+
+## The renderer (src/engine/render.c, rframe.c)
+
+### Q-RENDER-01: the outline mode marks the pixel after a span
+
+- **Where:** `xn_render_span_mark_ends` (12A860); `src/engine/render.c`.
+- **Asm:** 12A865 `mov [edi + 1], al` / 12A868 `mov [edi + ebp + 1], al`: the span's first
+  pixel and the pixel after its last.
+- **Behaviour:** the right mark lies one pixel right of the span (the next span overdraws it,
+  or the background).
+- **Visible:** in render mode 0 (outlines), and in mode 8 for texture kinds 8 and 12; the game
+  selects mode 8 only.
+- **Kept by:** `pix[n] = text_colour`; 12A860's 6 records.
+- **Status:** kept.
+
+### Q-RENDER-02: the draw lists' quicksort resumes its right part where its left part stopped
+
+- **Where:** `xn_render_sort_pairs_range` (15811C); `src/engine/render.c`.
+- **Asm:** 158168-15817D: the recursive calls keep ESI (the forward scan's position) as the
+  callee left it: the right part `[esi, hi]` starts where the left part's own sort stopped,
+  not where this partition's scan did.
+- **Behaviour:** the result is still sorted, but the recursion (and so the order of equal
+  keys) differs from a textbook quicksort.
+- **Visible:** the order the game sees models and flats drawn in (painter's order for equal
+  distances): the screen.
+- **Kept by:** `i = xn_render_sort_pairs_range(pairs, lo, j)` feeding the right part;
+  15811C's 28 records, the model and flat passes' records, the scenarios.
+- **Status:** kept.
+
+### Q-RENDER-03: the pick's span test counts the span's end and offsets only x's low word
+
+- **Where:** `xn_render_pick` (12A608); `src/engine/render.c`.
+- **Asm:** 12A667 `cmp ax, [esi+6]` / 12A66D `cmp [esi+4], ax`: 16-bit compares with x_end
+  inclusive; 12A676 `sub ax, [esi+6]`.
+- **Behaviour:** a click on a span's end pixel (which the next span draws) picks this span's
+  polygon; the depth comes from x's low word.
+- **Visible:** to the game (the pick's result and pick_distance, xn_pick_view_x/y).
+- **Kept by:** the `(s16)` compares and the low-word offset; 12A608's 24 records (--boundary).
+- **Status:** kept.
+
+### Q-RENDER-05: the frame draws the rows symmetric about the view centre
+
+- **Where:** `xn_render_frame` (12A8B6-12A8C3, 12A963); `src/engine/rframe.c`.
+- **Asm:** the row loop runs xn_render_row_y from clip_top - centre_y up to -(that): the end
+  is the row as far below the centre as the clip top is above it, not the clip bottom.
+- **Behaviour:** with a clip window not centred on the view centre, rows past the clip bottom
+  are drawn, or rows above it left out.
+- **Visible:** the game's windows are centred (160, 100 / 160, 77 with the clip matching).
+- **Kept by:** `end_row = -xn_render_row_y`; 12A870's 28 records; the scenarios.
+- **Status:** kept.
+
+### D-RENDER-01 (a deviation): a pick outside the clip window unbalances the asm's stack
+
+- **Where:** `xn_render_pick` (12A608, 12A611..12A635 jumping to 12A6C3).
+- **Asm:** outside the clip window the asm jumps to 12A6C3 `pop eax`, which pops the saved ESI
+  as the flat pick's result, then pops ESI, ECX, EBX one slot off and returns through the
+  caller's stack: a crash or a jump into the caller's data.
+- **Behaviour:** canonical C returns 0 (no polygon).
+- **Visible:** engine_pick_object (engsupp.c) checks only y > the view's bottom (199 or the
+  HUD's top row), so a click on the HUD's top row with the HUD shown (y = clip bottom) reaches
+  it; nothing in the records or scenarios does.
+- **Kept by:** not kept: no C can return as the asm does there.
+- **Status:** dropped (a crash in the asm).
+
+## The texture mapper (src/engine/tmap.c)
+
+### Q-TMAP-01: the mapper count goes up before the full test
+
+- **Where:** `xn_tmap_compile` (15C274); `src/engine/tmap.c`.
+- **Asm:** 15C281 `inc [xn_tmap_pool_count]` / 15C287 `cmp ..., 300h` / 15C291 `jae`.
+- **Behaviour:** the 768th compile and every later one fail (xn_tex_cache_full) without the
+  count coming back; slot 767 is never handed out.
+- **Visible:** to the game: a full texture cache makes xn_render_frame return 1.
+- **Kept by:** `slot = xn_tmap_pool_count++` before the test; 15C274's 26 records.
+- **Status:** kept.
+
+## Camera (src/engine/cam.c)
+
+### Q-CAM-01: the dead in-place scale scales m[2][2] where m[1][2] belongs
+
+- **Where:** `xn_cam_scale_matrix_in_place` (13742B), dead. Canonical: cam.c.
+- **Asm:** the sixth product reads and writes `[esi + 20h]` (137476..13747F), m[2][2], where
+  the row-1 pattern of the five before it (+0, +4, +8, +0Ch, +10h) wants +14h.
+- **Behaviour:** rows 0 and 1 are scaled by the view's x and y scales except m[1][2], which
+  stays; m[2][2] is scaled by the y scale.
+- **Visible:** no caller.
+- **Kept by:** `m->m[2][2] = xn_mulshr(m->m[2][2], xn_cam_scale_y, 14);` (marked); its
+  record (`test xn_cam_scale_matrix_in_place`).
+- **Status:** kept.
+
+### Q-CAM-02: the sphere test's leftover reaches the game through xn_light_add
+
+- **Where:** `xn_cam_cull_sphere` (15CF18) and its helpers `xn_cam_sphere_dist_x/_y`
+  (15D03C, 15D05C). Canonical: cam.c.
+- **Asm:** the test returns CF; EAX is whatever it computed last: the low dword of
+  `2y * inv_scale_y` (15CF72) when the centre is inside the view, the near or far plane's
+  difference (15CF9B, 15CFB3), or the low dword of `nz * pick_distance` from a side plane's
+  distance (15D047). `xn_light_add` (136AD8) returns it in EAX when it drops a light or keeps a
+  point light, and the game stores it (object->draw_handle, func_000830C7).
+- **Behaviour:** the game's light handle is that leftover.
+- **Visible:** to the game, through `xn_light_add` (10 game sites; `game_reads` has EAX).
+- **Kept by:** the `*residue` out-parameter of `xn_cam_cull_sphere`, `xn_cam_sphere_dist_x/_y`'s
+  `*low`; C's `xn_light_add` passes it on. Records (cull_sphere 28; sphere_dist 2 crafted:
+  group_d_cam), `equiv_d.py xn_cam_cull_sphere` (2 million samples) and the side planes' specs.
+- **Status:** kept.
+
+## Polygons (src/engine/poly.c)
+
+### Q-POLY-01: a model face inside the view is walked with byte-sized counters
+
+- **Where:** `xn_poly_project_face` (158420), the path for a face whose vertices are all inside
+  the view (its outcodes' OR is 0). Canonical: poly.c (`walk_projected`).
+- **Asm:** 15855B `add ecx, 3FFh`: CL counts the vertices after the first (`dec cl; jne`) and
+  CH steps the ring's byte offset by 4 (`add ch, 4`); 158594 `shr ecx, 0Ah` picks the ring of
+  CH / 4 vertices, DL the top vertex's byte offset.
+- **Behaviour:** for a face of n points the ring is that of n mod 64 points and the counters
+  wrap: a face of 1 point copies 256 more, one of 0 points 255 more (CH starting at 3).
+- **Visible:** no: prepare rejects faces of more than 24 points and the data has none below 3;
+  the C keeps the counters as the asm has them.
+- **Kept by:** `walk_projected` (the `u8` counters from `n + 3FFh`); the face records.
+- **Status:** kept.
+
+### Q-POLY-02: the edge walker counts the vertices in a signed byte
+
+- **Where:** `xn_poly_rasterize` (15B9A0) and the flats' `xn_flat_raster` (1552A0), through
+  `xn_poly_vertex_count` (15B984). Canonical: poly.c `xn_walk_left_edge/_right_edge`.
+- **Asm:** `dec byte ptr [15B984h]; js` before each edge (15B9B7, 15BA5F; 1552D3, 155394).
+- **Behaviour:** a polygon of 128 to 255 vertices ends its walk at once (the count is
+  negative); one of 0 walks 255 edges.
+- **Visible:** no: the clipper's buffers hold 32 vertices, a face is dropped from 28
+  (Q-POLY-03), a terrain cell has 3 or 4.
+- **Kept by:** `xn_edge_walk.count` (`s8`), set from the count the projectors pass.
+- **Status:** kept.
+
+### Q-POLY-03: a clipped face of 28 or more vertices is dropped
+
+- **Where:** `xn_poly_project_face` (158420), the clipped path. Canonical: poly.c.
+- **Asm:** 1584E9 `cmp cl, 1Ch; jae 1585B2` after the projection.
+- **Behaviour:** such a face adds no spans (the projector has already written its vertices).
+- **Visible:** in principle (a 24-point face clipped by several planes); not seen in the
+  records or the scenarios.
+- **Kept by:** `if ((u8)n >= 0x1C) return 0;` (marked).
+- **Status:** kept.
+
+## Flats (src/engine/flat.c)
+
+### Q-FLAT-01: the first visible piece of every flat is not drawn
+
+- **Where:** `xn_flat_draw` (154E20) installs `xn_flat_span_light_setup` (155610) as the flat's
+  span routine; `xn_flat_span_emit` (15526C) calls it for the first piece. Canonical: flat.c.
+- **Asm:** 154ECD `mov [edi+3Ch], 155610h`; 155610 stores the real routine in `[esi+3Ch]` and
+  returns without drawing (docs/xngine_map.md, "Unsure" 3).
+- **Behaviour:** each flat loses its first visible run of pixels (its top row's leftmost
+  piece).
+- **Visible:** to the game: the screen (every scenario with flats).
+- **Kept by:** `xn_flat_span_light_setup` draws nothing; `xn_flat_span_emit` calls the flat's
+  routine once a piece. The scenarios (town_crowd, night, fight...).
+- **Status:** kept.
+
+### Q-FLAT-02: a flat that is not queued returns its scale argument
+
+- **Where:** `xn_flat_add` (154D00) / `xn_flat_add_body` (154D20). Canonical: flat.c.
+- **Asm:** 154DA2 `pop ecx; pop edi` gives back the pushed scale argument in EDI, which 154D13
+  `mov eax, edi` returns.
+- **Behaviour:** for a flat behind the eye, beyond the far plane or past the 512th of a frame,
+  the result is the scale argument (with its light byte), not 0.
+- **Visible:** to the game: it stores the result as the object's draw handle (8 sites of 14).
+- **Kept by:** `return scale;` (marked); `test --boundary xn_flat_add`.
+- **Status:** kept.
+
+### Q-FLAT-03: a flat of a kind without a quad draws the last flat's quad
+
+- **Where:** `xn_flat_draw` and `xn_flat_pick` through `xn_flat_quad_table` (153C00): kinds 2-3
+  and 8-16 are `xn_flat_quad_none*` (154FD4, 1550BC, 1550C0), a lone `ret`. Canonical: flat.c
+  `build_quad`.
+- **Asm:** 154E81 `call [ebx*4 + 153C00h]`; 154E88 tests the clipper's AND, which the last
+  quad left.
+- **Behaviour:** such a flat is projected with the clipper's buffer and outcodes as the last
+  quad built left them (or skipped when that one was outside a plane).
+- **Visible:** to the screen if the game queued such kinds; the records and scenarios show
+  kinds 1 and 4 only.
+- **Kept by:** `build_quad`'s default case does nothing.
+- **Status:** kept.
+
+### Q-FLAT-04: a directional light is added again and again until the shade row is the last
+
+- **Where:** `xn_flat_span_light_setup` (155610). Canonical: flat.c.
+- **Asm:** 1556DB-1556E9: `add ebp, intensity << 8; cmp ebp, last; jl 155654`, back to the
+  same light's type test without stepping EDI or counting ECX down.
+- **Behaviour:** one directional light makes any flat unlit (the last row: no shading at all,
+  or the fog's row past the fog's start).
+- **Visible:** to the screen (outdoors the sun is a directional light).
+- **Kept by:** the inner `do ... while (row < last)` (marked).
+- **Status:** kept.
+
+### Q-FLAT-05: the pick reads a missing image's header at address 0
+
+- **Where:** `xn_flat_pick` (155508). Canonical: flat.c.
+- **Asm:** 155552 `call xn_tex_cache_lookup_image` then 155557.. reads `[eax+0Eh]`, `[eax+6]`,
+  `[eax+4]` without testing EAX for 0 (the cache full).
+- **Behaviour:** with the cache full the quad's size comes from the bytes at linear 4 and 6
+  (the real-mode interrupt table).
+- **Visible:** to the pick's result (rare: the cache is full only until the game flushes it).
+- **Kept by:** `image->width`, `image->height` with image 0 (marked).
+- **Status:** kept.
+
+### Q-FLAT-06: kinds 17 to 31 read past the quad table
+
+- **Where:** `xn_flat_draw`, `xn_flat_pick`: `xn_flat_quad_table` has 17 entries; `flags &
+  1Fh` indexes 32.
+- **Asm:** 154E7B `and ebx, 1Fh`; 154E81 `call [ebx*4 + 153C00h]`: entries 17-31 are the flat
+  sort list (153C44: keys and flat addresses).
+- **Behaviour:** the asm would call into data (a crash).
+- **Visible:** no: the game passes kinds 1 and 4 (and 0-31 never beyond 16 in the records,
+  scenarios or game code: objlib.c 1, args.c 4, func_000830C7 4/32|4/1/n with n from the
+  flat's own kind).
+- **Kept by:** nothing: `build_quad` builds no quad for them (as kinds 2-3, 8-16).
+- **Status:** dropped.
+
+## Models (src/engine/model.c)
+
+### Q-MODEL-01: the dead x-z extent starts its minimum and maximum swapped
+
+- **Where:** `xn_model_xz_extent` (0CE828), dead. Canonical: model.c.
+- **Asm:** 0CE833-0CE842: the minima start at -100000 (FFFE7960h), the maxima at 100000.
+- **Behaviour:** the extents are at least 200000 >> 8; points within +-100000 change nothing.
+- **Visible:** no caller.
+- **Kept by:** the swapped starting values (marked); record group_d_model `xz_extent_wide`.
+- **Status:** kept.
+
+### Q-MODEL-02: a count of 0 runs 2^32 times
+
+- **Where:** the model loops `dec; jne` / `loop` over points, faces and face points
+  (`xn_model_max_y`, `_xz_extent`, `_prepare`, `_calc_*`, `_transform_face_verts`,
+  `_draw_faces`, `_is_occluded`'s rows). Canonical: model.c (`do ... while (--n != 0)`).
+- **Behaviour:** a model with no points or faces (or a face of 0 points) runs off its data.
+- **Visible:** no: ARCH3D models have points and faces.
+- **Kept by:** the `do`-`while` loops.
+- **Status:** kept.
+
+### Q-MODEL-03: preparing a model leaves a face's edge in the pick's point
+
+- **Where:** `xn_model_calc_face_uv_axes` (13FF65) and `xn_model_calc_face_normal` (140845),
+  under `xn_model_prepare` (13FE15, a game entry). Canonical: model.c.
+- **Asm:** 13FF7E.. and 140867.. store the first edge in `xn_pick_view_x/_y` and
+  `pick_distance` (the shared scratch vector a, 120288) and work on it there.
+- **Behaviour:** after a model is prepared, `pick_distance` holds the last face's edge z
+  (scaled when it had texture axes).
+- **Visible:** `xn_pick_view_x` and `pick_distance` are game-visible (config/xngine_boundary.csv:
+  13 object-1 references to pick_distance).
+- **Kept by:** the edge kept in `xn_scratch_vecs.a` (marked); the second edge and the
+  scratch scalars are locals (dropped rows: private).
+- **Status:** kept.
+
+### Q-MODEL-04: the occlusion test offsets x in 16 bits
+
+- **Where:** `xn_model_is_occluded` (140910). Canonical: model.c.
+- **Asm:** 140955 `sub ax, [esi+6]; je; js`: only AX is offset by the span's start; the
+  product 140960 `imul eax, [ebp+5Ch]` takes all of EAX.
+- **Behaviour:** an x with a high word (never: screen x) would keep it in the depth estimate.
+- **Visible:** no (screen coordinates); kept as the asm computes it.
+- **Kept by:** `(x & 0xFFFF0000) | (u16)(x - node->x_start)` (marked).
+- **Status:** kept.
+
+### Q-MODEL-05: the back-face test's last add is compared without its wrap
+
+- **Where:** `xn_model_draw_faces` (1403AF). Canonical: model.c.
+- **Asm:** 140409-140424: `n.x * eye.x + plane_d` and `n.z * eye.z + n.y * eye.y` are 32-bit
+  sums; `add eax, ecx; jge` tests the last add's true sign (SF = OF).
+- **Behaviour:** when the last add overflows, the face is front-facing by the true sum's sign,
+  not the wrapped one; the wrapped sum is the 1/z gradient's divisor.
+- **Visible:** in principle (huge eye offsets); not in the records.
+- **Kept by:** `sum_negative(a, b)` (marked) and the wrapped divisor.
+- **Status:** kept.
+
+### Q-MODEL-06: a model of 1024 or more vertices overwrote the vertex-flag clear's code
+
+- **Where:** `xn_model_draw_faces` (1403AF) and the unrolled clear `xn_model_clear_vert_flags`
+  (140A28, 1024 steps of 6 bytes).
+- **Asm:** 1403BE plants `C3h` at 140A28 + 6n and 1403CA writes `88h` back there: for n = 1024
+  that is the body's own `ret` (142228), for n > 1024 the code after it.
+- **Behaviour:** the asm corrupts its own code for such a model (the next draw crashes).
+- **Visible:** no: the vertex arrays hold 1024 vertices and no ARCH3D model comes near (the
+  check of prepare covers "v2.5" files only).
+- **Kept by:** nothing: the C clears at most 1024 flags (`xn_model_clear_vert_flags`).
+- **Status:** dropped.
+
+## Texture cache (src/engine/tex.c)
+
+### Q-TEX-01: an eviction never reports failure
+
+- **Where:** `xn_tex_heap_evict` (136145), `xn_tex_heap_alloc` (1360EE). Canonical: tex.c.
+- **Asm:** 136170 `stc` falls into 136171 `clc; ret`; 136107 `jb 13611D` (the 'SET: Out of
+  memory in find_memory.' fatal exit) is never taken.
+- **Behaviour:** when nothing is left to evict, the first fit just fails and the cache is
+  marked full; the fatal exit cannot run.
+- **Visible:** to the game: a full cache instead of the end of the program.
+- **Kept by:** `xn_tex_heap_evict` is `void`; `xn_tex_heap_alloc` has no fatal path. Records
+  group_d_tex `load_no_room` (nothing evictable).
+- **Status:** kept.
+
+### Q-TEX-02: the least recently used search tests an archive's use count at a byte offset
+
+- **Where:** `xn_tex_heap_find_lru` (136173). Canonical: tex.c.
+- **Asm:** 136194 `sub ebx, xn_tex_archives; shr ebx, 2` (the archive number), then
+  13619D `test word ptr [ebx + xn_tex_archive_use]`: the number as a byte offset into a table
+  of words.
+- **Behaviour:** archive n's eligibility reads the high byte of count n/2 and the low byte of
+  count n/2 + 1 (or count n/2 for even n): an archive in use may be evicted, an unused one
+  kept.
+- **Visible:** to the game (which archives stay loaded; the heap is game-visible).
+- **Kept by:** `XN_AT(u16, xn_tex_archive_use, archive)` (marked).
+- **Status:** kept.
+
+### Q-TEX-03: the texture path is not terminated after the file name
+
+- **Where:** `xn_tex_load_archive` (135EAB). Canonical: tex.c.
+- **Asm:** 135EF8-135F00 copies "texture.NNN" up to its 0 and does not copy the 0; a missing
+  backslash is added (135EEF), reading the byte before the path when the configured path is
+  empty.
+- **Behaviour:** the path in `xn_tex_path` ends where an earlier, longer path left a 0.
+- **Visible:** `xn_tex_path` is game-visible (the game reads 22 bytes of it).
+- **Kept by:** the copy loops (marked); records group_d_tex `load_no_backslash`.
+- **Status:** kept.
+
+### Q-TEX-04: a transparent pixel in an image's last column is missed
+
+- **Where:** `xn_tex_check_transparent` (135FCF). Canonical: tex.c.
+- **Asm:** 136011 `repne scasb` over the row's width, 136013 `test ecx, ecx; jne`: a 0 in the
+  last column also leaves ECX 0.
+- **Behaviour:** such an image is compiled (a mapper, kind 4) although it has a colour 0.
+- **Visible:** to the screen (the image is drawn opaque).
+- **Kept by:** `if (k < width - 1)` (marked).
+- **Status:** kept.
+
+### Q-TEX-05: a caller's frame is not checked against the image's frames
+
+- **Where:** `xn_tex_cache_lookup` (135D00). Canonical: tex.c.
+- **Asm:** 135D76 `test ebx, ebx; jns 135D9D`: a frame of 0 or more indexes the frame table
+  (135DA1 `mov esi, [esi + ebx*4]`) as it is.
+- **Behaviour:** a frame past the image's last reads past its frame table.
+- **Visible:** to the game for its flats' frames (they stay within the images' frames).
+- **Kept by:** `image->frame_offsets[frame]` (marked).
+- **Status:** kept.
+
+### Q-TEX-06: the frames the animation clock picks share one decoded frame a game frame
+
+- **Where:** `xn_tex_cache_lookup` (135D00) and `xn_tex_unpack_alloc` (1362CF). Canonical:
+  tex.c.
+- **Asm:** 135D19 keeps the caller's frame in `xn_tex_cur_frame`; the clock's frame (135D7A..)
+  is computed in EBX only; 1362CF..1362EB make the key from `xn_tex_cur_frame & 0FFFFh`.
+- **Behaviour:** every lookup by the clock (frame -1) keys its decode as frame 0FFFFh: if the
+  clock moves on within a game frame, the later lookups get the first decode.
+- **Visible:** to the screen, for a tick within a frame.
+- **Kept by:** the key from the caller's frame (marked).
+- **Status:** kept.

@@ -460,7 +460,7 @@ s32 xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_v
     s32 height, width, half_diag, radius, t;
 
     /* the flat's size, and a sphere around it at its anchor */
-    img = (const u8 *)xn_tex_cache_lookup_image(image >> 7, image & 0x7F, 0);
+    img = (const u8 *)xn_tex_cache_lookup_image(image >> 7, image & 0x7F);
     height = (*(const u16 *)(img + 6) * scale) >> 8;
     width = (*(const u16 *)(img + 4) * scale) >> 8;
     half_diag = xn_vec_length_approx(height >> 1, width >> 1, 0);

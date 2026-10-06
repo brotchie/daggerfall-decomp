@@ -92,6 +92,7 @@ struct xn_wld_bands;
 struct xn_world_nature_odds;
 struct xn_terrain_vert_coord;
 struct xn_flat;
+struct xn_light_shader;
 struct xn_sky_star;
 struct xn_snow_flake;
 struct xn_view;
@@ -144,16 +145,16 @@ struct xn_poly {
                                        (patch_140497; 15BC42 sets handle+39h bit 1) */
         int owner;                  /*       1 terrain (13EC17), 0 flats: xn_pick_hit.model */
     };
-    int shader_falloff[3];          /* +0x08: a compiled light shader's per-light falloff
-                                       (xn_light_build_shader_1/2/3 store one per point light;
-                                       the shader code reads them by address) */
+    int shader_falloff[3];          /* +0x08: the asm's light shaders kept their per-light
+                                       falloffs here; canonical C keeps them in the shader
+                                       record (struct xn_light_shader), and nothing uses these */
     union {
         struct xn_light_ref *light_list; /* +0x14: terrain cells before setup: their
                                        directional light list (13EC14, read by 15BC9C) */
         unsigned char *shade_row;   /*       after setup, light index 4: the shade row (256
                                        bytes of xn_shade_table) for the whole polygon */
-        void (*shader)(void);       /*       after setup, light index 8: the compiled light
-                                       shader (in big_buffer, xn_light_code_next) */
+        const struct xn_light_shader *shader; /* after setup, light index 8: the polygon's
+                                       light shader (xlight.h: light.c's frame pool) */
     };
     union {
         struct {
@@ -175,9 +176,10 @@ struct xn_poly {
     int v_dx;                       /* +0x30: v/z per screen x */
     int v_dy;                       /* +0x34: v/z per screen y */
     int v_c;                        /* +0x38: v/z constant */
-    void (*span_fn)(void);          /* +0x3C: the span routine: first a setup routine from
-                                       xn_render_span_setups[kind], which stores the real one
-                                       here and jumps to it */
+    void (*span_fn)(struct xn_poly *, const struct xn_span *, int, int, unsigned char *);
+                                    /* +0x3C: the span routine (xspan.h xn_span_fn): first a
+                                       setup (xn_render_span_setup(kind)), which stores the
+                                       polygon's routine here and runs it */
     union {
         struct xn_tex_entry *tex;   /* +0x40: before setup: the texture's cache entry
                                        (xn_tex_cache_lookup) */
@@ -1124,9 +1126,10 @@ struct xn_flat {
     int v_dx;                       /* +0x30: v/z gradient per screen x (15515F) */
     int v_dy;                       /* +0x34: per screen y (155169) */
     int v_c;                        /* +0x38: constant term (155173, 1551BF; per row 155357) */
-    void (*span)(void);             /* +0x3C: the span routine 15526C calls: first
-                                       xn_flat_span_light_setup 155610 (154ECD), which installs
-                                       157620/157800/157B20/157E20 */
+    void (*span)(struct xn_flat *, unsigned int, int, int, unsigned char *);
+                                    /* +0x3C: the span routine (xspan.h xn_flat_span_fn) 15526C
+                                       calls: first xn_flat_span_light_setup 155610 (154ECD),
+                                       which installs one of the four flat spans */
     unsigned char *texels;          /* +0x40: the frame's pixels, 256 bytes a row (154E5B) */
     unsigned short scale;           /* +0x44: size, 100h = 1.0; xn_flat_draw adds the image's
                                        x_scale (texture header +0x18) (154E4F) */

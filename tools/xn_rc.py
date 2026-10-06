@@ -731,10 +731,15 @@ class RImage:
         asm_address, size, reason). A machine made from asm state (a record's, a snapshot's)
         has run the asm's initialisation, not the C's: the C's own storage starts as built,
         so state an earlier call set (the 1/z table, the view) is taken from where the asm
-        keeps it. A row's `kind` is `copy` (the default: the bytes as they are) or `codeptr`
-        (a dword holding an asm entry's address becomes that function's C address). A
+        keeps it. A row's `kind` is `copy` (the default: the bytes as they are), `codeptr`
+        (a dword holding an asm entry's address becomes that function's C address) or
+        `codeptr-inplace` (asm entries in the asm's own structures become C addresses where
+        they are; `every` repeats it: _adopt_inplace). A
         test-harness migration, never part of the engine."""
         for r in adopt_rows():
+            if (r.get("kind") or "").strip() == "codeptr-inplace":
+                self._adopt_inplace(emu, r)
+                continue
             name = r["c_symbol"].strip()
             a = next((self.syms[n] for n in ("_" + name, name, name + "_") if n in self.syms), None)
             if a is None:
@@ -753,6 +758,21 @@ class RImage:
                     v = rt["c"]
                 data = struct.pack("<I", v)
             emu.uc.mem_write(a, data)
+
+    def _adopt_inplace(self, emu, r):
+        """codeptr-inplace: the dwords at asm_address (and, with `every=STRIDE*COUNT`, every
+        STRIDE bytes on) that hold a converted function's asm entry become its C address, in
+        place: records of pointers the asm left in its own structures (the polygons' span
+        routines) that the C will call. Any other value stays (0, an asm-only entry such as
+        the background polygon's 12A949, garbage in unused records)."""
+        import xn_boundary
+        lo = int(r["asm_address"], 16)
+        row = {"start": "%X" % lo, "end": "%X" % (lo + 4), "every": (r.get("every") or "").strip()}
+        for a, _b in xn_boundary.row_ranges(row):
+            v = struct.unpack("<I", bytes(emu.uc.mem_read(LOAD + a, 4)))[0]
+            rt = self.routes.get(v - LOAD) if v >= LOAD else None
+            if rt is not None and rt.get("c") is not None:
+                emu.uc.mem_write(LOAD + a, struct.pack("<I", rt["c"]))
 
     def game_routes(self):
         """The functions routed when the game runs (route_game)."""
@@ -1011,12 +1031,17 @@ def alloc_drops(rows=None):
 
 def own_drops(rows=None):
     """{function va: [(lo, hi)]} of the `memory-own` dropped rows: preferred addresses (any
-    object's) excused only in the records of their function: what a deviation's own calls
+    object's), or linear ones written L:ADDR, excused only in the records of their function: what a deviation's own calls
     change in memory nobody reads (D-VID-01: MemCheck's last-call record)."""
     out = {}
     for r in (rows if rows is not None else load_dropped()[3]):
         if r["kind"].strip() == "memory-own":
             import xn_boundary
+            if r["start"].strip().upper().startswith("L:"):
+                # a linear address (low memory, a probe's made-up pointer): as it is
+                out.setdefault(func_va(r["function"].strip()), []).append(
+                    (int(r["start"].strip()[2:], 16), int(r["end"].strip().lstrip("Ll:"), 16)))
+                continue
             out.setdefault(func_va(r["function"].strip()), []).extend(
                 (LOAD + lo, LOAD + hi) for lo, hi in xn_boundary.row_ranges(r))
     return out
