@@ -2,10 +2,123 @@ function,kind,start,end,name,reason
 *,exceptions,,,00 FD,"canonical C checks a divide instead of letting it fault: the asm's divide errors (and the return from XnGine's handler) are gone; the results are the handler's (Q-SYS-01, src/engine/arith.c)"
 xn_vec_unit_to_angles_regs,memory,0C1F00,0C1F0C,xn_vec_angles_in,"scratch: the asm kept its input (x, y, z) here and read y back; nothing else reads it (config/xngine_boundary.csv: private)"
 xn_mat_scaled_axes,memory,136E84,136E90,xn_mat_scaled_axes_in,"scratch: the asm kept its scales a, b, c here; nothing reads them"
-xn_mat_from_angles,memory,13719F,1371AB,xn_mat_from_angles_tmp,"scratch in code bytes: three products of sines and cosines the asm kept between its steps"
+xn_mat_from_angles,memory,13719F,1371AB,xn_mat_from_angles_tmp,scratch in code bytes: three products of sines and cosines the asm kept between its steps
 xn_math_triangle_y_at,memory,14BB00,14BB24,xn_math_tri_edges,"scratch: the edges e1, e2 and the query offset (xn_math_triangle_y_at, xn_vec_triangle_normal)"
-xn_math_triangle_y_at,memory,14BB30,14BB3C,xn_math_tri_edges+30,"scratch: the normal's y and the height's two terms"
-xn_vec_blend,memory,14BB60,14BB68,xn_vec_blend_weights,"scratch: the weights << 10"
-xn_mat_mul_int,memory,15D165,15D16D,xn_mat_int_strides,"scratch in code bytes: the row strides the product passed to its dot product (now parameters)"
-xn_mat_mul_fixed,memory,15D1E9,15D1F5,xn_mat_fixed_strides,"scratch in code bytes: the row strides and the shift (xn_mat_fixed_shift) passed to the dot product"
-xn_mat_mul_fixed64,memory,15D27C,15D286,xn_mat_fixed64_strides,"scratch in code bytes: the row strides and the shift (xn_mat_fixed64_shift) passed to the dot product"
+xn_math_triangle_y_at,memory,14BB30,14BB3C,xn_math_tri_edges+30,scratch: the normal's y and the height's two terms
+xn_vec_blend,memory,14BB60,14BB68,xn_vec_blend_weights,scratch: the weights << 10
+xn_mat_mul_int,memory,15D165,15D16D,xn_mat_int_strides,scratch in code bytes: the row strides the product passed to its dot product (now parameters)
+xn_mat_mul_fixed,memory,15D1E9,15D1F5,xn_mat_fixed_strides,scratch in code bytes: the row strides and the shift (xn_mat_fixed_shift) passed to the dot product
+xn_mat_mul_fixed64,memory,15D27C,15D286,xn_mat_fixed64_strides,scratch in code bytes: the row strides and the shift (xn_mat_fixed64_shift) passed to the dot product
+xn_dos_open,register,,,edx,"the path the asm left in EDX (the file_resolver's answer): no caller reads it (xn_dos_load_file, xn_dos_file_size and xn_dos_load_palette set EDX at once; the texture loader and the world never read it)"
+xn_dos_file_exists,register,,,ebx,the closed handle the asm left in EBX: no caller reads it (xn_vid_play sets EBX at once; the C form returns the carry)
+xn_dos_write,register,,,edx,"the buffer the asm left advanced past the whole 32K pieces in EDX: no caller reads it (the world editor's writes, dead, and the C form)"
+xn_pal_find_nearest,memory,12B852,12B85A,xn_pal_best_dist,scratch: the nearest-colour searches kept their best distance and index here; canonical C keeps them in locals (config/xngine_boundary.csv: private)
+xn_pal_find_nearest_hsv,memory,12B80C,12B812,xn_pal_hsv_target,scratch: the dead HSV search kept its target colour here for the comparisons; canonical C keeps its parameters (private)
+xn_pal_rgb_to_hsv,memory,12B85A,12B874,xn_pal_hsv_scratch,"scratch: the RGB to HSV conversions (and the dead inverse) kept the colour, its largest and smallest components and their difference here; canonical C keeps them in locals (private)"
+xn_pal_fade_to,memory,12BB78,12C778,xn_pal_fade_rgb,working storage of one fade: the 16.16 components; canonical C keeps them in pal.c's own arrays (private: nothing else reads them)
+xn_pal_fade_to,memory,12C778,12D378,xn_pal_fade_step,working storage of one fade: the per-retrace steps; in pal.c's own arrays (private)
+xn_font_draw_glyph,memory,12DD02,12DD03,xn_font_glyph_skip,"a self-patched operand (shl eax, SKIP): the bits to shift out of a row, a local in canonical C (code bytes: private)"
+xn_font_draw_glyph,memory,12DD10,12DD14,xn_font_glyph_step,"a self-patched operand (add edi, STEP): the row step xn_gfx_width - w, computed where it is used (code bytes: private)"
+xn_gfx_wait_vretraces,register,,,eax,dead (no caller): EAX is the retrace count run down to 0
+xn_gfx_get_cursor_pos,register,,,ecx ebx esi edi,"dead (no caller): the registers as the BIOS left them (CX the cursor's shape, EBX the page 0 it was given); the results are the row and column"
+xn_gfx_set_cursor_pos,register,,,eax ecx edx ebx esi edi,dead (no caller): the registers it loaded for the BIOS and what the BIOS left
+xn_gfx_copy_and_clear,register,,,eax ecx esi edi,"its callers are canonical C (present, the banked present): the asm left the fill dword in EAX, ECX 0 and ESI EDI past the copy for the banked present's next bank; nothing reads them"
+xn_gfx_copy_rows,register,,,ecx esi edi,its callers are canonical C: the asm left ECX 0 and ESI EDI past the copy (the banked present's next bank); nothing reads them
+xn_draw_image_scaled,memory,0C0600,0C061E,xn_draw_scaled_flags .. xn_draw_scaled_src_ofs,"the scaled image's arguments, steps, clip cuts and column offset as the asm kept them (words and bytes) for its row compiler, clip and unpacker; canonical C passes them as parameters and locals (config/xngine_boundary.csv: private)"
+xn_draw_paperdoll_item,memory,0C0606,0C0612,xn_draw_scaled_src_w .. xn_draw_scaled_src,the paperdoll item handed its image to the unpacker through the scaled image's statics; canonical C passes it (private)
+xn_draw_image_scaled,memory,0C08AD,0C08B1,xn_draw_scaled_bottom,"a self-patched operand (cmp edi, BOTTOM): the screen's end, a local (code bytes: private)"
+xn_draw_image_scaled,memory,0C08B9,0C08BD,xn_draw_scaled_stride,"a self-patched operand (add esi, STRIDE): always 100h, a constant (code bytes: private)"
+xn_draw_image_scaled,memory,0C08BE,0C08BF,xn_draw_scaled_yint_op,"a self-patched operand (mov bh, YINT): the y step's integer part, a local (code bytes: private)"
+xn_draw_image_scaled,memory,xn_mem_work_block+0x0,xn_mem_work_block+0x1800,big_buffer (the scaled row's code),"the machine code of one scaled row the asm generated at big_buffer and ran; canonical C draws the same columns directly. The game never reads what the row compiler wrote (writer-private: build/xn_canon/group_b/boundary_extra.csv, tools/codegen_flow.py)"
+xn_draw_image_scaled_row,memory,xn_mem_work_block+0x0,xn_mem_work_block+0x1800,big_buffer (the scaled row's code),"the same, in the row compiler's own records"
+xn_draw_image_scaled_row,register,,,eax ecx dx bx bp,"its caller is canonical C (xn_draw_image_scaled): the asm left the last je displacement in EAX, the counts in ECX and BP, the accumulator in BX and the x step in DX for the asm runner; nothing reads them"
+xn_draw_line_text_colour,memory,0CDE33,0CDE4F,xn_line_err_step_neg .. xn_line_y2,"the line's ends, error steps and the address of its x- or y-major loop (the asm jumped to it): locals in canonical C (private; the steps and the loop address unobserved: no object-1 reference, written only on the diagonal path no survey reached)"
+xn_draw_line_clip,memory,153000,153008,xn_draw_line_dx .. xn_draw_line_dy,the clipped line's deltas the asm kept for its cuts: locals (private)
+xn_draw_img_record,register,,,eax edx ebx,dead (no caller): the blit's leftover registers
+xn_draw_img_record_regs,register,,,eax edx ebx,its only caller is the dead xn_draw_img_record: the blit's leftover registers
+xn_draw_img_record_transparent,register,,,eax edx ebx,dead (no caller): the blit's leftover registers
+xn_draw_img_record_transparent_regs,register,,,eax edx ebx,its only caller is the dead xn_draw_img_record_transparent: the blit's leftover registers
+xn_draw_remap_rect_regs,register,,,eax ecx,its only caller is the dead xn_draw_remap_rect: the last colour in AL (EBP's other bytes) and the spent row count in ECX
+xn_img_rle_decode,register,,,ecx,"its callers are canonical C (xn_img_unpack_rows, xn_draw_cel_frame): the asm left ECX 0 (the counts in CX), on which the asm cel blitter's row loop relied (Q-DRAW-11)"
+xn_vid_refill,register,,,ebx,its callers are canonical C: the asm left the file handle it gave DOS in BX
+xn_vid_fill,register,,,edx ebx,its callers are canonical C: the asm left the buffer and the file handle it gave DOS in EDX and BX
+xn_vid_finish,register,,,edx,its callers are canonical C: EDX as the timer removal left it (the asm threaded it into the next unlock: Q-VID-04)
+xn_vid_audio_stop,register,,,edx,its callers are canonical C: EDX as the SOS stop call left it (Q-VID-04)
+xn_vid_audio_start,memory,0C106B,0C106F,xn_vid_sample+5C (done),"the sample-done callback's address the player gives SOS: the C function's (xn_vid_audio_done_cb), where the asm gave its own entry (the sample descriptor is the engine's: private; SOS calls the callback through it)"
+xn_vid_play,memory-own,188A9B,188AAE,MemCheck's last-call record (the game's),"Deviation D-VID-01: the unlocks the asm never made (a leftover size of 0) go through the game's dpmi_unlock_region, whose checked memset records its source line (86) in MemCheck's last-call location (0x188A9B file, 0x188A9F line): read only by MemCheck's own error reports"
+xn_vid_finish,memory-own,188A9B,188AAE,MemCheck's last-call record (the game's),"Deviation D-VID-01: the same, for the audio buffers' unlocks"
+xn_vid_play,flags,,,CF,"the asm's clc/stc (1 played, 0 not) is undone by the dpmi_unlock_region calls after it: CF comes back as their code leaves it (clear); no caller reads flags (the game's 8 sites read EBP ESI EDI)"
+xn_gfx_vesa_blit_rect_banked,memory,15FFCC,15FFD0,xn_vesa_blit_dwords,"a self-patched operand (mov ecx, DW: w >> 2), computed where it is used (code bytes: private)"
+xn_gfx_vesa_blit_rect_banked,memory,15FFD3,15FFD7,xn_vesa_blit_bytes,"a self-patched operand (mov ecx, B: w & 3) (code bytes: private)"
+xn_gfx_vesa_blit_rect_banked,memory,15FFDB,15FFDF,xn_vesa_blit_skip,"a self-patched operand (add edi, SKIP: xn_gfx_width - w) (code bytes: private)"
+xn_sky_draw_rain_streak_bottom_clip,memory,0C9EA0,0C9EA1,xn_sky_rain_restore_op,"code: the rain streak's restoring instruction, where the dead bottom-clip entry's 31-pixel run leaves its planted ret (Q-SKY-03, dropped); canonical C writes no code"
+xn_water_draw,memory,12DE10,12DE18,xn_water_row,"scratch: the row being drawn and that row's jitter pointer, which xn_water_draw kept for xn_water_span (now a local and a parameter); nothing else reads them (config/xngine_boundary.csv: private)"
+xn_water_clip_extent,memory,12F47A,12F49A,xn_water_line_p0,"scratch: the water line's two ends (xn_water_line_p0, _p1: view space, outcode, then 2^40 / z), passed from xn_water_clip_extent to xn_water_draw (now locals); private"
+xn_water_draw,memory,12F976,12F97A,xn_water_row_inv_step,"code: the per-row step of the plane's 1/z, which xn_water_draw patched into its own row loop (now a local)"
+xn_world_gen_river_body,memory,0C23B3,0C23B8,xn_world_last_dx,"scratch of the dead walkers: their last step and the paths' avoided step (xn_world_last_dx/_dy, xn_world_path_avoid_dx/_dy), now locals and a parameter of xn_world_steepest_neighbour; nothing else reads them"
+xn_world_update,memory,0C23D8,0C23E9,xn_world_eye_sub_x,"scratch: the eye's square in its cell, its cell's column and row (xn_world_cell_slot, xn_world_cell_index) and the directions loaded (xn_world_loaded_dirs), passed to xn_world_update's loads in globals (now locals and parameters); private"
+xn_world_read_cell,memory,0C28A3,0C28AB,xn_world_noise_amp,"scratch: the cell's noise amplitude and its half, which xn_world_read_cell kept for the heightmap (now computed there from the cell header); private"
+xn_world_update,memory,0C28B3,0C28B4,xn_world_update_pass,scratch: xn_world_update's pass count (a local); private
+xn_world_gen_heightmap,memory,0C28D4,0C28F8,xn_world_gen_step,"scratch: the heightmap's square size and count, its walk over the work grid (xn_world_scratch_x/_y/_x2/_y2, which the terrain also borrowed for its texture origins and xn_terrain_height_at's point) and the slot being filled (xn_world_slot), now locals and parameters; private"
+xn_world_shutdown,register,,,ebx,"the closed file's handle the asm leaves in EBX: its callers (the render group's shutdown, the game's exit) never read it"
+xn_world_load_west,register,,,ebx,"the slot beside, which the asm computes in EBX: xn_world_update never reads it"
+xn_world_load_east,register,,,ebx,"the slot beside, which the asm computes in EBX: xn_world_update never reads it"
+xn_world_load_north,register,,,ebx,"the slot beside, which the asm computes in EBX: xn_world_update never reads it"
+xn_world_load_south,register,,,ebx,"the slot beside, which the asm computes in EBX: xn_world_update never reads it"
+xn_world_unpack_cell_slot,register,,,eax,the slot's byte offset the dead entry leaves in EAX: no caller
+xn_world_fix_lone_tiles,register,,,eax ebx,"the class lookups' register and the square's position the asm leaves (their upper halves: the row's outputs, which only xn_world_rock_slopes' unused upper EBX read)"
+xn_terrain_transform_grid,memory,13E98A,13E98E,xn_tgrid_row_x,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13E994,13E998,xn_tgrid_row_y,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13E99E,13E9A2,xn_tgrid_row_z,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13E9B7,13E9BB,xn_tgrid_x,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13E9BE,13E9C2,xn_tgrid_y,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13E9C3,13E9C7,xn_tgrid_z,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EAC8,13EACC,xn_tgrid_col_dx,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EAD2,13EAD6,xn_tgrid_col_dy,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EADC,13EAE0,xn_tgrid_col_dz,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EAE7,13EAEB,xn_tgrid_row_end,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EAF7,13EAFB,xn_tgrid_row_dx,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EB01,13EB05,xn_tgrid_row_dy,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EB0B,13EB0F,xn_tgrid_row_dz,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_transform_grid,memory,13EB16,13EB1A,xn_tgrid_end,"code: the grid walker's state, a patched operand of its own code (smc TERRAIN-GRID); now a local"
+xn_terrain_draw_cells,memory,13F06A,13F06E,xn_tcells_setup_a,"code: the cells' span setup and ground archive, patched operands of its own code (smc TERRAIN-CELLS); now locals"
+xn_terrain_draw_cells,memory,13F0A2,13F0A6,xn_tcells_archive_a,"code: the cells' span setup and ground archive, patched operands of its own code (smc TERRAIN-CELLS); now locals"
+xn_terrain_draw_cells,memory,13F0E3,13F0E7,xn_tcells_setup_b,"code: the cells' span setup and ground archive, patched operands of its own code (smc TERRAIN-CELLS); now locals"
+xn_terrain_draw_cells,memory,13F11B,13F11F,xn_tcells_archive_b,"code: the cells' span setup and ground archive, patched operands of its own code (smc TERRAIN-CELLS); now locals"
+xn_terrain_draw_cells,memory,13F182,13F186,xn_tcells_setup_c,"code: the cells' span setup and ground archive, patched operands of its own code (smc TERRAIN-CELLS); now locals"
+xn_terrain_draw_cells,memory,13F1BA,13F1BE,xn_tcells_archive_c,"code: the cells' span setup and ground archive, patched operands of its own code (smc TERRAIN-CELLS); now locals"
+xn_terrain_face_plane_a,memory,12028C,120290,xn_pick_view_y,"scratch: the face planes kept an edge's y in the shared scratch vectors (a.y; private); a.z (pick_distance, game-visible) is still written: Q-TERRAIN-02"
+xn_terrain_face_plane_a,memory,120294,1202A0,xn_scratch_vec_b,scratch: the face planes kept their second edge in the shared scratch vectors (b; private)
+xn_terrain_u_axis_x,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_terrain_u_axis_z,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_terrain_u_axis_neg_x,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_terrain_u_axis_neg_z,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_terrain_v_axis_z,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_terrain_v_axis_x,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_terrain_v_axis_neg_z,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_terrain_v_axis_neg_x,register,,,ecx,the origin the asm leaves in ECX: xn_terrain_draw_cells never reads it
+xn_collide_segment_model,memory,14A100,14A249,xn_collide_work,"scratch: the collision tests' working state (the matrices, the segment or probe in model space, the mode, the hit's t, the sphere builder's grid; xn_terrain_height_at's ground triangle in its first 36 bytes), passed between their steps in globals (now locals and parameters); private"
+xn_collide_segment_model,memory,14A68F,14A6B3,xn_collide_seg,"scratch in code bytes: xn_collide_segment_model's own variables (the model's points and normals, the face lists' pointers and count, the hit list's pointers); now locals"
+xn_collide_model_model,memory,14AA66,14AA92,xn_collide_detail,scratch in code bytes: the dead detailed model-model test's lists (unobserved); now locals
+xn_collide_spheres_model,memory,14AF0C,14AF30,xn_collide_sph,scratch in code bytes: xn_collide_spheres_model's own variables; now locals
+xn_collide_spheres_spheres,memory,14B193,14B19B,xn_collide_ss_hits,scratch in code bytes: the dead probe-probe test's hit list pointers (unobserved); now locals
+xn_collide_segment_flat,memory,14B453,14B45B,xn_collide_flat_height,scratch in code bytes: the flat's height and width (unobserved); now locals
+xn_collide_build_model_spheres,memory,14BA7D,14BA95,xn_collide_build,scratch in code bytes: the dead sphere builder's walk over the model; now locals
+xn_collide_segment_plane,memory,14BB24,14BB30,xn_collide_mid,"scratch: the approximate segment test's middle and the plane-plane test's plane constants (xn_collide_mid; its last 12 bytes, 14BB30, are the pilot's triangle scratch row); now locals; private"
+xn_collide_segment_plane,memory,14BB3C,14BB60,xn_collide_normal,"scratch: the plane and sphere tests' shared vectors (xn_collide_normal, xn_collide_vec_a, xn_collide_vec_b), where the asm kept a normal, a centre or a difference between its steps; now locals (math.c's dead xn_math_plane_y_at still leaves its normal there); private"
+xn_collide_plane_plane_line,memory,14C6FD,14C711,xn_collide_ppl_axis,scratch in code bytes: the dead plane-plane intersection's arguments and axis; now parameters and a local
+xn_collide_point_in_face,memory,15C500,15C524,xn_collide_edge_v0,scratch: the face tests' edge vectors and test point; now locals; private
+xn_collide_point_in_face,memory,15CC2E,15CC36,xn_collide_face_normal_ptr,scratch in code bytes: the face test's normal and points pointers; now parameters
+xn_collide_face_area,memory,15CE76,15CE7E,xn_collide_area_points,scratch in code bytes: the dead face area's points and last fan index; now locals
+xn_collide_face_test_edges,memory,15CED6,15CEDE,xn_collide_edge_first,scratch in code bytes: the edge test's first point and points; now locals
+xn_collide_face_test_vertices,memory,15CF11,15CF15,xn_collide_vertex_points,scratch in code bytes: the dead vertex test's points (unobserved); now a parameter
+xn_collide_point_in_face_v2,memory,1202A0,1202AC,xn_pick_flat_x,scratch: the dead face test v2 kept its point in the shared scratch vectors (flat; private); now a parameter
+xn_collide_segment_sphere_fx,register,,,esi,"what the asm leaves in ESI (an end, or |b|^2): only the dead register chain xn_collide_ref_helpers would read it"
+xn_collide_segment_sphere,register,,,edx ebx,"the centre's y and z, |a|^2 and the last product or remainder the asm leaves in EDX, EBX: no caller reads them"
+xn_collide_sphere_plane,register,,,ebx,the low dword of the x and y products' sum the asm leaves in EBX: only the dead register chain xn_collide_ref_helpers would read it
+xn_collide_sphere_sphere,register,,,edx ebx,the result again (EDX) and the low dword of d^2 (EBX) the asm leaves: no caller reads them
+xn_collide_point_in_sphere_approx,register,,,edx ebx,"the approximate length's y and z terms the asm leaves in EDX, EBX: no caller reads them"
+xn_collide_point_in_face,register,,,edx ebx esi edi,"the edge it stopped at, the edge table and the cross product's y and z the asm leaves: only the dead register chain xn_collide_ref_helpers would read them"
+xn_collide_face_test_edges,register,,,ecx esi edi,"the radius, the edge test's ESI and the slot it stopped at, which the asm leaves: no caller reads them"
+xn_collide_ref_helpers,register,,,eax ecx edx ebx esi edi,"the dead stub's register chain: what the three helpers leave (Q-COLL-07, dropped)"
+xn_collide_build_model_spheres,register,,,edx,the dead tool's count on its failures: the asm leaves its last remainder or node there

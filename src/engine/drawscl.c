@@ -1,234 +1,150 @@
-/* drawscl.c: XnGine's scaled image (xn_draw_image_scaled) and its row compiler as readable C
-   (xdraw.h; see xngine.h, docs/xngine_readable.md and docs/engine/smc/draw.md,
-   DRAW-SCALED). The compiler still emits the row's machine code into big_buffer (its bytes
-   are behaviour the records compare); the C draws the row from the plan built with it. */
+/* drawscl.c: XnGine's scaled image (canonical C; the interface and the module's documentation
+   are in xdraw.h). The asm compiled each row into machine code at big_buffer (one load, test and
+   store sequence per source column) and called it once per screen row
+   (docs/engine/smc/draw.md, DRAW-SCALED); the C computes the same columns once and draws them. */
 #include "xdraw.h"
 
-#define SCALED_COLS 330         /* columns a row can have: at most one per screen column + 1 */
+/* The columns of the row being drawn: the row's plan, at most one per screen column */
+static xn_scaled_col row_cols[XN_SCALED_COLS];
 
-int xn_draw_image_scaled_clip(void)
+/* n / d as the asm's `idiv r16` of DX:AX = n: the 16-bit quotient, or 0 when it does not fit
+   in 16 bits or d is 0 (the divide error XnGine's handler turns into 0: Q-SYS-01) */
+static s16 idiv16_or0(s32 n, s16 d)
 {
-    xn_draw_scaled_skip_x = 0;
-    xn_draw_scaled_skip_y = 0;
-    if (xn_draw_scaled_x >= (s16)xn_gfx_clip_right)
+    s32 q;
+
+    if (d == 0)
         return 0;
-    if (xn_draw_scaled_x < (s16)xn_gfx_clip_left) {
-        xn_draw_scaled_skip_x = (s16)xn_gfx_clip_left - xn_draw_scaled_x;
-        xn_draw_scaled_x = xn_gfx_clip_left;
+    q = n / d;
+    if (q < -32768 || q > 32767)
+        return 0;
+    return (s16)q;
+}
+
+/* an 8.8 step: v * 256 / d (`movzx dx, ah; shl ax, 8; idiv d`: v's low word, shifted) */
+static s16 step88(u16 v, s16 d)
+{
+    return idiv16_or0((s32)v << 8, d);
+}
+
+int xn_draw_image_scaled_clip(s16 *x, s16 *y, u16 *skip_x, u16 *skip_y)
+{
+    *skip_x = 0;
+    *skip_y = 0;
+    if (*x >= (s16)xn_gfx_clip_right)
+        return 0;
+    if (*x < (s16)xn_gfx_clip_left) {
+        *skip_x = (s16)xn_gfx_clip_left - *x;
+        *x = (s16)xn_gfx_clip_left;
     }
-    if (xn_draw_scaled_y >= (s16)xn_gfx_clip_bottom)
+    if (*y >= (s16)xn_gfx_clip_bottom)
         return 0;
-    if (xn_draw_scaled_y < (s16)xn_gfx_clip_top) {
-        xn_draw_scaled_skip_y = (s16)xn_gfx_clip_top - xn_draw_scaled_y;
-        xn_draw_scaled_y = xn_gfx_clip_top;
+    if (*y < (s16)xn_gfx_clip_top) {
+        *skip_y = (s16)xn_gfx_clip_top - *y;
+        *y = (s16)xn_gfx_clip_top;
     }
     return 1;
 }
 
-void xn_draw_image_scaled_clip_r(xn_regs *r)
+int xn_draw_image_scaled_row(xn_scaled_col *cols, u32 x, u16 src_ofs, u16 src_w, u8 step_int,
+                             u8 step_frac)
 {
-    XN_SETFLAG(r, XN_CF, !xn_draw_image_scaled_clip());
-}
+    u16 acc = (u16)step_int << 8 | step_frac;   /* 8.8: the integer part is this column's */
+    u16 left = src_w;
+    int n = 0;
 
-/* the 8.8 accumulator's next value: the integer part reloaded, the fraction added */
-static u16 next_acc(u8 step_int, u16 acc, u16 step_frac)
-{
-    return (u16)(((u16)step_int << 8 | (acc & 0xFF)) + step_frac);
-}
-
-void xn_draw_image_scaled_compile_row(xn_scaled_row *row, u32 loop_hi)
-{
-    u8 *code = big_buffer;
-    u16 cols = xn_draw_scaled_src_w;
-    u16 acc = (u16)xn_draw_scaled_x_int << 8 | (u8)xn_draw_scaled_x_frac;
-    u32 x = (u16)xn_draw_scaled_x;
-
-    row->n = 0;
-    row->remap = (xn_draw_scaled_flags & 0x8000) != 0;
-    row->last_jump = 0;
     do {
         s16 count = acc >> 8;
 
-        row->count_left = 0;
         if (count != 0) {
-            u8 *je_zero, *je_ff;
-            xn_scaled_col *col = row->n < row->cap ? &row->col[row->n] : 0;
-
-            /* mov al, [esi + src_ofs]; or al, al; je; cmp al, 0FFh; je */
-            code[0] = 0x8A;
-            code[1] = 0x86;
-            XN_PUT32(code + 2, xn_draw_scaled_src_ofs);
-            code[6] = 0x0A;
-            code[7] = 0xC0;
-            code[8] = 0x74;
-            code += 10;
-            je_zero = code;
-            code[0] = 0x3C;
-            code[1] = 0xFF;
-            code[2] = 0x74;
-            code += 4;
-            je_ff = code;
-            if (col) {
-                col->src = xn_draw_scaled_src_ofs;
-                col->x = (u16)x;
-                col->count = 0;
-            }
             if ((s16)(x + count) > (s16)xn_gfx_clip_right) {
-                /* the window's right edge: the last column, cut */
-                cols = 1;
-                count -= (s16)(x + count) - (s16)xn_gfx_clip_right;
-                if (count <= 0)
-                    row->count_left = count;
-            }
-            if (count > 0) {
-                u32 pairs;
+                /* the window's right edge: this column, cut, is the row's last (`sub; jle`:
+                   no pixels when the column is no wider than the cut) */
+                s16 over = (s16)((s16)(x + count) - (s16)xn_gfx_clip_right);
 
-                if (row->remap)
-                    *code++ = 0xD7;                     /* xlat */
-                if (count & 1) {                        /* mov [edi + x], al */
-                    code[0] = 0x88;
-                    code[1] = 0x87;
-                    XN_PUT32(code + 2, x);
-                    code += 6;
-                    x++;
-                    if (col)
-                        col->count++;
-                }
-                if ((count >> 1) != 0) {
-                    pairs = (loop_hi << 16) | (count >> 1);   /* (`loop` counts all of ECX) */
-                    code[0] = 0x8A;                     /* mov ah, al */
-                    code[1] = 0xE0;
-                    code += 2;
-                    do {                                /* mov [edi + x], ax */
-                        code[0] = 0x66;
-                        code[1] = 0x89;
-                        code[2] = 0x87;
-                        XN_PUT32(code + 3, x);
-                        code += 7;
-                        x += 2;
-                        if (col)
-                            col->count += 2;
-                    } while (--pairs != 0);
-                    loop_hi = 0;
-                }
+                left = 1;
+                count = count <= over ? 0 : count - over;
             }
-            je_ff[-1] = (u8)(code - je_ff);
-            je_zero[-1] = (u8)(code - je_zero);
-            row->last_jump = code - je_zero;
-            row->n++;
+            if (count > 0 && n < XN_SCALED_COLS) {
+                cols[n].src = src_ofs;
+                cols[n].count = count;
+                cols[n].x = x;
+                n++;
+                x += count;
+            }
         }
-        xn_draw_scaled_src_ofs++;
-        acc = next_acc(xn_draw_scaled_x_int, acc, xn_draw_scaled_x_frac);
-    } while (--cols != 0);
-    *code = 0xC3;
-    row->acc = acc;
-    row->loop_hi = loop_hi;
+        src_ofs++;
+        acc = (u16)(((u16)step_int << 8 | (acc & 0xFF)) + step_frac);
+    } while (--left != 0);
+    return n;
 }
 
-void xn_draw_image_scaled_compile_row_r(xn_regs *r)
-{
-    xn_scaled_row row;
-
-    row.col = 0;
-    row.cap = 0;
-    xn_draw_image_scaled_compile_row(&row, r->ecx >> 16);
-    if (row.n != 0)
-        r->eax = row.last_jump;
-    r->ecx = (u32)row.loop_hi << 16 | row.count_left;
-    r->edx = (r->edx & 0xFFFF0000u) | xn_draw_scaled_x_frac;
-    r->ebx = (r->ebx & 0xFFFF0000u) | row.acc;
-    r->ebp &= 0xFFFF0000u;                      /* BP: the column count, spent */
-}
-
-/* What the emitted code does for one source row: each column's pixel, unless 0 or FFh,
-   (through color_remap) on its screen pixels */
-static void run_row(const xn_scaled_row *row, const u8 *src, u8 *dst)
+/* One screen row of the image: each column's source pixel, unless 0 or FFh, (through
+   color_remap with flag 8000h) on its screen pixels */
+static void draw_row(const xn_scaled_col *cols, int n, const u8 *src, u8 *dst, int remap)
 {
     int i;
 
-    for (i = 0; i < row->n; i++) {
-        const xn_scaled_col *col = &row->col[i];
-        u8 c = src[col->src];
+    for (i = 0; i < n; i++) {
+        u8 c = src[cols[i].src];
         u32 k;
 
         if (c == 0 || c == 0xFF)
             continue;
-        if (row->remap)
+        if (remap)
             c = color_remap[c];
-        for (k = 0; k < col->count; k++)
-            dst[col->x + k] = c;
+        for (k = 0; k < cols[i].count; k++)
+            dst[cols[i].x + k] = c;
     }
 }
 
 void xn_draw_image_scaled(s32 x, s32 y, s32 w, s32 h, s32 src_w, s32 src_h, s32 flags,
                           const u8 *src)
 {
-    xn_scaled_col cols[SCALED_COLS];
-    xn_scaled_row row;
-    s16 q, rem;
-    u16 acc, rows;
-    u8 *dst;
-    const u8 *src_row;
+    s16 sx = (s16)x, sy = (s16)y, step_x, step_y, q;
+    u16 skip_x, skip_y, src_ofs, rows, acc, cw = (u16)src_w, ch = (u16)src_h;
+    u8 *dst, *bottom;
+    int ncols;
 
-    if ((s16)w <= 2)
+    if ((s16)w <= 2)                    /* Quirk Q-DRAW-15 */
         return;
-    xn_draw_scaled_x = x;
-    xn_draw_scaled_y = y;
-    xn_draw_scaled_w = w;
-    xn_draw_scaled_h = h;
-    xn_draw_scaled_src_w = src_w;
-    xn_draw_scaled_src_h = src_h;
-    xn_draw_scaled_flags = flags;
-    xn_draw_scaled_src = (u8 *)src;
-    if (xn_draw_scaled_flags & 8) {
-        xn_img_unpack_rows();
-        xn_draw_scaled_src = scratch_buffer;
+    if (flags & 8) {
+        xn_img_unpack_rows(src, cw, ch, scratch_buffer);
+        src = scratch_buffer;
     }
-    /* the 8.8 steps: w * 256 / src_w, h * 256 / src_h */
-    q = xn_idiv16((u32)(u16)w << 8, (s16)xn_draw_scaled_src_w, &rem);
-    xn_draw_scaled_x_int = (u16)q >> 8;
-    xn_draw_scaled_x_frac = (u8)q;
-    if (xn_draw_scaled_h <= 2)
+    step_x = step88((u16)w, (s16)cw);
+    if ((s16)h <= 2)                    /* (the image unpacked all the same) */
         return;
-    q = xn_idiv16((u32)(u16)xn_draw_scaled_h << 8, (s16)xn_draw_scaled_src_h, &rem);
-    xn_draw_scaled_y_int = (u16)q >> 8;
-    xn_draw_scaled_y_frac = (u8)q;
-    XN_KEEP(xn_draw_scaled_stride, 0x100);
-    if (!xn_draw_image_scaled_clip())
+    step_y = step88((u16)h, (s16)ch);
+    if (!xn_draw_image_scaled_clip(&sx, &sy, &skip_x, &skip_y))
         return;
-    /* the source rows and columns the clip cut */
-    q = xn_idiv16((u32)xn_draw_scaled_skip_y << 8,
-                  (s16)((u16)xn_draw_scaled_y_int << 8 | (u8)xn_draw_scaled_y_frac), &rem);
-    xn_draw_scaled_src_h -= q;
-    if ((s16)xn_draw_scaled_src_h <= 0)
+    /* the source rows and columns the clip cut (16-bit: `sub; jle` compares as signed) */
+    q = step88(skip_y, step_y);
+    if ((s16)ch <= q)
         return;
-    xn_draw_scaled_src_ofs = q * xn_draw_scaled_src_w;     /* rows of src_w, not of 100h */
-    q = xn_idiv16((u32)xn_draw_scaled_skip_x << 8,
-                  (s16)((u16)xn_draw_scaled_x_int << 8 | (u8)xn_draw_scaled_x_frac), &rem);
-    xn_draw_scaled_src_w -= q;
-    if ((s16)xn_draw_scaled_src_w <= 0)
+    ch -= q;
+    src_ofs = (u16)(q * cw);            /* Quirk Q-DRAW-16: rows of src_w, not of 100h */
+    q = step88(skip_x, step_x);
+    if ((s16)cw <= q)
         return;
-    xn_draw_scaled_src_ofs += q;
-    XN_KEEP(xn_draw_scaled_bottom, XN_SCREEN(0, xn_gfx_clip_bottom));
-    dst = screen_buffer + xn_gfx_row_offset[(u16)xn_draw_scaled_y];
-    src_row = xn_draw_scaled_src;
-    row.col = cols;
-    row.cap = SCALED_COLS;
-    xn_draw_image_scaled_compile_row(&row, (u32)h >> 16);
-    /* each source row y-step times (the 8.8 accumulator's integer part) */
-    rows = xn_draw_scaled_src_h;
-    acc = (u16)xn_draw_scaled_y_int << 8 | (u8)xn_draw_scaled_y_frac;
-    XN_KEEP(xn_draw_scaled_yint_op, xn_draw_scaled_y_int);
-    do {
+    cw -= q;
+    src_ofs += q;
+    bottom = XN_SCREEN(0, xn_gfx_clip_bottom);
+    dst = screen_buffer + xn_gfx_row_offset[(u16)sy];
+    ncols = xn_draw_image_scaled_row(row_cols, (u16)sx, src_ofs, cw, (u8)(step_x >> 8),
+                                     (u8)step_x);
+    /* each source row y-step times: the integer part of the 8.8 accumulator */
+    acc = (u16)step_y;
+    for (rows = ch; rows != 0; rows--) {
         u16 n;
 
         for (n = acc >> 8; n != 0; n--) {
-            run_row(&row, src_row, dst);
-            dst += 320;
-            if (dst >= xn_draw_scaled_bottom)
+            draw_row(row_cols, ncols, src, dst, (flags & 0x8000) != 0);
+            dst += 320;                 /* (Q-DRAW-16: not xn_gfx_width) */
+            if (dst >= bottom)
                 return;
         }
-        src_row += 0x100;                       /* xn_draw_scaled_stride */
-        acc = next_acc(xn_draw_scaled_y_int, acc, xn_draw_scaled_y_frac);
-    } while (--rows != 0);
+        src += 0x100;                   /* Q-DRAW-16 */
+        acc = (u16)(((u16)step_y & 0xFF00 | (acc & 0xFF)) + (u8)step_y);
+    }
 }

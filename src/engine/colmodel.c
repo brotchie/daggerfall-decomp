@@ -1,17 +1,23 @@
-/* colmodel.c: XnGine's collision tests of models, probes and flats as readable C (xcollide.h;
-   see xngine.h and docs/xngine_readable.md).
+/* colmodel.c: XnGine's collision tests of models, probes and flats (canonical C; the interface
+   and the module's documentation are in xcollide.h).
 
    A model's collision spheres each list the faces near them (descending by face offset). A
-   test keeps the spheres it meets and merges their lists, then tests those faces. Hits go to
-   big_buffer (struct xn_collide_hits); big_buffer + 1000h..3FFFh are the tests' work areas. */
+   test keeps the spheres it meets and merges their lists, then tests those faces. The hits go
+   to big_buffer (struct xn_collide_hits); big_buffer + 1000h..3FFFh are the tests' work areas,
+   which the game can see: they are written as the asm writes them. The asm kept the tests'
+   other state in globals and in its own code; here it is in locals. */
 #include "xcollide.h"
 #include "xmat.h"
 #include "xmath.h"
 #include "xvec.h"
+#include "xtex.h"
 
 #define HIT_LIST        ((struct xn_collide_hits *)big_buffer)
+#define PROBE_MET       ((struct xn_collide_probe_sphere **)(big_buffer + 0x1000))
+#define PROBE_LOCAL     ((struct xn_collide_probe_sphere *)(big_buffer + 0x1400))
 #define FACE_LIST_A     ((struct xn_model_sphere_face *)(big_buffer + 0x2000))
 #define FACE_LIST_B     ((struct xn_model_sphere_face *)(big_buffer + 0x3000))
+#define FIXED_SHIFT     0x1C            /* the rotations' products: 2.28 */
 
 /* ---- model data ------------------------------------------------------------------------- */
 
@@ -48,6 +54,12 @@ static const xn_vec3 *handle_pos(const struct xn_model_handle *h)
     return (const xn_vec3 *)&h->x;
 }
 
+/* the bounding sphere's radius in world units */
+static s32 model_radius(const struct xn_model *m)
+{
+    return (u32)m->radius >> 8;
+}
+
 /* the 16.16 normal of an 8-bit model normal */
 static void normal16(xn_vec3 *n, const xn_vec3 *normal)
 {
@@ -56,13 +68,14 @@ static void normal16(xn_vec3 *n, const xn_vec3 *normal)
     n->z = normal->z << 8;
 }
 
-/* a world point into model space: (p - pos) << 8 through the model's rotation's inverse */
-static void to_model_space(xn_vec3 *out, const xn_vec3 *p, const xn_vec3 *pos)
+/* a world point into model space: (p - pos) << 8 through the inverse of the rotation rot */
+static void to_model_space(xn_vec3 *out, const xn_vec3 *p, const xn_vec3 *pos,
+                           const xn_mat3 *rot)
 {
     out->x = (p->x - pos->x) << 8;
     out->y = (p->y - pos->y) << 8;
     out->z = (p->z - pos->z) << 8;
-    xn_mat_transform_transposed(out, &xn_collide_work.model_matrix);
+    xn_mat_transform_transposed(out, rot);
 }
 
 /* (v + 80h) >> 8: model space to world units */
@@ -73,27 +86,40 @@ static s32 round8(s32 v)
 
 /* ---- merging face lists ------------------------------------------------------------------- */
 
-/* Merges sphere's face list into *list (count entries) at *next, both descending by face
-   offset, a face in both once; then *list is the result and *next the other buffer. */
-static void merge_faces(struct xn_model_sphere_face **list, struct xn_model_sphere_face **next,
-                        s32 *count, const struct xn_model_sphere *sphere)
-{
-    const struct xn_model_sphere_face *src = *list, *add = sphere->faces;
-    struct xn_model_sphere_face *dst = *next, *t;
-    u32 old = *count, left = sphere->face_count;
+/* The faces of the spheres met so far: the merged list and the other buffer, both in
+   big_buffer */
+struct face_list {
+    struct xn_model_sphere_face *list, *next;
+    u32 count;
+};
 
-    *count = 0;
+static void face_list_init(struct face_list *fl)
+{
+    fl->list = FACE_LIST_A;
+    fl->next = FACE_LIST_B;
+    fl->count = 0;
+}
+
+/* Merges sphere's face list into the list (both descending by face offset, a face in both
+   once) in the other buffer, which becomes the list */
+static void merge_faces(struct face_list *fl, const struct xn_model_sphere *sphere)
+{
+    const struct xn_model_sphere_face *src = fl->list, *add = sphere->faces;
+    struct xn_model_sphere_face *dst = fl->next, *t;
+    u32 old = fl->count, left = sphere->face_count;
+
+    fl->count = 0;
     if (old != 0) {
         for (;;) {
             if (src->face > add->face) {
                 *dst++ = *src++;
-                (*count)++;
+                fl->count++;
                 if (--old == 0)
                     goto rest_add;
             } else {
                 if (src->face < add->face) {
                     *dst++ = *add;
-                    (*count)++;
+                    fl->count++;
                 }
                 add++;
                 if (--left == 0)
@@ -104,18 +130,18 @@ static void merge_faces(struct xn_model_sphere_face **list, struct xn_model_sphe
 rest_add:
     for (; left != 0; left--) {
         *dst++ = *add++;
-        (*count)++;
+        fl->count++;
     }
     goto swap;
 rest_src:
     for (; old != 0; old--) {
         *dst++ = *src++;
-        (*count)++;
+        fl->count++;
     }
 swap:
-    t = *list;
-    *list = *next;
-    *next = t;
+    t = fl->list;
+    fl->list = fl->next;
+    fl->next = t;
 }
 
 /* ---- a segment against a model ------------------------------------------------------------ */
@@ -123,392 +149,240 @@ swap:
 s32 xn_collide_segment_model(struct xn_model_handle *h, const xn_vec3 *start,
                              const xn_vec3 *end, s32 mode)
 {
-    struct xn_collide_scratch *w = &xn_collide_work;
-    struct xn_collide_seg_state *st = &xn_collide_seg;
     struct xn_model *m = h->model;
-    const struct xn_model_sphere *sphere;
-    struct xn_model_sphere_face *e;
-    struct xn_model_face *face;
+    struct xn_collide_hits *hits = HIT_LIST;
     struct xn_collide_hit *hit;
-    xn_vec3 n, p, v;
-    s32 left;
+    const struct xn_model_sphere *sphere;
+    const struct xn_model_sphere_face *e;
+    const struct xn_model_face *face;
+    const xn_vec3 *points, *normals, *normal;
+    struct face_list fl;
+    xn_mat3 rot;
+    xn_vec3 ls, le, n, p, v;
+    s32 left, t;
 
-    w->model = h;
-    w->seg_start = (xn_vec3 *)start;
-    w->seg_end = (xn_vec3 *)end;
-    w->mode = mode;
-    if (xn_collide_segment_sphere(handle_pos(h), (u32)m->radius >> 8, start, end) < 0)
+    if (xn_collide_segment_sphere(handle_pos(h), model_radius(m), start, end) < 0)
         return -1;
     if (mode == 2)
         return 0;
     /* the segment in model space */
-    xn_mat_from_angles(h->angle_x, h->yaw, h->angle_z, &w->model_matrix);
-    to_model_space(&w->local_end, end, handle_pos(h));
-    to_model_space(&w->local_start, start, handle_pos(h));
-    st->points = model_at(m, m->point_offset);
-    st->normals = model_at(m, m->normal_offset);
-    st->model = m;
-    st->list = FACE_LIST_A;
-    st->list_next = FACE_LIST_B;
-    st->list_count = 0;
-    st->hits = HIT_LIST;
-    st->hits->count = 0;
-    st->hit_next = st->hits->hits;
+    xn_mat_from_angles(h->angle_x, h->yaw, h->angle_z, &rot);
+    to_model_space(&le, end, handle_pos(h), &rot);
+    to_model_space(&ls, start, handle_pos(h), &rot);
+    points = model_at(m, m->point_offset);
+    normals = model_at(m, m->normal_offset);
+    face_list_init(&fl);
+    hits->count = 0;
+    hit = hits->hits;
     /* the faces of the collision spheres it meets */
     sphere = model_at(m, m->sphere_offset);
     left = m->sphere_count;
     if (left <= 0)
-        return 0;                       /* (no spheres: a hit) */
+        return 0;                       /* Quirk Q-COLL-03: no spheres, a hit */
     do {
-        if (xn_collide_segment_sphere_fx(sphere_centre(sphere), sphere->radius, &w->local_start,
-                                         &w->local_end) >= 0) {
+        if (xn_collide_segment_sphere_fx(sphere_centre(sphere), sphere->radius, &ls, &le) >= 0) {
             if (mode == 1)
                 return 0;
-            merge_faces(&st->list, &st->list_next, &st->list_count, sphere);
+            merge_faces(&fl, sphere);
         }
         sphere = next_sphere(sphere);
     } while (--left != 0);
     /* the faces it crosses inside their edges */
-    left = st->list_count;
+    left = fl.count;
     if (left == 0)
         return -1;
-    e = st->list;
+    e = fl.list;
     do {
         face = model_at(m, e->face);
-        st->normal = (xn_vec3 *)entry_normal(st->normals, e);
-        normal16(&n, st->normal);
-        w->hit_t = xn_collide_segment_plane(&n, face_anchor(face, st->points), &w->local_start,
-                                            &w->local_end, &p);
-        if (w->hit_t >= 0 && xn_collide_point_in_face(&p, face, st->points, st->normal) >= 0) {
-            hit = st->hit_next;
+        normal = entry_normal(normals, e);
+        normal16(&n, normal);
+        t = xn_collide_segment_plane(&n, face_anchor(face, points), &ls, &le, &p);
+        if (t >= 0 && xn_collide_point_in_face(&p, face, points, normal) >= 0) {
             v = p;
-            xn_mat_transform(&v, &w->model_matrix);
+            xn_mat_transform(&v, &rot);
             hit->x = round8(v.x) + h->x;
             hit->y = round8(v.y) + h->y;
             hit->z = round8(v.z) + h->z;
-            v = *st->normal;
-            xn_mat_transform(&v, &w->model_matrix);
+            v = *normal;
+            xn_mat_transform(&v, &rot);
             hit->nx = v.x;
             hit->ny = v.y;
             hit->nz = v.z;
             hit->face = e->face;
-            hit->t_half = (s16)(w->hit_t >> 1);
-            st->hit_next = (struct xn_collide_hit *)((u8 *)hit + sizeof *hit);
-            st->hits->count++;
+            hit->t_half = (s16)(t >> 1);
+            hit = (struct xn_collide_hit *)((u8 *)hit + sizeof *hit);
+            hits->count++;
         }
         e++;
     } while (--left != 0);
-    return st->hits->count >= 1 ? (s32)st->hits : -1;
+    return hits->count >= 1 ? (s32)hits : -1;
 }
 
 /* ---- two models --------------------------------------------------------------------------- */
 
-/* The detailed model-model test the asm has after 14A6C0's exit (from 14A710), which nothing
-   reaches: B's position in A's space, A's spheres that meet B's bounding sphere and B's that
-   meet A's, the pairs of them that meet, then each pair's B sphere against the A sphere's faces
-   (whose plane point is taken from the face's point record, not the point: a bug). 0 on the
-   first touch (or the first pair in mode 1), else -1. Kept as C, not routed: entered on its
-   own, its exit pops 14A6C0's saved registers. */
-static s32 model_model_detail(void)
-{
-    struct xn_collide_scratch *w = &xn_collide_work;
-    struct xn_collide_detail_state *d = &xn_collide_detail;
-    struct xn_model_handle *a = w->model, *b = (struct xn_model_handle *)w->probe;
-    struct xn_model *ma = a->model, *mb = b->model;
-    const struct xn_model_sphere *s, *sa, *sb;
-    const struct xn_model_sphere_face *e;
-    struct xn_model_sphere **pa, **pb, **pair;
-    xn_vec3 v, n;
-    s32 left, la, lb, dist;
-
-    xn_mat_from_angles(a->angle_x, a->yaw, a->angle_z, &w->model_matrix);
-    xn_mat_transpose_copy3(&w->model_matrix, &w->model_matrix_inv);
-    w->local_end.x = (b->x - a->x) << 8;
-    w->local_end.y = (b->y - a->y) << 8;
-    w->local_end.z = (b->z - a->z) << 8;
-    xn_mat_transform(&w->local_end, &w->model_matrix_inv);
-    w->local_start.x = -w->local_end.x;
-    w->local_start.y = -w->local_end.y;
-    w->local_start.z = -w->local_end.z;
-    /* A's spheres that meet B's bounding sphere */
-    d->a_count = 0;
-    d->a_list = d->a_next = (struct xn_model_sphere **)big_buffer;
-    s = model_at(ma, ma->sphere_offset);
-    left = ma->sphere_count;
-    if (left <= 0)
-        return 0;
-    do {
-        if (xn_collide_sphere_sphere(sphere_centre(s), s->radius, &w->local_end, mb->radius) >= 0) {
-            *d->a_next++ = (struct xn_model_sphere *)s;
-            d->a_count++;
-        }
-        s = next_sphere(s);
-    } while (--left != 0);
-    if (d->a_count == 0)
-        return -1;
-    /* B's that meet A's */
-    d->b_count = 0;
-    d->b_list = d->b_next = (struct xn_model_sphere **)(big_buffer + 0x1000);
-    s = model_at(mb, mb->sphere_offset);
-    left = mb->sphere_count;
-    if (left <= 0)
-        return 0;
-    do {
-        if (xn_collide_sphere_sphere(sphere_centre(s), s->radius, &w->local_start, ma->radius) >= 0) {
-            *d->b_next++ = (struct xn_model_sphere *)s;
-            d->b_count++;
-        }
-        s = next_sphere(s);
-    } while (--left != 0);
-    if (d->b_count == 0)
-        return -1;
-    /* the pairs that meet, B's spheres in A's space */
-    xn_mat_from_angles(b->angle_x, b->yaw, b->angle_z, &w->probe_matrix);
-    xn_mat_mul_fixed(&w->rel_matrix.m[0][0], &w->model_matrix_inv.m[0][0],
-                     &w->probe_matrix.m[0][0], 3, 3, 3, 0x1C);
-    d->pair_count = 0;
-    d->pairs = d->pairs_next = (struct xn_model_sphere **)(big_buffer + 0x2000);
-    pa = d->a_list;
-    la = d->a_count;
-    do {
-        sa = *pa;
-        pb = d->b_list;
-        lb = d->b_count;
-        do {
-            sb = *pb;
-            v = *sphere_centre(sb);
-            xn_mat_transform(&v, &w->rel_matrix);
-            v.x += w->local_end.x;
-            v.y += w->local_end.y;
-            v.z += w->local_end.z;
-            if (xn_collide_sphere_sphere(&v, sb->radius, sphere_centre(sa), sa->radius) >= 0) {
-                if (w->mode == 1)
-                    return 0;
-                d->pairs_next[0] = (struct xn_model_sphere *)sa;
-                d->pairs_next[1] = (struct xn_model_sphere *)sb;
-                d->pairs_next += 2;
-                d->pair_count++;
-            }
-            pb++;
-        } while (--lb != 0);
-        pa++;
-    } while (--la != 0);
-    if (d->pair_count == 0)
-        return -1;
-    /* each pair's B sphere against its A sphere's faces */
-    d->model = ma;
-    d->normals = model_at(ma, ma->normal_offset);
-    pair = d->pairs;
-    left = d->pair_count;
-    do {
-        sb = pair[1];
-        v = *sphere_centre(sb);
-        xn_mat_transform(&v, &w->rel_matrix);
-        w->local_pos.x = v.x + w->local_end.x;
-        w->local_pos.y = v.y + w->local_end.y;
-        w->local_pos.z = v.z + w->local_end.z;
-        sa = pair[0];
-        e = sa->faces;
-        lb = sa->face_count;
-        do {
-            normal16(&n, entry_normal(d->normals, e));
-            if (xn_collide_sphere_plane(&n, (const xn_vec3 *)((u8 *)model_at(ma, e->face) + 8),
-                                        &w->local_pos, sb->radius, &dist) >= 0)
-                return 0;
-            e++;
-        } while (--lb != 0);
-        pair += 2;
-    } while (--left != 0);
-    return -1;
-}
-
-/* the asm jumps past the detailed test both ways */
-#define XN_MODEL_DETAIL     0
-
 s32 xn_collide_model_model(struct xn_model_handle *a, struct xn_model_handle *b, s32 mode)
 {
-    struct xn_collide_scratch *w = &xn_collide_work;
-
-    w->model = a;
-    w->probe = (struct xn_collide_probe *)b;
-    w->mode = mode;
-    if (xn_collide_sphere_sphere(handle_pos(a), (u32)a->model->radius >> 8, handle_pos(b),
-                                 (u32)b->model->radius >> 8) < 0)
+    (void)mode;
+    if (xn_collide_sphere_sphere(handle_pos(a), model_radius(a->model), handle_pos(b),
+                                 model_radius(b->model)) < 0)
         return -1;
-    if (mode != 2 && XN_MODEL_DETAIL)
-        return model_model_detail();
+    /* Quirk Q-COLL-04: the asm jumps past its detailed test whatever the mode */
     return 0;
 }
 
 /* ---- a probe against a model -------------------------------------------------------------- */
 
+/* the relative rotation of a probe in a model's space: rot_inv * the probe's rotation */
+static void relative_rotation(xn_mat3 *rel, const xn_mat3 *rot_inv, s32 angle_x, s32 yaw,
+                              s32 angle_z)
+{
+    xn_mat3 probe;
+
+    xn_mat_from_angles(angle_x, yaw, angle_z, &probe);
+    xn_mat_mul_fixed(&rel->m[0][0], &rot_inv->m[0][0], &probe.m[0][0], 3, 3, 3, FIXED_SHIFT);
+}
+
 s32 xn_collide_spheres_model(struct xn_model_handle *h, struct xn_collide_probe *p, s32 mode)
 {
-    struct xn_collide_scratch *w = &xn_collide_work;
-    struct xn_collide_sph_state *st = &xn_collide_sph;
     struct xn_model *m = h->model;
-    struct xn_collide_probe_sphere *ps, **met;
-    struct xn_collide_probe_sphere *local = (struct xn_collide_probe_sphere *)(big_buffer + 0x1400);
-    const struct xn_model_sphere *sphere;
-    struct xn_model_sphere_face *e;
-    struct xn_model_face *face;
+    struct xn_collide_probe_sphere *ps, **met = PROBE_MET, *local = PROBE_LOCAL;
+    struct xn_collide_hits *hits;
     struct xn_collide_hit *hit;
-    const xn_vec3 *normal;
-    xn_vec3 c, n, v;
+    const struct xn_model_sphere *sphere;
+    const struct xn_model_sphere_face *e;
+    const struct xn_model_face *face;
+    const xn_vec3 *points, *normals, *normal;
+    struct face_list fl;
+    xn_mat3 rot, rot_inv, rel;
+    xn_vec3 c, n, v, origin;
     s32 left, k, count, dist;
 
-    w->model = h;
-    w->probe = p;
-    w->mode = mode;
     left = p->sphere_count;
     if (left == 0)
         return -1;
-    /* the probe's spheres that meet the bounding sphere */
-    w->local_pos = p->position;
+    /* the probe's spheres that meet the bounding sphere (pointers at big_buffer + 1000h) */
     ps = p->spheres;
-    met = (struct xn_collide_probe_sphere **)(big_buffer + 0x1000);
     count = 0;
     do {
-        c.x = ps->x + w->local_pos.x;
-        c.y = ps->y + w->local_pos.y;
-        c.z = ps->z + w->local_pos.z;
-        if (xn_collide_sphere_sphere(&c, ps->radius, handle_pos(h), (u32)m->radius >> 8) >= 0) {
+        c.x = ps->x + p->position.x;
+        c.y = ps->y + p->position.y;
+        c.z = ps->z + p->position.z;
+        if (xn_collide_sphere_sphere(&c, ps->radius, handle_pos(h), model_radius(m)) >= 0) {
             if (mode == 2)
                 return 0;
-            *met++ = ps;
-            count++;
+            met[count++] = ps;
         }
         ps++;
     } while (--left != 0);
     if (count <= 0)
         return -1;
-    st->probe_count = count;
     /* those spheres in model space (big_buffer + 1400h) */
-    xn_mat_from_angles(h->angle_x, h->yaw, h->angle_z, &w->model_matrix);
-    xn_mat_transpose_copy3(&w->model_matrix, &w->model_matrix_inv);
-    w->local_end.x = (p->position.x - h->x) << 8;
-    w->local_end.y = (p->position.y - h->y) << 8;
-    w->local_end.z = (p->position.z - h->z) << 8;
-    xn_mat_transform(&w->local_end, &w->model_matrix_inv);
-    xn_mat_from_angles(p->angle_x, p->yaw, p->angle_z, &w->probe_matrix);
-    xn_mat_mul_fixed(&w->rel_matrix.m[0][0], &w->model_matrix_inv.m[0][0],
-                     &w->probe_matrix.m[0][0], 3, 3, 3, 0x1C);
-    met = (struct xn_collide_probe_sphere **)(big_buffer + 0x1000);
-    for (k = 0; k < count; k++) {       /* (the asm: a count down from probe_count) */
+    xn_mat_from_angles(h->angle_x, h->yaw, h->angle_z, &rot);
+    xn_mat_transpose_copy3(&rot, &rot_inv);
+    origin.x = (p->position.x - h->x) << 8;
+    origin.y = (p->position.y - h->y) << 8;
+    origin.z = (p->position.z - h->z) << 8;
+    xn_mat_transform(&origin, &rot_inv);
+    relative_rotation(&rel, &rot_inv, p->angle_x, p->yaw, p->angle_z);
+    for (k = 0; k < count; k++) {
         ps = met[k];
         v.x = ps->x << 8;
         v.y = ps->y << 8;
         v.z = ps->z << 8;
-        xn_mat_transform(&v, &w->rel_matrix);
-        local[k].x = v.x + w->local_end.x;
-        local[k].y = v.y + w->local_end.y;
-        local[k].z = v.z + w->local_end.z;
+        xn_mat_transform(&v, &rel);
+        local[k].x = v.x + origin.x;
+        local[k].y = v.y + origin.y;
+        local[k].z = v.z + origin.z;
         local[k].radius = ps->radius << 8;
     }
-    st->points = model_at(m, m->point_offset);
-    st->normals = model_at(m, m->normal_offset);
-    st->model = m;
-    st->list = FACE_LIST_A;
-    st->list_next = FACE_LIST_B;
-    st->list_count = 0;
-    st->hits = HIT_LIST;
-    st->hits->count = 0;
-    st->hit_next = st->hits->hits;
+    points = model_at(m, m->point_offset);
+    normals = model_at(m, m->normal_offset);
+    face_list_init(&fl);
+    hits = HIT_LIST;
+    hits->count = 0;
+    hit = hits->hits;
     /* the faces of the collision spheres they meet */
     sphere = model_at(m, m->sphere_offset);
     left = m->sphere_count;
     if (left <= 0)
-        return 0;                       /* (no spheres: a hit) */
+        return 0;                       /* Quirk Q-COLL-03: no spheres, a hit */
     do {
-        k = 0;
-        do {
+        for (k = 0; k != count; k++) {
             if (xn_collide_sphere_sphere((const xn_vec3 *)&local[k], local[k].radius,
                                          sphere_centre(sphere), sphere->radius) >= 0) {
-                /* Mode 1 means "stop at the first": here the asm pops two dwords too many
-                   and returns through its caller's frame (an original bug no game call
-                   reaches); the C returns 0 */
+                /* Quirk Q-COLL-06 (dropped): in mode 1 ("stop at the first") the asm pops two
+                   dwords too many here and returns through its caller's frame */
                 if (mode == 1)
                     return 0;
-                merge_faces(&st->list, &st->list_next, &st->list_count, sphere);
+                merge_faces(&fl, sphere);
                 break;
             }
-        } while (++k != st->probe_count);
+        }
         sphere = next_sphere(sphere);
     } while (--left != 0);
     /* the faces a probe sphere touches inside their edges, or on one */
-    left = st->list_count;
+    left = fl.count;
     if (left == 0)
         return -1;
-    e = st->list;
+    e = fl.list;
     do {
         face = model_at(m, e->face);
-        normal = entry_normal(st->normals, e);
+        normal = entry_normal(normals, e);
         normal16(&n, normal);
-        for (k = 0; k < st->probe_count; k++) {
-            if (xn_collide_sphere_plane(&n, face_anchor(face, st->points), (const xn_vec3 *)&local[k],
-                                        local[k].radius, &dist) < 0)
+        for (k = 0; k < count; k++) {
+            c = *(const xn_vec3 *)&local[k];
+            if (xn_collide_sphere_plane(&n, face_anchor(face, points), &c, local[k].radius,
+                                        &dist) < 0)
                 continue;
-            if (xn_collide_point_in_face((const xn_vec3 *)&local[k], face, st->points, normal) < 0 &&
-                xn_collide_face_test_edges((const xn_vec3 *)&local[k], face, st->points,
-                                           local[k].radius) < 0)
+            if (xn_collide_point_in_face(&c, face, points, normal) < 0 &&
+                xn_collide_face_test_edges(&c, face, points, local[k].radius) < 0)
                 continue;
-            hit = st->hit_next;
             hit->face = e->face;
             hit->t_half = -1;
             v = *normal;
-            xn_mat_transform(&v, &w->model_matrix);
+            xn_mat_transform(&v, &rot);
             hit->nx = v.x;
             hit->ny = v.y;
             hit->nz = v.z;
-            st->hit_next = (struct xn_collide_hit *)((u8 *)hit + sizeof *hit);
-            st->hits->count++;
+            hit = (struct xn_collide_hit *)((u8 *)hit + sizeof *hit);
+            hits->count++;
             break;
         }
         e++;
     } while (--left != 0);
-    return st->hits->count >= 1 ? (s32)st->hits : -1;
-}
-
-/* the asm interface: the handle in EAX, the probe in EDX, the mode in EBX; it keeps ECX ESI EDI
-   EBP (its row lists them as outputs: its mode-1 exit pops them wrongly) */
-void xn_collide_spheres_model_r(xn_regs *r)
-{
-    r->eax = xn_collide_spheres_model((struct xn_model_handle *)r->eax,
-                                      (struct xn_collide_probe *)r->edx, r->ebx);
+    return hits->count >= 1 ? (s32)hits : -1;
 }
 
 /* ---- probes ------------------------------------------------------------------------------- */
 
-/* a point into the probe's space: through the inverse of its rotation (no << 8) */
-static void to_probe_space(xn_vec3 *out, const xn_vec3 *p, const struct xn_collide_probe *probe)
+/* a point into a probe's space: through the inverse of its rotation (no << 8) */
+static void to_probe_space(xn_vec3 *out, const xn_vec3 *p, const struct xn_collide_probe *probe,
+                           const xn_mat3 *rot_inv)
 {
     out->x = p->x - probe->position.x;
     out->y = p->y - probe->position.y;
     out->z = p->z - probe->position.z;
-    xn_mat_transform(out, &xn_collide_work.model_matrix_inv);
+    xn_mat_transform(out, rot_inv);
 }
 
 s32 xn_collide_segment_spheres(struct xn_collide_probe *p, const xn_vec3 *start,
                                const xn_vec3 *end)
 {
-    struct xn_collide_scratch *w = &xn_collide_work;
     struct xn_collide_probe_sphere *s;
+    xn_mat3 rot, rot_inv;
+    xn_vec3 ls, le;
     s32 left;
 
-    w->model = (struct xn_model_handle *)p;
-    w->seg_start = (xn_vec3 *)start;
-    w->seg_end = (xn_vec3 *)end;
-    xn_mat_from_angles(p->angle_x, p->yaw, p->angle_z, &w->model_matrix);
-    xn_mat_transpose_copy3(&w->model_matrix, &w->model_matrix_inv);
-    to_probe_space(&w->local_end, end, p);
-    to_probe_space(&w->local_start, start, p);
+    xn_mat_from_angles(p->angle_x, p->yaw, p->angle_z, &rot);
+    xn_mat_transpose_copy3(&rot, &rot_inv);
+    to_probe_space(&le, end, p, &rot_inv);
+    to_probe_space(&ls, start, p, &rot_inv);
     left = p->sphere_count;
     if (left <= 0)
         return -1;
     s = p->spheres;
     do {
-        if (xn_collide_segment_sphere((const xn_vec3 *)s, s->radius, &w->local_start,
-                                      &w->local_end) >= 0)
+        if (xn_collide_segment_sphere((const xn_vec3 *)s, s->radius, &ls, &le) >= 0)
             return 0;
         s++;
     } while (--left != 0);
@@ -517,52 +391,49 @@ s32 xn_collide_segment_spheres(struct xn_collide_probe *p, const xn_vec3 *start,
 
 s32 xn_collide_spheres_spheres(struct xn_collide_probe *a, struct xn_collide_probe *b)
 {
-    struct xn_collide_scratch *w = &xn_collide_work;
     struct xn_collide_probe_sphere *sa, *sb;
+    struct xn_collide_hits *hits = HIT_LIST;
     struct xn_collide_hit *hit;
+    xn_mat3 rot, rot_inv, rel;
+    xn_vec3 origin, v;
     u32 la, lb;
-    xn_vec3 v;
 
-    w->model = (struct xn_model_handle *)a;
-    w->probe = b;
-    xn_mat_from_angles(a->angle_x, a->yaw, a->angle_z, &w->model_matrix);
-    xn_mat_transpose_copy3(&w->model_matrix, &w->model_matrix_inv);
-    w->local_end.x = (b->position.x - a->position.x) << 8;
-    w->local_end.y = (b->position.y - a->position.y) << 8;
-    w->local_end.z = (b->position.z - a->position.z) << 8;
-    xn_mat_transform(&w->local_end, &w->model_matrix_inv);
-    xn_mat_from_angles(b->angle_x, b->yaw, b->angle_z, &w->probe_matrix);
-    xn_mat_mul_fixed(&w->rel_matrix.m[0][0], &w->model_matrix_inv.m[0][0],
-                     &w->probe_matrix.m[0][0], 3, 3, 3, 0x1C);
-    xn_collide_ss_hits = HIT_LIST;
-    xn_collide_ss_hits->count = 0;
-    xn_collide_ss_hit_next = xn_collide_ss_hits->hits;
+    xn_mat_from_angles(a->angle_x, a->yaw, a->angle_z, &rot);
+    xn_mat_transpose_copy3(&rot, &rot_inv);
+    origin.x = (b->position.x - a->position.x) << 8;
+    origin.y = (b->position.y - a->position.y) << 8;
+    origin.z = (b->position.z - a->position.z) << 8;
+    xn_mat_transform(&origin, &rot_inv);
+    relative_rotation(&rel, &rot_inv, b->angle_x, b->yaw, b->angle_z);
+    /* Quirk Q-COLL-08: the probes' offset is in 24.8 (<< 8), their spheres in world units:
+       only probes at the same place can meet */
+    hits->count = 0;
+    hit = hits->hits;
     sa = a->spheres;
     la = a->sphere_count;
-    do {
+    do {                                /* (a sphere count of 0 runs 2^32 times) */
         sb = b->spheres;
         lb = b->sphere_count;
         do {
             v.x = sb->x;
             v.y = sb->y;
             v.z = sb->z;
-            xn_mat_transform(&v, &w->rel_matrix);
-            v.x += w->local_end.x;
-            v.y += w->local_end.y;
-            v.z += w->local_end.z;
+            xn_mat_transform(&v, &rel);
+            v.x += origin.x;
+            v.y += origin.y;
+            v.z += origin.z;
             if (xn_collide_sphere_sphere(&v, sb->radius, (const xn_vec3 *)sa, sa->radius) >= 0) {
-                /* the pair's sphere numbers in the hit's face field: A's, then B's */
-                hit = xn_collide_ss_hit_next;
-                xn_collide_ss_hit_next = (struct xn_collide_hit *)((u8 *)hit + sizeof *hit);
+                /* the pair's sphere numbers in the hit's face field: a's, then b's */
                 ((u16 *)&hit->face)[0] = (u16)(a->sphere_count - la);
                 ((u16 *)&hit->face)[1] = (u16)(b->sphere_count - lb);
-                xn_collide_ss_hits->count++;
+                hit = (struct xn_collide_hit *)((u8 *)hit + sizeof *hit);
+                hits->count++;
             }
             sb++;
         } while (--lb != 0);
         sa++;
     } while (--la != 0);
-    return xn_collide_ss_hits->count > 0 ? (s32)xn_collide_ss_hits : -1;
+    return hits->count > 0 ? (s32)hits : -1;
 }
 
 s32 xn_collide_miss_stk(s32 a, s32 b)
@@ -582,73 +453,55 @@ s32 xn_collide_miss(void)
 s32 xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
                             u32 image, u32 flags, s32 scale, s32 mode)
 {
-    struct xn_collide_scratch *w = &xn_collide_work;
     struct xn_collide_hits *hits = HIT_LIST;
     struct xn_collide_hit *hit = hits->hits;
     const u8 *img;
-    xn_vec3 c, d, p;
-    s32 half_diag, radius, t;
+    xn_vec3 anchor, c, ls, le, normal, p;
+    s32 height, width, half_diag, radius, t;
 
-    w->model = (struct xn_model_handle *)pos;
-    w->seg_start = (xn_vec3 *)start;
-    w->seg_end = (xn_vec3 *)end;
-    w->mode = mode;
     /* the flat's size, and a sphere around it at its anchor */
-    img = xn_tex_cache_lookup_image(image >> 7, image & 0x7F, 0);
-    xn_collide_flat_height = (*(const u16 *)(img + 6) * scale) >> 8;
-    xn_collide_flat_width = (*(const u16 *)(img + 4) * scale) >> 8;
-    half_diag = xn_vec_length_approx(xn_collide_flat_height >> 1, xn_collide_flat_width >> 1, 0);
+    img = (const u8 *)xn_tex_cache_lookup_image(image >> 7, image & 0x7F, 0);
+    height = (*(const u16 *)(img + 6) * scale) >> 8;
+    width = (*(const u16 *)(img + 4) * scale) >> 8;
+    half_diag = xn_vec_length_approx(height >> 1, width >> 1, 0);
     radius = half_diag + (half_diag >> 3);
-    w->local_pos.x = 0;
-    w->local_pos.y = (xn_collide_flat_height >> xn_collide_flat_anchor_shift[((flags >> 1) & 0xF) * 2])
-                     - (xn_collide_flat_height >> 1);
-    w->local_pos.z = 0;
-    c.x = pos->x + w->local_pos.x;
-    c.y = pos->y + w->local_pos.y;
-    c.z = pos->z + w->local_pos.z;
+    anchor.x = 0;
+    anchor.y = (height >> xn_collide_flat_anchor_shift[((flags >> 1) & 0xF) * 2]) - (height >> 1);
+    anchor.z = 0;
+    c.x = pos->x + anchor.x;
+    c.y = pos->y + anchor.y;
+    c.z = pos->z + anchor.z;
     if (xn_collide_segment_sphere(&c, radius, start, end) < 0)
         return -1;
     if (mode == 2)
         return 0;
     /* the segment from the anchor, << 8; the upright plane facing it */
-    w->local_start.x = (start->x - pos->x - w->local_pos.x) << 8;
-    w->local_start.y = (start->y - pos->y - w->local_pos.y) << 8;
-    w->local_start.z = (start->z - pos->z - w->local_pos.z) << 8;
-    w->local_end.x = (end->x - pos->x - w->local_pos.x) << 8;
-    w->local_end.y = (end->y - pos->y - w->local_pos.y) << 8;
-    w->local_end.z = (end->z - pos->z - w->local_pos.z) << 8;
-    d.x = w->local_end.x - w->local_start.x;
-    d.y = 0;
-    d.z = w->local_end.z - w->local_start.z;
-    xn_vec_normalize(&d);
-    w->flat_normal = d;
-    t = xn_collide_segment_plane(&w->flat_normal, &w->local_pos, &w->local_start, &w->local_end,
-                                 &p);
+    ls.x = (start->x - pos->x - anchor.x) << 8;
+    ls.y = (start->y - pos->y - anchor.y) << 8;
+    ls.z = (start->z - pos->z - anchor.z) << 8;
+    le.x = (end->x - pos->x - anchor.x) << 8;
+    le.y = (end->y - pos->y - anchor.y) << 8;
+    le.z = (end->z - pos->z - anchor.z) << 8;
+    normal.x = le.x - ls.x;
+    normal.y = 0;
+    normal.z = le.z - ls.z;
+    xn_vec_normalize(&normal);
+    t = xn_collide_segment_plane(&normal, &anchor, &ls, &le, &p);
     if (t < 0)
         return -1;
-    w->hit_t = t;
-    if (xn_collide_point_in_cylinder(p.x, p.y, p.z, &w->local_pos, xn_collide_flat_width << 8,
-                                     xn_collide_flat_height << 8) < 0)
+    if (xn_collide_point_in_cylinder(&p, &anchor, width << 8, height << 8) < 0)
         return -1;
-    /* one hit; its normal gets the flat's position added (a bug, kept) */
+    /* one hit */
     hits->count = 1;
-    hit->x = round8(p.x) + pos->x + w->local_pos.x;
-    hit->y = round8(p.y) + pos->y + w->local_pos.y;
-    hit->z = round8(p.z) + pos->z + w->local_pos.z;
-    hit->nx = round8(w->flat_normal.x) + pos->x;
-    hit->ny = round8(w->flat_normal.y) + pos->y;
-    hit->nz = round8(w->flat_normal.z) + pos->z;
+    hit->x = round8(p.x) + pos->x + anchor.x;
+    hit->y = round8(p.y) + pos->y + anchor.y;
+    hit->z = round8(p.z) + pos->z + anchor.z;
+    hit->nx = round8(normal.x) + pos->x;        /* Quirk Q-COLL-05: + the flat's position */
+    hit->ny = round8(normal.y) + pos->y;
+    hit->nz = round8(normal.z) + pos->z;
     hit->face = -1;
-    hit->t_half = (s16)(w->hit_t >> 1);
+    hit->t_half = (s16)(t >> 1);
     return (s32)hits;
-}
-
-/* the asm interface: pos in EAX, start in EDX, end in EBX, the image in ECX, the flags in ESI,
-   the scale in EDI, the mode in EBP */
-void xn_collide_segment_flat_r(xn_regs *r)
-{
-    r->eax = xn_collide_segment_flat((const xn_vec3 *)r->eax, (const xn_vec3 *)r->edx,
-                                     (const xn_vec3 *)r->ebx, r->ecx, r->esi, r->edi, r->ebp);
 }
 
 s32 xn_collide_segment_flat_stk(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
@@ -659,45 +512,35 @@ s32 xn_collide_segment_flat_stk(const xn_vec3 *pos, const xn_vec3 *start, const 
 
 /* ---- the sphere builder -------------------------------------------------------------------- */
 
-/* (max - min) / cells, the extent's step (xor edx: an unsigned high dword) */
+/* extent / cells, the cells' step (an unsigned 64-bit dividend: the asm's `xor edx, edx`) */
 static s32 cell_step(s32 extent, s32 cells)
 {
     xn_s64 t;
 
     t.lo = extent;
     t.hi = 0;
-    return xn_s64_div(&t, cells);
+    return xn_s64_div_or0(&t, cells);
 }
 
 s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *count)
 {
-    struct xn_collide_scratch *w = &xn_collide_work;
-    struct xn_collide_build_state *b = &xn_collide_build;
-    s32 *min = &w->build_min.x, *max = &w->build_max.x;
-    s32 *first = &w->build_first.x, *centre = &w->build_centre.x;
-    s32 *cells = w->build_cells, *left = w->build_left;
-    const xn_vec3 *pt, *anchor;
-    xn_vec3 n, foot;
+    const xn_vec3 *points = model_at(m, m->point_offset), *pt, *anchor;
+    const xn_vec3 *normal = model_at(m, m->normal_offset);
+    const struct xn_model_face *face = model_at(m, m->face_offset);
+    s32 min[3], max[3], first[3], centre[3], cells[3], left[3];
+    s32 cell, radius, k, axis, ncells, dist, rr, rem, face_index, faces_left;
+    s32 *node, *list, *next_node;
+    xn_vec3 n, foot, at;
     xn_s64 t;
-    s32 k, axis, ncells, dist, rr, rem;
-    s32 *node, *head, *cell;
     u8 *o;
     u16 entries;
 
-    w->model = (struct xn_model_handle *)m;
-    w->build_radius = r;
-    w->build_out = (char *)out;
-    b->points = model_at(m, m->point_offset);
-    b->normals = model_at(m, m->normal_offset);
-    b->faces_left = m->face_count;
-    b->face = model_at(m, m->face_offset);
-    b->face_index = 0;
     /* the points' bounding box */
     for (axis = 0; axis < 3; axis++) {
         min[axis] = 0x800000;
         max[axis] = (s32)0xFF800000;
     }
-    pt = b->points;
+    pt = points;
     k = m->point_count;
     do {
         for (axis = 0; axis < 3; axis++) {
@@ -711,89 +554,82 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
     /* cells of r * sqrt 2, spheres of 1.2 r */
     xn_s64_mul(&t, 0x16A0A, r);
     xn_s64_addu(&t, 0x8000);
-    w->build_cell = xn_s64_shr(&t, 16);
+    cell = xn_s64_shr(&t, 16);
     xn_s64_mul(&t, r, 0x133);
     xn_s64_addu(&t, 0x80);
-    w->build_radius = xn_s64_shr(&t, 8);
+    radius = xn_s64_shr(&t, 8);
     for (axis = 0; axis < 3; axis++) {
         xn_s64_set(&t, max[axis] - min[axis]);
-        cells[axis] = xn_s64_divrem(&t, w->build_cell, &rem) + 1;
+        cells[axis] = xn_s64_divrem_or0(&t, cell, &rem) + 1;
     }
     ncells = cells[2] * cells[0] * cells[1];
-    if (ncells * 4 >= 0x10000) {
-        *count = rem;                   /* (the asm's EDX: the last remainder) */
+    if (ncells * 4 >= 0x10000)
         return -1;
-    }
-    /* the cells' face lists' heads in big_buffer, the nodes after them */
-    cell = (s32 *)big_buffer;
-    w->build_cell_list = cell;
+    /* the cells' face lists' heads in big_buffer, the nodes {next, face, normal4} after them */
+    list = (s32 *)big_buffer;
+    k = ncells;
     do
-        *cell++ = 0;
-    while (--ncells != 0);
-    b->next_node = cell;
+        *list++ = 0;
+    while (--k != 0);
+    next_node = list;
     for (axis = 0; axis < 3; axis++)
         first[axis] = centre[axis] = (cell_step(max[axis] - min[axis], cells[axis]) >> 1) +
                                      min[axis];
     /* each face: the cells whose sphere touches it */
+    face_index = 0;
+    faces_left = m->face_count;
     do {
-        anchor = face_anchor(b->face, b->points);
-        normal16(&n, b->normals);
-        left[2] = cells[2];
-        do {
-            left[1] = cells[1];
-            do {
-                left[0] = cells[0];
-                do {
-                    if (xn_collide_sphere_plane(&n, anchor, &w->build_centre, w->build_radius,
-                                                &dist) >= 0) {
+        anchor = face_anchor(face, points);
+        normal16(&n, normal);
+        list = (s32 *)big_buffer;
+        for (left[2] = cells[2]; left[2] != 0; left[2]--) {
+            for (left[1] = cells[1]; left[1] != 0; left[1]--) {
+                for (left[0] = cells[0]; left[0] != 0; left[0]--) {
+                    at.x = centre[0];
+                    at.y = centre[1];
+                    at.z = centre[2];
+                    if (xn_collide_sphere_plane(&n, anchor, &at, radius, &dist) >= 0) {
                         /* the circle the sphere cuts from the plane: its centre and radius */
-                        xn_s64_mul(&t, w->build_radius, w->build_radius);
+                        xn_s64_mul(&t, radius, radius);
                         xn_s64_msub(&t, dist, dist);
                         rr = xn_math_isqrt64(t.lo, t.hi);
-                        foot.x = ((b->normals->x * -dist + 0x80) >> 8) + centre[0];
-                        foot.y = ((b->normals->y * -dist + 0x80) >> 8) + centre[1];
-                        foot.z = ((b->normals->z * -dist + 0x80) >> 8) + centre[2];
-                        if (xn_collide_point_in_face(&foot, b->face, b->points, b->normals) >= 0 ||
-                            xn_collide_face_test_edges(&foot, b->face, b->points, rr) >= 0) {
-                            node = b->next_node;
-                            head = w->build_cell_list;
-                            node[0] = *head;
-                            *head = (s32)node;
-                            node[1] = (u8 *)b->face - (u8 *)m;
-                            node[2] = b->face_index << 2;
-                            b->next_node = node + 3;
-                            if ((u8 *)b->next_node + 12 - big_buffer >= 0x10000) {
-                                *count = (s32)node;     /* (the asm's EDX) */
+                        foot.x = ((normal->x * -dist + 0x80) >> 8) + centre[0];
+                        foot.y = ((normal->y * -dist + 0x80) >> 8) + centre[1];
+                        foot.z = ((normal->z * -dist + 0x80) >> 8) + centre[2];
+                        if (xn_collide_point_in_face(&foot, face, points, normal) >= 0 ||
+                            xn_collide_face_test_edges(&foot, face, points, rr) >= 0) {
+                            node = next_node;
+                            node[0] = *list;
+                            *list = (s32)node;
+                            node[1] = (u8 *)face - (u8 *)m;
+                            node[2] = face_index << 2;
+                            next_node = node + 3;
+                            if ((u8 *)next_node + 12 - big_buffer >= 0x10000)
                                 return -1;
-                            }
                         }
                     }
-                    w->build_cell_list++;
-                    centre[0] += w->build_cell;
-                } while (--left[0] != 0);
+                    list++;
+                    centre[0] += cell;
+                }
                 centre[0] = first[0];
-                centre[1] += w->build_cell;
-            } while (--left[1] != 0);
+                centre[1] += cell;
+            }
             centre[1] = first[1];
-            centre[2] += w->build_cell;
-        } while (--left[2] != 0);
+            centre[2] += cell;
+        }
         centre[2] = first[2];
-        w->build_cell_list = (s32 *)big_buffer;
-        b->normals++;
-        b->face = (struct xn_model_face *)((u8 *)b->face + 8 + 8 * b->face->point_count);
-        b->face_index++;
-    } while (--b->faces_left != 0);
+        normal++;
+        face = (const struct xn_model_face *)((const u8 *)face + 8 + 8 * face->point_count);
+        face_index++;
+    } while (--faces_left != 0);
     /* a sphere for each cell with faces: centre, radius, its list */
-    cell = w->build_cell_list;
+    list = (s32 *)big_buffer;
     o = out;
     *count = 0;
-    left[2] = cells[2];
-    do {
-        left[1] = cells[1];
-        do {
-            left[0] = cells[0];
-            do {
-                node = (s32 *)*cell;
+    for (left[2] = cells[2]; left[2] != 0; left[2]--) {
+        for (left[1] = cells[1]; left[1] != 0; left[1]--) {
+            for (left[0] = cells[0]; left[0] != 0; left[0]--) {
+                node = (s32 *)*list;
                 if (node != 0) {
                     struct xn_model_sphere *s = (struct xn_model_sphere *)o;
 
@@ -801,7 +637,7 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
                     s->x = centre[0];
                     s->y = centre[1];
                     s->z = centre[2];
-                    s->radius = w->build_radius;
+                    s->radius = radius;
                     o += 0x12;
                     entries = 0;
                     do {
@@ -813,25 +649,14 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
                     } while (node != 0);
                     s->face_count = entries;
                 }
-                cell++;
-                centre[0] += w->build_cell;
-            } while (--left[0] != 0);
+                list++;
+                centre[0] += cell;
+            }
             centre[0] = first[0];
-            centre[1] += w->build_cell;
-        } while (--left[1] != 0);
+            centre[1] += cell;
+        }
         centre[1] = first[1];
-        centre[2] += w->build_cell;
-    } while (--left[2] != 0);
+        centre[2] += cell;
+    }
     return o - out;
-}
-
-/* the asm interface: the model in EAX, r in EDX, out in EBX; the bytes in EAX, the count in
-   EDX */
-void xn_collide_build_model_spheres_r(xn_regs *r)
-{
-    s32 count;
-
-    r->eax = xn_collide_build_model_spheres((struct xn_model *)r->eax, r->edx, (u8 *)r->ebx,
-                                            &count);
-    r->edx = count;
 }

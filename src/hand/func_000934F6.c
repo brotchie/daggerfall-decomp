@@ -9,7 +9,7 @@ extern char D_001770B8[];
 extern signed char text_buffer[];
 extern char scratch_current_object[];
 extern char inv_right_container[];
-extern int D_00195B80;
+extern int color_remap;
 extern int game_minutes;
 extern int trade_mode;
 extern unsigned char D_0019626F;
@@ -73,7 +73,7 @@ int inv_draw_item_cell(char *object, short cell, struct rect *rects)
         inv_draw_cell_mark(380, 7, rects, cell);
     if (U16(object, 21) & 32)
         inv_draw_cell_mark(380, 6, rects, cell);
-    *(char **)&D_00195B80 = *(char **)color_remap_tables + (*(unsigned char *)(item + 56) << 8);
+    *(char **)&color_remap = *(char **)color_remap_tables + (*(unsigned char *)(item + 56) << 8);
     if (U16(item, 32) == 3 && U16(item, 34) == 8) {
         image_bump++;
         (*(short *)(item + 50))++;
@@ -83,7 +83,7 @@ int inv_draw_item_cell(char *object, short cell, struct rect *rects)
     else
         inv_draw_item_image(item, rects, cell);
     *(short *)(item + 50) -= image_bump;
-    *(char **)&D_00195B80 = *(char **)color_remap_tables;
+    *(char **)&color_remap = *(char **)color_remap_tables;
     if (U16(item, 32) == 3 && U16(item, 34) == 18) {
         mc_set_location(723, D_0017704C);
         mc_sprintf(((char *)text_buffer), D_001770B0, *(unsigned char *)(item + 49));

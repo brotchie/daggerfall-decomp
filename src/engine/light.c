@@ -16,8 +16,7 @@ void asm_xn_kbd_remove(void);
 #pragma aux asm_xn_kbd_remove modify exact [eax];
 void asm_xn_render_shutdown(void);
 #pragma aux asm_xn_render_shutdown modify exact [eax];
-void asm_xn_gfx_restore_mode(void);
-#pragma aux asm_xn_gfx_restore_mode modify exact [eax];
+void xn_gfx_restore_mode(void);
 void asm_xn_mem_shutdown(void);
 #pragma aux asm_xn_mem_shutdown modify exact [eax edx];
 extern void asm_xn_cam_cull_sphere(void);       /* eax ecx edx ebx in; eax and CF out */
@@ -55,7 +54,7 @@ void xn_light_init(void)
     /* out of memory: never in the records (the game exits) */
     asm_xn_kbd_remove();
     asm_xn_render_shutdown();
-    asm_xn_gfx_restore_mode();
+    xn_gfx_restore_mode();
     asm_xn_mem_shutdown();
     r.eax = 0x0900;
     r.edx = (u32)xn_light_msg_no_memory;

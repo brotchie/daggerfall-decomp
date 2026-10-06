@@ -1,10 +1,11 @@
-/* anim.c: XnGine's ASCR animation scripts as readable C (xanim.h; see xngine.h). */
+/* anim.c: XnGine's ASCR animation scripts (canonical C; the interface and the module's
+   documentation are in xanim.h). */
 #include "xanim.h"
-#include "xtimer.h"
+#include "xpc.h"
 
-#define ANIM_NONE   0xFF                /* request: none; wait: hold */
+#define STATE_NONE_ENTRY 0x8000             /* a state table entry: none (use state 0's) */
 
-/* The script's word at pos + k, and the script position at an offset from its start */
+/* The script's word at pos + k, and the position at an offset from the record's start */
 static u16 word_at(xn_ascr_pos pos, s32 k)
 {
     return *(const u16 *)(pos + k);
@@ -35,19 +36,18 @@ s32 xn_anim_reset(struct xn_anim *a)
 
 s32 xn_anim_reset_with_rate(struct xn_anim *a, u16 tick_divisor)
 {
-    s32 zero = xn_anim_reset(a);
-
-    ((struct xn_anim *)zero)->tick_divisor = tick_divisor;     /* (sic: linear 0Ch) */
-    return zero;
+    xn_anim_reset(a);
+    *(volatile u16 *)0x0C = tick_divisor;   /* Quirk Q-ANIM-01: through the reset's 0 */
+    return 0;
 }
 
 /* Whether a requested state may start now: stopped, waiting (1..127 steps), or at a
    frame-wait or goto opcode */
-static int anim_may_start(const struct xn_anim *a)
+static int may_start(const struct xn_anim *a)
 {
     if (a->pos == 0 || (s8)a->wait > 0)
         return 1;
-    return *a->pos == 3 || *a->pos == 4;
+    return *a->pos == XN_ASCR_FRAME_WAIT || *a->pos == XN_ASCR_GOTO;
 }
 
 void xn_anim_update(struct xn_anim *a)
@@ -55,15 +55,15 @@ void xn_anim_update(struct xn_anim *a)
     const struct xn_ascr *ascr;
     u32 entry;
 
-    if (a->request != ANIM_NONE && anim_may_start(a)) {
+    if (a->request != XN_ANIM_NONE && may_start(a)) {
         a->wait = 0;
         a->state = a->request;
         ascr = (const struct xn_ascr *)a->script;
         entry = ascr->state_entry[a->request];
-        if (entry == 0x8000)            /* none: state 0's */
+        if (entry == STATE_NONE_ENTRY)
             entry = ascr->state_entry[0];
         a->pos = a->script + entry;
-        a->request = ANIM_NONE;
+        a->request = XN_ANIM_NONE;
     }
     while (xn_anim_tick(a))
         ;
@@ -71,19 +71,17 @@ void xn_anim_update(struct xn_anim *a)
 
 s32 xn_anim_tick(struct xn_anim *a)
 {
-    xn_s64 ticks;
     u16 step;
     xn_ascr_pos pos;
 
     if (a->pos == 0)
         return 0;
-    ticks.lo = xn_anim_ticks;
-    ticks.hi = 0;
-    step = (u16)xn_u64_div(&ticks, a->tick_divisor);
+    /* Quirk Q-SYS-01: a speed of 0 divides by zero: step 0 */
+    step = (u16)(a->tick_divisor != 0 ? xn_anim_ticks / a->tick_divisor : 0);
     if (step == a->last_step)
         return 0;
     a->last_step = step;
-    if (a->wait == ANIM_NONE)           /* holding */
+    if (a->wait == XN_ANIM_NONE)            /* holding */
         return 1;
     if (a->wait != 0) {
         a->wait--;
@@ -91,46 +89,30 @@ s32 xn_anim_tick(struct xn_anim *a)
     }
     pos = a->pos;
     xn_anim_run_opcodes(a, &pos);
-    a->pos = (u8 *)pos;
+    a->pos = pos;
     return 1;
 }
 
-void xn_anim_tick_r(xn_regs *r)
-{
-    XN_SETFLAG(r, XN_CF, !xn_anim_tick((struct xn_anim *)r->eax));
-}
-
-/* An opcode the table has no handler for: the asm calls whatever the table holds there */
-static s32 anim_op_other(struct xn_anim *a, xn_ascr_pos *pos, s32 op)
-{
-    xn_regs r;
-
-    r.eax = op;
-    r.esi = (u32)a;
-    r.edi = (u32)*pos;
-    xn_asmcall(xn_anim_opcodes[op], &r);
-    *pos = (xn_ascr_pos)r.edi;
-    return (r.eflags & XN_CF) == 0;
-}
-
 /* Runs opcode op at *pos: 1 go on, 0 yield */
-static s32 anim_op(struct xn_anim *a, xn_ascr_pos *pos, s32 op)
+static s32 run_opcode(struct xn_anim *a, xn_ascr_pos *pos, s32 op)
 {
     switch (op) {
-    case 0: return xn_anim_op_loop_start(a, pos);
-    case 1: return xn_anim_op_loop_end(a, pos);
-    case 2: return xn_anim_op_set_events(a, pos);
-    case 3: return xn_anim_op_frame_wait(a, pos);
-    case 4: return xn_anim_op_goto(a, pos);
-    case 5: return xn_anim_op_restart(a, pos);
-    case 6: return xn_anim_op_stop(a, pos);
-    case 7: return xn_anim_op_goto_random(a, pos);
-    case 8: return xn_anim_op_goto_if_events(a, pos);
-    case 9: return xn_anim_op_set_mirror(a, pos);
-    case 10: return xn_anim_op_set_byte13(a, pos);
-    case 11: return xn_anim_op_set_record(a, pos);
+    case XN_ASCR_LOOP_START: return xn_anim_op_loop_start(a, pos);
+    case XN_ASCR_LOOP_END: return xn_anim_op_loop_end(a, pos);
+    case XN_ASCR_SET_EVENTS: return xn_anim_op_set_events(a, pos);
+    case XN_ASCR_FRAME_WAIT: return xn_anim_op_frame_wait(a, pos);
+    case XN_ASCR_GOTO: return xn_anim_op_goto(a, pos);
+    case XN_ASCR_RESTART: return xn_anim_op_restart(a, pos);
+    case XN_ASCR_STOP: return xn_anim_op_stop(a, pos);
+    case XN_ASCR_GOTO_RANDOM: return xn_anim_op_goto_random(a, pos);
+    case XN_ASCR_GOTO_IF_EVENTS: return xn_anim_op_goto_if_events(a, pos);
+    case XN_ASCR_SET_MIRROR: return xn_anim_op_set_mirror(a, pos);
+    case XN_ASCR_SET_BYTE13: return xn_anim_op_set_byte13(a, pos);
+    case XN_ASCR_SET_RECORD: return xn_anim_op_set_record(a, pos);
     }
-    return anim_op_other(a, pos, op);
+    /* Quirk Q-ANIM-05 (dropped): the asm calls what its table holds past its 12 handlers (two
+       zeros, then other data) and crashes; canonical C stops the script */
+    return xn_anim_op_stop(a, pos);
 }
 
 void xn_anim_run_opcodes(struct xn_anim *a, xn_ascr_pos *pos)
@@ -139,34 +121,17 @@ void xn_anim_run_opcodes(struct xn_anim *a, xn_ascr_pos *pos)
 
     for (;;) {
         b = (s8)**pos;
-        if (b < 0) {                    /* a frame */
+        if (b < 0) {                        /* a frame */
             (*pos)++;
             a->frame_copy = a->frame = (u16)(-(s16)b - 1);
             return;
         }
-        if (!anim_op(a, pos, b))
+        if (!run_opcode(a, pos, b))
             return;
     }
 }
 
-void xn_anim_run_opcodes_r(xn_regs *r)
-{
-    xn_ascr_pos pos = (xn_ascr_pos)r->edi;
-
-    xn_anim_run_opcodes((struct xn_anim *)r->esi, &pos);
-    r->edi = (u32)pos;
-}
-
-/* the opcodes' asm interface: ESI the state, EDI the position, CF set to yield */
-static void op_glue(xn_regs *r, s32 (*op)(struct xn_anim *, xn_ascr_pos *))
-{
-    xn_ascr_pos pos = (xn_ascr_pos)r->edi;
-
-    XN_SETFLAG(r, XN_CF, !op((struct xn_anim *)r->esi, &pos));
-    r->edi = (u32)pos;
-}
-
-#pragma off (unreferenced)          /* the opcodes share one signature; some use no state */
+#pragma off (unreferenced)                  /* the opcodes share one signature */
 
 s32 xn_anim_op_loop_start(struct xn_anim *a, xn_ascr_pos *pos)
 {
@@ -175,30 +140,20 @@ s32 xn_anim_op_loop_start(struct xn_anim *a, xn_ascr_pos *pos)
 
     if (lo != hi)
         count = (u8)xn_anim_rand_range(lo | hi << 8);
-    ((u8 *)*pos)[3] = count;            /* the loop's count lives in the script */
+    (*pos)[3] = count;                      /* the loop's count lives in the script */
     *pos += 4;
     return 1;
 }
 
-void xn_anim_op_loop_start_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_loop_start);
-}
-
 s32 xn_anim_op_loop_end(struct xn_anim *a, xn_ascr_pos *pos)
 {
-    u8 *start = (u8 *)script_at(a, word_at(*pos, 1));
+    xn_ascr_pos start = script_at(a, word_at(*pos, 1));
 
     if (--start[3] != 0)
-        *pos = start + 4;               /* the body again */
+        *pos = start + 4;                   /* the body again */
     else
         *pos += 3;
     return 1;
-}
-
-void xn_anim_op_loop_end_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_loop_end);
 }
 
 s32 xn_anim_op_set_events(struct xn_anim *a, xn_ascr_pos *pos)
@@ -208,21 +163,11 @@ s32 xn_anim_op_set_events(struct xn_anim *a, xn_ascr_pos *pos)
     return 1;
 }
 
-void xn_anim_op_set_events_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_set_events);
-}
-
 s32 xn_anim_op_set_byte13(struct xn_anim *a, xn_ascr_pos *pos)
 {
     a->opcode10_byte = (*pos)[1];
     *pos += 2;
     return 1;
-}
-
-void xn_anim_op_set_byte13_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_set_byte13);
 }
 
 s32 xn_anim_op_set_mirror(struct xn_anim *a, xn_ascr_pos *pos)
@@ -234,23 +179,13 @@ s32 xn_anim_op_set_mirror(struct xn_anim *a, xn_ascr_pos *pos)
     return 1;
 }
 
-void xn_anim_op_set_mirror_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_set_mirror);
-}
-
 s32 xn_anim_op_restart(struct xn_anim *a, xn_ascr_pos *pos)
 {
     u32 offset = ((const struct xn_ascr *)a->script)->restart;
 
-    a->pos = (u8 *)offset;              /* (sic: the offset, not script + offset) */
+    a->pos = (u8 *)offset;                  /* Quirk Q-ANIM-02: the bare offset */
     *pos = (xn_ascr_pos)offset;
     return 1;
-}
-
-void xn_anim_op_restart_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_restart);
 }
 
 s32 xn_anim_op_stop(struct xn_anim *a, xn_ascr_pos *pos)
@@ -259,24 +194,14 @@ s32 xn_anim_op_stop(struct xn_anim *a, xn_ascr_pos *pos)
     return 0;
 }
 
-void xn_anim_op_stop_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_stop);
-}
-
 s32 xn_anim_op_frame_wait(struct xn_anim *a, xn_ascr_pos *pos)
 {
     u8 steps = (*pos)[2];
 
     a->frame_copy = a->frame = (*pos)[1];
     *pos += 3;
-    a->wait = steps != 0 ? steps : ANIM_NONE;
+    a->wait = steps != 0 ? steps : XN_ANIM_NONE;
     return 0;
-}
-
-void xn_anim_op_frame_wait_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_frame_wait);
 }
 
 s32 xn_anim_op_goto(struct xn_anim *a, xn_ascr_pos *pos)
@@ -285,23 +210,13 @@ s32 xn_anim_op_goto(struct xn_anim *a, xn_ascr_pos *pos)
     return 1;
 }
 
-void xn_anim_op_goto_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_goto);
-}
-
 s32 xn_anim_op_goto_random(struct xn_anim *a, xn_ascr_pos *pos)
 {
-    if ((u8)xn_anim_rand_range(100 << 8) <= (*pos)[1])  /* 0..100 */
+    if ((u8)xn_anim_rand_range(100 << 8) <= (*pos)[1])     /* 0..100 */
         *pos = script_at(a, word_at(*pos, 2));
     else
         *pos += 4;
     return 1;
-}
-
-void xn_anim_op_goto_random_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_goto_random);
 }
 
 s32 xn_anim_op_goto_if_events(struct xn_anim *a, xn_ascr_pos *pos)
@@ -313,24 +228,14 @@ s32 xn_anim_op_goto_if_events(struct xn_anim *a, xn_ascr_pos *pos)
     return 1;
 }
 
-void xn_anim_op_goto_if_events_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_goto_if_events);
-}
-
 s32 xn_anim_op_set_record(struct xn_anim *a, xn_ascr_pos *pos)
 {
     xn_ascr_pos next = *pos + 2;
-    s32 wrapped = next < *pos;
+    s32 wrapped = next < *pos;              /* Quirk Q-ANIM-03: the add's carry */
 
     a->record_group = (*pos)[1];
     *pos = next;
     return !wrapped;
-}
-
-void xn_anim_op_set_record_r(xn_regs *r)
-{
-    op_glue(r, xn_anim_op_set_record);
 }
 
 #pragma on (unreferenced)
@@ -339,11 +244,11 @@ u16 xn_anim_rand_range(u16 range)
 {
     u8 lo = (u8)range, hi = (u8)(range >> 8);
     u8 span = hi - lo + 1;
-    u16 qr = xn_divb(xn_anim_rand_next() & 0x7F, span);    /* AH: the remainder */
+    u8 r = (u8)(xn_anim_rand_next() & 0x7F);
 
     if (span == 0)
-        return 0;                       /* the divide error (see xanim.h) */
-    return (u8)(lo + (qr >> 8));
+        return 0;                           /* Quirk Q-ANIM-04 (Q-SYS-01) */
+    return (u8)(lo + r % span);
 }
 
 u16 xn_anim_rand_next(void)

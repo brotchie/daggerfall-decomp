@@ -15,8 +15,7 @@ void asm_xn_joy_shutdown(void);
 #pragma aux asm_xn_joy_shutdown modify exact [eax];
 void asm_xn_render_shutdown(void);
 #pragma aux asm_xn_render_shutdown modify exact [eax];
-void asm_xn_gfx_restore_mode(void);
-#pragma aux asm_xn_gfx_restore_mode modify exact [eax];
+void xn_gfx_restore_mode(void);
 void asm_xn_mem_shutdown(void);
 #pragma aux asm_xn_mem_shutdown modify exact [eax edx];
 
@@ -37,7 +36,7 @@ void xn_tmap_pool_alloc(void)
     asm_xn_kbd_remove();
     asm_xn_joy_shutdown();
     asm_xn_render_shutdown();
-    asm_xn_gfx_restore_mode();
+    xn_gfx_restore_mode();
     asm_xn_mem_shutdown();
     r.eax = 0x0900;
     r.edx = (u32)xn_tmap_msg_no_memory;

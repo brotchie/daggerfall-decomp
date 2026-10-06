@@ -43,7 +43,7 @@ void asm_xn_dos_close(s32 handle);
 #pragma aux asm_xn_dos_close parm [ebx] modify exact [];
 extern void asm_xn_kbd_remove(void);
 extern void asm_xn_joy_shutdown(void);
-extern void asm_xn_gfx_restore_mode(void);
+void xn_gfx_restore_mode(void);
 extern void asm_xn_mem_shutdown(void);
 /* the game's C library (object 1) */
 void *func_000A10A8(u32 size);          /* malloc */
@@ -65,7 +65,7 @@ static void fatal(char *msg)
     xn_call_asm(asm_xn_kbd_remove);
     xn_call_asm(asm_xn_joy_shutdown);
     xn_render_shutdown();
-    xn_call_asm(asm_xn_gfx_restore_mode);
+    xn_gfx_restore_mode();
     xn_call_asm(asm_xn_mem_shutdown);
     r.eax = 0x0900;
     r.edx = (u32)msg;

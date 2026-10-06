@@ -1,6 +1,7 @@
-/* str.c: XnGine's string and array helpers as readable C (xstr.h; see xngine.h and
-   docs/xngine_readable.md). */
+/* str.c: XnGine's string and array helpers (canonical C; the interface and the module's
+   documentation are in xstr.h). */
 #include "xstr.h"
+#include "xrand.h"
 
 void xn_str_copy_dword(u32 *dst, const u32 *src)
 {
@@ -43,7 +44,7 @@ s32 xn_str_copy_alnum(char *dst, const char *src)
         if (c >= '0' && c <= '9')
             ;
         else if (c >= 'A' && c <= 'Z')
-            c &= 0xDF;          /* the asm's case mask, applied to capitals only: no change */
+            c &= 0xDF;          /* Quirk Q-STR-04: the case mask lands on capitals: no change */
         else if (c < 'a' || c > 'z')
             break;
         *dst++ = c;
@@ -81,7 +82,7 @@ u32 *xn_str_find_u32(u32 *array, u32 value, u32 count)
 
 u16 *xn_str_find_u16(u16 *array, u16 value, u32 count)
 {
-    do {
+    do {                                /* Quirk Q-STR-02: the count is tested after */
         if (*array == value)
             return array;
         array++;
@@ -113,12 +114,12 @@ void xn_str_append_char(char *s, char ch)
 {
     while (*s != 0)
         s++;
-    *s = ch;
+    *s = ch;                            /* Quirk Q-STR-03: no new terminator */
 }
 
 void xn_str_fill_ascending(u8 *dst, u8 first, u32 n)
 {
-    do {
+    do {                                /* Quirk Q-STR-02 */
         *dst++ = first++;
     } while (--n != 0);
 }
@@ -127,7 +128,7 @@ s32 xn_str_count_nonzero(const u8 *p, u32 n)
 {
     s32 count = 0;
 
-    do {
+    do {                                /* Quirk Q-STR-02 */
         if (*p != 0)
             count++;
         p++;
@@ -152,7 +153,7 @@ const char *xn_str_skip_fields(const char *s, char delim, s32 n)
 
 u8 *xn_str_find_byte_pair(u8 *p, u16 pair, u32 n)
 {
-    do {
+    do {                                /* Quirk Q-STR-02 */
         if (*(u16 *)p == pair)
             return p;
         p++;
@@ -192,7 +193,7 @@ void xn_str_nop(void)
 {
 }
 
-void xn_str_insert_char(char c, char *s, s32 at)
+void xn_str_insert_char(char *s, s32 at, char c)
 {
     char moved;
 
@@ -204,7 +205,7 @@ void xn_str_insert_char(char c, char *s, s32 at)
     s[at] = 0;
 }
 
-void xn_str_delete_char(s32 at, char *s)
+void xn_str_delete_char(char *s, s32 at)
 {
     char *p = s + at;
 
@@ -233,7 +234,7 @@ s32 xn_str_find_char(const char *s, char ch)
             return k;
         k++;
     } while (c != 0);
-    return 0;
+    return 0;                           /* Quirk Q-STR-05: as index 0 */
 }
 
 void xn_str_from_int(s32 value, char *dst, s32 ndigits)
@@ -243,16 +244,19 @@ void xn_str_from_int(s32 value, char *dst, s32 ndigits)
     u32 left;
 
     if (k == 0)
-        return;                         /* the asm's quirk: one digit writes nothing */
+        return;                         /* Quirk Q-STR-01: one digit writes nothing */
     if (value < 0) {
         *dst++ = '-';
         value = -value;
     }
     left = value;
-    do {                                /* place values 10^k .. 1 (k = -1: the dword before) */
+    do {                                /* the place values 10^k .. 1 */
         rest.lo = left;
         rest.hi = 0;
-        *dst++ = '0' + (char)xn_u64_divrem(&rest, xn_pow10_table[k], &left);
+        /* Quirk Q-STR-01: no digits divides by the dword before the table, xn_rand_seed (a
+           seed of 0 divides by zero: 0, Q-SYS-01) */
+        *dst++ = '0' + (char)xn_u64_divrem_or0(&rest, k >= 0 ? xn_pow10_table[k] : xn_rand_seed,
+                                               &left);
     } while (--k >= 0);
 }
 
@@ -278,14 +282,14 @@ s32 xn_str_to_int(const char *s)
     return value * sign;
 }
 
-void xn_str_copy_word_max80(const char *src, char *dst)
+void xn_str_copy_word_max80(char *dst, const char *src)
 {
     s32 n = 80;
     s8 c;
 
     do {
         c = *src++;
-        if (c <= ' ')
+        if (c <= ' ')                   /* Quirk Q-STR-06: signed */
             break;
         *dst++ = c;
     } while (--n != 0);

@@ -88,7 +88,7 @@ extern int people_count;
 extern struct quest *current_quest;
 extern int nearest_fire_distance;
 extern struct record *nearest_fire;
-extern int D_001A3F40;
+extern int timer_tick_count;
 extern char spell_cast_queue_list[];
 extern char D_001A4FEC[];
 extern char free_later_list[];
@@ -617,10 +617,10 @@ void func_0007E066(void)
 
 void frame_ticks_update(void)
 {
-    if ((frame_ticks = (D_001A3F40 * 1828) / 256) > 100) frame_ticks = 100;
+    if ((frame_ticks = (timer_tick_count * 1828) / 256) > 100) frame_ticks = 100;
     xn_anim_ticks += frame_ticks;
     D_001343C2 &= 7;
-    D_001A3F40 = 0;
+    timer_tick_count = 0;
 }
 
 void player_position_save(int slot)

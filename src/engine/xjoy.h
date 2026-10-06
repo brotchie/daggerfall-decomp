@@ -1,37 +1,51 @@
-/* xjoy.h: XnGine's joystick (src/engine/joy.c; see xngine.h): port 201h timed by an int 1Ch
-   (BIOS tick) handler, ranges widened as the stick moves, joystick_x and joystick_y in
-   -4095..4095 with a dead zone. The state is struct xn_joy_state (xnstruct.h) at 0x152A00,
-   whose globals names.csv names one by one (xn_joy_axis_mask, joystick_status, joystick_x...);
-   the C reads it through the struct. Stick B's ranges and counts are kept but its outputs are
-   only cleared. */
+/* xjoy.h: XnGine's joystick (src/engine/joy.c). Canonical C: plain prototypes, Watcom's own
+   calling convention; docs/xngine_canonical.md.
+
+   What it does
+     Reads a PC game-port joystick (port 201h). An int 1Ch handler (the BIOS tick, 18.2 Hz)
+     fires the port's one-shots and counts how long each axis bit stays up, and reads the
+     four buttons; every frame xn_joy_poll widens the ranges seen and turns stick A's counts
+     into joystick_x and joystick_y in -4095..4095 around the calibrated centre, with a dead
+     zone. Stick B's ranges and counts are kept, its outputs only cleared.
+
+   Units
+     counts      port reads while an axis bit stays up (at most 800h).
+     outputs     -4095..4095: the distance from the centre over the range seen on that side,
+                 times -4096 (right and down are negative).
+
+   The state (object 2, 6Eh bytes at 0x152A00, locked by the install): struct xn_joy_state
+   (xnstruct.h), xn_joy; the game reads joystick_status (2: off; the options turn it on),
+   joystick_x / _y and the buttons.
+
+   The handler's vector holds its interrupt entry (xn_joy_timer_entry: the build's stub at the
+   asm entry, which loads DS and ES and calls xn_joy_timer_isr).
+
+   Quirks (docs/engine/quirks.md): Q-JOY-01 (the axis mask's pairing tests do nothing),
+   Q-SYS-01 (a range of 0 divides by zero: that axis is 0). */
 #ifndef XJOY_H
 #define XJOY_H
 
 #include "xngine.h"
 #include "xnstruct.h"
-#include "xsysutil.h"
 
-extern u8 xn_joy_axis_mask;
-#define xn_joy (*(struct xn_joy_state *)&xn_joy_axis_mask)
+extern struct xn_joy_state xn_joy;          /* 0x152A00 */
 
 #define XN_JOY_OFF      2                   /* joystick_status: disabled */
 #define XN_JOY_PORT     0x201
 
-/* The tick handler's asm entry (the vector holds it), and the end of its code */
-void asm_xn_joy_timer_isr(void);
-extern u8 xn_code_152F41[];
+/* The handler's interrupt entry (the build's stub at 152EA0), and the end of its asm
+   (152F41), which the install locks */
+extern void xn_joy_timer_entry(void);
+extern u8 xn_joy_timer_end[];
 
 /* init_game_data: once, finds which axis bits of port 201h answer (64 reads after a BIOS
-   tick), sets the joystick off (joystick_status 2: the options turn it on), and installs the
-   int 1Ch handler, locking its code and the state. The mask is every bit that read 0 all
-   64 times: the asm's tests on its low nibble (meant to pair the axes) end in an OR of bits
-   the mask already has. */
+   tick: the bits that read 0 every time, Q-JOY-01), sets the joystick off, installs the int
+   1Ch handler and locks its code and the state. */
 void xn_joy_init(void);
-#pragma aux xn_joy_init parm [] modify exact [eax ecx edx ebx];
 
-/* shutdown_free_all: the int 1Ch vector back (when installed); the joystick off. */
+/* shutdown_free_all and the fatal paths: the int 1Ch vector back (when installed); the
+   joystick off. */
 void xn_joy_shutdown(void);
-#pragma aux xn_joy_shutdown parm [] modify exact [eax];
 
 /* The ranges back to "nothing seen" (minimums 32000, maximums 0) and the buttons released. */
 void xn_joy_reset_range(void);
@@ -40,17 +54,16 @@ void xn_joy_reset_range(void);
    centre the average of its counts over 4 BIOS ticks, rounded. */
 void xn_joy_calibrate(void);
 
-/* Every frame: joystick_x and joystick_y from the last counts (each axis: its distance from
-   the centre over the range on that side, times -4096, within -4095..4095; 0 inside the dead
-   zone), widening the ranges first. Stick B's outputs are cleared only. A range of 0 divides
-   by zero: XnGine's divide handler makes that axis 0. */
+/* Every frame (3 game sites): joystick_x and joystick_y from the last counts, the ranges
+   widened first; stick B's outputs cleared. Nothing but the clearing while the joystick is
+   off. */
 void xn_joy_poll(void);
-#pragma aux xn_joy_poll parm [] modify exact [eax edx ebx];
 
-/* The int 1Ch handler: the buttons cleared, and while the joystick is on, the four axes
-   timed (port 201h fired, then counted while each bit stays up, at most 800h reads) and the
-   four buttons read (set while pressed). The asm's 4 run-time blocks (152EAD..152F40) are
-   this function's. */
+/* The int 1Ch handler: the buttons cleared; while the joystick is on, the four axes timed
+   (port 201h fired, then read while any axis bit is up, at most 800h times, each read adding
+   its bits to the counts) and the four buttons read (set while pressed: their bit 0). A
+   vector (its entry stub's). The asm's 4 run-time blocks (152EAD..152F40) are this
+   function's. */
 void xn_joy_timer_isr(void);
 
 #endif

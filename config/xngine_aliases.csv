@@ -3,3 +3,12 @@ global,0x000C10FF,xn_vid_state,strong,"alias of xn_vid_audio_state: the VID play
 global,0x00120288,xn_pick_view_x,strong,"alias of xn_scratch_vecs: the scratch vectors' first dword, the pick's view x, read as a scalar in the pick and helmet code"
 global,0x0014A100,xn_collide_matrix_b,strong,"alias of xn_collide_work: its first field is both the probe matrix and the ground triangle"
 global,0x0014AF0C,xn_collide_sph,strong,"alias of xn_collide_sph_points: the sphere test's state block (struct) starts with its points"
+global,0x000C0500,xn_sys_crit_error_entry,strong,"alias of xn_sys_crit_error_handler: the int 24h vector's entry, where the build's interrupt stub calls the C handler (tools/xn_rc.py isr_stub)"
+global,0x00149FC8,xn_sys_divide_error_entry,strong,"alias of xn_sys_divide_error_handler: exception 0's entry, where the build's stub calls the C handler (retf)"
+global,0x0014A0E5,xn_sys_divide_error_end,strong,the end of the divide-error handler's asm (its run-time blocks): xn_sys_install_divide_handler locks the entry up to here
+global,0x000A12B8,xn_mem_game_lock_start,strong,the game's code (object 1) xn_mem_init locks 400h bytes of at start-up
+global,0x00142840,xn_kbd_int9_entry,strong,"alias of xn_kbd_int9_handler: the int 9 vector's entry, where the build's interrupt stub loads DS and ES and calls the C handler"
+global,0x00142700,xn_kbd_code_start,strong,"alias of xn_kbd_install: the keyboard module's asm (1EEh bytes, the int 9 entry's) that the install locks"
+global,0x00152A00,xn_joy,strong,"alias of xn_joy_axis_mask: the joystick's state block (struct xn_joy_state, 6Eh bytes) starts with the axis mask"
+global,0x00152EA0,xn_joy_timer_entry,strong,"alias of xn_joy_timer_isr: the int 1Ch vector's entry, where the build's interrupt stub loads DS and ES and calls the C handler"
+global,0x00152F41,xn_joy_timer_end,strong,the end of the int 1Ch handler's asm (its iretd's end): xn_joy_init locks the entry up to here

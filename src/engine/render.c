@@ -50,7 +50,7 @@ extern s32 *xn_span_flat_fogged_recip, *xn_span_flat_translucent_recip;
 extern void asm_xn_sys_install_divide_handler(void);
 extern void asm_xn_sys_remove_divide_handler(void);
 extern void asm_xn_light_free(void);
-extern void asm_xn_world_shutdown(void);
+void xn_world_shutdown(void);              /* the world group's (xworld.h) */
 extern void asm_xn_light_to_view(void);
 extern void asm_xn_light_setup_poly(void);
 extern void asm_xn_light_setup_terrain(void);
@@ -95,7 +95,7 @@ void xn_render_shutdown(void)
 {
     xn_call_asm(asm_xn_light_free);
     xn_tex_cache_free();
-    xn_call_asm(asm_xn_world_shutdown);
+    xn_world_shutdown();
     xn_call_asm(asm_xn_sys_remove_divide_handler);
     func_000A117E(xn_render_recip_table);
 }

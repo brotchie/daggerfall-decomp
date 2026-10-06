@@ -1,5 +1,10 @@
-/* timer.c: XnGine's timing as readable C (xtimer.h; see xngine.h). */
+/* timer.c: XnGine's timing (canonical C; the interface and the module's documentation are in
+   xtimer.h). */
 #include "xtimer.h"
+
+#define PIT_CHANNEL0    0x40
+#define PIT_COMMAND     0x43
+#define TICKS_A_SECOND  18
 
 u32 xn_timer_bios_ticks(void)
 {
@@ -28,7 +33,7 @@ void xn_timer_add_25(void)
 u32 xn_timer_fps_update(void)
 {
     xn_fps_frame_count++;
-    if (XN_BIOS_TICKS - xn_fps_last_tick > 18) {
+    if (XN_BIOS_TICKS - xn_fps_last_tick > TICKS_A_SECOND) {
         xn_fps_last_tick = XN_BIOS_TICKS;
         xn_timer_fps = xn_fps_frame_count;
         xn_fps_average = (xn_timer_fps + xn_fps_average) >> 1;
@@ -41,9 +46,9 @@ u32 xn_timer_read_pit(void)
 {
     u32 lo, hi;
 
-    xn_outb(0x43, 0xB0);
-    lo = xn_inb(0x40);
-    hi = xn_inb(0x40);
+    xn_outb(PIT_COMMAND, 0xB0);         /* Quirk Q-TIMER-01: channel 2, mode 0 (no latch) */
+    lo = xn_inb(PIT_CHANNEL0);
+    hi = xn_inb(PIT_CHANNEL0);
     return hi << 8 | lo;
 }
 

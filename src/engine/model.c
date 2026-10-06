@@ -8,6 +8,7 @@
 #include "xvec.h"
 #include "xmat.h"
 #include "xmath.h"
+#include "xdraw.h"
 
 extern s32 xn_model_angle_or_bits;
 extern xn_mat3 xn_model_base_matrix, xn_model_object_matrix, xn_model_combined_matrix;
@@ -43,10 +44,9 @@ extern s32 xn_model_scale_inv_x, xn_model_scale_inv_y;     /* 1406DD 14072A (12A
 extern s32 xn_model_scale_focal_x, xn_model_scale_focal_y; /* 1406E2 14072F (12A274) */
 
 /* other groups' functions, through their asm entries */
-extern void asm_xn_draw_clip_rect_xyxy(void);
 extern void asm_xn_kbd_remove(void);
 extern void asm_xn_joy_shutdown(void);
-extern void asm_xn_gfx_restore_mode(void);
+void xn_gfx_restore_mode(void);
 extern void asm_xn_mem_shutdown(void);
 extern void asm_xn_model_clear_vert_flags(void);    /* the body the asm plants its ret in */
 
@@ -76,7 +76,7 @@ static void fatal(char *msg, int joy)
     if (joy)
         xn_call_asm(asm_xn_joy_shutdown);
     xn_render_shutdown();
-    xn_call_asm(asm_xn_gfx_restore_mode);
+    xn_gfx_restore_mode();
     xn_call_asm(asm_xn_mem_shutdown);
     r.eax = 0x0900;
     r.edx = (u32)msg;
@@ -778,22 +778,22 @@ void xn_model_scale_matrix_r(xn_regs *r)
     r->edx = xn_render_matrix_next->m[1][2];
 }
 
-/* xn_draw_clip_rect_xyxy (asm, draw group): the rectangle clipped to the view; 0 when empty */
+/* xn_draw_clip_rect_xyxy (draw group, xdraw.h): the rectangle clipped to the view; 0 when empty */
 static int clip_rect(s32 *x0, s32 *y0, s32 *x1, s32 *y1)
 {
-    xn_regs r;
+    xn_line r;
+    int ok;
 
-    r.eax = *x0;
-    r.edx = *y0;
-    r.ebx = *x1;
-    r.ecx = *y1;
-    r.ebp = r.esi = r.edi = 0;
-    xn_asmcall(asm_xn_draw_clip_rect_xyxy, &r);
-    *x0 = r.eax;
-    *y0 = r.edx;
-    *x1 = r.ebx;
-    *y1 = r.ecx;
-    return (r.eflags & XN_CF) == 0;
+    r.x1 = *x0;
+    r.y1 = *y0;
+    r.x2 = *x1;
+    r.y2 = *y1;
+    ok = xn_draw_clip_rect_xyxy(&r);
+    *x0 = r.x1;
+    *y0 = r.y1;
+    *x1 = r.x2;
+    *y1 = r.y2;
+    return ok;
 }
 
 int xn_model_is_occluded(const struct xn_model *m, const struct xn_model_handle *h)

@@ -1,4 +1,4 @@
-/* bits.c: XnGine's flag helpers as readable C (xbits.h; see xngine.h). */
+/* bits.c: XnGine's flag helpers (canonical C; the interface is documented in xbits.h). */
 #include "xbits.h"
 
 void xn_bits_set_or_clear_u8(u8 *flags, u8 mask, s32 clear)

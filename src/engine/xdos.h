@@ -1,145 +1,156 @@
-/* xdos.h: XnGine's DOS file I/O (src/engine/dos.c; see xngine.h): opening, reading and
-   seeking with int 21h, whole-file loads from the ARENA2 directory, and the 'DOS:' fatal
-   error. The asm cores take their arguments in the registers DOS wants (the handle in EBX,
-   the buffer in EDX, the count in ECX); a C-callable wrapper (_c) of each, and the find,
-   create, write and file size functions, are XnGine's library, linked in whole and never
-   called.
+/* xdos.h: XnGine's DOS files (src/engine/dos.c). Canonical C: plain prototypes, Watcom's own
+   calling convention; docs/xngine_canonical.md.
 
-   A DOS call is compared by the value of EAX at its int 21h. Where the asm sets only AH (or
-   AX), the rest of EAX is what its caller left there, and the C passes it on: those
-   functions take the caller's EAX.
+   What it does
+     The DOS services the engine uses (int 21h through the DOS extender, CauseWay): open,
+     create, read, write, seek and close a file, find files, print a message and end the
+     program. Each of those functions is one DOS call, the platform's file layer; the rest of
+     the engine reads its files through them. On top of them: whole files loaded from the
+     ARENA2 directory (fonts, light.dat, the shade tables), the length of a file, and the
+     'DOS:' fatal error that ends the game when a file is missing.
 
-   Each declaration keeps the function's asm interface (config/xngine_abi.csv): no pragma is
-   Watcom's own convention; a pragma names the registers; NAME_r is the glue for a function
-   whose asm callers read several registers or flags. */
+   Units and conventions
+     handles    DOS's file handles (16 bits, in an s32).
+     offsets    bytes; seek takes a signed 32-bit offset and a mode (0 from the start, 1 from
+                the current position, 2 from the end), as DOS does.
+     results    what DOS returns (a count, a handle, a position); a failure (DOS's carry) as
+                the function says. A count or a position comes back as DOS left it: after a
+                failure that is DOS's error code, and no engine caller tells the two apart
+                (Q-DOS-02).
+     paths      NUL-terminated; xn_dos_print's messages end in '$' (DOS function 09h).
+
+   Globals (in object 2, the engine's)
+     xn_dos_path                ARENA2 path + '\' + name, built by xn_dos_make_path;
+     xn_dos_msg_not_found, xn_dos_msg_create_failed, xn_dos_msg_out_of_memory
+                                the 'DOS:' messages ('$'-terminated).
+   The game's
+     arena2_path                Z.CFG's path ('C:\ARENA2\');
+     disk_last_file_size        the length of the last file loaded (the game reads it);
+     file_resolver              the disk index's path lookup (disk_resolve_path), or 0;
+     internal_check_failed      not 0: fatal_error reports 'Failed internal check N.' with it
+                                instead of its message;
+     fatal_error, exit, filelength and the allocator (the boundary's exits).
+
+   Quirks kept (docs/engine/quirks.md): Q-DOS-01 (a missing file is reported as a failed
+   internal check), Q-DOS-02 (counts and positions are DOS's AX even after a failure),
+   Q-DOS-03 (xn_dos_write checks only its last piece), Q-DOS-04 (xn_dos_make_path's shared
+   count of 80 characters), Q-DOS-05 (xn_dos_load_file adds an error code to the length). */
 #ifndef XDOS_H
 #define XDOS_H
 
 #include "xngine.h"
-#include "xsysutil.h"
 
-extern char xn_dos_path[81];                /* ARENA2 path + '\' + name (0xC0B53) */
-extern char xn_dos_msg_not_found[];         /* 'DOS: File not found: $' */
-extern char xn_dos_msg_create_failed[];     /* 'DOS: Error creating file: $' */
-extern char xn_dos_msg_out_of_memory[];     /* 'DOS: Out of memory loading file: $' */
+#define XN_DOS_SEEK_SET 0               /* seek modes */
+#define XN_DOS_SEEK_CUR 1
+#define XN_DOS_SEEK_END 2
+
+extern char xn_dos_path[81];            /* ARENA2 path + '\' + name (0xC0B53) */
+extern char xn_dos_msg_not_found[];     /* 'DOS: File not found: $' */
+extern char xn_dos_msg_create_failed[]; /* 'DOS: Error creating file: $' */
+extern char xn_dos_msg_out_of_memory[]; /* 'DOS: Out of memory loading file: $' */
 
 /* The game's */
-extern char arena2_path[];                  /* the Z.CFG path: 'C:\ARENA2\' */
-extern u32 disk_last_file_size;             /* the length of the last file loaded */
-extern u32 internal_check_failed;           /* non-zero: fatal_error reports it */
-extern char *(*file_resolver)(char *path);  /* the disk index's path lookup, or 0 */
+extern char arena2_path[];
+extern u32 disk_last_file_size;
+extern u32 internal_check_failed;
+extern char *(*file_resolver)(char *path);
 s32 filelength(s32 handle);
 void exit(s32 status);
-/* (the game's void function: what it leaves in EAX when it returns, which it does only when
-   the game is already exiting) */
-u32 fatal_error(const char *message);
+u32 fatal_error(const char *message);   /* returns only while the game is already exiting */
+void *func_000A10A8(u32 size);          /* the game's allocator (malloc) */
 
-/* Dead: loads a palette ARENA2\name into buf (300h bytes allocated when buf is 0): a 768-byte
-   file as it is; any other is read from offset 8, 768 bytes, each shifted right 2 (8-bit
-   colour to the DAC's 6). Returns buf. */
-u8 *xn_dos_load_palette(const char *name, u8 *buf);
-#pragma aux xn_dos_load_palette parm [eax] [edx] value [eax] modify exact [eax esi];
+/* ---- files ------------------------------------------------------------------------------ */
 
-/* Dead: xn_dos_open for C: the handle of path. */
-s32 xn_dos_open_c(const char *path);
+/* Opens path for reading (DOS 3D00h), first passing it through the game's file_resolver when
+   one is set (the disk index: it may give another path). Returns the handle. A file that
+   does not open ends the game: the 'DOS:' fatal error (Q-DOS-01). The textures, WOODS.WLD,
+   xn_dos_load_file. */
+s32 xn_dos_open(const char *path);
 
-/* Opens *path for reading (int 21h 3D00h), first passing it through the game's
-   file_resolver when one is set (which may replace *path). Returns the handle. A missing file
-   is fatal ('DOS: File not found: '), reported as the failed internal check `check` when that
-   is not 0: the asm stores its caller's EAX there. */
-s32 xn_dos_open(const char **path, u32 check);
-void xn_dos_open_r(xn_regs *r);
+/* Opens path as it is (DOS 3Dh with access mode `mode`: 0 read, 1 write, 2 both; no
+   file_resolver, never fatal). *handle gets DOS's AX either way: the handle, or the error
+   code when DOS fails. Returns 0 when it opened, else that error code. The movie player opens
+   its file with it and never looks at the result. */
+u32 xn_dos_open_mode(const char *path, u8 mode, s32 *handle);
 
-/* Dead: xn_dos_close for C. */
-void xn_dos_close_c(s32 handle);
-#pragma aux xn_dos_close_c parm [eax] modify exact [eax];
+/* Creates (or truncates) path with no attributes (DOS 3Ch). Returns the handle. A failure
+   ends the game ('DOS: Error creating file: ', Q-DOS-01). The world editor's (dead). */
+s32 xn_dos_create(const char *path);
 
-/* Closes a file (int 21h 3E00h). */
+/* Closes a file (DOS 3Eh). */
 void xn_dos_close(s32 handle);
-#pragma aux xn_dos_close parm [ebx] modify exact [eax];
 
-/* Dead: xn_dos_find_first for C: 1 when nothing matches spec (DOS's carry), else 0. */
-s32 xn_dos_find_first_c(const char *spec);
+/* Reads count bytes into buf (DOS 3Fh). Returns the bytes read: count, fewer at the end of
+   the file, or DOS's error code after a failure (Q-DOS-02). The textures, WOODS.WLD, whole
+   files. */
+u32 xn_dos_read(s32 handle, void *buf, u32 count);
 
-/* Find first (int 21h AH = 4Eh, any attributes) of the spec at EDX; AL and the upper half of
-   EAX as the caller left them; DOS's carry says none matched. */
-void xn_dos_find_first_r(xn_regs *r);
+/* Writes count bytes from buf (DOS 40h) in pieces of 32K while more than 32K are left (a
+   signed compare), then the rest. Returns 1 when the last piece failed, else 0: the others'
+   failures are not looked at (Q-DOS-03). The world editor's (dead). */
+int xn_dos_write(s32 handle, const void *buf, s32 count);
 
-/* Dead: xn_dos_find_next for C: 1 when there are no more (the carry). eax: the caller's EAX,
-   which DOS gets with AH = 4Fh. */
-s32 xn_dos_find_next_c(u32 eax);
+/* Moves the file pointer to offset from mode (DOS 42h: XN_DOS_SEEK_SET, _CUR or _END; any
+   other mode DOS refuses and does not move). Returns 0, or DOS's error code when it fails;
+   the new position to *pos (pos may be 0). */
+u32 xn_dos_seek(s32 handle, s32 offset, u8 mode, u32 *pos);
 
-/* Find next (int 21h AH = 4Fh); the carry says no more. */
-void xn_dos_find_next_r(xn_regs *r);
+/* Finds the first file matching spec, any attributes (DOS 4Eh): 1 when one matched (its
+   entry in the disk transfer area), 0 when none. Dead (only the C form calls it). */
+int xn_dos_find_first(const char *spec);
 
-/* Dead: xn_dos_file_exists for C: 0 when path opens, 1 when not. */
-s32 xn_dos_file_exists_c(const char *path);
-#pragma aux xn_dos_file_exists_c parm [eax] value [eax] modify exact [eax ebx];
+/* The next match of the last xn_dos_find_first (DOS 4Fh): 1, or 0 when there are no more.
+   Dead. */
+int xn_dos_find_next(void);
 
-/* Whether path opens (int 21h 3D00h; closed again at once). *handle: the handle it had.
-   xn_vid_play checks the movie file with it. */
-s32 xn_dos_file_exists(const char *path, s32 *handle);
-void xn_dos_file_exists_r(xn_regs *r);
+/* 1 when path opens for reading (DOS 3D00h; closed again at once), else 0. xn_vid_play checks
+   the movie file with it. */
+int xn_dos_file_exists(const char *path);
 
-/* Dead: xn_dos_create for C: the handle of a new file at path. */
-s32 xn_dos_create_c(const char *path);
+/* The length of path in bytes: opened (xn_dos_open: a missing file is fatal), the pointer
+   moved to the end, closed. */
+u32 xn_dos_file_size(const char *path);
 
-/* Creates path (int 21h 3Ch, attributes 0); returns the handle. Failure is fatal ('DOS:
-   Error creating file: '). eax: the caller's EAX: DOS gets it with AX = 3C00h, and it is the
-   failed internal check reported. The world editor's (dead). */
-s32 xn_dos_create(const char *path, u32 eax);
-void xn_dos_create_r(xn_regs *r);
+/* Loads ARENA2\name whole into buf, or into a block of its length from the game's allocator
+   when buf is 0 (no memory is fatal: 'DOS: Out of memory loading file: '), reading FFFFh
+   bytes at a time while whole pieces come; disk_last_file_size counts what was read (an
+   error code too, Q-DOS-05). Returns buf. Fonts, light.dat, the shade tables. */
+void *xn_dos_load_file(const char *name, void *buf);
 
-/* Dead: xn_dos_write for C: 1 when the last write failed (the carry), else 0. */
-s32 xn_dos_write_c(const u8 *buf, u32 count, s32 handle);
-#pragma aux xn_dos_write_c parm [eax] [edx] [ebx] value [eax] modify exact [eax edx];
-
-/* Writes count bytes from *buf to a file (int 21h 40h) in pieces of 32K (while more than 32K
-   are left: a signed compare); *buf advances past each whole piece, not past the last.
-   Returns DOS's carry from the last piece (the others' are not looked at). The world
-   editor's (dead). */
-s32 xn_dos_write(const u8 **buf, s32 count, s32 handle);
-void xn_dos_write_r(xn_regs *r);
-
-/* Dead: xn_dos_read for C. */
-s32 xn_dos_read_c(void *buf, u32 count, s32 handle);
-#pragma aux xn_dos_read_c parm [eax] [edx] [ebx] value [eax] modify exact [eax edx];
-
-/* Reads count bytes into buf (int 21h 3F00h); returns DOS's EAX: the bytes read (or the error
-   code, with the carry, which no caller looks at). Textures, WOODS.WLD, whole files. */
-s32 xn_dos_read(void *buf, u32 count, s32 handle);
-#pragma aux xn_dos_read parm [edx] [ecx] [ebx] value [eax] modify exact [eax];
-
-/* Dead: xn_dos_seek for C: the offset as one dword, split into CX:DX; 1 when DOS failed.
-   eax: the caller's EAX, whose AL is the mode. */
-s32 xn_dos_seek_c(u32 eax, u32 offset, s32 handle);
-#pragma aux xn_dos_seek_c parm [eax] [edx] [ebx] value [eax] modify exact [eax edx];
-
-/* Seek (int 21h AH = 42h): AL the mode (0 start, 1 current, 2 end), CX:DX the offset, EBX the
-   handle; DX:AX the new position, the carry on error. The rest of EAX goes to DOS as the
-   caller left it: xn_world_read_cell's reader calls it without setting AL (docs/xngine.md). */
-void xn_dos_seek_r(xn_regs *r);
-
-/* Dead: xn_dos_file_size for C. */
-u32 xn_dos_file_size_c(const char *path);
-
-/* The length of path: opened, the pointer moved to the end, closed. eax: the caller's EAX:
-   the failed check of a missing file, and the upper half of the seek's EAX. */
-u32 xn_dos_file_size(const char *path, u32 eax);
-void xn_dos_file_size_r(xn_regs *r);
-
-/* Loads ARENA2\name whole into buf, or into a block of its length allocated with the game's
-   malloc when buf is 0 (failure is fatal: 'DOS: Out of memory loading file: '), reading
-   FFFFh bytes at a time; disk_last_file_size counts what was read. Returns buf. Fonts,
-   light.dat, the shade tables. */
-u8 *xn_dos_load_file(const char *name, u8 *buf);
-void xn_dos_load_file_r(xn_regs *r);
-
-/* xn_dos_path = arena2_path, a backslash when it does not end in one, then name, terminated.
-   The path and the name share one count of 80 characters (the backslash not counted); a path
-   of 80 or more leaves the count at 0, which the name's loop then takes as 2^32. Returns
-   xn_dos_path. */
+/* Builds ARENA2\name in xn_dos_path: arena2_path, a backslash when it does not end in one,
+   then name, terminated. The path and the name share one count of 80 characters, the
+   backslash not counted (Q-DOS-04). Returns xn_dos_path. */
 char *xn_dos_make_path(const char *name);
-void xn_dos_make_path_r(xn_regs *r);
+
+/* Dead: loads the palette ARENA2\name into buf (300h bytes from the game's allocator when buf
+   is 0): a file of 768 bytes as it is; any other is read from offset 8, 768 bytes, each
+   shifted right 2 (8-bit colour to the DAC's 6). Returns buf. */
+u8 *xn_dos_load_palette(const char *name, u8 *buf);
+
+/* ---- the C forms (dead: XnGine's library, linked whole and never called) ---------------- */
+
+s32 xn_dos_open_c(const char *path);                    /* xn_dos_open */
+s32 xn_dos_create_c(const char *path);                  /* xn_dos_create */
+void xn_dos_close_c(s32 handle);                        /* xn_dos_close */
+u32 xn_dos_read_c(void *buf, u32 count, s32 handle);    /* xn_dos_read */
+/* xn_dos_write: 1 when the last piece failed */
+int xn_dos_write_c(const void *buf, s32 count, s32 handle);
+/* xn_dos_seek: 1 when DOS failed */
+int xn_dos_seek_c(u8 mode, s32 offset, s32 handle);
+int xn_dos_find_first_c(const char *spec);              /* 1 when nothing matched */
+int xn_dos_find_next_c(void);                           /* 1 when there are no more */
+int xn_dos_file_exists_c(const char *path);             /* 1 when path does NOT open */
+u32 xn_dos_file_size_c(const char *path);               /* xn_dos_file_size */
+
+/* ---- messages and the end ---------------------------------------------------------------- */
+
+/* Prints msg, which ends in '$' (DOS 09h). */
+void xn_dos_print(const char *msg);
+
+/* Ends the program with exit code `code` (DOS 4Ch). Does not return. */
+void xn_dos_exit(u8 code);
+
+/* The selector of the program's PSP (DOS 51h). */
+u16 xn_dos_psp(void);
 
 #endif
