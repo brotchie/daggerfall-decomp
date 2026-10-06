@@ -96,6 +96,6 @@ void xn_shade_fog_span(const struct xn_poly *poly, const struct xn_span *span, s
 
 /* The remap: pixel k of pix[0..n-1] becomes the colour at the fog row (row's high bytes, the
    pixel as the low byte); row += step after each pixel. n at most 641. */
-void xn_shade_fog_pixels(u8 *pix, s32 n, u32 row, s32 step);
+void xn_shade_fog_pixels(u8 *pix, s32 n, uptr row, s32 step);
 
 #endif

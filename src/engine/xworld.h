@@ -66,6 +66,15 @@ extern u16 xn_world_ground_archive;             /* the ground's TEXTURE archive 
 /* ---- WOODS.WLD and the window ------------------------------------------------------------ */
 extern s32 xn_world_file;                       /* the DOS handle of WOODS.WLD */
 extern struct xn_wld_header xn_world_header;    /* .offsets: the offset table's window */
+/* The offset table's window. Natively the header keeps the file's 4 bytes at +0Ch (it is
+   read and written whole), too narrow for the address: the window's pointer is a global of
+   the native build's own (world.c). */
+#if defined(DAGGER_PORT)
+extern u32 *xn_world_offsets;
+#define XN_WORLD_OFFSETS xn_world_offsets
+#else
+#define XN_WORLD_OFFSETS xn_world_header.offsets
+#endif
 extern u32 xn_world_offsets_window_bytes;       /* bytes of the table in the window */
 extern s32 xn_world_offsets_window_max;         /* the window's capacity (4000h bytes) */
 extern s32 xn_world_offsets_window_count;       /* cells in the window */

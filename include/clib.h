@@ -13,6 +13,8 @@
 #ifndef CLIB_H
 #define CLIB_H
 
+#include "doslow.h"       /* DOS_LOW, DOS_NULL: real-mode memory and the zero page */
+
 #ifdef DAGGER_PORT
 typedef unsigned long csize;    /* the host's size_t */
 /* the game's view of the C library (strlen returns an int...) differs from the host's builtins */

@@ -30,7 +30,7 @@ extern void xn_model_set_angles_yaw_offset(short *, int);
 extern void *xn_tex_cache_lookup_image(int, int);
 extern int xn_light_add(int, int, int, int, int, int);
 extern void xn_model_submit(void *, int);
-extern int xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
+extern iptr xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
 
 int object_draw_cb(struct record *object)
 {

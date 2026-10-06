@@ -99,7 +99,9 @@ void xn_model_calc_uv_axes(struct xn_model *m);
 void xn_model_calc_face_uv_axes(const struct xn_model *m, const struct xn_model_face *face,
                                 struct xn_model_face_data *out);
 
-/* Each face's plane constant (its first point . its normal) and its texture-axis pointer. */
+/* Each face's plane constant (its first point . its normal) and its texture-axis pointer
+   (XN_SET_FACE_DATA, xnstruct.h: natively the axes' offset from the face, the file's 4-byte
+   slot being too narrow for an address). */
 void xn_model_calc_face_planes(struct xn_model *m);
 
 /* The radius: the largest vertex distance from the origin. */

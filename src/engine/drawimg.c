@@ -46,8 +46,8 @@ void xn_draw_copy_rect_stride_bytes(const u8 *src, u8 *dst, s32 w, s32 h, s32 sr
    asm leaves its row count, run down, in ECX, and the game's 7 sites read it: 0. */
 void xn_draw_copy_rect_stride_bytes_b(xn_regs *r)
 {
-    xn_draw_copy_rect_stride_bytes((const u8 *)r->eax, (u8 *)r->edx, r->ebx, r->ecx,
-                                   XN_STACK_ARG(r, 0));
+    xn_draw_copy_rect_stride_bytes((const u8 *)r->eax, (u8 *)r->edx, (s32)r->ebx,
+                                   (s32)r->ecx, XN_STACK_ARG(r, 0));
     r->ecx = 0;
 }
 
@@ -225,7 +225,7 @@ void xn_draw_paperdoll_mask(u8 *dst, const u8 *src, s32 w, s32 h, u8 colour)
    ECX, w EDX, h EBX, the colour on the stack (the caller pops it) */
 void xn_draw_paperdoll_mask_b(xn_regs *r)
 {
-    xn_draw_paperdoll_mask((u8 *)r->eax, (const u8 *)r->ecx, r->edx, r->ebx,
+    xn_draw_paperdoll_mask((u8 *)r->eax, (const u8 *)r->ecx, (s32)r->edx, (s32)r->ebx,
                            (u8)XN_STACK_ARG(r, 0));
 }
 

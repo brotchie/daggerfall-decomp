@@ -20,6 +20,10 @@ extern u8 text_colour, text_shadow_colour;
 extern xn_vec3 xn_scratch_vec_b;        /* xn_flat_pick leaves the pick point's x, y here */
 extern s32 xn_pick_flat_x, xn_pick_flat_y, xn_pick_flat_z;
 
+/* a draw-list pair's bytes: the lists are walked by byte offsets (8 under Watcom; natively
+   the value is a pointer) */
+#define PAIR_SIZE   ((s32)sizeof(struct xn_sort_pair))
+
 /* the frame's lists and counts */
 extern struct xn_sort_pair xn_model_queue[200];
 extern struct xn_sort_pair *xn_model_queue_ptr;
@@ -261,10 +265,10 @@ int xn_render_draw_models(void)
 
     if (xn_model_queue_count == 0)
         return 0;
-    last = (u8 *)xn_model_queue_ptr - (u8 *)xn_model_queue - 8;
+    last = (s32)((u8 *)xn_model_queue_ptr - (u8 *)xn_model_queue) - PAIR_SIZE;
     xn_render_sort_pairs(xn_model_queue, 0, last);
     pair = xn_model_queue;
-    left = (u32)last >> 3;
+    left = (u32)last / PAIR_SIZE;
     do {                                /* dec; jns: last / 8 + 1 models */
         if (xn_model_draw((struct xn_model_handle *)pair->value))
             return 1;
@@ -282,10 +286,10 @@ int xn_render_draw_flats(void)
         return 0;
     xn_flat_begin_frame();
     xn_light_to_view();
-    last = (u8 *)xn_flat_sort_end - (u8 *)xn_flat_sort_list - 8;
+    last = (s32)((u8 *)xn_flat_sort_end - (u8 *)xn_flat_sort_list) - PAIR_SIZE;
     xn_render_sort_pairs(xn_flat_sort_list, 0, last);
     pair = xn_flat_sort_list;
-    left = (u32)last >> 3;
+    left = (u32)last / PAIR_SIZE;
     do {
         if (xn_flat_draw((struct xn_flat *)pair->value))
             return 1;
@@ -337,20 +341,20 @@ s32 xn_render_sort_pairs_range(struct xn_sort_pair *pairs, s32 lo, s32 hi)
 {
     s32 i = lo;
     s32 j = hi;
-    s32 key = PAIR(((u32)(lo + hi) >> 4) << 3).key;     /* the middle pair */
+    s32 key = PAIR((u32)(lo + hi) / (2 * PAIR_SIZE) * PAIR_SIZE).key;   /* the middle pair */
 
     do {
         while (PAIR(i).key < key)
-            i += 8;
+            i += PAIR_SIZE;
         while (key < PAIR(j).key)
-            j -= 8;
+            j -= PAIR_SIZE;
         if (i <= j) {
             struct xn_sort_pair t = PAIR(i);
 
             PAIR(i) = PAIR(j);
             PAIR(j) = t;
-            i += 8;
-            j -= 8;
+            i += PAIR_SIZE;
+            j -= PAIR_SIZE;
         }
     } while (i <= j);
     /* Quirk Q-RENDER-02: the right part starts where the left part's sort stopped scanning */

@@ -162,7 +162,7 @@ void xn_light_begin_frame(void);
    camera's rays of its column and row) times its z. Each light adds
    (falloff[(d^2 * light falloff) >> 32] * intensity) >> 12 to the base row while that index
    is below 8000h (d^2 from the squares table, Q-LIGHT-04); the sum is clamped to the last
-   row. */
-s32 xn_light_shade(const struct xn_light_shader *shader, s32 ray_y, s32 ray_x, s32 z);
+   row. The shade is an address: the row's, its low byte a fraction (iptr). */
+iptr xn_light_shade(const struct xn_light_shader *shader, s32 ray_y, s32 ray_x, s32 z);
 
 #endif

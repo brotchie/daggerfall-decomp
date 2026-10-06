@@ -25,6 +25,7 @@
 #define XMAT_H
 
 #include "xngine.h"
+#include "ptrint.h"                     /* iptr: an int that holds an address */
 
 extern s32 xn_cam_scale_x;              /* the view's x and y scales (xcam.h) */
 extern s32 xn_cam_scale_y;

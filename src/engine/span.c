@@ -13,7 +13,7 @@
 
 /* colour c through a shade row: the row's address (a shade: its low byte is a fraction) with
    the low byte replaced */
-#define ROW(row, c)     (*(const u8 *)(((u32)(row) & ~0xFFu) | (c)))
+#define ROW(row, c)     (*(const u8 *)(((uptr)(row) & ~(uptr)0xFF) | (c)))
 
 /* the polygon's packed texture origin (+18h: u in the low word, v in the high one) */
 #define TEX_ORIGIN(poly) (*(const u32 *)&(poly)->tex_u0)
@@ -58,7 +58,7 @@ static s32 lit_z(u32 inv_z)
     return (s32)xn_udiv64_or0(0x4000, 0, inv_z);
 }
 
-void xn_span_solid_lit_tail(u8 *pix, s32 n, u32 base, u32 shade, s32 step)
+void xn_span_solid_lit_tail(u8 *pix, s32 n, uptr base, uptr shade, s32 step)
 {
     s32 k;
 
@@ -66,7 +66,7 @@ void xn_span_solid_lit_tail(u8 *pix, s32 n, u32 base, u32 shade, s32 step)
         /* Quirk Q-SPAN-01: only the shade's bits 8-15 move the address; its top half stays
            the start shade's (base, whose low byte is the colour), so a carry out of bit 15
            is lost */
-        pix[k] = *(const u8 *)((base & 0xFFFF00FFu) | (shade & 0xFF00u));
+        pix[k] = *(const u8 *)((base & ~(uptr)0xFF00) | (shade & 0xFF00u));
         shade += step;
     }
 }
@@ -78,7 +78,7 @@ void xn_span_solid_lit(struct xn_poly *poly, const struct xn_span *span, s32 xs,
     s32 ray_x = xn_cam_dir_x_mid[xs];
     u32 inv_z = span->inv_z;
     u8 colour = (u8)poly->colour4;
-    s32 start, shade;
+    iptr start, shade;                  /* shades: row addresses, a fraction in the low byte */
 
     start = xn_light_shade(shader, ray_y, ray_x, lit_z(inv_z));
     if (n >= 16) {
@@ -86,17 +86,17 @@ void xn_span_solid_lit(struct xn_poly *poly, const struct xn_span *span, s32 xs,
         s32 dz16 = poly->inv_z_step * 2;
 
         do {
-            u32 base = ((u32)start & ~0xFFu) | colour;
-            u32 sh = start;
+            uptr base = ((uptr)start & ~(uptr)0xFF) | colour;
+            uptr sh = start;
             s32 step, k;
 
             inv_z += dz16;
             ray_x += RAY_DX16;
             shade = xn_light_shade(shader, ray_y, ray_x, lit_z(inv_z));
-            step = (shade - start) >> 3;
+            step = (s32)(shade - start) >> 3;
             /* one lookup for each pixel pair */
             for (k = 0; k < 16; k += 2) {
-                u8 c = *(const u8 *)((base & 0xFFFF00FFu) | (sh & 0xFF00u));    /* Q-SPAN-01 */
+                u8 c = *(const u8 *)((base & ~(uptr)0xFF00) | (sh & 0xFF00u));  /* Q-SPAN-01 */
 
                 sh += step;
                 pix[k] = c;
@@ -112,8 +112,8 @@ void xn_span_solid_lit(struct xn_poly *poly, const struct xn_span *span, s32 xs,
     /* the last n pixels: the shade at x + n, the step divided by n */
     ray_x += xn_cam_dir_x_mid[n];
     shade = xn_light_shade(shader, ray_y, ray_x, lit_z(n * poly->inv_z_dx + inv_z));
-    xn_span_solid_lit_tail(pix, n, ((u32)start & ~0xFFu) | colour, start,
-                           (s32)((shade - start) * xn_recip16_table[n]) >> 16);
+    xn_span_solid_lit_tail(pix, n, ((uptr)start & ~(uptr)0xFF) | colour, start,
+                           (s32)((u32)(shade - start) * xn_recip16_table[n]) >> 16);
 }
 
 /* ---- textured -------------------------------------------------------------------------------- */
@@ -269,12 +269,13 @@ void xn_span_tex_lit(struct xn_poly *poly, const struct xn_span *span, s32 xs, s
     s32 ray_x = xn_cam_dir_x_mid[xs];
     u32 inv_z = span->inv_z;
     s32 z = Z_OF(inv_z);
-    s32 start = xn_light_shade(shader, ray_y, ray_x, z);
+    iptr start = xn_light_shade(shader, ray_y, ray_x, z);
     s32 u_num = xs * poly->u_dx + xn_render_row_y * poly->u_dy + poly->u_c;
     s32 u_prev = xn_mulhi(u_num, z);
     s32 v_num = xs * poly->v_dx + xn_render_row_y * poly->v_dy + poly->v_c;
     s32 v_prev = xn_mulhi(v_num, z);
-    s32 u, v, shade;
+    s32 u, v;
+    iptr shade;
 
     if (n >= 16) {
         s32 blocks = n >> 4;
@@ -289,7 +290,7 @@ void xn_span_tex_lit(struct xn_poly *poly, const struct xn_span *span, s32 xs, s
             u = xn_mulhi(z, u_num);
             v = xn_mulhi(z, v_num);
             xn_tmap_draw(pix, 16, ((u32)u_prev << 16 | (u16)v_prev) + TEX_ORIGIN(poly),
-                         uv_step(u - u_prev, v - v_prev, 4), start, (shade - start) >> 3,
+                         uv_step(u - u_prev, v - v_prev, 4), start, (s32)(shade - start) >> 3,
                          texels, mask);
             u_prev = u;
             v_prev = v;
@@ -309,7 +310,7 @@ void xn_span_tex_lit(struct xn_poly *poly, const struct xn_span *span, s32 xs, s
     xn_tmap_draw(pix, n, ((u32)u_prev << 16 | (u16)v_prev) + TEX_ORIGIN(poly),
                  ((u32)((u - u_prev) * xn_recip16_table[n]) & 0xFFFF0000u) |
                      (u16)((s32)((v - v_prev) * xn_recip16_table[n]) >> 16),
-                 start, (shade - start) >> 3, texels, mask);
+                 start, (s32)(shade - start) >> 3, texels, mask);
 }
 
 /* ---- the terrain's 64 x 64 textures ------------------------------------------------------------ */

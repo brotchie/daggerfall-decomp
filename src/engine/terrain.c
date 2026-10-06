@@ -90,9 +90,9 @@ void xn_terrain_build_light_list(void)
             light++;
         } while (--n != 0);
     }
-    /* the end mark is an entry's first dword; the next list starts right after it */
-    *(s32 *)out = -1;
-    xn_render_light_list_next = (struct xn_light_ref *)((u8 *)out + 4);
+    /* the end mark is an entry's light pointer, -1; the next list starts right after it */
+    *(iptr *)out = -1;
+    xn_render_light_list_next = (struct xn_light_ref *)((u8 *)out + PTR_SIZE);
 }
 
 void xn_terrain_add_nature_flats(void)
@@ -427,7 +427,7 @@ static const xn_terrain_axis_fn v_axis_fns[8] = {
 /* The next polygon record as cell v's: the span setup, the texture axes of the tile's
    rotation and flips (the flat byte's bits 0, u, and 1, v), the tile's texture (by the
    animation clock) */
-static struct xn_poly *cell_poly(u32 v, u32 setup, u32 archive, s32 u0, s32 v0)
+static struct xn_poly *cell_poly(u32 v, uptr setup, u32 archive, s32 u0, s32 v0)
 {
     struct xn_poly *p = xn_render_poly_next;
     const struct xn_vert_flags *f = &xn_vert_flags[v];
@@ -456,7 +456,7 @@ static u32 with_corner(u32 outcodes, u32 v)
 /* the outcodes for the clipper: the OR without bit 7 */
 #define CLIP_OUTCODES(oc)   ((oc) & 0x7FFF)
 
-static void draw_cell(u32 v, u32 setup, u32 archive, s32 u0, s32 v0)
+static void draw_cell(u32 v, uptr setup, u32 archive, s32 u0, s32 v0)
 {
     u32 first = xn_vert_flags[v].terrain_outcode & 0x7F;
     u32 oc = first << 8 | first;
@@ -501,14 +501,16 @@ static void draw_cell(u32 v, u32 setup, u32 archive, s32 u0, s32 v0)
 
 int xn_terrain_draw_cells(void)
 {
-    u32 archive, setup, v = 0;
+    u32 archive;
+    uptr setup;                         /* the span setup's address */
+    u32 v = 0;
     s32 rows, cols, u0, v0, row_u0;
 
     xn_terrain_setup_tex_gradients(&u0, &v0);
     archive = xn_world_ground_archive;
     if (xn_tex_cache_lookup(archive, 0, -1) == 0)
         return 0;
-    setup = (u32)xn_render_span_setup(16);
+    setup = (uptr)xn_render_span_setup(16);
     for (rows = XN_GRID_SIDE - 1; rows != 0; rows--) {
         row_u0 = u0;
         for (cols = XN_GRID_SIDE - 1; cols != 0; cols--) {

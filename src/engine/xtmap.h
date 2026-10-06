@@ -62,8 +62,9 @@ void xn_tmap_rebase(void *handle, u8 *texels);
 void xn_tmap_pool_reset(void);
 
 /* Draws pix[0..n-1] (n <= 16): pixel k is texels[uv's texel & mask] through the shade row of
-   its pair (shade, then shade + shade_step for pixels 2-3, ...); uv += step every pixel. */
-void xn_tmap_draw(u8 *pix, s32 n, u32 uv, u32 step, u32 shade, s32 shade_step,
+   its pair (shade, then shade + shade_step for pixels 2-3, ...); uv += step every pixel.
+   shade: a row's address, its low byte a fraction (uptr). */
+void xn_tmap_draw(u8 *pix, s32 n, u32 uv, u32 step, uptr shade, s32 shade_step,
                   const u8 *texels, u32 mask);
 
 #endif

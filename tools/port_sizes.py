@@ -91,10 +91,11 @@ ENGINE_PAIRS = [
     ("offsetof(struct monster_anim, anim_request)", "offsetof(struct xn_anim, request)"),
 ]
 
-NATIVE_FLAGS = ["-std=gnu89", "-funsigned-char", "-DDAGGER_PORT", "-include",
+# both packed to 1 byte, as Watcom's default and the native build (port/CMakeLists.txt)
+NATIVE_FLAGS = ["-std=gnu89", "-funsigned-char", "-fpack-struct=1", "-DDAGGER_PORT", "-include",
                 "port/include/port.h", "-Iport/include", "-Iinclude", "-w"]
 I386_FLAGS = ["-target", "i386-unknown-none", "-fsyntax-only", "-std=gnu89",
-              "-funsigned-char", "-Iinclude", "-Wno-gnu-folding-constant"]
+              "-funsigned-char", "-fpack-struct=1", "-Iinclude", "-Wno-gnu-folding-constant"]
 
 
 def native_values(exprs, prelude):

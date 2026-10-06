@@ -97,8 +97,8 @@ void xn_span_solid_lit(struct xn_poly *poly, const struct xn_span *span, s32 xs,
 
 /* The lit span's last n pixels (n < 16): the colour through a shade that starts at `shade`
    and moves by `step` a pixel. base: the start shade with the colour in its low byte; only
-   the shade's bits 8-15 move the address (Q-SPAN-01). */
-void xn_span_solid_lit_tail(u8 *pix, s32 n, u32 base, u32 shade, s32 step);
+   the shade's bits 8-15 move the address (Q-SPAN-01). Both are addresses (uptr). */
+void xn_span_solid_lit_tail(u8 *pix, s32 n, uptr base, uptr shade, s32 step);
 
 /* ---- textured ------------------------------------------------------------------------------ */
 

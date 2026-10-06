@@ -66,7 +66,7 @@ void xn_shade_load_haze(s32 n)
     u8 *buf;
 
     xn_str_from_int(n, xn_haze_filename + 5, 3);            /* "HAZE.nnn" */
-    buf = (u8 *)(((u32)func_000A10A8(0x4100) + 0xFF) & ~0xFFu);
+    buf = (u8 *)(((uptr)func_000A10A8(0x4100) + 0xFF) & ~(uptr)0xFF);
     xn_fog_table_last = (u8 *)xn_dos_load_file(xn_haze_filename, buf) +
                         (SHADE_ROWS - 1) * SHADE_ROW;
 }
@@ -99,12 +99,12 @@ void xn_shade_fog_span_off(const struct xn_poly *poly, const struct xn_span *spa
     (void)pix;
 }
 
-void xn_shade_fog_pixels(u8 *pix, s32 n, u32 row, s32 step)
+void xn_shade_fog_pixels(u8 *pix, s32 n, uptr row, s32 step)
 {
     s32 k;
 
     for (k = 0; k < n; k++) {
-        pix[k] = *(const u8 *)((row & ~0xFFu) | pix[k]);
+        pix[k] = *(const u8 *)((row & ~(uptr)0xFF) | pix[k]);
         row += step;
     }
 }
@@ -112,9 +112,9 @@ void xn_shade_fog_pixels(u8 *pix, s32 n, u32 row, s32 step)
 /* The fog row of depth inv_z: the fog table's level step * 2^32 / inv_z - start * step
    bytes before its last level, plus that position's fraction (the low byte, which the pixel
    replaces). */
-static u32 fog_row(u32 inv_z)
+static uptr fog_row(u32 inv_z)
 {
-    return (u32)xn_fog_table_last + (u32)xn_fog_start * xn_fog_step -
+    return (uptr)xn_fog_table_last + (u32)xn_fog_start * xn_fog_step -
            xn_udiv64_or0(xn_fog_step, 0, inv_z);
 }
 

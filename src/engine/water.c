@@ -236,7 +236,7 @@ void xn_water_span(u8 *row, const s32 *jitter, s32 x0, s32 x1)
         return;
     /* the asm's tint pointer has the pixel put in its low byte: only bits 8-31 count */
     xn_water_span_unrolled(row + x0, jitter + x0, n,
-                           (const u8 *)((u32)xn_water_tint_table & ~0xFFu));
+                           (const u8 *)((uptr)xn_water_tint_table & ~(uptr)0xFF));
 }
 
 void xn_water_span_unrolled(u8 *pix, const s32 *jitter, s32 n, const u8 *tint)

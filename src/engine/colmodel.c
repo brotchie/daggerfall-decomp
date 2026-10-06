@@ -146,8 +146,8 @@ swap:
 
 /* ---- a segment against a model ------------------------------------------------------------ */
 
-s32 xn_collide_segment_model(struct xn_model_handle *h, const xn_vec3 *start,
-                             const xn_vec3 *end, s32 mode)
+iptr xn_collide_segment_model(struct xn_model_handle *h, const xn_vec3 *start,
+                              const xn_vec3 *end, s32 mode)
 {
     struct xn_model *m = h->model;
     struct xn_collide_hits *hits = HIT_LIST;
@@ -215,7 +215,7 @@ s32 xn_collide_segment_model(struct xn_model_handle *h, const xn_vec3 *start,
         }
         e++;
     } while (--left != 0);
-    return hits->count >= 1 ? (s32)hits : -1;
+    return hits->count >= 1 ? (iptr)hits : -1;
 }
 
 /* ---- two models --------------------------------------------------------------------------- */
@@ -242,7 +242,7 @@ static void relative_rotation(xn_mat3 *rel, const xn_mat3 *rot_inv, s32 angle_x,
     xn_mat_mul_fixed(&rel->m[0][0], &rot_inv->m[0][0], &probe.m[0][0], 3, 3, 3, FIXED_SHIFT);
 }
 
-s32 xn_collide_spheres_model(struct xn_model_handle *h, struct xn_collide_probe *p, s32 mode)
+iptr xn_collide_spheres_model(struct xn_model_handle *h, struct xn_collide_probe *p, s32 mode)
 {
     struct xn_model *m = h->model;
     struct xn_collide_probe_sphere *ps, **met = PROBE_MET, *local = PROBE_LOCAL;
@@ -350,7 +350,7 @@ s32 xn_collide_spheres_model(struct xn_model_handle *h, struct xn_collide_probe 
         }
         e++;
     } while (--left != 0);
-    return hits->count >= 1 ? (s32)hits : -1;
+    return hits->count >= 1 ? (iptr)hits : -1;
 }
 
 /* ---- probes ------------------------------------------------------------------------------- */
@@ -389,7 +389,7 @@ s32 xn_collide_segment_spheres(struct xn_collide_probe *p, const xn_vec3 *start,
     return -1;
 }
 
-s32 xn_collide_spheres_spheres(struct xn_collide_probe *a, struct xn_collide_probe *b)
+iptr xn_collide_spheres_spheres(struct xn_collide_probe *a, struct xn_collide_probe *b)
 {
     struct xn_collide_probe_sphere *sa, *sb;
     struct xn_collide_hits *hits = HIT_LIST;
@@ -433,7 +433,7 @@ s32 xn_collide_spheres_spheres(struct xn_collide_probe *a, struct xn_collide_pro
         } while (--lb != 0);
         sa++;
     } while (--la != 0);
-    return hits->count > 0 ? (s32)hits : -1;
+    return hits->count > 0 ? (iptr)hits : -1;
 }
 
 s32 xn_collide_miss_stk(s32 a, s32 b)
@@ -450,8 +450,8 @@ s32 xn_collide_miss(void)
 
 /* ---- a segment against a flat ------------------------------------------------------------- */
 
-s32 xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
-                            u32 image, u32 flags, s32 scale, s32 mode)
+iptr xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
+                             u32 image, u32 flags, s32 scale, s32 mode)
 {
     struct xn_collide_hits *hits = HIT_LIST;
     struct xn_collide_hit *hit = hits->hits;
@@ -501,11 +501,11 @@ s32 xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_v
     hit->nz = round8(normal.z) + pos->z;
     hit->face = -1;
     hit->t_half = (s16)(t >> 1);
-    return (s32)hits;
+    return (iptr)hits;
 }
 
-s32 xn_collide_segment_flat_stk(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
-                                u32 image, u32 flags, s32 scale, s32 mode)
+iptr xn_collide_segment_flat_stk(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
+                                 u32 image, u32 flags, s32 scale, s32 mode)
 {
     return xn_collide_segment_flat(pos, start, end, image, flags, scale, mode);
 }
@@ -529,7 +529,7 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
     const struct xn_model_face *face = model_at(m, m->face_offset);
     s32 min[3], max[3], first[3], centre[3], cells[3], left[3];
     s32 cell, radius, k, axis, ncells, dist, rr, rem, face_index, faces_left;
-    s32 *node, *list, *next_node;
+    iptr *node, *list, *next_node;      /* the cells' lists: nodes {next, face, normal4} */
     xn_vec3 n, foot, at;
     xn_s64 t;
     u8 *o;
@@ -563,10 +563,10 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
         cells[axis] = xn_s64_divrem_or0(&t, cell, &rem) + 1;
     }
     ncells = cells[2] * cells[0] * cells[1];
-    if (ncells * 4 >= 0x10000)
+    if (ncells * (s32)sizeof(iptr) >= 0x10000)
         return -1;
     /* the cells' face lists' heads in big_buffer, the nodes {next, face, normal4} after them */
-    list = (s32 *)big_buffer;
+    list = (iptr *)big_buffer;
     k = ncells;
     do
         *list++ = 0;
@@ -581,7 +581,7 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
     do {
         anchor = face_anchor(face, points);
         normal16(&n, normal);
-        list = (s32 *)big_buffer;
+        list = (iptr *)big_buffer;
         for (left[2] = cells[2]; left[2] != 0; left[2]--) {
             for (left[1] = cells[1]; left[1] != 0; left[1]--) {
                 for (left[0] = cells[0]; left[0] != 0; left[0]--) {
@@ -600,11 +600,11 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
                             xn_collide_face_test_edges(&foot, face, points, rr) >= 0) {
                             node = next_node;
                             node[0] = *list;
-                            *list = (s32)node;
+                            *list = (iptr)node;
                             node[1] = (u8 *)face - (u8 *)m;
                             node[2] = face_index << 2;
                             next_node = node + 3;
-                            if ((u8 *)next_node + 12 - big_buffer >= 0x10000)
+                            if ((u8 *)next_node + 3 * sizeof(iptr) - big_buffer >= 0x10000)
                                 return -1;
                         }
                     }
@@ -623,13 +623,13 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
         face_index++;
     } while (--faces_left != 0);
     /* a sphere for each cell with faces: centre, radius, its list */
-    list = (s32 *)big_buffer;
+    list = (iptr *)big_buffer;
     o = out;
     *count = 0;
     for (left[2] = cells[2]; left[2] != 0; left[2]--) {
         for (left[1] = cells[1]; left[1] != 0; left[1]--) {
             for (left[0] = cells[0]; left[0] != 0; left[0]--) {
-                node = (s32 *)*list;
+                node = (iptr *)*list;
                 if (node != 0) {
                     struct xn_model_sphere *s = (struct xn_model_sphere *)o;
 
@@ -641,11 +641,11 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
                     o += 0x12;
                     entries = 0;
                     do {
-                        ((struct xn_model_sphere_face *)o)->face = node[1];
+                        ((struct xn_model_sphere_face *)o)->face = (s32)node[1];
                         ((struct xn_model_sphere_face *)o)->normal4 = (u16)node[2];
                         o += 6;
                         entries++;
-                        node = (s32 *)node[0];
+                        node = (iptr *)node[0];
                     } while (node != 0);
                     s->face_count = entries;
                 }
@@ -658,5 +658,5 @@ s32 xn_collide_build_model_spheres(struct xn_model *m, s32 r, u8 *out, s32 *coun
         centre[1] = first[1];
         centre[2] += cell;
     }
-    return o - out;
+    return (s32)(o - out);
 }

@@ -10,7 +10,7 @@
 #define WORK_MIN        0x10000         /* the work buffer's least size */
 #define WORK_ALIGN      0x20
 
-u32 xn_mem_align_up(u32 p, u32 align)
+uptr xn_mem_align_up(uptr p, uptr align)
 {
     return (p + align - 1) & ~(align - 1);
 }
@@ -39,7 +39,7 @@ void xn_mem_init(u32 size)
         return;                         /* (not reached) */
     }
     xn_mem_work_block = block;
-    big_buffer = (u8 *)xn_mem_align_up((u32)block, WORK_ALIGN);
+    big_buffer = (u8 *)xn_mem_align_up((uptr)block, WORK_ALIGN);
     xn_dpmi_segment_selector(0x40, &xn_sel_bios_data);
     xn_dpmi_segment_selector(0xA000, &xn_sel_vga);
     xn_sys_psp_addr = (u32)xn_dos_psp() << 4;

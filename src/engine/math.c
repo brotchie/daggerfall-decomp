@@ -371,5 +371,5 @@ s32 xn_math_isqrt_lookup(u32 v)
    reaches 0 when x is 0x10000 and z is 0. This keeps what the game got. */
 void xn_math_isqrt_b(xn_regs *r)
 {
-    r->eax = r->eax != 0 ? xn_math_isqrt(r->eax) : xn_math_isqrt_zero(r->ecx);
+    r->eax = r->eax != 0 ? xn_math_isqrt((s32)r->eax) : xn_math_isqrt_zero((s32)r->ecx);
 }

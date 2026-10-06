@@ -353,8 +353,9 @@ static void walk_projected(const struct xn_model_face *face)
         }
         at += 4;
     } while (--left != 0);
-    xn_poly_rasterize(top_y, (struct xn_poly_vertex **)((u8 *)xn_poly_ring_a[at >> 2] + top_at),
-                      n);
+    /* (top_at counts the asm's 4-byte ring entries: natively PTR_SIZE each) */
+    xn_poly_rasterize(top_y, (struct xn_poly_vertex **)((u8 *)xn_poly_ring_a[at >> 2] +
+                                                        top_at * (PTR_SIZE / 4)), n);
 }
 
 int xn_poly_project_face(const struct xn_model_face *face, u32 codes)
@@ -368,7 +369,7 @@ int xn_poly_project_face(const struct xn_model_face *face, u32 codes)
 
     if ((codes & 0xFF00) == 0) {
         walk_projected(face);
-        return (u32)spans < (u32)xn_render_span_next;
+        return (uptr)spans < (uptr)xn_render_span_next;
     }
     xn_poly_clip_outcode_and = (u8)codes;
     xn_poly_clip_outcode_or = (u8)(codes >> 8);
@@ -392,7 +393,7 @@ int xn_poly_project_face(const struct xn_model_face *face, u32 codes)
     if ((u8)n >= 0x1C)                  /* Quirk Q-POLY-03 */
         return 0;
     xn_poly_rasterize(top_y, ring_at(n, top), n);
-    return (u32)spans < (u32)xn_render_span_next;
+    return (uptr)spans < (uptr)xn_render_span_next;
 }
 
 void xn_poly_project_terrain(int n)
@@ -457,7 +458,7 @@ void xn_poly_setup_textured(struct xn_poly *poly, const struct xn_span *span, s3
     if ((d >> (xn_gfx_width == 320 ? 18 : 25)) == 0)
         kind += 12;
     poly->span_fn = xn_render_tmap_span_fns[kind / 4];
-    xn_poly_tex_gradients((const xn_mat3 *)poly->handle->matrix, poly->face->points[2].data,
+    xn_poly_tex_gradients((const xn_mat3 *)poly->handle->matrix, XN_FACE_DATA(poly->face),
                           poly);
     /* the gradients at the face's first vertex: the texture origin, u in 6.26, v in 22.10 */
     sx = poly->cam_x * xn_cam_half_width;

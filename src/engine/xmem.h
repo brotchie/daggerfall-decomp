@@ -20,6 +20,7 @@
 #define XMEM_H
 
 #include "xngine.h"
+#include "ptrint.h"                     /* uptr: an int that holds an address */
 
 extern u8 *big_buffer;                      /* the work buffer, 32-byte aligned (0x147954) */
 extern u8 *xn_mem_work_block;               /* the block as allocated (0x147958) */
@@ -39,8 +40,9 @@ void *func_000A10A8(u32 size);
 void func_000A117E(void *block);
 
 /* (p + align - 1) rounded down to a multiple of align (a power of 2). init_game_data and
-   color_init_remap_tables align their 256-byte tables (water.tbl, haze.000/001). */
-u32 xn_mem_align_up(u32 p, u32 align);
+   color_init_remap_tables align their 256-byte tables (water.tbl, haze.000/001): p is an
+   address (uptr). */
+uptr xn_mem_align_up(uptr p, uptr align);
 
 /* init_video: the work buffer (size + 32 bytes, at least 64K: its start aligned to 32 bytes;
    without the memory: the keyboard, joystick and video put back, 'SYSTEM: Unable to

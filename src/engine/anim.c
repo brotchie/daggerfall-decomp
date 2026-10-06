@@ -2,6 +2,7 @@
    documentation are in xanim.h). */
 #include "xanim.h"
 #include "xpc.h"
+#include "doslow.h"                     /* DOS_LOW: real-mode memory (Q-ANIM-01, Q-ANIM-02) */
 
 #define STATE_NONE_ENTRY 0x8000             /* a state table entry: none (use state 0's) */
 
@@ -37,7 +38,8 @@ s32 xn_anim_reset(struct xn_anim *a)
 s32 xn_anim_reset_with_rate(struct xn_anim *a, u16 tick_divisor)
 {
     xn_anim_reset(a);
-    *(volatile u16 *)0x0C = tick_divisor;   /* Quirk Q-ANIM-01: through the reset's 0 */
+    /* Quirk Q-ANIM-01: through the reset's 0 (the real-mode int 3 vector's offset) */
+    *(volatile u16 *)DOS_LOW(0x0C) = tick_divisor;
     return 0;
 }
 
@@ -183,8 +185,9 @@ s32 xn_anim_op_restart(struct xn_anim *a, xn_ascr_pos *pos)
 {
     u32 offset = ((const struct xn_ascr *)a->script)->restart;
 
-    a->pos = (u8 *)offset;                  /* Quirk Q-ANIM-02: the bare offset */
-    *pos = (xn_ascr_pos)offset;
+    /* Quirk Q-ANIM-02: the bare offset, an address in low memory */
+    a->pos = (u8 *)DOS_LOW(offset);
+    *pos = (xn_ascr_pos)DOS_LOW(offset);
     return 1;
 }
 

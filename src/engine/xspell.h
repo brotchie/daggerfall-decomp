@@ -21,6 +21,7 @@
 #define XSPELL_H
 
 #include "xngine.h"
+#include "ptrint.h"                     /* iptr: an int that holds an address */
 
 /* The game's cost formulas 1..7 (0xCAF24): spell_cost_duration_chance ... */
 extern s32 (*spell_cost_formulas[7])(void);

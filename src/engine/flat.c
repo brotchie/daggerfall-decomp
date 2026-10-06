@@ -7,6 +7,7 @@
 #include "xmath.h"
 #include "xspan.h"
 #include "xlight.h"
+#include "xshade.h"                     /* the fog: xn_fog_start, _step, _table_last */
 
 extern struct xn_sort_pair xn_flat_sort_list[512];
 extern struct xn_sort_pair *xn_flat_sort_end;
@@ -19,11 +20,10 @@ extern xn_mat3 xn_flat_proj_matrix;     /* scaled for the flats' projection */
 extern xn_vec3 xn_scratch_vec_b;        /* the pick's screen point (x, y) */
 extern s32 xn_pick_flat_x, xn_pick_flat_y, xn_pick_flat_z;
 extern u8 xn_pick_skip_flats;
-extern s32 xn_fog_start, xn_fog_step, xn_fog_table_last;
 
 /* ---- queueing ------------------------------------------------------------------------------ */
 
-u32 xn_flat_add(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale)
+uptr xn_flat_add(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale)
 {
     return xn_flat_add_body(x, y, z, image, frame, flags, scale);
 }
@@ -47,7 +47,7 @@ static struct xn_flat *new_flat(u32 image, s32 frame, u32 flags, const xn_vec3 *
     return flat;
 }
 
-u32 xn_flat_add_body(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale)
+uptr xn_flat_add_body(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale)
 {
     struct xn_flat *flat;
     xn_vec3 v;
@@ -62,7 +62,7 @@ u32 xn_flat_add_body(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 s
         return scale;
     flat = new_flat(image, frame, flags, &v);
     *(u32 *)&flat->scale = scale;       /* the scale word, the light byte and one more */
-    return (u32)flat;
+    return (uptr)flat;
 }
 
 void xn_flat_add_view(s32 x, s32 y, s32 z, u32 image)
@@ -373,7 +373,7 @@ static u8 *fog_row(const struct xn_flat *flat)
 {
     s32 d = (s32)((u32)flat->view_z >> 8) - xn_fog_start;
 
-    return (u8 *)(xn_fog_table_last - d * xn_fog_step);
+    return xn_fog_table_last - d * (s32)xn_fog_step;
 }
 
 /* beyond the fog's start: the true comparison (the asm's `sub; jle`) */
@@ -456,8 +456,8 @@ struct xn_flat *xn_flat_pick(s32 x, s32 y)
     do {                                /* nearest first */
         struct xn_flat *flat = (struct xn_flat *)pair->value;
         /* Quirk Q-FLAT-05: a missing image (the cache full) is read at address 0 */
-        struct xn_tex_image *image = xn_tex_cache_lookup_image(flat->image >> 7,
-                                                               flat->image & 0x7F);
+        struct xn_tex_image *image = (struct xn_tex_image *)XN_LOW_IF_NULL(
+            xn_tex_cache_lookup_image(flat->image >> 7, flat->image & 0x7F));
         u32 scale = *(u32 *)&flat->scale & 0xFFFF;
 
         build_quad(flat, image->width * scale, image->height * scale);

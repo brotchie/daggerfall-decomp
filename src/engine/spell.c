@@ -14,7 +14,7 @@ s32 spell_cost_formula_dispatch(s32 formula)
 
 s32 spell_effect_dispatch(s32 type, void *spell, s32 slot, void *target)
 {
-    return xn_tail_jump3(spell_effect_handlers[type], (s32)spell, slot, (s32)target);
+    return xn_tail_jump3(spell_effect_handlers[type], (iptr)spell, slot, (iptr)target);
 }
 
 void xn_spell_kludge_menu_dispatch(s32 row)

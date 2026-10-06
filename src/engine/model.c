@@ -32,8 +32,9 @@ extern char xn_model_msg_too_many_verts[], xn_model_msg_corrupted[];
 
 #define VERT_FLAGS_MAX  1024            /* the vertex arrays' entries */
 
-/* the handle whose angles the game passes (&handle->pad_0c) */
-#define HANDLE_OF(angles) ((struct xn_model_handle *)((u8 *)(angles) - 0x0C))
+/* the handle whose angles the game passes (&handle->pad_0c: +0Ch, natively +18h) */
+#define HANDLE_OF(angles) \
+    ((struct xn_model_handle *)((u8 *)(angles) - XN_OFFSETOF(struct xn_model_handle, pad_0c)))
 
 /* a model's lists: by their offsets from the model's start */
 #define POINTS(m) ((const xn_vec3 *)((const u8 *)(m) + (m)->point_offset))
@@ -350,7 +351,7 @@ void xn_model_calc_face_planes(struct xn_model *m)
         const xn_vec3 *p = POINT_AT(POINTS(m), f->points[0].vertex);
 
         f->points[1].plane_d = p->x * n->x + p->y * n->y + p->z * n->z;
-        f->points[2].data = d;
+        XN_SET_FACE_DATA(f, d);
         d++;
         n++;
         f = NEXT_FACE(f);
@@ -675,9 +676,9 @@ void xn_model_build_light_list(struct xn_model_handle *h)
         ref->range_sq = light->range_sq << 4;
         ref++;
     }
-    /* the end mark; the next list starts after it */
-    *(s32 *)ref = -1;
-    xn_render_light_list_next = (struct xn_light_ref *)((u8 *)ref + 4);
+    /* the end mark (a light pointer of -1); the next list starts after it */
+    *(iptr *)ref = -1;
+    xn_render_light_list_next = (struct xn_light_ref *)((u8 *)ref + PTR_SIZE);
 }
 
 void xn_model_scale_matrix(struct xn_model_matrix_slot *slot)

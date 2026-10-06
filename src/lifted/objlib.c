@@ -74,7 +74,7 @@ extern void xn_math_yaw_offset_xz(int, int, int *, int *);
 extern int xn_model_max_y(void *);
 extern int xn_light_add(int, int, int, int, int, int);
 extern void xn_model_prepare(void *);
-extern int xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
+extern iptr xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
 extern void arch3d_apply_climate_textures(struct arch3d_header *);
 extern void fatal_error(iptr);
 extern void mem_pool_init(iptr, int);

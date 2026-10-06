@@ -24,6 +24,10 @@
 
 void func_000A117E(void *p);            /* the game's free */
 
+#if defined(DAGGER_PORT)
+u32 *xn_world_offsets;                  /* the offset window (XN_WORLD_OFFSETS, xworld.h) */
+#endif
+
 /* a slot's first square in the layers */
 static u32 slot_origin(s32 slot)
 {
@@ -72,7 +76,7 @@ void xn_world_init(void)
         return;
     }
     xn_world_layers_alloc = block;
-    layer = (u8 *)(((u32)block + 0x1F) & ~0x1Fu);
+    layer = (u8 *)(((uptr)block + 0x1F) & ~(uptr)0x1F);
     xn_world_height_layer = layer;
     xn_world_flat_layer = layer + XN_WORLD_LAYER;
     xn_world_tile_layer = layer + 2 * XN_WORLD_LAYER;
@@ -223,7 +227,7 @@ void xn_world_create_file(const char *name)
     xn_world_file = xn_dos_create(name);
     xn_world_header.offsets_size = (xn_world_header.width * xn_world_header.height + 1) * 4;
     offsets = func_000A10A8(xn_world_header.offsets_size);
-    xn_world_header.offsets = offsets;
+    XN_WORLD_OFFSETS = offsets;
     offsets[0] = xn_world_header.offsets_size + FILE_HEADER_BYTES + sizeof xn_world_height_bands;
 }
 
@@ -233,7 +237,13 @@ void xn_world_open(const char *name)
        xn_dos_open, so the asm's own message after it is never reached */
     xn_world_file = xn_dos_open(name);
     xn_world_read_header();
-    xn_world_read_height_bands((u8)(u32)name);     /* Quirk Q-WORLD-01 */
+#ifdef DAGGER_PORT
+    /* Quirk Q-WORLD-01 as FALL.EXE has it: the game's one call passes the name at 0x17521C,
+       so the mode is 1Ch, which DOS refuses (a native address's low byte could be 0-2) */
+    xn_world_read_height_bands(0x1C);
+#else
+    xn_world_read_height_bands((u8)(uptr)name);    /* Quirk Q-WORLD-01 */
+#endif
     fill(xn_world_height_layer, 0xFF, XN_WORLD_LAYER);
     xn_world_size_x = xn_world_header.width << 15;
     xn_world_size_z = xn_world_header.height << 15;
@@ -252,7 +262,7 @@ void xn_world_write_header(void)
     xn_world_header.bands_offset = xn_world_header.offsets_size + FILE_HEADER_BYTES;
     seek_to(0);
     xn_dos_write(xn_world_file, &xn_world_header, sizeof xn_world_header);
-    xn_dos_write(xn_world_file, xn_world_header.offsets, xn_world_header.offsets_size);
+    xn_dos_write(xn_world_file, XN_WORLD_OFFSETS, xn_world_header.offsets_size);
     xn_dos_write(xn_world_file, xn_world_height_bands, sizeof xn_world_height_bands);
 }
 
@@ -272,7 +282,7 @@ void xn_world_read_header(void)
         world_fatal(xn_world_msg_out_of_memory);
         return;
     }
-    xn_world_header.offsets = offsets;
+    XN_WORLD_OFFSETS = offsets;
     xn_dos_read(xn_world_file, offsets, n);
     seek_to(xn_world_header.offsets_size + FILE_HEADER_BYTES);     /* the band table */
     xn_world_offsets_window_count = n >> 2;
@@ -281,9 +291,9 @@ void xn_world_read_header(void)
 
 void xn_world_free_offsets(void)
 {
-    if (xn_world_header.offsets != 0) {
-        func_000A117E(xn_world_header.offsets);
-        xn_world_header.offsets = 0;
+    if (XN_WORLD_OFFSETS != 0) {
+        func_000A117E(XN_WORLD_OFFSETS);
+        XN_WORLD_OFFSETS = 0;
     }
 }
 
@@ -302,16 +312,16 @@ void xn_world_read_cell(s32 cell)
             first = last;
         xn_world_offsets_window_first = first;
         seek_to(first * 4 + FILE_HEADER_BYTES);
-        xn_dos_read(xn_world_file, xn_world_header.offsets, xn_world_offsets_window_bytes);
+        xn_dos_read(xn_world_file, XN_WORLD_OFFSETS, xn_world_offsets_window_bytes);
     }
-    seek_to(xn_world_header.offsets[cell - xn_world_offsets_window_first]);
+    seek_to(XN_WORLD_OFFSETS[cell - xn_world_offsets_window_first]);
     xn_dos_read(xn_world_file, &xn_world_cell_header, CELL_RECORD_HEADER);
     xn_dos_read(xn_world_file, big_buffer, full_cell() ? FULL_CELL_BYTES : CELL_CONTROLS);
 }
 
 void xn_world_write_cell(s32 cell, const void *data, u32 n)
 {
-    u32 *offsets = xn_world_header.offsets;
+    u32 *offsets = XN_WORLD_OFFSETS;
 
     seek_to(offsets[cell]);
     xn_dos_write(xn_world_file, data, n);

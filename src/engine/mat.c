@@ -105,7 +105,8 @@ void xn_mat_set_scale(xn_mat3 *m)
 {
     xn_mat_identity(&m->m[0][0], 28, 3);
     m->m[0][0] = xn_cam_scale_x << 14;
-    m->m[1][1] = (s32)m;                /* Quirk Q-MAT-01: meant xn_cam_scale_y << 14 */
+    m->m[1][1] = (s32)(iptr)m;          /* Quirk Q-MAT-01: meant xn_cam_scale_y << 14
+                                           (natively the address's low half) */
 }
 
 void xn_mat_transform(xn_vec3 *v, const xn_mat3 *m)

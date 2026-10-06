@@ -55,15 +55,16 @@ typedef struct xn_flat_walk {
 
 /* Queues a flat at the world position (x, y, z) for this frame (xn_flat_add_body). Returns
    the flat, or, when it is not queued (behind the eye, beyond the far plane, or the 513th),
-   the scale argument (Q-FLAT-02). 14 game sites. */
-u32 xn_flat_add(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale);
+   the scale argument (Q-FLAT-02). 14 game sites. The game keeps the result as the object's
+   draw handle: an address (uptr). */
+uptr xn_flat_add(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale);
 
 /* The flat at (x, y, z) into view space ((p - eye) << 8 through the view matrix), then a
    polygon record: image (archive << 7 | record), frame (the texture lookup's: -1 by the
    animation clock), flags (bits 0-4 the quad kind, 20h mirrored), scale (100h = 1.0; its
    third byte the light), and an entry of the flat sort list (key -z). Returns the flat, or
    the scale argument when it is not queued (Q-FLAT-02). */
-u32 xn_flat_add_body(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale);
+uptr xn_flat_add_body(s32 x, s32 y, s32 z, u32 image, s32 frame, u32 flags, u32 scale);
 
 /* Queues a flat already in view space: frame 0, standing (kind 4), scale 100h. The terrain's
    nature flats. */

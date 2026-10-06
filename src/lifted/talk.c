@@ -1581,7 +1581,8 @@ int factions_can_war(struct faction *faction1, struct faction *faction2)
 
 int faction_is_regional_noble(struct faction *faction)
 {
-    return (((faction->type == 7) && (faction->region != 255)) ? 1 : 0);
+    /* an empty enemy slot (0) reads the zero page under DOS: not a noble */
+    return (((DOS_NULL(faction)->type == 7) && (DOS_NULL(faction)->region != 255)) ? 1 : 0);
 }
 
 int faction_has_enemy(struct faction *faction, struct faction *other)

@@ -13,7 +13,7 @@ void xn_tmap_pool_alloc(void)
 
     if (block != 0) {
         xn_tmap_pool_block = block;
-        xn_tmap_pool = (u8 *)(((u32)block + 0x1F) & ~0x1Fu);
+        xn_tmap_pool = (u8 *)(((uptr)block + 0x1F) & ~(uptr)0x1F);
         xn_tmap_pool_count = 0;
         return;
     }
@@ -59,10 +59,10 @@ void xn_tmap_pool_reset(void)
     xn_tmap_pool_count = 0;
 }
 
-void xn_tmap_draw(u8 *pix, s32 n, u32 uv, u32 step, u32 shade, s32 shade_step,
+void xn_tmap_draw(u8 *pix, s32 n, u32 uv, u32 step, uptr shade, s32 shade_step,
                   const u8 *texels, u32 mask)
 {
-    u32 row = 0;
+    uptr row = 0;
     s32 k;
 
     for (k = 0; k < n; k++) {
@@ -70,7 +70,7 @@ void xn_tmap_draw(u8 *pix, s32 n, u32 uv, u32 step, u32 shade, s32 shade_step,
         u32 t = (uv >> 24 | (uv & 0xFF00u)) & mask;
 
         if ((k & 1) == 0) {
-            row = shade & ~0xFFu;               /* a pixel pair's shade row */
+            row = shade & ~(uptr)0xFF;          /* a pixel pair's shade row */
             shade += shade_step;
         }
         pix[k] = *(const u8 *)(row | texels[t]);

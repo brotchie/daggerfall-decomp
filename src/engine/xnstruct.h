@@ -17,16 +17,67 @@
      matrices), 16.16, 24.8...; angles are 2048 to a turn;
    - a pointer field holds a flat address, as every pointer in the game does.
 
+   The native build (docs/port.md: arm64, 8-byte pointers). Under Watcom every size below is
+   exact. Natively:
+   - a struct only the engine uses may grow with its pointers (RECORD_SIZE_P /
+     RECORD_OFFSET_P, as records.h checks the game's);
+   - a struct the game also sees has the layout the game's headers give it natively (the
+     model handle, the texture cache's entries and heap blocks, the animation state, the
+     polygon's first 16 bytes that the pick reads): XN_NATIVE_SIZE / XN_NATIVE_OFFSET check
+     it here, tools/port_sizes.py check against the game's headers;
+   - a struct read raw from a data file keeps the file's layout, so a 4-byte slot the engine
+     fills with an address after loading cannot hold one: each such slot has a native-only
+     layout, documented at the field (the texture image's mapper, a face's texture-axis
+     pointer, WOODS.WLD's offset window; the TEXTURE.nnn directory is widened when it is
+     loaded, tex.c).
+
    Use: include it after src/engine/xngine.h when both are used (both define xn_vec3 and
    xn_mat3; this file defines them only when XNGINE_H is not defined). The compiler runs
    under DOS: copy or rename it to an 8.3 name (e.g. xnstruct.h) where it is included. */
 #ifndef XN_ENGINE_STRUCTS_H
 #define XN_ENGINE_STRUCTS_H
 
+#include "ptrint.h"                   /* iptr, uptr: ints that hold addresses */
+
 #ifndef RECORD_SIZE
 #define RECORD_SIZE(tag, n) typedef char tag##_size_check[(sizeof(struct tag) == (n)) ? 1 : -1]
+#endif
+#ifndef RECORD_OFFSET
+#if defined(DAGGER_PORT)
+#define RECORD_OFFSET(tag, m, n) \
+    typedef char tag##_##m##_offset_check[(__builtin_offsetof(struct tag, m) == (n)) ? 1 : -1]
+#else
 #define RECORD_OFFSET(tag, m, n) \
     typedef char tag##_##m##_offset_check[((unsigned)&((struct tag *)0)->m == (n)) ? 1 : -1]
+#endif
+#endif
+/* a struct holding pointers: exact under Watcom, natively it may only grow (records.h's) */
+#ifndef RECORD_SIZE_P
+#if defined(DAGGER_PORT)
+#define RECORD_SIZE_P(tag, n) typedef char tag##_size_check[(sizeof(struct tag) >= (n)) ? 1 : -1]
+#define RECORD_OFFSET_P(tag, m, n) \
+    typedef char tag##_##m##_offset_check[(__builtin_offsetof(struct tag, m) >= (n)) ? 1 : -1]
+#else
+#define RECORD_SIZE_P(tag, n) RECORD_SIZE(tag, n)
+#define RECORD_OFFSET_P(tag, m, n) RECORD_OFFSET(tag, m, n)
+#endif
+#endif
+/* the native size and offsets of a struct the game also sees (nothing under Watcom) */
+#if defined(DAGGER_PORT)
+#define XN_NATIVE_SIZE(tag, n) \
+    typedef char tag##_native_size_check[(sizeof(struct tag) == (n)) ? 1 : -1]
+#define XN_NATIVE_OFFSET(tag, m, n) \
+    typedef char tag##_##m##_native_offset_check[(__builtin_offsetof(struct tag, m) == (n)) ? 1 : -1]
+#else
+#define XN_NATIVE_SIZE(tag, n) typedef char tag##_native_size_check[1]
+#define XN_NATIVE_OFFSET(tag, m, n) typedef char tag##_##m##_native_offset_check[1]
+#endif
+/* a member's offset as an int constant, where the asm wrote the number (records.h's
+   REC_OFFSETOF): the same constant under Watcom, the native layout's natively */
+#if defined(DAGGER_PORT)
+#define XN_OFFSETOF(type, m) ((int)__builtin_offsetof(type, m))
+#else
+#define XN_OFFSETOF(type, m) ((int)&((type *)0)->m)
 #endif
 
 #pragma pack(1)
@@ -143,7 +194,8 @@ struct xn_poly {
     union {
         struct xn_model_handle *handle; /* +0x04: model faces: the drawn model's handle
                                        (patch_140497; 15BC42 sets handle+39h bit 1) */
-        int owner;                  /*       1 terrain (13EC17), 0 flats: xn_pick_hit.model */
+        iptr owner;                 /*       1 terrain (13EC17), 0 flats: xn_pick_hit.model
+                                       (pointer-wide: the pick reads the whole slot) */
     };
     int shader_falloff[3];          /* +0x08: the asm's light shaders kept their per-light
                                        falloffs here; canonical C keeps them in the shader
@@ -214,7 +266,10 @@ struct xn_poly {
     int dx_per_inv_z;               /* +0x60: 2^32 / [+5Ch] (15BC55, 15BCA8; 0 when +5Ch is 0:
                                        the divide-error handler) */
 };                                  /* +0x64 */
-RECORD_SIZE(xn_poly, 100);
+RECORD_SIZE_P(xn_poly, 100);
+/* natively the pick's struct xn_pick_hit (include/structs.h) is the first 16 bytes */
+XN_NATIVE_OFFSET(xn_poly, handle, 8);
+XN_NATIVE_OFFSET(xn_poly, shader_falloff, 16);
 
 /* ---- spans: the S-buffer ----------------------------------------------------------------- */
 
@@ -235,7 +290,7 @@ struct xn_span {
                                        table with (inv_z >> 13) & 0xFFFF */
     struct xn_poly *poly;           /* +0x0C: the polygon drawn there */
 };                                  /* +0x10 */
-RECORD_SIZE(xn_span, 16);
+RECORD_SIZE_P(xn_span, 16);
 
 /* ---- the clipper's vertices --------------------------------------------------------------- */
 
@@ -265,7 +320,7 @@ struct xn_poly_clip_state {
     unsigned char outcode_or;       /* +0x11: xn_poly_clip_outcode_or (xn_cam_cull_sphere
                                        leaves a sphere's outcode here) */
 };                                  /* +0x12 */
-RECORD_SIZE(xn_poly_clip_state, 18);
+RECORD_SIZE_P(xn_poly_clip_state, 18);
 
 /* ---- the transformed-vertex arrays ---------------------------------------------------------- */
 
@@ -323,7 +378,7 @@ struct xn_sort_pair {
     int key;                        /* +0x00 */
     void *value;                    /* +0x04 */
 };                                  /* +0x08 */
-RECORD_SIZE(xn_sort_pair, 8);
+RECORD_SIZE_P(xn_sort_pair, 8);
 
 #pragma pack()
 
@@ -372,7 +427,8 @@ RECORD_SIZE(xn_light, 29);
  * terrain (xn_terrain_build_light_list 13E63C: directional lights only; every terrain
  * polygon's +14h points at it). Read by xn_light_setup_poly 15BC42 (through the polygon's
  * handle) and xn_light_setup_terrain 15BC9C, which call the dispatchers with esi = the entry,
- * edi = the polygon. */
+ * edi = the polygon. The end mark is the light pointer alone (an iptr -1; the next list
+ * starts PTR_SIZE bytes on, the asm's 4). */
 struct xn_light_ref {
     struct xn_light *light;         /* +0x00: -1 ends the list; light->type picks the routine */
     int x;                          /* +0x04: models: the light in object space (point: world
@@ -386,7 +442,7 @@ struct xn_light_ref {
                                        squared distance to the face plane with it); terrain:
                                        not written */
 };                                  /* +0x18 */
-RECORD_SIZE(xn_light_ref, 24);
+RECORD_SIZE_P(xn_light_ref, 24);
 
 /* The point lights that reach the polygon being set up (0x158C28, 64 bytes; names.csv names
  * each array): xn_light_add_point (15BF75) fills slot ebp/4 = 0..2, the shader builders
@@ -404,7 +460,7 @@ struct xn_light_point_slots {
                                        row (base row + ambient + xn_shade_table); directional
                                        lights add whole rows to it */
 };                                  /* +0x40 */
-RECORD_SIZE(xn_light_point_slots, 64);
+RECORD_SIZE_P(xn_light_point_slots, 64);
 
 /* ---- the texture cache ('SET:') -------------------------------------------------------------- */
 
@@ -425,12 +481,15 @@ struct xn_tex_block {
     unsigned int last_tick;         /* +0x12: BIOS tick of the last lookup (135D5A writes
                                        archive - 4) */
 };                                  /* +0x16 */
-RECORD_SIZE(xn_tex_block, 22);
+RECORD_SIZE_P(xn_tex_block, 22);
+XN_NATIVE_SIZE(xn_tex_block, 34);       /* = include/structs.h struct tex_block natively */
 
 /* A TEXTURE.nnn record's directory entry (DFU TextureFile RecordDirectoryEntry, 20 bytes) as
  * the cache keeps it: xn_tex_load_archive (135EAB) turns the offset into a pointer and fills
  * the two null dwords. xn_tex_cache_lookup (135D00) returns one (include/structs.h
- * struct tex_cache_entry: its +0x0C image); the polygon's +40h holds it until setup. */
+ * struct tex_cache_entry: its +0x0C image); the polygon's +40h holds it until setup.
+ * Natively the two pointers make an entry 28 bytes (the game's tex_cache_entry agrees): the
+ * load widens the file's 20-byte entries in place (tex.c, tex_widen_directory). */
 struct xn_tex_entry {
     unsigned char type1_lo;         /* +0x00: DFU Type1 (low byte) */
     unsigned char solid_colour;     /* +0x01: DFU Type1's high byte: the colour a polygon is
@@ -449,11 +508,17 @@ struct xn_tex_entry {
                                        compiled: an index into xn_render_span_setups (0 solid
                                        colour, 4 textured) */
 };                                  /* +0x14 */
-RECORD_SIZE(xn_tex_entry, 20);
+RECORD_SIZE_P(xn_tex_entry, 20);
+XN_NATIVE_SIZE(xn_tex_entry, 28);
+XN_NATIVE_OFFSET(xn_tex_entry, current, 16);    /* tex_cache_entry.image natively */
+#define XN_TEX_FILE_ENTRY 20            /* a directory entry's bytes in the file */
 
 /* A loaded archive, in a heap block's data: the TEXTURE.nnn file read whole (its 26-byte
  * header, then the directory, then the records). xn_tex_archives[archive] points here;
- * xn_tex_record_offsets[record] = record * 20 indexes the directory. */
+ * xn_tex_record_offsets[record] = record * 20 indexes the directory. Natively the file is
+ * read (record_count * 8) bytes further on and its directory widened into the native entries
+ * in front of it (the game reads the name at +2 and the entries); the images' offsets count
+ * from the file's start, there. */
 struct xn_tex_archive {
     unsigned short record_count;    /* +0x00: DFU RecordCount */
     char name[24];                  /* +0x02 */
@@ -463,8 +528,11 @@ RECORD_OFFSET(xn_tex_archive, entries, 0x1A);
 
 /* A record's image header (DFU TextureFile RecordHeader, 28 bytes; include/structs.h
  * struct texture_header, which agrees) with what xn_tex_load_archive writes over it: the
- * packed wrap masks over x/y and the compiled mapper over the record size, and
- * xn_tex_cache_lookup the decoded frame's offset over data_offset */
+ * packed wrap masks over x/y and the compiled mapper's address over the record size, and
+ * xn_tex_cache_lookup the decoded frame's offset over data_offset. The layout is the file's
+ * natively too (the game reads it): the mapper's slot holds the low 32 bits of its address
+ * there, which nothing reads (the canonical span routines run no mapper copies); the decoded
+ * frame's offset fits because the unpack buffer is the heap block's tail natively (tex.c). */
 struct xn_tex_image {
     union {
         struct {
@@ -481,11 +549,9 @@ struct xn_tex_image {
                                        checked (RLE), 0x100 set by xn_tex_check_transparent
                                        when a pixel is 0 (then not compiled either); flats:
                                        drawn with 0x8000 added */
-    union {
-        int size;                   /* +0x0A: DFU RecordSize */
-        void (*tmap)(void);         /*       compiled records: the mapper copy (xn_tmap_compile;
-                                       xn_tmap_rebase gets it when the frame moves) */
-    };
+    int size;                       /* +0x0A: DFU RecordSize; compiled records: the mapper
+                                       copy's address (xn_tmap_compile; xn_tmap_rebase gets
+                                       it when the frame moves), natively its low 32 bits */
     int data_offset;                /* +0x0E: the pixels, from the start of this header (rows of
                                        256 bytes); animated records: the decoded frame's */
     unsigned short is_normal;       /* +0x12: DFU IsNormal */
@@ -516,7 +582,7 @@ struct xn_tex_unpack_strip {
     unsigned char *start;           /* +0x02: the strip's first row in the buffer */
     unsigned short height;          /* +0x06: its rows */
 };                                  /* +0x08 */
-RECORD_SIZE(xn_tex_unpack_strip, 8);
+RECORD_SIZE_P(xn_tex_unpack_strip, 8);
 
 /* A frame decoded this frame (xn_tex_unpack_entries 0x134C02, at most 256; xn_tex_unpack_used
  * is the bytes used, cleared every frame; xn_tex_unpack_find 1363D9 looks the key up) */
@@ -524,7 +590,7 @@ struct xn_tex_unpack_entry {
     unsigned int key;               /* +0x00: (archive << 7 | record) << 16 | frame */
     unsigned char *pixels;          /* +0x04: in the decode buffer, stride 256 */
 };                                  /* +0x08 */
-RECORD_SIZE(xn_tex_unpack_entry, 8);
+RECORD_SIZE_P(xn_tex_unpack_entry, 8);
 
 /* ---- the texture-mapper copies ('Shaders') --------------------------------------------------- */
 
@@ -536,11 +602,12 @@ struct xn_tmap_step {
     unsigned int wrap_mask_a;       /* +0x07:   the mask: v mask << 8 | u mask (from the
                                        image's wrap_mask) */
     unsigned char code_0b[4];       /* +0x0B: add ebx,ecx; mov dl,[eax+ */
-    unsigned char *texels_a;        /* +0x0F:   the texel base] */
+    unsigned int texels_a;          /* +0x0F:   the texel base] (an address as the code's
+                                       32-bit displacement) */
     unsigned char code_13[14];      /* +0x13: shade lookup, store the first pixel, next u/v */
     unsigned int wrap_mask_b;       /* +0x21 */
     unsigned char code_25[4];       /* +0x25 */
-    unsigned char *texels_b;        /* +0x29 */
+    unsigned int texels_b;          /* +0x29 */
     unsigned char code_2d[7];       /* +0x2D: store the second pixel */
 };                                  /* +0x34 */
 RECORD_SIZE(xn_tmap_step, 52);
@@ -649,8 +716,14 @@ struct xn_model_face_point {
                                        from it into poly +0x18 */
         int plane_d;                /* +0x04: point 1 after prepare: the plane constant
                                        dot(point0, normal) (24.8 * 8-bit fraction; 0x1407C6) */
+#if !defined(DAGGER_PORT)
         struct xn_model_face_data *data; /* +0x04: point 2 after prepare: this face's texture
-                                       axes (absolute pointer, 0x1407CA) */
+                                       axes (absolute pointer, 0x1407CA); XN_FACE_DATA */
+#else
+        int data_offset;            /*       natively the file's 4 bytes cannot hold that
+                                       address: the axes' offset from the face (both are in
+                                       the model's block); XN_FACE_DATA */
+#endif
     };
 };                                  /* +0x08 */
 RECORD_SIZE(xn_model_face_point, 8);
@@ -672,6 +745,17 @@ struct xn_model_face {
     struct xn_model_face_point points[1]; /* +0x08: point_count of them */
 };
 RECORD_OFFSET(xn_model_face, points, 8);
+
+/* A prepared face's texture axes (point 2's slot), and setting them */
+#if !defined(DAGGER_PORT)
+#define XN_FACE_DATA(f)         ((f)->points[2].data)
+#define XN_SET_FACE_DATA(f, d)  ((f)->points[2].data = (d))
+#else
+#define XN_FACE_DATA(f) \
+    ((struct xn_model_face_data *)((const unsigned char *)(f) + (f)->points[2].data_offset))
+#define XN_SET_FACE_DATA(f, d) \
+    ((f)->points[2].data_offset = (int)((const unsigned char *)(d) - (const unsigned char *)(f)))
+#endif
 
 /* An entry of a collision sphere's face list: 6 bytes, sorted by face offset, descending (the
    merge in 0x14A4C1 / 0x14AD35 relies on it). */
@@ -741,7 +825,10 @@ struct xn_model_handle {
                                        (0x140363); bit 1: one of its polygons reached the
                                        rasterizer (xn_light_setup_poly 0x15BC48) */
 };                                  /* +0x3A */
-RECORD_SIZE(xn_model_handle, 58);
+RECORD_SIZE_P(xn_model_handle, 58);
+/* natively the game's struct model_instance (records.h), whose lights and matrix are pointers */
+XN_NATIVE_SIZE(xn_model_handle, 70);
+XN_NATIVE_OFFSET(xn_model_handle, pad_0c, 24);
 
 /* A model's matrices for one frame: element of xn_render_matrix_pool 0xD7AC0 (struct
    xn_model_matrix_pool below), handed out by xn_render_matrix_next 0xCEA70 (+0x24 per drawn
@@ -792,7 +879,7 @@ struct xn_model_draw_state {
     int radius_sq;                  /* +0x34: (radius^2 + 0x8000) >> 16 (world units^2):
                                        0x14068B */
 };                                  /* +0x38 */
-RECORD_SIZE(xn_model_draw_state, 56);
+RECORD_SIZE_P(xn_model_draw_state, 56);
 
 /* A sphere of a collision probe (the game's struct probe_sphere): offsets from the probe's
    position in the probe's own axes, world units. */
@@ -883,7 +970,7 @@ struct xn_collide_scratch {
     xn_vec3 build_min;              /* +0x130: the points' bounding box */
     xn_vec3 build_max;              /* +0x13C */
 };                                  /* +0x148 */
-RECORD_SIZE(xn_collide_scratch, 0x148);
+RECORD_SIZE_P(xn_collide_scratch, 0x148);
 
 /* xn_collide_segment_model 0x14A300's own variables, stored in its code segment right after
    its ret (0x14A68F..0x14A6B2). */
@@ -899,7 +986,7 @@ struct xn_collide_seg_state {
     struct xn_collide_hits *hits;   /* +0x1C: 0x14A6AB: big_buffer, the result */
     struct xn_collide_hit *hit_next; /* +0x20: 0x14A6AF: where the next hit goes */
 };                                  /* +0x24 */
-RECORD_SIZE(xn_collide_seg_state, 36);
+RECORD_SIZE_P(xn_collide_seg_state, 36);
 
 /* xn_collide_spheres_model 0x14AA92's variables, after its ret (0x14AF0C..0x14AF2F). Its other
    work areas: big_buffer +0x1000 the probe spheres that meet the bounding sphere (pointers),
@@ -916,7 +1003,7 @@ struct xn_collide_sph_state {
     int probe_count;                /* +0x20: 0x14AF2C: probe spheres that met the bounding
                                        sphere */
 };                                  /* +0x24 */
-RECORD_SIZE(xn_collide_sph_state, 36);
+RECORD_SIZE_P(xn_collide_sph_state, 36);
 
 /* The shared scratch vectors at 0x120288..0x1202B3 (data of xn_120200): free for any routine
    between frames' uses; the names.csv names come from xn_render_pick. Users: xn_cam_cull_sphere
@@ -980,7 +1067,8 @@ struct xn_anim {
                                        draws record record_group + facing */
     unsigned char state;            /* +0x17: the state last started (copied from +0x14) */
 };                                  /* +0x18 */
-RECORD_SIZE(xn_anim, 24);
+RECORD_SIZE_P(xn_anim, 24);
+XN_NATIVE_SIZE(xn_anim, 32);            /* natively the game's struct monster_anim's first 32 */
 
 /* The ASCR record (MONSTER.BSA ASCRnnnn.ANC, kept in memory as read): the header, a word
    state table, a byte table the engine never reads, then the script bytes. 60 records; 59
@@ -1012,8 +1100,14 @@ struct xn_wld_header {
                                        width * height; the dead editor C30D6 makes it 4 more) */
     unsigned int width;             /* +0x04: cells per row (1000) = xn_world_width */
     unsigned int height;            /* +0x08: rows of cells (500) = xn_world_height */
+#if !defined(DAGGER_PORT)
     unsigned int *offsets;          /* +0x0C: in memory: the window of the offset table
-                                       (xn_world_offsets); 0 in the file (DFU NullValue1) */
+                                       (xn_world_offsets); 0 in the file (DFU NullValue1).
+                                       XN_WORLD_OFFSETS (xworld.h) */
+#else
+    unsigned int offsets_slot;      /*       natively the file's 4 bytes, as read: the window's
+                                       pointer is a global of its own (XN_WORLD_OFFSETS) */
+#endif
     unsigned int bands_offset;      /* +0x10: file offset of the band table (0x90 +
                                        offsets_size = 0x1E8510) = xn_world_bands_offset */
     unsigned int unknown_14;        /* +0x14: 1 (DFU Unknown1); not read */
@@ -1102,9 +1196,14 @@ RECORD_SIZE(xn_terrain_vert_coord, 12);
    polygon record (struct xn_poly) but has its own layout; the game keeps its address as the
    object's draw handle (pick_sprite_cb). */
 struct xn_flat {
-    unsigned int image;             /* +0x00: archive << 7 | record (154D72, 154DC5; 154E20) */
-    int object;                     /* +0x04: always 0 (154D83, 154DDE): xn_pick_hit.model 0 =
-                                       a flat */
+    union {
+        unsigned int image;         /* +0x00: archive << 7 | record (154D72, 154DC5; 154E20) */
+        void *pad_00;               /*       (the slot is as wide as the polygon's face pointer:
+                                       natively too the pick reads object where a polygon has
+                                       its handle) */
+    };
+    iptr object;                    /* +0x04: always 0 (154D83, 154DDE): xn_pick_hit.model 0 =
+                                       a flat (pointer-wide: the pick reads the whole slot) */
     int du_dx;                      /* +0x08: u step per pixel times 1/z (155116; negated when
                                        mirrored 1551D4); spans 157654 */
     int dv_dx;                      /* +0x0C: v step per pixel times 1/z (155156); spans
@@ -1151,7 +1250,10 @@ struct xn_flat {
     int view_z;                     /* +0x58: depth; the sort key is -view_z */
     char pad_5c[8];                 /* +0x5C */
 };                                  /* +0x64 */
-RECORD_SIZE(xn_flat, 100);
+RECORD_SIZE_P(xn_flat, 100);
+/* natively too a flat is a record of the polygon pool, read by the pick as one */
+XN_NATIVE_OFFSET(xn_flat, object, 8);
+typedef char xn_flat_in_poly_check[(sizeof(struct xn_flat) <= sizeof(struct xn_poly)) ? 1 : -1];
 
 /* ---- sky and weather data (xn_C5400, used by xn_C7F00) ----------------------------------- */
 
@@ -1244,7 +1346,7 @@ struct xn_view {
                                        [n] = 2^24 / n (allocated by xn_render_init; its address
                                        is also patched into 25 span routines) */
 };                                  /* +0x89 */
-RECORD_SIZE(xn_view, 137);
+RECORD_SIZE_P(xn_view, 137);
 
 /* ---- the mouse -------------------------------------------------------------------------- */
 
@@ -1305,7 +1407,7 @@ struct xn_kbd_state {
     unsigned char ascii[2][128];    /* +0x097: xn_kbd_ascii_table: by scan code - 1,
                                        [1] while a Shift is down */
 };                                  /* +0x197 */
-RECORD_SIZE(xn_kbd_state, 407);
+RECORD_SIZE_P(xn_kbd_state, 407);
 
 /* ---- the joystick ------------------------------------------------------------------------- */
 
@@ -1391,7 +1493,7 @@ struct xn_gfx_state {
     void (*drv_present[1])(void);   /* +0xC4E: xn_gfx_drv_present (14396C) */
     void (*drv_clear[1])(void);     /* +0xC52: xn_gfx_drv_clear (143924) */
 };                                  /* +0xC56 */
-RECORD_SIZE(xn_gfx_state, 3158);
+RECORD_SIZE_P(xn_gfx_state, 3158);
 
 /* The DPMI real-mode call structure (int 31h AX=0300h, 50 bytes): xn_gfx_vesa_rm_regs
  * (0x15FA08) and xn_helmet_c_rm_regs (0x161300) */
@@ -1481,7 +1583,7 @@ struct xn_font_state {
     struct xn_fnt_file *table[8];   /* +0x1C: xn_font_table */
     struct xn_fnt_file *glyphs;     /* +0x3C: font_glyphs: the selected font */
 };                                  /* +0x40 */
-RECORD_SIZE(xn_font_state, 64);
+RECORD_SIZE_P(xn_font_state, 64);
 
 /* ---- the VID player ---------------------------------------------------------------------------- */
 
@@ -1550,7 +1652,7 @@ struct xn_vid_player {
     char path[129];                 /* +0x36D: xn_vid_path */
     int skippable;                  /* +0x3EE: xn_vid_skippable: a key or button stops it */
 };                                  /* +0x3F2 */
-RECORD_SIZE(xn_vid_player, 1010);
+RECORD_SIZE_P(xn_vid_player, 1010);
 
 #pragma pack()
 

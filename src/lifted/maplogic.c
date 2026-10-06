@@ -506,12 +506,12 @@ void location_pick_random_undiscovered(struct loaded_location *location)
 
 void location_set_discovered(int location_index, int discovered)
 {
-    ((struct bf32_30_1 *)((char *)(iptr)(int)(iptr)((location_index * 17) + (char *)region_locations) + 4))->f = discovered;
+    ((struct bf32_30_1 *)((char *)(iptr)((location_index * 17) + (char *)region_locations) + 4))->f = discovered;
 }
 
 void location_set_hidden(int location_index, int hidden)
 {
-    ((struct bf32_31_1 *)((char *)(iptr)(int)(iptr)((location_index * 17) + (char *)region_locations) + 4))->f = hidden;
+    ((struct bf32_31_1 *)((char *)(iptr)((location_index * 17) + (char *)region_locations) + 4))->f = hidden;
 }
 
 void location_flatten_terrain(signed char *heights, signed char *flats)

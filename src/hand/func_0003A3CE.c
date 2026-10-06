@@ -19,7 +19,7 @@ extern char D_00170BE6[];
 extern char D_00170BF3[];
 extern char D_00170C00[];
 extern char D_00170C0E[];
-extern int D_0017B4B0;
+extern iptr D_0017B4B0;              /* the title menu's keys ("LSE"): a pointer */
 extern signed char D_0017B4B7[];
 extern char *D_0017CCFA[];
 extern signed char text_buffer[];

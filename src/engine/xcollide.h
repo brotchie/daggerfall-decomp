@@ -172,8 +172,8 @@ void xn_collide_ref_helpers(void);
    (the crossing in world units, the normal in world axes, the face, t / 2). Returns the hit
    list (big_buffer), or -1 for none; Q-COLL-03: 0 (a hit) for a model without collision
    spheres. Nine game sites. */
-s32 xn_collide_segment_model(struct xn_model_handle *h, const xn_vec3 *start,
-                             const xn_vec3 *end, s32 mode);
+iptr xn_collide_segment_model(struct xn_model_handle *h, const xn_vec3 *start,
+                              const xn_vec3 *end, s32 mode);
 
 /* Dead: two models' bounding spheres only: 0 when they meet, else -1. (The asm has a detailed
    sphere-and-face test after its exits, 14A710, which nothing reaches: Q-COLL-04.) */
@@ -185,7 +185,7 @@ s32 xn_collide_model_model(struct xn_model_handle *a, struct xn_model_handle *b,
    or on one, is a hit (the face, its normal; t -1). Returns the hit list, or -1; 0 for a
    model without collision spheres (Q-COLL-03). Seven game sites. Q-COLL-06 (dropped): mode
    1 with a hit among the collision spheres unbalances the asm's stack; here it returns 0. */
-s32 xn_collide_spheres_model(struct xn_model_handle *h, struct xn_collide_probe *p, s32 mode);
+iptr xn_collide_spheres_model(struct xn_model_handle *h, struct xn_collide_probe *p, s32 mode);
 
 /* Dead: a segment against a probe's spheres (in the probe's axes, without the << 8): 0 when
    one meets it, else -1. */
@@ -195,7 +195,7 @@ s32 xn_collide_segment_spheres(struct xn_collide_probe *p, const xn_vec3 *start,
 /* Dead: a probe against another: a hit for each pair of their spheres that meet (the pair's
    numbers in the hit's face field: a's in the low word, b's in the high); the hit list, or
    -1. Q-COLL-08: the probes' offset is taken in 24.8, their spheres in world units. */
-s32 xn_collide_spheres_spheres(struct xn_collide_probe *a, struct xn_collide_probe *b);
+iptr xn_collide_spheres_spheres(struct xn_collide_probe *a, struct xn_collide_probe *b);
 
 /* Dead: a stub: always -1 (its two arguments are not used). */
 s32 xn_collide_miss_stk(s32 a, s32 b);
@@ -208,12 +208,12 @@ s32 xn_collide_miss(void);
    then the upright plane through its axis facing the segment, and the upright cylinder of
    its size: one hit (Q-COLL-05: its normal has the flat's position added). Returns the hit
    list, or -1. image: archive << 7 | record. */
-s32 xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
-                            u32 image, u32 flags, s32 scale, s32 mode);
+iptr xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
+                             u32 image, u32 flags, s32 scale, s32 mode);
 
 /* The same: the game's entry (its last three arguments on the stack). One game site. */
-s32 xn_collide_segment_flat_stk(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
-                                u32 image, u32 flags, s32 scale, s32 mode);
+iptr xn_collide_segment_flat_stk(const xn_vec3 *pos, const xn_vec3 *start, const xn_vec3 *end,
+                                 u32 image, u32 flags, s32 scale, s32 mode);
 
 /* Dead (a tool's): a model's collision spheres: a grid of cells (r * sqrt 2 apart) over its
    points' bounding box, each a sphere of 1.2 r listing the faces it touches, written to out

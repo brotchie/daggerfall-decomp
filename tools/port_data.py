@@ -52,7 +52,7 @@ EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
 # virtual PC's port_low_memory_block
 LOWMEM_FIRST, LOWMEM_END = 0x400, 0x110000
 CFLAGS = ["-std=gnu89", "-include", os.path.join(ROOT, "port", "include", "port.h"),
-          "-DPORT_ENGINE", "-funsigned-char", "-I" + os.path.join(ROOT, "port", "include"),
+          "-DPORT_ENGINE", "-funsigned-char", "-fpack-struct=1", "-I" + os.path.join(ROOT, "port", "include"),
           "-I" + os.path.join(ROOT, "include"), "-I" + os.path.join(ROOT, "src", "engine"),
           "-fsyntax-only", "-w", "-ferror-limit=0",
           "-Xclang", "-fdump-record-layouts-canonical"]
@@ -89,6 +89,9 @@ TYPES = {
     # pointers for n vertices), which the C reaches only through the rings: pointers up to
     # the next global ("all": the 0xDB87DB87 filler between the tables too)
     "xn_poly_ring_tables": ("void *__v[1]", "all"),
+    # the per-object light lists: 400 declared, but the pool runs to xn_render_light_list_pool_start
+    # (1,600 entries of 24 bytes) and a frame may use them all: every entry at native size
+    "xn_render_light_list_pool": ("struct xn_light_ref __v[1]", "all", "src/engine/xpipe.h"),
 }
 
 DECL = re.compile(r"^extern\s+((?:const\s+|volatile\s+|signed\s+|unsigned\s+|struct\s+|union\s+)*"
@@ -481,8 +484,9 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
     for addr in sorted(chosen):
         name = starts[addr]
         if name in TYPES:
-            decl, unsized = TYPES[name] if isinstance(TYPES[name], tuple) else (TYPES[name], False)
-            pick[name] = (os.path.join(ROOT, "include", "records.h"), decl, unsized)
+            t = TYPES[name] if isinstance(TYPES[name], tuple) else (TYPES[name], False)
+            header = os.path.join(ROOT, t[2] if len(t) > 2 else "include/records.h")
+            pick[name] = (header, t[0], t[1])
             groups[pick[name][0]].append((name, pick[name][1]))
             continue
         ds = decls.get(name)

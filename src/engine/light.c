@@ -15,7 +15,7 @@
 #define LIGHT_DIRECTIONAL   8
 
 /* a light list ends at a -1 light */
-#define LIST_END(ref)       ((s32)(ref)->light == -1)
+#define LIST_END(ref)       ((iptr)(ref)->light == -1)
 
 /* a model face's plane distance (its arch3d_plane header's +14h) */
 #define FACE_PLANE_D(face)  (*(const s32 *)((const u8 *)(face) + 0x14))
@@ -38,11 +38,11 @@ void xn_light_init(void)
     block = func_000A10A8(0x8000);
     if (block != 0) {
         xn_shade_table_alloc = block;
-        xn_shade_table = (u8 *)(((u32)block + 0x3FFF) & ~0x3FFFu);
+        xn_shade_table = (u8 *)(((uptr)block + 0x3FFF) & ~(uptr)0x3FFF);
         block = func_000A10A8(0x10020);
         if (block != 0) {
             xn_light_falloff_alloc = block;
-            xn_light_falloff = (u16 *)(((u32)block + 0x1F) & ~0x1Fu);
+            xn_light_falloff = (u16 *)(((uptr)block + 0x1F) & ~(uptr)0x1F);
             xn_dos_load_file(xn_light_filename, xn_light_falloff);
             return;
         }
@@ -199,7 +199,8 @@ static const asm_image images[3] = {
       { 0x4C, 0x56, 0x60 }, { 0x75, 0x90, 0xAB }, { 0x7B, 0x96, 0xB1 }, 0x65, 0xBC, 0xC3 },
 };
 
-#define PUT32(p, v)     (*(u32 *)(p) = (u32)(v))
+/* (natively the low 32 bits of an address: nothing runs or reads the image's operands) */
+#define PUT32(p, v)     (*(u32 *)(p) = (u32)(uptr)(v))
 
 /* the shader's bytes as the asm compiled them, at xn_light_code_next (Q-LIGHT-07) */
 static void write_asm_image(const struct xn_poly *poly, const struct xn_light_shader *s)
@@ -224,12 +225,12 @@ static void write_asm_image(const struct xn_poly *poly, const struct xn_light_sh
     xn_light_code_next = out + im->size;
 }
 
-s32 xn_light_shade(const struct xn_light_shader *shader, s32 ray_y, s32 ray_x, s32 z)
+iptr xn_light_shade(const struct xn_light_shader *shader, s32 ray_y, s32 ray_x, s32 z)
 {
     s32 y = xn_mulhi(ray_y, z), x = xn_mulhi(ray_x, z);
     u32 zz = (u32)z >> 14;
     u32 h[XN_LIGHT_POINTS];
-    s32 shade = (s32)shader->row;
+    iptr shade = (iptr)shader->row;
     int i;
 
     /* d^2 from the squares table at the foot point less the pixel's point (Quirk Q-LIGHT-04:
@@ -246,8 +247,8 @@ s32 xn_light_shade(const struct xn_light_shader *shader, s32 ray_y, s32 ray_x, s
             shade += (s32)((xn_light_falloff[h[i]] * (u32)shader->light[i].intensity) >> 12);
     /* clamped to the last row (the asm's one-light shader clamps only after its light adds
        something: the base row is below the last row, so that is the same) */
-    if (shade > (s32)xn_shade_table_last_row)
-        shade = (s32)xn_shade_table_last_row;
+    if (shade > (iptr)xn_shade_table_last_row)
+        shade = (iptr)xn_shade_table_last_row;
     return shade;
 }
 
@@ -312,7 +313,7 @@ int xn_light_add_point(const struct xn_poly *poly, const struct xn_light_ref *re
 }
 
 /* the row has reached the last one: lit no further (a signed compare, as the asm's jg) */
-#define FULLY_LIT(row)  ((s32)xn_shade_table_last_row <= (s32)(row))
+#define FULLY_LIT(row)  ((iptr)xn_shade_table_last_row <= (iptr)(row))
 
 int xn_light_add_directional(const struct xn_poly *poly, const struct xn_light_ref *ref,
                              u8 **row)
@@ -353,8 +354,8 @@ s32 xn_light_setup_poly(struct xn_poly *poly)
 
     poly->handle->flags |= 2;                   /* the model reached the rasterizer */
     set_inverse_slope(poly);
-    row = (u8 *)((u32)poly->face->shade << 8) + (u32)xn_light_ambient_row;
-    if ((u32)row >= (u32)xn_shade_table_last_row)
+    row = (u8 *)((uptr)poly->face->shade << 8) + (uptr)xn_light_ambient_row;
+    if ((uptr)row >= (uptr)xn_shade_table_last_row)
         return 0;
     for (ref = poly->handle->lights; !LIST_END(ref); ref++) {
         switch (ref->light->type) {

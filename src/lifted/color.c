@@ -24,7 +24,7 @@ extern struct record *doors_moving[];
 extern int sound_play(int, struct record *, int);
 extern void xn_str_fill_ascending(char *, int, unsigned);
 extern iptr xn_mem_align_up(uptr, unsigned);
-extern int xn_collide_spheres_model(void *, void *, int);
+extern iptr xn_collide_spheres_model(void *, void *, int);
 extern void object_foreach_post(struct record *, void (*)());
 int door_blocked_by_player(struct record *);
 void building_disable_monster_marker_cb(struct record *);
@@ -42,7 +42,7 @@ void color_init_remap_tables(void)
         }
     }
     for (table = 1; table < 16; table++) {
-        xn_str_fill_ascending((char *)(iptr)((int)(iptr)(color_remap_tables + (table << 8)) + ((int)(unsigned char)D_001886A8[table * 2])), (int)(unsigned char)D_001886A9[table * 2], 16);
+        xn_str_fill_ascending((char *)(iptr)((iptr)(color_remap_tables + (table << 8)) + ((int)(unsigned char)D_001886A8[table * 2])), (int)(unsigned char)D_001886A9[table * 2], 16);
     }
     xn_str_fill_ascending((char *)(iptr)((iptr)color_remap_tables + 6689), 161, 15);
     xn_str_fill_ascending((char *)(iptr)((iptr)color_remap_tables + 6721), 193, 15);
@@ -57,7 +57,7 @@ void color_init_remap_tables(void)
     xn_str_fill_ascending((char *)(iptr)((iptr)color_remap_tables + 7489), 129, 15);
     color_remap_tables[7677] = 216;
     for (table = 0; table < 10; table++) {
-        mc_memcpy((void *)(iptr)((int)(iptr)(color_remap_tables + ((table << 8) + 4096)) + 112), (void *)(((iptr)D_001886D2) + (table << 4)), 16, D_00177350, 87, 4);
+        mc_memcpy((void *)(iptr)((iptr)(color_remap_tables + ((table << 8) + 4096)) + 112), (void *)(((iptr)D_001886D2) + (table << 4)), 16, D_00177350, 87, 4);
     }
 }
 
@@ -113,7 +113,7 @@ void doors_update(void)
 int door_blocked_by_player(struct record *door)
 {
     int *model;
-    int hit;
+    iptr hit;
 
     D_00187B6E.position.x = player_object->x;
     D_00187B6E.position.y = player_object->y;

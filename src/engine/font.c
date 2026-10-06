@@ -13,7 +13,7 @@ void xn_mem_shutdown(void);
 
 void xn_font_init(void)
 {
-    xn_fill_dwords(xn_font_table, 0, 8);
+    xn_fill_dwords(xn_font_table, 0, 8 * PTR_SIZE / 4);     /* 8 pointers */
     font_char_spacing = 1;
     xn_font_line_gap = 1;
 }
@@ -28,7 +28,7 @@ struct xn_fnt_file *xn_font_load(s32 number, s32 slot)
    the digit count it gave xn_str_from_int, and init_game_data's next call reads it. */
 void xn_font_load_b(xn_regs *r)
 {
-    r->eax = (u32)xn_font_load(r->eax, r->edx);
+    r->eax = (uptr)xn_font_load((s32)r->eax, (s32)r->edx);
     r->ebx = 4;
 }
 

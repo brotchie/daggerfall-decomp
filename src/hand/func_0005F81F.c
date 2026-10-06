@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005F81F */
 #include <dos.h>
 #include "clib.h"
+#include "doslow.h"
 struct savehdr { char pad[128]; char f128; char pad81[99]; short f228; };
 struct slot { short id; short f2; };
 struct flags16 { unsigned short f0; };
@@ -38,7 +39,7 @@ void books_scan(void)
         fd = disk_open_data(((char *)text_buffer));
         read(fd, buf, 234);
         close(fd);
-        if (buf->f128 == 0 || (game_settings->f0 & 4) == 0)
+        if (buf->f128 == 0 || (DOS_NULL(game_settings)->f0 & 4) == 0   /* not set yet: 0 */)
             book_list[book_count++].f2 = buf->f228 - 1;
         rc = func_000A13F7(&ff);
     }

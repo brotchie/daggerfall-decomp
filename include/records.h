@@ -1049,7 +1049,7 @@ struct record {
     union {
         unsigned int pad2F;         /* +0x2F */
         struct record *caster;      /* +0x2F: spells (type 9) */
-        int draw_handle;            /* +0x2F: other drawn objects: the XnGine draw handle
+        iptr draw_handle;           /* +0x2F: other drawn objects: the XnGine draw handle
                                        (object_draw_cb, automap_draw_object_cb, pick_sprite_cb) */
         unsigned int home_id;       /* +0x2F: items in repair (54), room loot piles (58): the id of
                                        the object to go back to */

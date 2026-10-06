@@ -16,7 +16,10 @@
      an archive    the file as it is (struct xn_tex_archive): record_count, a name, and
                    20-byte directory entries (struct xn_tex_entry) whose image offsets the
                    load turns into pointers; an entry's kind is 4 when its image has a mapper
-                   (the render mode's textured setup), else 0
+                   (the render mode's textured setup), else 0. Natively (8-byte pointers) the
+                   entries are 28 bytes: the load widens the directory in front of the file
+                   (tex.c), and the unpack buffer is the heap block's tail, so that an image's
+                   4-byte data_offset reaches its decoded frame
      an image      struct xn_tex_image: the packed wrap masks (0FFh | u mask << 8 | 0FFh << 16
                    | v mask << 24: n - 1 for a power-of-two size, else 0FFh), width, height,
                    flags (1000h RLE, 100h has a colour 0), the mapper, the pixels' offset (rows

@@ -27,13 +27,19 @@
 #include "xngine.h"
 #include "xnstruct.h"
 #include "xnsmc.h"                    /* xn_udiv64_or0, xn_idiv64_or0 */
+#include "doslow.h"                   /* DOS_LOW: real-mode memory */
 
 /* ---- arithmetic (compiler support and the asm's divides; promote to xngine.h) ------------ */
 
 /* Bits 16..47 of a * b: a 16.16 product (imul; shrd 16) */
+#ifndef DAGGER_PORT
 s32 xn_fixmul16(s32 a, s32 b);
 #pragma aux xn_fixmul16 = "imul edx" "shrd eax, edx, 16" parm [eax] [edx] value [eax] \
     modify [edx];
+#else
+/* natively: the low 32 bits of the shrd */
+static __inline__ s32 xn_fixmul16(s32 a, s32 b) { return (s32)(((int64_t)a * b) >> 16); }
+#endif
 
 /* The low dword of a * b (what an asm imul leaves in EAX) */
 #define XN_LOW32(a, b) ((s32)((u32)(a) * (u32)(b)))
@@ -53,6 +59,16 @@ typedef void (*xn_routine)(void);
 
 /* The entry `off` bytes into a table the asm indexes by byte offsets (0, 4, 8...) */
 #define XN_AT(type, base, off) (*(type *)((u8 *)(base) + (off)))
+
+/* A pointer the asm reads through without testing it for 0 (a quirk): under DOS a 0 reads the
+   real-mode memory at linear 0 (the interrupt vector table); natively the virtual PC's low
+   memory there (include/doslow.h), not a fault. The pointer itself under Watcom. */
+#if defined(DAGGER_PORT)
+static __inline__ void *xn_low_if_null(void *p) { return p != 0 ? p : DOS_LOW(0); }
+#define XN_LOW_IF_NULL(p) xn_low_if_null(p)
+#else
+#define XN_LOW_IF_NULL(p) (p)
+#endif
 
 /* ---- the view (struct xn_view at 0xCEA20, as separate globals) ---------------------------- */
 extern s32 xn_cam_near_z, xn_cam_far_z;         /* the near and far planes, 24.8 */

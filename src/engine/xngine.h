@@ -41,6 +41,9 @@ typedef signed char s8;
 typedef short s16;
 typedef int s32;
 
+/* iptr / uptr: an int that holds an address (int under Watcom, pointer-wide natively) */
+#include "ptrint.h"
+
 /* ---- common types ---------------------------------------------------------------------- */
 
 /* A vector or point: world units, or fixed point (the function says which: 16.16, 2.28...) */

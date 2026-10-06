@@ -115,7 +115,7 @@ extern int xn_math_approx_dist2d(int, int, int, int);
 extern int xn_math_fixmul28(int, int);
 extern int xn_light_add(int, int, int, int, int, int);
 extern int xn_model_submit(void *, int);
-extern int xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
+extern iptr xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
 extern void sky_apply_sunlight(void);
 extern void weapon_missile_orient(struct record *);
 extern void object_free_pending(void);

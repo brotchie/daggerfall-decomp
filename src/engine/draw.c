@@ -148,7 +148,8 @@ void xn_draw_get_rect_b(xn_regs *r)
     xn_blit b;
     int drawn;
 
-    set_blit(&b, r->eax, r->edx, r->ebx, r->ecx, (u8 *)XN_STACK_ARG(r, 0), XN_STACK_ARG(r, 1));
+    set_blit(&b, (s32)r->eax, (s32)r->edx, (s32)r->ebx, (s32)r->ecx,
+             (u8 *)(uptr)XN_STACK_ARG(r, 0), XN_STACK_ARG(r, 1));
     drawn = xn_draw_get_blit(&b);
     r->eax = drawn ? xn_gfx_width - b.w : b.x;
 }
@@ -189,7 +190,8 @@ void xn_draw_image_b(xn_regs *r)
 {
     xn_blit b;
 
-    set_blit(&b, r->eax, r->edx, r->ebx, r->ecx, (const u8 *)XN_STACK_ARG(r, 0), 0);
+    set_blit(&b, (s32)r->eax, (s32)r->edx, (s32)r->ebx, (s32)r->ecx,
+             (const u8 *)(uptr)XN_STACK_ARG(r, 0), 0);
     xn_draw_image_regs_out(&b, xn_draw_put_blit(&b), r);
 }
 
@@ -225,7 +227,8 @@ void xn_draw_image_transparent_b(xn_regs *r)
 {
     xn_blit b;
 
-    set_blit(&b, r->eax, r->edx, r->ebx, r->ecx, (const u8 *)XN_STACK_ARG(r, 0), 0);
+    set_blit(&b, (s32)r->eax, (s32)r->edx, (s32)r->ebx, (s32)r->ecx,
+             (const u8 *)(uptr)XN_STACK_ARG(r, 0), 0);
     xn_draw_image_transparent_regs_out(&b, xn_draw_put_blit_transparent(&b), r);
 }
 
