@@ -1057,8 +1057,23 @@ struct record {
 };
 RECORD_OFFSET_P(record, data, 0x47);
 
-/* the data of a record as a char pointer: `(char *)r + 71` */
-#define RECORD_DATA(r) ((char *)(r) + 0x47)
+/* Offsets and sizes the code once wrote as numbers (docs/port.md): as int constants, as the
+   numbers were, so the code that uses them does not change under Watcom; natively they follow
+   the native layout (pointers are 8 bytes there). */
+#if defined(DAGGER_PORT)
+#define REC_OFFSETOF(type, member) ((int)__builtin_offsetof(type, member))
+#else
+#define REC_OFFSETOF(type, member) ((int)&((type *)0)->member)
+#endif
+#define REC_SIZEOF(type) ((int)sizeof(type))
+
+/* the record header: its size (71 under Watcom), and where its links start (55) */
+#define RECORD_HEADER_SIZE REC_OFFSETOF(struct record, data)
+#define RECORD_LINKS_OFFSET REC_OFFSETOF(struct record, next)
+
+/* the data of a record as a char pointer: `(char *)r + 71`; and back */
+#define RECORD_DATA(r) ((char *)(r) + RECORD_HEADER_SIZE)
+#define RECORD_FROM_DATA(p) ((struct record *)((char *)(p) - RECORD_HEADER_SIZE))
 
 /* ---- other structures (not records) --------------------------------------------------------- */
 
