@@ -63,10 +63,19 @@ extern s32 xn_cos_table[XN_ANGLES];     /* cosine, 2.28 */
 /* ---- an asm caller's registers ----------------------------------------------------------- */
 
 /* As a stub saves them (pushfd; pushad) for a glue function, and as xn_asmcall loads them */
+#ifdef DAGGER_PORT
+/* The native build (docs/port.md): pointer-wide registers, the layout of the virtual PC's
+   struct vpc_regs (port/include/port_vpc.h): a DOS call passes a buffer's address in one */
+typedef struct xn_regs {
+    unsigned long edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    unsigned long eflags;
+} xn_regs;
+#else
 typedef struct xn_regs {
     u32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
     u32 eflags;
 } xn_regs;
+#endif
 
 #define XN_CF   0x0001
 #define XN_PF   0x0004
@@ -88,6 +97,13 @@ void xn_asmcall(void (*target)(void), xn_regs *r);
 /* Watcom C32 10.0a has no 64-bit integer type: products and quotients that need 64 bits are
    one-instruction inline functions. */
 
+/* A signed 64-bit value, for sums of products */
+typedef struct xn_s64 {
+    u32 lo;
+    s32 hi;
+} xn_s64;
+
+#ifndef DAGGER_PORT
 /* (a * b) >> 28 of the 64-bit product: 2.28 times anything (imul; shrd 28 / shld 4) */
 s32 xn_fixmul28(s32 a, s32 b);
 #pragma aux xn_fixmul28 = "imul edx" "shrd eax, edx, 28" parm [eax] [edx] value [eax] modify [edx];
@@ -110,11 +126,7 @@ s32 xn_mulshr(s32 a, s32 b, u32 n);
 s32 xn_muldiv(s32 a, s32 b, s32 d);
 #pragma aux xn_muldiv = "imul edx" "idiv ebx" parm [eax] [edx] [ebx] value [eax] modify [edx];
 
-/* A signed 64-bit value, for sums of products */
-typedef struct xn_s64 {
-    u32 lo;
-    s32 hi;
-} xn_s64;
+
 
 /* *r = v, sign-extended */
 void xn_s64_set(xn_s64 *r, s32 v);
@@ -174,6 +186,105 @@ u32 xn_u64_div(const xn_s64 *r, u32 d);
 #pragma aux xn_u64_div = "mov eax, [ebx]" "mov edx, [ebx+4]" "div ecx" parm [ebx] [ecx] \
     value [eax] modify [edx];
 
+#else
+/* The native build: the same arithmetic in C. Where the asm's divide would fault (a divisor
+   of 0, a quotient that does not fit), the result is XnGine's handler's: 0, and a remainder of
+   0 (docs/engine/quirks.md Q-SYS-01). Shift counts are taken mod 32, as the CPU takes CL. */
+#include <stdint.h>
+
+static __inline__ int64_t xn__s64_get(const xn_s64 *r)
+{
+    return (int64_t)((uint64_t)(u32)r->hi << 32 | r->lo);
+}
+
+static __inline__ void xn__s64_put(xn_s64 *r, uint64_t v)
+{
+    r->lo = (u32)v;
+    r->hi = (s32)(u32)(v >> 32);
+}
+
+static __inline__ s32 xn_fixmul28(s32 a, s32 b) { return (s32)(((int64_t)a * b) >> 28); }
+static __inline__ s32 xn_fixmul28r(s32 a, s32 b)
+{
+    return (s32)((int64_t)((uint64_t)((int64_t)a * b) + 0x08000000u) >> 28);
+}
+static __inline__ s32 xn_mulhi(s32 a, s32 b) { return (s32)(((int64_t)a * b) >> 32); }
+static __inline__ s32 xn_mulshr(s32 a, s32 b, u32 n) { return (s32)(((int64_t)a * b) >> (n & 31)); }
+
+/* idiv of a 64-bit value: 0 where it would fault */
+static __inline__ int xn__idiv(int64_t n, s32 d, s32 *q, s32 *r)
+{
+    int64_t qq;
+    if (d == 0 || (n == INT64_MIN && d == -1))
+        return 0;
+    qq = n / d;
+    if (qq < INT32_MIN || qq > INT32_MAX)
+        return 0;
+    *q = (s32)qq;
+    *r = (s32)(n % d);
+    return 1;
+}
+
+static __inline__ int xn__div(uint64_t n, u32 d, u32 *q, u32 *r)
+{
+    if (d == 0 || n / d > 0xFFFFFFFFu)
+        return 0;
+    *q = (u32)(n / d);
+    *r = (u32)(n % d);
+    return 1;
+}
+
+static __inline__ s32 xn_muldiv(s32 a, s32 b, s32 d)
+{
+    s32 q, r;
+    return xn__idiv((int64_t)a * b, d, &q, &r) ? q : 0;
+}
+
+static __inline__ void xn_s64_set(xn_s64 *r, s32 v) { xn__s64_put(r, (uint64_t)(int64_t)v); }
+static __inline__ void xn_s64_mul(xn_s64 *r, s32 a, s32 b) { xn__s64_put(r, (uint64_t)((int64_t)a * b)); }
+static __inline__ void xn_s64_mac(xn_s64 *r, s32 a, s32 b)
+{
+    xn__s64_put(r, (uint64_t)xn__s64_get(r) + (uint64_t)((int64_t)a * b));
+}
+static __inline__ void xn_s64_msub(xn_s64 *r, s32 a, s32 b)
+{
+    xn__s64_put(r, (uint64_t)xn__s64_get(r) - (uint64_t)((int64_t)a * b));
+}
+static __inline__ void xn_u64_mul(xn_s64 *r, u32 a, u32 b) { xn__s64_put(r, (uint64_t)a * b); }
+static __inline__ void xn_s64_addu(xn_s64 *r, u32 v) { xn__s64_put(r, (uint64_t)xn__s64_get(r) + v); }
+static __inline__ void xn_s64_shl(xn_s64 *r, u32 n) { xn__s64_put(r, (uint64_t)xn__s64_get(r) << (n & 31)); }
+static __inline__ s32 xn_s64_shr(const xn_s64 *r, u32 n) { return (s32)(u32)((uint64_t)xn__s64_get(r) >> (n & 31)); }
+static __inline__ s32 xn_s64_div(const xn_s64 *r, s32 d)
+{
+    s32 q, rem;
+    return xn__idiv(xn__s64_get(r), d, &q, &rem) ? q : 0;
+}
+static __inline__ s32 xn_s64_divrem(const xn_s64 *r, s32 d, s32 *rem)
+{
+    s32 q;
+    if (!xn__idiv(xn__s64_get(r), d, &q, rem)) {
+        *rem = 0;
+        return 0;
+    }
+    return q;
+}
+static __inline__ u32 xn_u64_divrem(const xn_s64 *r, u32 d, u32 *rem)
+{
+    u32 q;
+    if (!xn__div((uint64_t)xn__s64_get(r), d, &q, rem)) {
+        *rem = 0;
+        return 0;
+    }
+    return q;
+}
+static __inline__ u32 xn_u64_div(const xn_s64 *r, u32 d)
+{
+    u32 q, rem;
+    return xn__div((uint64_t)xn__s64_get(r), d, &q, &rem) ? q : 0;
+}
+
+#endif
+
 /* A divide that overflows (or divides by 0) raises a divide error. XnGine's own handler
    (xn_sys_divide_error_handler) steps over the instruction and makes EAX and EDX 0, and the
    emulator logs the exception: the C divides where the asm did, with these helpers (a
@@ -192,10 +303,15 @@ u32 xn_u64_divrem_or0(const xn_s64 *n, u32 d, u32 *rem);
 /* ---- bits ------------------------------------------------------------------------------- */
 /* The index of the highest (bsr) or lowest (bsf) set bit of v; for v = 0, `old` (the CPU
    leaves the destination register as it was) */
+#ifndef DAGGER_PORT
 s32 xn_bsr(u32 v, s32 old);
 #pragma aux xn_bsr = "bsr eax, edx" parm [edx] [eax] value [eax];
 s32 xn_bsf(u32 v, s32 old);
 #pragma aux xn_bsf = "bsf eax, edx" parm [edx] [eax] value [eax];
+#else
+static __inline__ s32 xn_bsr(u32 v, s32 old) { return v ? 31 - __builtin_clz(v) : old; }
+static __inline__ s32 xn_bsf(u32 v, s32 old) { return v ? __builtin_ctz(v) : old; }
+#endif
 
 /* ---- ports and interrupts ----------------------------------------------------------------- */
 u8 xn_inb(u32 port);

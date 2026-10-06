@@ -18,12 +18,16 @@
 #define __loadds
 #define __cdecl
 
+/* the game's file calls; not in XnGine's files (PORT_ENGINE: its file I/O goes through int 21h,
+   and its head-tracker drivers have members called open, read and close) */
+#ifndef PORT_ENGINE
 #define open(...) port_open(__VA_ARGS__)
 #define read(...) port_read(__VA_ARGS__)
 #define write(...) port_write(__VA_ARGS__)
 #define lseek(...) port_lseek(__VA_ARGS__)
 #define close(...) port_close(__VA_ARGS__)
 #define unlink(...) port_unlink(__VA_ARGS__)
+#endif
 #define filelength(...) port_filelength(__VA_ARGS__)
 #define fopen(...) port_fopen(__VA_ARGS__)
 #define fclose(...) port_fclose(__VA_ARGS__)

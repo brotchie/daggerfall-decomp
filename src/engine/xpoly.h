@@ -141,6 +141,7 @@ void xn_poly_rasterize_rows(struct xn_span *row, xn_edge_walk *w);
    outcodes): clipped when its outcodes' OR says so, projected in place, and walked by
    xn_flat_raster (with the flat's walk w, xflat.h) from its top vertex (the first of the
    least rows). The flats' draw. */
+struct xn_flat_walk;
 void xn_poly_project_flat(struct xn_flat_walk *w, struct xn_poly_vertex *quad);
 
 /* A model face (the outcodes of its vertices: their AND in the low byte of `codes`, OR in
