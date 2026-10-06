@@ -19,7 +19,7 @@ void inv_draw_item_image(struct item *item, struct rect *buttons, int cell)
         xn_tex_cache_flush();
         texture = xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, -1);
     }
-    image = *(struct texture_header **)(texture + 12);
+    image = ((struct tex_cache_entry *)texture)->image;
     centre_x = (buttons[cell].x0 + buttons[cell].x1) >> 1;
     centre_y = (buttons[cell].y0 + buttons[cell].y1) >> 1;
     width = image->width;

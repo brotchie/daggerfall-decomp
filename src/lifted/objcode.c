@@ -94,7 +94,7 @@ iptr marker_match_cb(struct record *object)
     case 34:
         if ((object->image >> 7) == 199 && ((object->image & 31) - 2) == marker_kind) {
             if (*(int *)D_00195B84 == 0 && marker_best < 0) {
-                mc_memcpy(found_marker, object, 55, D_00177358, 191, 4);
+                mc_memcpy(found_marker, object, RECORD_LINKS_OFFSET, D_00177358, 191, 4);
                 return 1;
             }
             *(int *)D_00195B84 += marker_best;
@@ -148,7 +148,7 @@ struct record *marker_find_first(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = -1;
-    mc_memset(found_marker, 0, 71, D_00177358, 261, 4);
+    mc_memset(found_marker, 0, RECORD_HEADER_SIZE, D_00177358, 261, 4);
     object_find_open(root, marker_match_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
@@ -161,7 +161,7 @@ struct record *marker_find_nth(struct record *root, int kind, int n)
     marker_kind = kind;
     *(int *)D_00195B84 = n;
     marker_best = -1;
-    mc_memset(found_marker, 0, 71, D_00177358, 287, 4);
+    mc_memset(found_marker, 0, RECORD_HEADER_SIZE, D_00177358, 287, 4);
     object_find_open(root, marker_match_cb);
     cell = location_cell_at(D_00195F71, D_00195F79);
     D_00195F81 = n;
@@ -176,7 +176,7 @@ struct record *marker_find_random(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
-    mc_memset(found_marker, 0, 71, D_00177358, 317, 4);
+    mc_memset(found_marker, 0, RECORD_HEADER_SIZE, D_00177358, 317, 4);
     object_find_open(root, marker_match_cb);
     if (*(int *)D_00195B84 == 0) return 0;
     n = (*(int *)D_00195B84 = rand() % *(int *)D_00195B84);
@@ -204,7 +204,7 @@ void marker_nearest_cb(struct record *object)
         if (dist < marker_best) {
             found_object = object;
             marker_best = dist;
-            mc_memcpy(found_marker, object, 55, D_00177358, 363, 4);
+            mc_memcpy(found_marker, object, RECORD_LINKS_OFFSET, D_00177358, 363, 4);
         }
         return;
     case 43:
@@ -256,7 +256,7 @@ struct record *marker_find_nearest(struct record *root, int kind)
 {
     marker_kind = kind;
     marker_best = 500000;
-    mc_memset(found_marker, 0, 71, D_00177358, 432, 4);
+    mc_memset(found_marker, 0, RECORD_HEADER_SIZE, D_00177358, 432, 4);
     object_foreach_open(root, marker_nearest_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
@@ -267,7 +267,7 @@ int marker_count(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
-    mc_memset(found_marker, 0, 71, D_00177358, 456, 4);
+    mc_memset(found_marker, 0, RECORD_HEADER_SIZE, D_00177358, 456, 4);
     object_find_open(root, marker_match_cb);
     return *(int *)D_00195B84;
 }

@@ -13,7 +13,7 @@ struct record *rmb_make_marker(struct record *parent, int image)
 
     kind = (image & 31) - 2;
     if (kind == 13 || kind == 14) {
-        data_size = 659;
+        data_size = REC_SIZEOF(struct monster);
         marker = object_create_child(parent, 0, data_size);
         marker->mobile_id = 0;
     } else {

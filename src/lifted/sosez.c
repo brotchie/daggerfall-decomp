@@ -80,12 +80,12 @@ iptr sos_load_sample(char *path)
     if (handle == (-1)) return 0;
     size = lseek(handle, 0, 2);
     lseek(handle, 0, 0);
-    buffer = (iptr)mc_malloc(size + 240, D_001700D5, 302);
+    buffer = (iptr)mc_malloc(size + (int)sizeof(struct sos_sample), D_001700D5, 302);
     if (buffer == 0) {
         close(handle);
         return 0;
     }
-    if (read(handle, (void *)(buffer + 240), size) != size) {
+    if (read(handle, (void *)(buffer + (int)sizeof(struct sos_sample)), size) != size) {
         close(handle);
         if (buffer != 0 && buffer != (-1751672937)) {
             mc_free((void *)buffer, D_001700D5, 318);
@@ -94,11 +94,11 @@ iptr sos_load_sample(char *path)
         return 0;
     }
     close(handle);
-    mc_memset((void *)buffer, 0, 240, D_001700D5, 328, 4);
+    mc_memset((void *)buffer, 0, sizeof(struct sos_sample), D_001700D5, 328, 4);
     sample = (struct sos_sample *)buffer;
-    if (strncmp((char *)(buffer + 240), D_00170112, 4) == 0) {
-        wav = (struct wav_header *)(buffer + 240);
-        sample->data = (char *)(buffer + 284);
+    if (strncmp((char *)(buffer + (int)sizeof(struct sos_sample)), D_00170112, 4) == 0) {
+        wav = (struct wav_header *)(buffer + (int)sizeof(struct sos_sample));
+        sample->data = (char *)(buffer + (int)sizeof(struct sos_sample) + (int)sizeof(struct wav_header));
         sample->length = wav->data_size - 44;
         sample->bits = wav->bits;
         sample->channels = wav->channels;
@@ -109,7 +109,7 @@ iptr sos_load_sample(char *path)
         }
         sample->rate = wav->rate;
     } else {
-        sample->data = (char *)(buffer + 240);
+        sample->data = (char *)(buffer + (int)sizeof(struct sos_sample));
         sample->length = size;
         sample->bits = 8;
         sample->channels = 1;

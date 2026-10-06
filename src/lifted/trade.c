@@ -125,7 +125,7 @@ int sound_init_music(void)
         sound_channels[i].handle = 305419896;
     }
     sound_enabled = 1;
-    dpmi_lock_region((iptr)sound_channels, 5168);
+    dpmi_lock_region((iptr)sound_channels, 4 * REC_SIZEOF(struct sound_channel) + 4096);
     dpmi_lock_region((iptr)D_000CDDA8, 4096);
     dpmi_lock_region((iptr)&D_001A3F40, 4096);
     D_001A3F3C = sound_timer_add((iptr)D_000CDDA8, 140);
@@ -144,7 +144,7 @@ void sound_shutdown_music(void)
         sound_stop_channel(channel);
     }
     sos_shutdown();
-    dpmi_unlock_region((iptr)sound_channels, 5168);
+    dpmi_unlock_region((iptr)sound_channels, 4 * REC_SIZEOF(struct sound_channel) + 4096);
     dpmi_unlock_region((iptr)D_000CDDA8, 4096);
     dpmi_unlock_region((iptr)&D_001A3F40, 4096);
 }

@@ -73,7 +73,7 @@ void potionmaker_update(void)
     for (COUNT = i = 0; i < 8; i++) {
         if ((iptr)potion_cauldron[i] != 0) {
             item = &potion_cauldron[i]->data.item;
-            image = *(struct texture_header **)((char *)xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, (int *)(iptr)-1) + 12);
+            image = ((struct tex_cache_entry *)xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, (int *)(iptr)-1))->image;
             xn_draw_image_drop_shadow((COUNT & 1) * 56 + 233 - (image->width >> 1), (COUNT >> 1) * 38 + 42 - (image->height >> 1), image->width, image->height, (char *)image + image->data_offset);
             text_draw_centred_coloured((iptr)item->name, (short)((COUNT & 1) * 56 + 236), (short)((COUNT >> 1) * 40 + 48), 145, 156);
             ((short *)D_001A9B9C)[COUNT++] = i;

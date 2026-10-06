@@ -563,7 +563,7 @@ void bank_house_bought(void)
     bank_house_price = bank_houses_for_sale[(unsigned char)bank_selected].price;
     bank_account->balance -= bank_house_price;
     player_character->house = bank_houses_for_sale[(unsigned char)bank_selected].id;
-    D_001A41E4 = (iptr)((char *)bank_houses_for_sale[(unsigned char)bank_selected].block - 71);
+    D_001A41E4 = (iptr)RECORD_FROM_DATA(bank_houses_for_sale[(unsigned char)bank_selected].block);
     D_001A41DC = (iptr)bank_houses_for_sale[(unsigned char)bank_selected].building;
     msgbox_show_rsc(282, 1);
     mc_strncpy(saved_region_name, region_names[((int)(unsigned char)current_region)], 32, D_00175CC4, 647);

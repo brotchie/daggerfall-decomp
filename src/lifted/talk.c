@@ -840,8 +840,8 @@ void talk_log_question(void)
 
     talk_add_line((iptr)D_0017041B);
     for (i = 0; i < talk_question_line_count; i++) {
-        *(signed char *)(*(char **)((talk_question_lines + (i << 2)))) |= 128;
-        talk_add_line(*(int *)((talk_question_lines + (i << 2))));
+        *(signed char *)((char **)talk_question_lines)[i] |= 128;
+        talk_add_line(((iptr *)talk_question_lines)[i]);
     }
     talk_clear_question();
 }
@@ -849,12 +849,12 @@ void talk_log_question(void)
 void talk_add_line(iptr line)
 {
     if (D_00190D0F != 0) {
-        *(iptr *)((talk_question_lines + (talk_question_line_count << 2))) = talk_alloc_line();
-        mc_strncpy((char *)*(iptr *)((talk_question_lines + (talk_question_line_count++ << 2))), (char *)line, 4, D_001703F0, 1148);
+        ((iptr *)talk_question_lines)[talk_question_line_count] = talk_alloc_line();
+        mc_strncpy((char *)((iptr *)talk_question_lines)[talk_question_line_count++], (char *)line, 4, D_001703F0, 1148);
         return;
     }
-    *(iptr *)((talk_answer_lines + (talk_answer_line_count << 2))) = talk_alloc_line();
-    mc_strncpy((char *)*(iptr *)((talk_answer_lines + (talk_answer_line_count++ << 2))), (char *)line, 4, D_001703F0, 1153);
+    ((iptr *)talk_answer_lines)[talk_answer_line_count] = talk_alloc_line();
+    mc_strncpy((char *)((iptr *)talk_answer_lines)[talk_answer_line_count++], (char *)line, 4, D_001703F0, 1153);
 }
 
 int talk_next_word(signed char **cursor)
@@ -1217,9 +1217,9 @@ void talk_build_place_topics(void)
             next_distance = talk_place_topics[i + 1].distance;
             if (next_distance < distance) {
                 swapped = 1;
-                mc_memcpy(&swap, &talk_place_topics[i], 19, D_001703F0, 1678, 4);
-                mc_memcpy(&talk_place_topics[i], &talk_place_topics[i + 1], 19, D_001703F0, 1679, 4);
-                mc_memcpy(&talk_place_topics[i + 1], &swap, 19, D_001703F0, 1680, 4);
+                mc_memcpy(&swap, &talk_place_topics[i], sizeof(swap), D_001703F0, 1678, 4);
+                mc_memcpy(&talk_place_topics[i], &talk_place_topics[i + 1], sizeof(swap), D_001703F0, 1679, 4);
+                mc_memcpy(&talk_place_topics[i + 1], &swap, sizeof(swap), D_001703F0, 1680, 4);
             }
         }
         last--;

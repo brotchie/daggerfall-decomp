@@ -58,15 +58,6 @@ extern struct record *quest_event_object;
 extern struct quest *quest_tick_data;
 extern int quest_ended_id;
 extern short qbn_record_sizes[];
-extern short D_0019978A;
-extern short D_0019978C;
-extern short D_0019978E;
-extern short D_00199790;
-extern short D_00199792;
-extern short D_00199794;
-extern short D_00199796;
-extern short D_00199798;
-extern short D_0019979A;
 extern short quest_event_code;
 extern int D_001AA698;
 
@@ -491,16 +482,17 @@ void loan_due_penalty(void)
 
 void quest_init_record_sizes(void)
 {
-    qbn_record_sizes[0] = 19;
-    D_0019978A = 94;
-    D_0019978C = 34;
-    D_0019978E = 20;
-    D_00199790 = 24;
-    D_00199792 = 16;
-    D_00199794 = 33;
-    D_00199796 = 14;
-    D_00199798 = 87;
-    D_0019979A = 8;
+    /* the sections' record sizes; 1, 2 and 5 have no struct (empty in every QBN file) */
+    qbn_record_sizes[0] = REC_SIZEOF(struct qbn_item);
+    qbn_record_sizes[1] = 94;
+    qbn_record_sizes[2] = 34;
+    qbn_record_sizes[3] = REC_SIZEOF(struct qbn_person);
+    qbn_record_sizes[4] = REC_SIZEOF(struct qbn_place);
+    qbn_record_sizes[5] = 16;
+    qbn_record_sizes[6] = REC_SIZEOF(struct qbn_timer);
+    qbn_record_sizes[7] = REC_SIZEOF(struct qbn_foe);
+    qbn_record_sizes[8] = REC_SIZEOF(struct qbn_op);
+    qbn_record_sizes[9] = REC_SIZEOF(struct qbn_state);
 }
 
 void quests_run_all(void)

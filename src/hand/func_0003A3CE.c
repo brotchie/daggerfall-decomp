@@ -123,7 +123,7 @@ L3A496:;
     mc_sprintf((char *)text_buffer, D_00170B9D, (iptr)arena2_path);
     unlink((char *)text_buffer);
     D_00196273 = 0;
-    mc_memset(player_character, 0, 560, D_00170B88, 122, 4);
+    mc_memset(player_character, 0, REC_OFFSETOF(struct character, career), D_00170B88, 122, 4);
     player_character->pad83 = 1;
     player_character->reflexes = 2;
     player_character->mobile_id = 200;
@@ -135,7 +135,7 @@ L3A496:;
     palette_restore();
     do {
         D_00196271 = 0;
-        mc_memset(player_character, 0, 560, D_00170B88, 148, 4);
+        mc_memset(player_character, 0, REC_OFFSETOF(struct character, career), D_00170B88, 148, 4);
         player_character->pad83 = 1;
         player_character->reflexes = 2;
         player_character->mobile_id = 200;

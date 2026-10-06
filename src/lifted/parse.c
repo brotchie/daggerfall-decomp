@@ -900,7 +900,7 @@ iptr macro_la_number(void)
 iptr macro_lev_guild_rank(void)
 {
     if ((iptr)guild_membership != 0) {
-        return *(int *)((faction_rank_names[((int)(unsigned char)(guild_membership->kind & 63))] + (guild_membership->rank << 2)));
+        return (iptr)((char **)faction_rank_names[((int)(unsigned char)(guild_membership->kind & 63))])[guild_membership->rank];
     }
     return macro_pcn_player_name();
 }
@@ -1012,12 +1012,12 @@ iptr macro_ml_max_loan(void)
     return (iptr)itoa(player_character->level * 50000, (char *)text_rsc_buffer, 10);
 }
 
-int macro_map_map_location(void)
+iptr macro_map_map_location(void)
 {
     char *map_location;
 
     map_location = (char *)text_macro_map_location;
-    return *(int *)(map_location + 16);
+    return (iptr)((struct loaded_location *)map_location)->data;
 }
 
 iptr macro_mpw_magic_powers(void)
@@ -1778,7 +1778,7 @@ void object_weight_add(struct record *object)
     item = &object->data.item;
     if (item->group == 23) return;
     ancestor = object->parent;
-    while (ancestor != 0 && xn_str_find_u32((unsigned int *)((char *)&house_container), (iptr)ancestor, 4) == 0) {
+    while (ancestor != 0 && PTR_TABLE_FIND(&house_container, ancestor, 4) == 0) {
         ancestor = ancestor->parent;
     }
     if (ancestor != 0) return;

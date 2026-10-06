@@ -584,7 +584,7 @@ void inv_draw_cell_mark(int archive, int record_index, struct rect *buttons, int
         xn_tex_cache_flush();
         texture = (iptr)xn_tex_cache_lookup(archive, record_index, (int *)(iptr)-1);
     }
-    image = *(struct texture_header **)((char *)texture + 12);
+    image = ((struct tex_cache_entry *)texture)->image;
     centre_x = (buttons[button].x0 + buttons[button].x1) >> 1;
     centre_y = (buttons[button].y0 + buttons[button].y1) >> 1;
     width = image->width;
@@ -675,7 +675,7 @@ int inv_take_item(struct record *object)
         found_object->data.item.condition = capacity;
         return 0;
     }
-    slot = (struct record **)xn_str_find_u32(player_character->equipped, (iptr)inv_selected_item, 27);
+    slot = (struct record **)PTR_TABLE_FIND(player_character->equipped, inv_selected_item, 27);
     if (slot != 0) {
         object = *slot;
         item_remove_equip_effects(object, (int)(((iptr)slot - (iptr)player_character->equipped) / 4));
@@ -743,7 +743,7 @@ void inv_unequip_all_saved(void)
     struct item *item;
     int slot;
 
-    mc_memset(D_001AA4CC, 0, 108, D_0017704C, 1274, 108);
+    mc_memset(D_001AA4CC, 0, 27 * REC_SIZEOF(iptr), D_0017704C, 1274, 27 * REC_SIZEOF(iptr));
     mc_memset(D_001AA460, 0, 108, D_0017704C, 1275, 108);
     for (slot = 0; slot < 27; slot++) {
         if (player_character->equipped[slot] != 0) {
@@ -766,7 +766,7 @@ void inv_reequip_saved(void)
     for (slot = 0; slot < 27; slot++) {
         if (D_001AA4CC[slot] != 0) {
             inv_equip_item(D_001AA4CC[slot]);
-            item = (struct item *)(D_001AA4CC[slot] + 71);
+            item = (struct item *)(D_001AA4CC[slot] + RECORD_HEADER_SIZE);
             item->condition = *(short *)(D_001AA460 + (slot << 2));
         }
     }
@@ -957,7 +957,7 @@ void inv_item_info(struct record *object, struct item *item)
     } else if (item->group == 1 && object->children != 0 && object->children->type == 11) {
         msgbox_show_rsc(1006, 1);
     } else if (item->group == 1 && item->index == 1 && object->children != 0 && object->children->type == 31) {
-        D_00195ACC = (iptr)object->children + 71;
+        D_00195ACC = (iptr)object->children + RECORD_HEADER_SIZE;
         msgbox_show_rsc(1008, 1);
     } else if (item->group == 27 && item->index == 1) {
         msgbox_show_rsc(1004, 1);
@@ -981,7 +981,7 @@ void inv_list_left_item(struct record *object, iptr rects)
     item = &object->data.item;
     if (guild_membership != 0 && guild_membership->kind == 3) {
         if (trade_mode == 2 && item->enchantments[0].type == (-1)) return;
-        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && xn_str_find_u32((unsigned int *)((iptr)player_character + 367), (uptr)object, 27) != 0 && item->group != 1) {
+        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && PTR_TABLE_FIND(player_character->equipped, object, 27) != 0 && item->group != 1) {
             return;
         }
     } else {
@@ -993,7 +993,7 @@ void inv_list_left_item(struct record *object, iptr rects)
         if ((((int)(unsigned char)game_mode) == 10 || (((int)D_0019626F) == 10 && ((int)(unsigned char)game_mode) == 8)) && (item->enchantments[0].type != (-1) || item->enchant_points == 0 || itemmaker_item_object == object || (item->group == 3 && item->index == 18) || (item->group == 27 && item->index == 1) || item->group == 23)) {
             return;
         }
-        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && xn_str_find_u32((unsigned int *)((iptr)player_character + 367), (uptr)object, 27) != 0 && item->group != 1) {
+        if (((struct bf8_2_1 *)&D_001940D8)->f == 0 && PTR_TABLE_FIND(player_character->equipped, object, 27) != 0 && item->group != 1) {
             return;
         }
     }
@@ -1543,7 +1543,7 @@ void inv_toggle_hidden(void)
         item->item_flags &= ~0x40;
         return;
     }
-    if (xn_str_find_u32(player_character->equipped, (iptr)object, 27) != 0) {
+    if (PTR_TABLE_FIND(player_character->equipped, object, 27) != 0) {
         msgbox_show_string((iptr)D_00177255, 1);
         return;
     }
@@ -1585,11 +1585,11 @@ void func_00098A15(void)
 
     if (((unsigned)(((unsigned)location_object->id) >> 16)) < 1000) {
         map_goto_location(D_001AA540, D_001AA544, D_001AA580, 0);
-        mc_memcpy(player_object, saved_player_object, 55, D_0017704C, 2917, 4);
+        mc_memcpy(player_object, saved_player_object, RECORD_LINKS_OFFSET, D_0017704C, 2917, 4);
         camera_object->yaw = player_object->yaw;
         return;
     }
-    mc_memcpy(saved_player_object, player_object, 55, D_0017704C, 2922, 4);
+    mc_memcpy(saved_player_object, player_object, RECORD_LINKS_OFFSET, D_0017704C, 2922, 4);
     D_001AA540 = (int)(unsigned char)current_region;
     D_001AA544 = (int)player_environment;
     D_001AA580 = location_object->image;

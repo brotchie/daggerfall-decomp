@@ -11,8 +11,7 @@ extern struct spell *spell_records;
 extern struct image *window_image;
 extern unsigned char *scratch_buffer;
 extern unsigned char mouse_buttons_prev;
-extern char shared_picklist[];
-extern unsigned short D_001A9AE1;
+extern struct picklist shared_picklist;
 extern int spellshop_close(void);
 extern void spellshop_buy(void);
 extern void spellshop_draw_spell(struct spell *);
@@ -31,13 +30,13 @@ void spellshop_update(void)
     image = window_image;
     xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     xn_font_select(4);
-    picked = picklist_frame(shared_picklist);
+    picked = picklist_frame((char *)&shared_picklist);
     if (picked > -1) {
         spellshop_close();
         spellshop_buy();
         return;
     }
-    spellshop_draw_spell(selected_spell = &spell_records[scratch_buffer[20000 + D_001A9AE1]]);
+    spellshop_draw_spell(selected_spell = &spell_records[scratch_buffer[20000 + shared_picklist.selected]]);
     if (key_down_esc != 0) {
         spellshop_close();
         return;

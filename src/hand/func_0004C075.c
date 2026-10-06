@@ -23,7 +23,7 @@ extern void xn_gfx_present_inclusive(int);
 
 int quest_offer_prompt(struct quest *quest)
 {
-    char anim[44];
+    char anim[sizeof(struct flc_player)];
     char *found_letter;
     int accepted;
 

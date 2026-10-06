@@ -10,8 +10,7 @@ extern struct record *location_object;
 extern struct location *current_location;
 extern unsigned *scratch_buffer;
 extern unsigned char current_region;
-extern int loaded_location_door_count;
-extern struct location_door *loaded_location_doors;
+extern struct loaded_location loaded_location;
 extern short D_001970C8;
 extern int D_001970CC;
 extern struct location_door *D_001970D0;
@@ -64,8 +63,8 @@ retry:
         loc_object = D_001970D4;
         location = D_001970D8;
     } else {
-        doors = loaded_location_doors;
-        door_count = loaded_location_door_count;
+        doors = loaded_location.doors;
+        door_count = loaded_location.door_count;
         loc_object = location_object;
         location = current_location;
     }

@@ -14,11 +14,11 @@ unsigned short bio_person_add(struct character *person, char *career, int kind)
 
     if (D_001966FC[kind] == 8)
         return 0xffff;
-    object = object_create_child(player_entity, 0, 634);
+    object = object_create_child(player_entity, 0, REC_SIZEOF(struct character));
     object->type = kind + 45;
     object->flags |= 3;
     object->image = D_001966FC[kind]++;
-    mc_memcpy(&object->data.character, person, 560, D_00170464, 1334, 4);
+    mc_memcpy(&object->data.character, person, REC_OFFSETOF(struct character, career), D_00170464, 1334, 4);
     mc_memcpy(&object->data.character.career, career, 74, D_00170464, 1335, 4);
     return object->image;
 }

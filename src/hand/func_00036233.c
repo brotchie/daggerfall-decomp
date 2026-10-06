@@ -46,7 +46,7 @@ void rdb_create_objects(struct record *quarter, struct rdb_object *rdb_object, i
             rdb_model_resource = (struct rdb_model *)(rdb_data + rdb_object->resource_offset);
             if (rdb_model_resource->action_offset <= 0)
                 func_000361B7(rdb_model_resource);
-            object = object_create_in_block(quarter, 6, 62, 0, block_index);
+            object = object_create_in_block(quarter, 6, MODEL_INSTANCE_DATA_SIZE, 0, block_index);
             rdb_model_id_from_name(object, rdb_loaded_file->model_references[rdb_model_resource->model_index].model_id);
             if ((object->image2 == 703 || object->image2 == 704) && (rdb_dungeon_block->x || rdb_dungeon_block->z)) {
                 object_free_single(object);

@@ -61,7 +61,7 @@ int flc_play_with_text(iptr name, struct flc_player *anim, int text_id, int ask_
     short ticks_addr2;
 
     i = 0;
-    mc_memset(anim, 0, 44, D_00175404, 127, 4);
+    mc_memset(anim, 0, sizeof(*anim), D_00175404, 127, 4);
     if (flc_open(name, anim) == 0) {
         mc_set_location(131, D_00175404);
         mc_sprintf((char *)text_buffer, D_0017540B, name);

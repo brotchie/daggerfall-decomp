@@ -108,7 +108,7 @@ void spellbook_add_spell_cb(struct record *object)
         mc_sprintf((char *)text_buffer, D_00170DEF, spell_cost(spell, player_character), spell->name);
     }
     picklist_add(&shared_picklist, text_buffer, 0);
-    *(iptr *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (iptr)object;
+    ((iptr *)scratch_190de4)[(int)(short)(*(short *)scratch_190d64)++] = (iptr)object;
 }
 
 void spellbook_frame(void)
@@ -131,7 +131,7 @@ void spellbook_frame(void)
     xn_font_select(4);
     *(int *)&picked = picklist_frame(&shared_picklist);
     if (((int)(short)picked) > (-1)) {
-        spell_object = (struct record *)*(iptr *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2));
+        spell_object = (struct record *)((iptr *)scratch_190de4)[(int)(unsigned short)shared_picklist.selected];
         spellbook_close();
         if ((player_character->conditions & 0x100) != 0) {
             hud_message_add(D_00184634);
@@ -166,7 +166,7 @@ void spellbook_frame(void)
         }
         return;
     }
-    spellbook_draw_spell((selected_spell = (struct spell *)(*(iptr *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2)) + 71)));
+    spellbook_draw_spell((selected_spell = (struct spell *)(((iptr *)scratch_190de4)[(int)(unsigned short)shared_picklist.selected] + RECORD_HEADER_SIZE)));
     if (((int)(unsigned char)msgbox_kind) == 2) {
         mc_strncpy(shared_picklist.entries[shared_picklist.selected].text, selected_spell->name, 40, D_00170DE4, 193);
     }
@@ -296,7 +296,7 @@ int spellbook_build_list(void)
 
 void spellbook_delete_button(void)
 {
-    object_delete((struct record *)((iptr)selected_spell - 71));
+    object_delete(RECORD_FROM_DATA(selected_spell));
     picklist_free(&shared_picklist);
     if (spellbook_build_list() != 0) return;
     spellbook_close();
@@ -306,7 +306,7 @@ void spellbook_up_button(void)
 {
     struct record *object;
 
-    object = (struct record *)((iptr)selected_spell - 71);
+    object = RECORD_FROM_DATA(selected_spell);
     if (object->prev == 0) return;
     object_swap_siblings(object, object->prev);
     picklist_free(&shared_picklist);
@@ -317,7 +317,7 @@ void spellbook_down_button(void)
 {
     struct record *object;
 
-    object = (struct record *)((iptr)selected_spell - 71);
+    object = RECORD_FROM_DATA(selected_spell);
     if (object->next == 0) return;
     object_swap_siblings(object, object->next);
     picklist_free(&shared_picklist);
@@ -339,7 +339,7 @@ int spell_cost_item_percent(void)
     day_ahead = (((unsigned)(game_minutes + 5760)) / 1440) & 31;
     for (slot = 0; slot < 27; slot++) {
         if (player_character->equipped[slot] == 0) continue;
-        item = (struct item *)((char *)player_character + 371);
+        item = (struct item *)&player_character->equipped[1];
         if (item->enchantments[0].type == -1) continue;
         for (i = 0; i < 10; i++) {
             if (item->enchantments[i].type == (-1)) break;

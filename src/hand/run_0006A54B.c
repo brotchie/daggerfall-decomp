@@ -23,7 +23,7 @@ extern int engine_running;
 extern struct record *nonworld_root;
 extern struct record *quest_root;
 extern struct record *location_object;
-extern struct mem_block *object_heap_blocks;
+extern struct mem_pool object_heap;
 extern int object_heap_size;
 extern void debug_checkpoint(int);
 extern struct qbn_place *quest_section(struct quest *, int);
@@ -41,7 +41,7 @@ int mem_pool_release(char *data)
     struct mem_block *neighbour;
     int size;
 
-    block = (struct mem_block *)(data - 18);
+    block = (struct mem_block *)(data - MEM_BLOCK_HEADER_SIZE);
     if (block->magic != 1768515945 || ((short)block->flags & ~1) != 0)
         fatal_error(D_00175B02);
     *(unsigned char *)&block->flags &= 254;
@@ -50,7 +50,7 @@ int mem_pool_release(char *data)
     if (block->next != 0) {
         if (!((short)block->next->flags & 1)) {
             neighbour = block->next;
-            block->size += neighbour->size + 18;
+            block->size += neighbour->size + MEM_BLOCK_HEADER_SIZE;
             block->next = neighbour->next;
             if (block->next != 0)
                 block->next->prev = block;
@@ -59,7 +59,7 @@ int mem_pool_release(char *data)
     if (block->prev != 0) {
         if (!((short)block->prev->flags & 1)) {
             neighbour = block->prev;
-            neighbour->size += block->size + 18;
+            neighbour->size += block->size + MEM_BLOCK_HEADER_SIZE;
             neighbour->next = block->next;
             if (neighbour->next != 0)
                 neighbour->next->prev = neighbour;
@@ -115,33 +115,33 @@ void mem_check_heap(int checkpoint)
         xn_sys_zero_page_check(checkpoint);
     object_foreach(nonworld_root, mem_check_quest_object_cb);
     object_foreach(quest_root->children, mem_check_quest_ids_cb);
-    prev = block = object_heap_blocks;
+    prev = block = object_heap.first;
     while (block != 0) {
         if (block->magic != 1768515945) {
             mc_set_location(300, D_00175AD4);
-            func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
+            func_000A148C(D_00175B79, ((unsigned char *)prev)[MEM_BLOCK_HEADER_SIZE]);
             fatal_error(D_00175B91);
         }
-        if (block->next != 0 && (char *)block + 18 + block->size != (char *)block->next) {
+        if (block->next != 0 && (char *)block + MEM_BLOCK_HEADER_SIZE + block->size != (char *)block->next) {
             mc_set_location(306, D_00175AD4);
-            func_000A148C(D_00175B79, ((unsigned char *)block)[18]);
+            func_000A148C(D_00175B79, ((unsigned char *)block)[MEM_BLOCK_HEADER_SIZE]);
             fatal_error(D_00175BA8);
         }
         if (block->size == 0 || (int)block->size > object_heap_size) {
             mc_set_location(312, D_00175AD4);
-            func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
+            func_000A148C(D_00175B79, ((unsigned char *)prev)[MEM_BLOCK_HEADER_SIZE]);
             fatal_error(D_00175BC1);
         }
-        if (block < object_heap_blocks || (iptr)object_heap_blocks + object_heap_size < (iptr)block) {
+        if (block < object_heap.first || (iptr)object_heap.first + object_heap_size < (iptr)block) {
             mc_set_location(318, D_00175AD4);
-            func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
+            func_000A148C(D_00175B79, ((unsigned char *)prev)[MEM_BLOCK_HEADER_SIZE]);
             fatal_error(D_00175BDC);
         }
         prev = block;
         block = block->next;
         if (block != 0 && block->prev != prev) {
             mc_set_location(327, D_00175AD4);
-            func_000A148C(D_00175B79, ((unsigned char *)prev)[18]);
+            func_000A148C(D_00175B79, ((unsigned char *)prev)[MEM_BLOCK_HEADER_SIZE]);
             fatal_error(D_00175BFA);
         }
     }

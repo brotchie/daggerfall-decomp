@@ -793,7 +793,7 @@ void guard_spawn(struct record *pedestrian)
 {
     struct record *guard;
 
-    guard = object_create_child(player_object->parent, 0, 659);
+    guard = object_create_child(player_object->parent, 0, REC_SIZEOF(struct monster));
     if (creature_count > 10) {
         object_delete(guard);
         return;

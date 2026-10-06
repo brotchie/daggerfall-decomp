@@ -58,9 +58,9 @@ void faction_load_file(void)
             factions = (struct faction *)0x97979797;
         }
     }
-    dest = factions = mc_malloc(faction_count * 92, D_00170464, 975);
-    mc_memset(dest, 0, faction_count * 92, D_00170464, 976, 4);
-    mc_memset(&parsed, 0, 92, D_00170464, 977, 4);
+    dest = factions = mc_malloc(faction_count * REC_SIZEOF(struct faction), D_00170464, 975);
+    mc_memset(dest, 0, faction_count * REC_SIZEOF(struct faction), D_00170464, 976, 4);
+    mc_memset(&parsed, 0, sizeof(parsed), D_00170464, 977, 4);
     text = D_00147954;
     text[len] = 0;
     while (*text != 0) {
@@ -83,7 +83,7 @@ void faction_load_file(void)
                 faction_add_record(&parsed, prev, dest++);
                 prev = indent;
                 indent = 0;
-                mc_memset(&parsed, 0, 92, D_00170464, 1012, 4);
+                mc_memset(&parsed, 0, sizeof(parsed), D_00170464, 1012, 4);
                 ally_count = enemy_count = 0;
             }
             have_record = 1;

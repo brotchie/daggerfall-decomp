@@ -1,5 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of inven from 0x98538 to 0x98941, kept together for its switch table's alignment */
-#include "structs.h"
+#include "records.h"
 #include "clib.h"
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 #define FREED ((char *)0x97979797)
@@ -43,10 +43,10 @@ void trade_mark_identified(void)
 {
     unsigned char *object;
 
-    object = *(unsigned char **)(inv_right_container + 63);
+    object = (unsigned char *)((struct record *)inv_right_container)->children;
     while (object != 0) {
-        object[113] |= 32;
-        object = *(unsigned char **)(object + 55);
+        object[REC_OFFSETOF(struct record, data.item.item_flags)] |= 32;
+        object = (unsigned char *)((struct record *)object)->next;
     }
 }
 
@@ -56,7 +56,7 @@ int trade_can_identify_selected(void)
     int holiday;
     int price;
 
-    item = inv_selected_item + 71;
+    item = inv_selected_item + RECORD_HEADER_SIZE;
     if (*(short *)(item + 67) != -1) {
         if (*(unsigned short *)(item + 42) & 32) {
             msgbox_show_string(D_001832BC, 1);
@@ -97,7 +97,7 @@ void transport_menu(void)
             enabled |= 2;
         if ((scratch_190d16 & 1) && player_environment == 1)
             enabled |= 4;
-        if (*(int *)(player_character + 120) != 0 && player_environment != 3)
+        if (((struct character *)player_character)->ship_owned != 0 && player_environment != 3)
             enabled |= 8;
     }
     while (done == 0) {

@@ -27,7 +27,7 @@ void msgbox_show_qrc_text(char *name, unsigned short message_id, short kind)
         return;
     msgbox_saved_screen = mc_malloc(64000, D_00170D55, 765);
     mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, D_00170D55, 766, 4);
-    mc_memset(&stub, 0, 60, D_00170D55, 768, 4);
+    mc_memset(&stub, 0, sizeof(stub), D_00170D55, 768, 4);
     mc_strncpy(stub.name, name, 9, D_00170D55, 769);
     xn_font_select(4);
     if (kind == 5) {

@@ -147,8 +147,9 @@ RECORD_OFFSET(arch3d_plane, points, 8);
  * draw handle, pick_sprite_cb); the first 8 bytes */
 struct xn_pick_hit {
     struct arch3d_plane *plane;     /* +0x00: a polygon's plane (click_face_texture) */
-    int model;                      /* +0x04: a polygon's: the address of its model pointer (pick_model_cb
-                                       compares &instance.model); 0 a flat, 1 nothing to pick */
+    char **model;                   /* +0x04: a polygon's: the address of its model pointer (pick_model_cb
+                                       compares &instance.model); 0 a flat, 1 nothing to pick
+                                       (a pointer, so natively it is the engine's xn_poly.handle) */
 };                                  /* +0x08 */
 RECORD_SIZE_P(xn_pick_hit, 8);
 
@@ -237,12 +238,28 @@ struct texture_header {
 RECORD_SIZE(texture_header, 28);
 
 /* a TEXTURE.nnn record's entry in XnGine's texture cache, as xn_tex_cache_lookup returns it
- * (the first 16 bytes) */
+ * (the first 16 bytes of the engine's struct xn_tex_entry, whose two pointers it declares, so
+ * that `image` is the engine's `current` natively too) */
 struct tex_cache_entry {
-    char pad00[12];                 /* +0x00 */
+    char pad00[2];                  /* +0x00 */
+    struct texture_header *header;  /* +0x02: the engine's: the record's header (relocated) */
+    char pad06[6];                  /* +0x06 */
     struct texture_header *image;   /* +0x0C: the decoded frame (its header, then the pixels) */
 };                                  /* +0x10 */
 RECORD_SIZE_P(tex_cache_entry, 16);
+RECORD_OFFSET_P(tex_cache_entry, image, 0x0C);
+
+/* the heap block header in front of a loaded TEXTURE.nnn archive (the engine's struct
+ * xn_tex_block, whose pointers it declares; the memory screen, kludge_show_memory) */
+struct tex_block {
+    struct tex_block *next;         /* +0x00 */
+    struct tex_block *prev;         /* +0x04 */
+    int size;                       /* +0x08: data bytes after the header */
+    unsigned short flags;           /* +0x0C */
+    char *slot;                     /* +0x0E: the xn_tex_archives slot */
+    unsigned int last_tick;         /* +0x12 */
+};                                  /* +0x16 */
+RECORD_SIZE_P(tex_block, 22);
 
 /* a BSA archive's directory entry: type-256 archives name their records, the others number them */
 struct bsa_name_entry {

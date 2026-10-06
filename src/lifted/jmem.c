@@ -41,7 +41,7 @@ void mem_pool_init(struct mem_pool *pool, int size)
     block = pool->first;
     if (block == 0) fatal_error(D_00175ADB);
     pool->size = size;
-    block->size = size - 18;
+    block->size = size - MEM_BLOCK_HEADER_SIZE;
     block->prev = 0;
     block->next = block->prev;
     block->flags = 0;
@@ -61,7 +61,7 @@ iptr mem_pool_alloc(struct mem_pool *pool, int size)
     int block_size;
 
     block_size = (size + 1) & -2;
-    block_size += 18;
+    block_size += MEM_BLOCK_HEADER_SIZE;
     block = pool->first;
     while (block != 0) {
         if ((int)block->size < block_size || ((int)(short)((short)block->flags & 1)) != 0) {
@@ -82,20 +82,20 @@ iptr mem_pool_alloc(struct mem_pool *pool, int size)
         if (next->next != 0) next->next->prev = next;
     } else {
         next = block->next;
-        block_size += 18;
+        block_size += MEM_BLOCK_HEADER_SIZE;
     }
     block->next = next;
-    block->size = block_size - 18;
+    block->size = block_size - MEM_BLOCK_HEADER_SIZE;
     block->flags |= 1;
     block->magic = 1768515945;
-    return (iptr)block + 18;
+    return (iptr)block + MEM_BLOCK_HEADER_SIZE;
 }
 
 int mem_block_size(char *data)
 {
     struct mem_block *block;
 
-    block = (struct mem_block *)(data - 18);
+    block = (struct mem_block *)(data - MEM_BLOCK_HEADER_SIZE);
     return block->size;
 }
 

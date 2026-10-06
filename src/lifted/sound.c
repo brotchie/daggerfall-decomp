@@ -118,7 +118,7 @@ int func_00069281(iptr sample, int length)
     if (channel == 3) return -1;
     volume = 32767;
     pan = 32768;
-    mc_memset(&sound_channels[channel].sample, 0, 240, D_00175ACC, 291, 4);
+    mc_memset(&sound_channels[channel].sample, 0, sizeof(sound_channels[channel].sample), D_00175ACC, 291, 4);
     sound_channels[channel].priority = 127;
     sound_channels[channel].sample.data = (char *)sample;
     sound_channels[channel].sample.length = length;
@@ -159,7 +159,7 @@ int sound_play_sample_flat(iptr sample, int length)
         }
     }
     if (channel == 3) return -1;
-    mc_memset(&sound_channels[channel].sample, 0, 240, D_00175ACC, 336, 4);
+    mc_memset(&sound_channels[channel].sample, 0, sizeof(sound_channels[channel].sample), D_00175ACC, 336, 4);
     sound_channels[channel].priority = 90;
     sound_channels[channel].sample.data = (char *)sample;
     sound_channels[channel].sample.length = length;

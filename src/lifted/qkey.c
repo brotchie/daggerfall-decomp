@@ -505,7 +505,7 @@ int damage_bonus_vs_target(struct item *weapon, struct character *attacker, stru
             bonus -= attacker->level;
         }
         if (weapon->enchantments[i].type == 21 && weapon->enchantments[i].param == 0) {
-            damage_apply((struct record *)((char *)attacker - 71), (int)(iptr)&*(signed char *)((char *)(iptr)(attacker->level >> 2) + 1), 0);
+            damage_apply(RECORD_FROM_DATA(attacker), (int)(iptr)&*(signed char *)((char *)(iptr)(attacker->level >> 2) + 1), 0);
         }
     }
     return bonus;

@@ -203,12 +203,12 @@ void automap_open(void)
             parent = player_object->parent;
         }
         if (parent != 0) {
-            player_marker = object_create_child(parent, 0, 62);
+            player_marker = object_create_child(parent, 0, MODEL_INSTANCE_DATA_SIZE);
             player_marker->image2 = 999;
             player_marker->image = 0;
             mc_memcpy(&player_marker->angle_x, &player_object->angle_x, 18, D_001707AE, 130, 4);
             player_marker->yaw = 2047 - player_marker->yaw;
-            xn_model_set_angles(player_marker->angle_x, player_marker->yaw, player_marker->angle_z, (short *)((iptr)RECORD_DATA(player_marker) + 12));
+            xn_model_set_angles(player_marker->angle_x, player_marker->yaw, player_marker->angle_z, (short *)player_marker->data.instance.angles);
             player_marker->type = 6;
             player_marker->flags = 128;
             player_marker->y -= 40;

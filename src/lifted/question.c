@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
+#include "structs.h"
 #include "clib.h"
 
 extern signed char mouse_buttons;
@@ -109,9 +110,9 @@ void class_question_scroll_step(iptr *scroll_cels, short delta)
 void class_question_answer_anim(short kind)
 {
 {
-    char flc[44];
+    char flc[sizeof(struct flc_player)];
 
-    func_000A1944(flc, 0, 44);
+    func_000A1944(flc, 0, sizeof(flc));
     *(short *)flc = 16;
     sound_play_ui(18);
     pflc_play(class_answer_cels[((int)(short)kind)], (iptr)flc);

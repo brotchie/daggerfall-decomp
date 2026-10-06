@@ -658,7 +658,9 @@ struct logbook {
 RECORD_SIZE(logbook, 3008);
 
 /* the data of a 3D object (types 6 models, 32 doors; also D_001A945E for arrows in flight):
- * XnGine's model instance, which object_draw_cb fills and xn_model_submit draws */
+ * XnGine's model instance, which object_draw_cb fills and xn_model_submit draws. It is the
+ * engine's struct xn_model_handle (58 bytes, 70 natively), field for field; the objects'
+ * data is 4 bytes more (MODEL_INSTANCE_DATA_SIZE) */
 struct model_instance {
     char *model;                    /* +0x00: model_get's result, 0 none */
     char *lights;                   /* +0x04: the engine's (xn_model_handle): this frame's light
@@ -669,8 +671,12 @@ struct model_instance {
     int y;                          /* +0x24 */
     int z;                          /* +0x28 */
     int missile_angles[3];          /* +0x2C: arrows: the heading, angle_z, 0 */
-};                                  /* +0x38 */
-RECORD_SIZE_P(model_instance, 56);
+    unsigned char frame;            /* +0x38: the engine's: the animation frame */
+    unsigned char draw_flags;       /* +0x39: the engine's: bit 0 occluded, bit 1 drawn */
+};                                  /* +0x3A */
+RECORD_SIZE_P(model_instance, 58);
+/* the data size of a type-6 or type-32 object (62 under Watcom) */
+#define MODEL_INSTANCE_DATA_SIZE (REC_SIZEOF(struct model_instance) + 4)
 
 /* the data of the automap record (type 51), saved as AT%05d.AMF */
 struct automap {
@@ -1074,6 +1080,39 @@ RECORD_OFFSET_P(record, data, 0x47);
 /* the data of a record as a char pointer: `(char *)r + 71`; and back */
 #define RECORD_DATA(r) ((char *)(r) + RECORD_HEADER_SIZE)
 #define RECORD_FROM_DATA(p) ((struct record *)((char *)(p) - RECORD_HEADER_SIZE))
+/* the four links next, prev, children, parent (16 bytes under Watcom) */
+#define RECORD_LINKS_SIZE (RECORD_HEADER_SIZE - RECORD_LINKS_OFFSET)
+
+/* the header of a block of the memory pools (18 under Watcom; the data follows it) */
+#define MEM_BLOCK_HEADER_SIZE REC_SIZEOF(struct mem_block)
+
+/* a capacity budgeted for 32-bit records and headers (the object heap): natively the records
+   are larger (95-byte headers, 26-byte blocks, 8-byte pointers in the data), so 1.5 times */
+#if defined(DAGGER_PORT)
+#define NATIVE_HEAP_BYTES(n) ((n) + (n) / 2)
+#else
+#define NATIVE_HEAP_BYTES(n) (n)
+#endif
+
+/* the slot of a table of pointers that holds a value, 0 none (the four inventory containers,
+   a character's equipped[27]): under Watcom the engine's 32-bit search, as the game called it;
+   natively the slots are 8 bytes */
+#if defined(DAGGER_PORT)
+static __inline__ void *ptr_table_find(void *table, void *value, unsigned count)
+{
+    void **slot = (void **)table;
+
+    for (; count != 0; count--, slot++)
+        if (*slot == value)
+            return slot;
+    return 0;
+}
+#define PTR_TABLE_FIND(table, value, count) \
+    ptr_table_find((void *)(table), (void *)(uptr)(value), (count))
+#else
+#define PTR_TABLE_FIND(table, value, count) \
+    xn_str_find_u32((unsigned *)(table), (uptr)(value), (count))
+#endif
 
 /* ---- other structures (not records) --------------------------------------------------------- */
 

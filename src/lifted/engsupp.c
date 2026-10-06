@@ -51,11 +51,11 @@ int engine_pick_object(int x, int y, struct pick_result *result)
 
     view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     if (y > view_bottom) return 0;
-    mc_memset(result, 0, 18, D_001702D4, 38, 4);
+    mc_memset(result, 0, sizeof(*result), D_001702D4, 38, 4);
     pick_result = result;
-    if ((pick_hit = (struct xn_pick_hit *)xn_render_pick(x, y))->model == 1) return 0;
+    if ((iptr)(pick_hit = (struct xn_pick_hit *)xn_render_pick(x, y))->model == 1) return 0;
     if (pick_hit->model != 0) {
-        D_0019647C = pick_hit->model;
+        D_0019647C = (iptr)pick_hit->model;
         click_face_texture = pick_hit->plane;
         world_for_each_object((iptr)pick_model_cb);
     } else {

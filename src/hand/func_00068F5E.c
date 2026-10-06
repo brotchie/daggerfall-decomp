@@ -60,7 +60,7 @@ int sound_play_sample(iptr sample, int length, struct record *object, int priori
         sound_volume_pan(sound_channels[i].position, &sound_channels[i].source->x, &volume, &pan, sound_channels[i].source);
     else
         sound_volume_pan(sound_channels[i].position, sound_channels[i].position, &volume, &pan, sound_channels[i].source);
-    mc_memset(&sound_channels[i].sample, 0, 240, D_00175ACC, 246, 4);
+    mc_memset(&sound_channels[i].sample, 0, sizeof(sound_channels[i].sample), D_00175ACC, 246, 4);
     sound_channels[i].priority = priority;
     sound_channels[i].sample.data = (char *)sample;
     sound_channels[i].sample.length = length;

@@ -29,10 +29,10 @@ void ladder_climb(void)
     if (p == 0 || p->type != 43) return;
     q = marker_find_nearest(p->children, 19);
     if (q == 0) return;
-    mc_memcpy(&a, q, 71, D_00177358, 521, 4);
+    mc_memcpy(&a, q, sizeof(a), D_00177358, 521, 4);
     q = marker_find_nearest(p->children, 20);
     if (q == 0) return;
-    mc_memcpy(&b, q, 71, D_00177358, 525, 4);
+    mc_memcpy(&b, q, sizeof(b), D_00177358, 525, 4);
     if (abs(player_object->y - a.y) > abs(player_object->y - b.y)) {
         player_object->x = a.x;
         player_object->y = a.y;

@@ -9,7 +9,7 @@ struct record *rmb_make_door(struct record *parent, short image2, short image, i
 {
     struct record *object;
 
-    object = object_create_child(parent, 0, 62);
+    object = object_create_child(parent, 0, MODEL_INSTANCE_DATA_SIZE);
     object->type = is_door ? 32 : 6;
     object->lock_level = 0;
     object->image2 = image2;

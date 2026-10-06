@@ -1,5 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of inven.c from 0x00097488 to 0x00097616, kept together for its switch table's alignment */
-#include "structs.h"
+#include "records.h"
 extern char *player_entity;
 extern unsigned char *found_object;
 extern struct image *D_001AA42C;
@@ -19,10 +19,10 @@ int inv_take_arrow(int consume)
     unsigned char *item;
 
     found_object = 0;
-    object_find(*(int *)(player_entity + 63), inv_match_arrows);
+    object_find((iptr)((struct record *)player_entity)->children, inv_match_arrows);
     if (found_object == 0) return 0;
     if (consume == 0) return 1;
-    item = found_object + 71;
+    item = found_object + RECORD_HEADER_SIZE;
     if (item[49] == 1) {
         object_delete(found_object);
         return 1;

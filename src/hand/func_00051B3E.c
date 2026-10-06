@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00051B3E */
 #include "ptrint.h"
+#include "structs.h"
 #include "clib.h"
 #include "doslow.h"
 #pragma pack(1)
@@ -10,10 +11,16 @@ struct Snd {
     short count;                /* 0x06 */
     unsigned short delay;       /* 0x08 */
     int data;                   /* 0x0a */
-    char pad1[0x2a - 0x0e];
+    char pad1[0x16 - 0x0e];
+    char *chunk;                /* 0x16: struct flc_player's three buffers, so that state and */
+    char *palette;              /* 0x1a: loops are where flc_open's player has them natively */
+    char *image;                /* 0x1e */
+    char pad2[0x2a - 0x22];
     unsigned char state;        /* 0x2a */
     unsigned char loops;        /* 0x2b */
 };
+/* pflc_play's view of struct flc_player (its own field types) */
+typedef char snd_size_check[(sizeof(struct Snd) == sizeof(struct flc_player)) ? 1 : -1];
 extern unsigned char mouse_buttons;
 extern char xn_kbd_last_scancode;
 extern void flc_show_frame(struct Snd *);

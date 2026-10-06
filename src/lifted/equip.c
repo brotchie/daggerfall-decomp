@@ -1077,7 +1077,7 @@ void ai_update_creatures(void)
     for (i = 0; i < creature_count; i++) {
         if ((creature_count - 1) != i) place_settle_creature(creature_list[i]);
         ai_entities[i] = (struct record *)(creature_list[i]);
-        ai_characters[i] = (struct character *)(((char *)ai_entities[i] + 71));
+        ai_characters[i] = (struct character *)RECORD_DATA(ai_entities[i]);
     }
     for (i = 0; (creature_count - 1) > i; i++) {
         bios_ticks = (int *)DOS_LOW(0x46C);

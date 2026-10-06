@@ -30,7 +30,7 @@ void potionmaker_ingredient_cb(struct record *object)
         return;
     }
     if (n < 12) {
-        spr = *(char **)(xn_tex_cache_lookup(p->inventory_image >> 7, p->inventory_image & 127, -1) + 12);
+        spr = (char *)((struct tex_cache_entry *)xn_tex_cache_lookup(p->inventory_image >> 7, p->inventory_image & 127, -1))->image;
         xn_draw_image_drop_shadow(n % 3 * 56 + 28 - (*(unsigned short *)(spr + 4) >> 1), n / 3 * 38 + 42 - (*(unsigned short *)(spr + 6) >> 1), *(unsigned short *)(spr + 4), *(unsigned short *)(spr + 6), spr + *(int *)(spr + 14));
         text_draw_centred_coloured(p->name, n % 3 * 56 + 30, n / 3 * 38 + 58 + (n % 3 == 1 ? 5 : 0), 145, 156);
     }

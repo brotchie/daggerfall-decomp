@@ -24,7 +24,7 @@ void kludge_fix_dungeon_door(void)
                 object = kludge_find_door();
                 if (object != 0)
                     object_delete(object);
-                object = object_create_child(D_00199720->parent, 0, 62);
+                object = object_create_child(D_00199720->parent, 0, MODEL_INSTANCE_DATA_SIZE);
                 object->type = 6;
                 object->image2 = 703;
                 object->image = 0;

@@ -29,7 +29,7 @@ void paperdoll_draw_item(struct item *item, int x, int y, int mask_value)
         xn_tex_cache_flush();
         texture = (char *)xn_tex_cache_lookup(item->inventory_image >> 7, (int)(unsigned short)(item->inventory_image & 127), (int *)(iptr)-1);
     }
-    image = *(struct texture_header **)(texture + 12);
+    image = ((struct tex_cache_entry *)texture)->image;
     if (item->enchantments[0].type == 26 && item->enchantments[0].param == 6) {
         xn_draw_image_scaled((image->x) + x, (image->y) + y, image->width, image->height, image->width, image->height, (int)(unsigned short)(image->flags | 32768), (char *)image + image->data_offset);
     } else {

@@ -414,7 +414,7 @@ void encounter_spawn_hidden(int monster_id)
     struct record *creature;
 
     if (monster_id == (-1)) return;
-    creature = object_create_child(location_object, 0, 659);
+    creature = object_create_child(location_object, 0, REC_SIZEOF(struct monster));
     creature->type = 18;
     creature->flags |= 1;
     creature->id = object_new_id(((unsigned)location_object->id) >> 16);
@@ -432,7 +432,7 @@ void encounter_spawn_ahead(int monster_id)
     struct record *creature;
 
     if (monster_id == (-1)) return;
-    creature = object_create_child(location_object, 0, 659);
+    creature = object_create_child(location_object, 0, REC_SIZEOF(struct monster));
     creature->type = 18;
     creature->flags |= 1;
     creature->id = object_new_id(((unsigned)location_object->id) >> 16);

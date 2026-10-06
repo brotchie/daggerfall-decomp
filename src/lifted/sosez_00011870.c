@@ -30,12 +30,12 @@ int sos_load_song(char *name)
     record = archive_find_record(midi_bsa, name, 13);
     record_size = archive_record_size(midi_bsa, record);
     size = record_size;
-    buffer = (iptr)mc_malloc(size + 32, D_001700D5, 385);
+    buffer = (iptr)mc_malloc(size + (int)sizeof(struct sos_song), D_001700D5, 385);
     if (buffer == 0) return 0;
-    archive_read_record(midi_bsa, record, buffer + 32);
+    archive_read_record(midi_bsa, record, buffer + (int)sizeof(struct sos_song));
     song = (struct sos_song *)buffer;
-    mc_memset(song, 0, 32, D_001700D5, 397, 4);
-    song->data = (char *)(buffer + 32);
+    mc_memset(song, 0, sizeof(struct sos_song), D_001700D5, 397, 4);
+    song->data = (char *)(buffer + (int)sizeof(struct sos_song));
     if (func_000A021C(song, &song_handle) != 0) {
         if (buffer != 0 && buffer != (-1751672937)) {
             mc_free((void *)buffer, D_001700D5, 406);
@@ -45,6 +45,6 @@ int sos_load_song(char *name)
     }
     D_0018DC34 = buffer;
     D_001A3F48 = buffer;
-    dpmi_lock_region(buffer, (D_001A3F4C = size + 32));
+    dpmi_lock_region(buffer, (D_001A3F4C = size + (int)sizeof(struct sos_song)));
     return song_handle;
 }

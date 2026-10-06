@@ -25,7 +25,7 @@ void quest_pick_location(struct loaded_location *location, unsigned kind, int su
 
     saved = region_locations;
     done = 0;
-    mc_memset(location, 0, 20, D_00176C94, 1045, 4);
+    mc_memset(location, 0, sizeof(*location), D_00176C94, 1045, 4);
     if (mode == 0) {
         location_load_exterior(location, location_object->image);
         return;

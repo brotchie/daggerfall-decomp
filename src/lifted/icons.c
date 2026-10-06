@@ -123,7 +123,7 @@ void hud_toggle_weapon(void)
     D_001940D6 ^= 64;
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
     if (player_character->equipped[19] == 0) return;
-    *(iptr *)&item_data = (iptr)player_character->equipped[19] + 71;
+    *(iptr *)&item_data = (iptr)player_character->equipped[19] + RECORD_HEADER_SIZE;
     sound_play((int)(short)D_00188208[((int)(unsigned short)*(short *)(*(char **)&item_data + 34))], player_object, 100);
 }
 
@@ -165,7 +165,7 @@ void magic_items_add_cb(struct record *object)
 
     if (object->type != 2) return;
     parent = object->parent;
-    while (parent != 0 && xn_str_find_u32((unsigned int *)((char *)&house_container), (uptr)parent, 4) == 0) {
+    while (parent != 0 && PTR_TABLE_FIND(&house_container, parent, 4) == 0) {
         parent = parent->parent;
     }
     if (parent != 0) return;
@@ -194,7 +194,7 @@ void magic_items_add_cb(struct record *object)
         parse_expand(D_001758A4, D_00190B44);
     }
     picklist_add(&shared_picklist, D_00190B44, 0);
-    *(iptr *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (iptr)object;
+    ((iptr *)scratch_190de4)[(int)(short)(*(short *)scratch_190d64)++] = (iptr)object;
 }
 
 void magic_items_open(void)
@@ -233,7 +233,7 @@ void magic_items_frame(void)
     *(int *)&picked = picklist_poll(&shared_picklist) - 1;
     if (((int)(short)picked) > (-1)) {
         magic_items_close();
-        inv_selected_item = (struct record *)(*(iptr *)(scratch_190de4 + (((int)(short)picked) << 2)));
+        inv_selected_item = (struct record *)((iptr *)scratch_190de4)[(int)(short)picked];
         inv_use_item();
         return;
     }

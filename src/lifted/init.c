@@ -675,7 +675,7 @@ void init_player_records(struct record *root)
     camera_object->x = player_object->x;
     camera_object->y = player_object->y - 75;
     camera_object->z = player_object->y;
-    (player_entity = object_create_child(player_object, 0, 634))->type = 3;
+    (player_entity = object_create_child(player_object, 0, REC_SIZEOF(struct character)))->type = 3;
     player_entity->flags = 3;
     player_class = &(player_character = &player_entity->data.character)->career;
     player_character->pad83 = 1;
@@ -709,12 +709,12 @@ void init_player_records(struct record *root)
     quest_root->flags = 3;
     *(signed char *)((char *)(*(iptr *)&options_object = (iptr)object_create_child(player_entity, 0, 6))) = 23;
     options_object->flags = 3;
-    *(short *)((char *)(*(iptr *)&game_settings = (iptr)options_object + 71)) = 32514;
+    *(short *)((char *)(*(iptr *)&game_settings = (iptr)options_object + RECORD_HEADER_SIZE)) = 32514;
     game_settings->sound_volume = 127;
     game_settings->music_volume = 128;
     *(signed char *)((char *)(*(iptr *)&logbook_object = (iptr)object_create_child(player_entity, 0, 3008))) = 24;
     logbook_object->flags = 3;
-    logbook = (iptr)logbook_object + 71;
+    logbook = (iptr)logbook_object + RECORD_HEADER_SIZE;
     *(signed char *)((char *)(*(iptr *)&bank_accounts = (iptr)object_create_child(player_entity, 0, 806))) = 25;
     bank_accounts->flags = 3;
 }
@@ -841,7 +841,7 @@ void game_reset(void)
         regions[region].price_adjustment = rand_range(0, 500) + 750;
     }
     mc_memset(saved_positions, 0, 48, D_00175040, 851, 48);
-    mc_memset(((char *)creature_list), 0, 512, D_00175040, 852, 512);
+    mc_memset(((char *)creature_list), 0, 128 * REC_SIZEOF(struct record *), D_00175040, 852, 128 * REC_SIZEOF(struct record *));
     creature_count = 0;
 }
 

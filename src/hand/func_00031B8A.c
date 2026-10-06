@@ -14,8 +14,7 @@ extern struct location *current_location;
 extern char *scratch_buffer;
 extern struct record *D_00195CE8;
 extern unsigned char current_region;
-extern int loaded_location_door_count;
-extern struct location_door *loaded_location_doors;
+extern struct loaded_location loaded_location;
 extern char D_001970C8[];
 extern int D_001970CC;
 extern struct location_door *D_001970D0;
@@ -209,8 +208,8 @@ int quest_init_person(struct qbn_person *qbn_person)
     tries = 0;
 retry:
     if ((int)(short)(qbn_person->flags & 0xff) == 0) {
-        doors = loaded_location_doors;
-        door_count = loaded_location_door_count;
+        doors = loaded_location.doors;
+        door_count = loaded_location.door_count;
         loc_object = location_object;
         location = current_location;
     } else {

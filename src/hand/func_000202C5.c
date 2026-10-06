@@ -38,7 +38,7 @@ extern char *xn_str_find_u16(char *, short, int);
 
 void daedra_summon(struct record *object)
 {
-    char flc[44];
+    char flc[sizeof(struct flc_player)];
     struct faction *guild;
     struct faction *daedra;
     char *day_entry;
@@ -174,7 +174,7 @@ void daedra_summon(struct record *object)
     }
     if (daedra->flags & 64) {
         daedra_entry = &REGION(daedra);
-        mc_memset(flc, 0, 44, D_00170634, 189, 4);
+        mc_memset(flc, 0, sizeof(flc), D_00170634, 189, 4);
         current_quest = 0;
         flc_play_with_text(D_001850E5[daedra_entry - D_001850D4], flc, 482, 0);
         object = monster_summon_near_player(D_00179E90[rand_range(0, 4)]);

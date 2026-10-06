@@ -47,7 +47,7 @@ int inv_draw_item_cell(char *object, short cell, struct rect *rects)
 
     image_bump = 0;
     *(char * *)&scratch_current_object = object;
-    item = object + 71;
+    item = RECORD_DATA(object);
     if (object == (char *)inv_selected_item && MODE != 10 && MODE2 != 10) {
         for (y = rects[cell].y0; y <= rects[cell].y1; y++)
             mc_memcpy(SCREEN + y * 320 + rects[cell].x0, (char *)(iptr)BUFS[0] + y * 320 + rects[cell].x0,

@@ -15,8 +15,8 @@ extern struct record *player_object;
 extern struct record *location_object;
 extern struct record *found_object;
 extern struct location *current_location;
-extern char object_heap[];
-extern int loaded_location_door_count;
+extern struct mem_pool object_heap;
+extern struct loaded_location loaded_location;
 extern iptr object_found_last;
 extern int D_001A3F94;
 extern int object_move_new;
@@ -86,16 +86,16 @@ void object_heap_init(void)
 {
     if (object_heap_size == 0) {
         if (D_001A3F94 < 13000) {
-            object_heap_size = 1280000;
+            object_heap_size = NATIVE_HEAP_BYTES(1280000);
         } else {
-            object_heap_size = 2048000;
+            object_heap_size = NATIVE_HEAP_BYTES(2048000);
         }
     }
     object_heap_free = object_heap_size;
     mc_set_location(55, D_00176E44);
     func_000A148C(D_00176E4D, object_heap_size);
-    mem_pool_init((iptr)object_heap, object_heap_size);
-    (location_object = object_alloc(0, 0, 48))->type = 1;
+    mem_pool_init((iptr)&object_heap, object_heap_size);
+    (location_object = object_alloc(0, 0, REC_SIZEOF(struct location)))->type = 1;
     location_object->image = 65535;
     location_object->id = -65535;
     (current_location = &location_object->data.location)->buildings = 0;
@@ -105,7 +105,7 @@ void object_heap_init(void)
 
 void object_heap_shutdown(void)
 {
-    mem_pool_free((iptr)object_heap);
+    mem_pool_free((iptr)&object_heap);
 }
 
 void object_free_node(struct record *object)
@@ -157,14 +157,14 @@ struct record *object_alloc(struct record *after, struct record *source, int dat
     int size;
     struct record *object;
 
-    size = data_size + 71;
-    object_heap_free -= size + 18;
-    object = (struct record *)mem_pool_alloc((iptr)object_heap, size);
+    size = data_size + RECORD_HEADER_SIZE;
+    object_heap_free -= size + MEM_BLOCK_HEADER_SIZE;
+    object = (struct record *)mem_pool_alloc((iptr)&object_heap, size);
     if (object == 0) fatal_error(D_00176E70);
     if (source != 0) {
-        mc_memcpy(object, source, 55, D_00176E44, 163, 4);
-        mc_memcpy(&object->data, &source->data, size - 71, D_00176E44, 164, 4);
-        mc_memset(&object->next, 0, 16, D_00176E44, 165, 4);
+        mc_memcpy(object, source, RECORD_LINKS_OFFSET, D_00176E44, 163, 4);
+        mc_memcpy(&object->data, &source->data, size - RECORD_HEADER_SIZE, D_00176E44, 164, 4);
+        mc_memset(&object->next, 0, RECORD_LINKS_SIZE, D_00176E44, 165, 4);
     } else {
         mc_memset(object, 0, size, D_00176E44, 169, 4);
         object->id = object_new_id(1);
@@ -177,8 +177,8 @@ void object_heap_release(struct record *object)
 {
     struct mem_block *block;
 
-    block = (struct mem_block *)((char *)object - 18);
-    object_heap_free += block->size + 18;
+    block = (struct mem_block *)((char *)object - MEM_BLOCK_HEADER_SIZE);
+    object_heap_free += block->size + MEM_BLOCK_HEADER_SIZE;
     mem_pool_release((iptr)object);
 }
 
@@ -188,11 +188,11 @@ struct record *object_clone(struct record *object)
     struct record *clone;
     int size;
 
-    block = (struct mem_block *)((char *)object - 18);
+    block = (struct mem_block *)((char *)object - MEM_BLOCK_HEADER_SIZE);
     size = block->size;
-    clone = object_create_child(object->parent, 0, size - 71);
-    mc_memcpy(clone, object, 55, D_00176E44, 203, 4);
-    mc_memcpy(&clone->data, &object->data, size - 71, D_00176E44, 204, 4);
+    clone = object_create_child(object->parent, 0, size - RECORD_HEADER_SIZE);
+    mc_memcpy(clone, object, RECORD_LINKS_OFFSET, D_00176E44, 203, 4);
+    mc_memcpy(&clone->data, &object->data, size - RECORD_HEADER_SIZE, D_00176E44, 204, 4);
     return clone;
 }
 
@@ -461,7 +461,7 @@ struct record *object_create_in_block(struct record *parent, int type, int data_
     object->pad13 = pad13;
     object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     if (object->id == (-1016397758)) {
-        mc_memcpy(object_debug_watch_copy, object, 71, D_00176E44, 634, 4);
+        mc_memcpy(object_debug_watch_copy, object, RECORD_HEADER_SIZE, D_00176E44, 634, 4);
         object_debug_watch = (iptr)object;
     }
     return object;
@@ -562,7 +562,7 @@ void object_delete_quest_cb(struct record *object)
             return;
         }
     }
-    if (loaded_location_door_count != 0 && (object->id & -65536) == (location_object->id & -65536)) {
+    if (loaded_location.door_count != 0 && (object->id & -65536) == (location_object->id & -65536)) {
         door = location_find_door(object->id);
         if (door != 0) door->flags &= 0xFFF;
     }
@@ -578,7 +578,7 @@ void object_delete_quest_objects(struct record *root, unsigned char quest_id)
 
 void object_tree_size_cb(struct record *object)
 {
-    *(int *)scratch_190be4 += ((struct mem_block *)((char *)object - 18))->size;
+    *(int *)scratch_190be4 += ((struct mem_block *)((char *)object - MEM_BLOCK_HEADER_SIZE))->size;
 }
 
 int object_tree_size(struct record *root)

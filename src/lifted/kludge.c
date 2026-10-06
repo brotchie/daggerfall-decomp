@@ -6,7 +6,7 @@
 #include "clib.h"
 
 extern signed char D_0012B508;
-extern int xn_tex_archives[];
+extern iptr xn_tex_archives[];
 extern signed char key_down_minus;
 extern signed char key_down_equals;
 extern char D_00171044[];
@@ -61,8 +61,7 @@ extern signed char cfg_artifact;
 extern signed char forced_material;
 extern int faction_count;
 extern struct faction *factions;
-extern int loaded_location_door_count;
-extern iptr loaded_location_doors;
+extern struct loaded_location loaded_location;
 extern int D_00199634;
 extern struct record *D_00199714;
 extern int D_00199718;
@@ -414,7 +413,7 @@ void kludge_pick_pockets(void)
 
     scratch_190ce4[0] = 1;
     player_character->skills[15].value = 80;
-    creature = object_create_child(location_object, 0, 659);
+    creature = object_create_child(location_object, 0, REC_SIZEOF(struct monster));
     creature->type = 18;
     monster_id = rand() % 20;
     scratch_190ce4[0] = 2;
@@ -444,7 +443,7 @@ void kludge_remove_all_items(void)
 {
     struct record *object;
 
-    mc_memset(player_character->equipped, 0, 108, D_00171044, 469, 108);
+    mc_memset(player_character->equipped, 0, sizeof(player_character->equipped), D_00171044, 469, sizeof(player_character->equipped));
     object = player_entity->children;
     while (object != 0) object = object_delete(object);
 }
@@ -462,12 +461,12 @@ void kludge_show_memory(void)
     total = row;
     for (; i < 512; i++) {
         if (xn_tex_archives[i] == 0) continue;
-        block = xn_tex_archives[i] - 22;
+        block = xn_tex_archives[i] - REC_SIZEOF(struct tex_block);
         mc_set_location(487, D_00171044);
-        mc_sprintf((char *)text_buffer, D_001710BA, *(int *)((char *)block + 8), xn_tex_archives[i] + 2);
+        mc_sprintf((char *)text_buffer, D_001710BA, ((struct tex_block *)block)->size, xn_tex_archives[i] + 2);
         text_draw((iptr)text_buffer, (row / 25) * 160, (row % 25) << 3);
         row++;
-        total += *(int *)((char *)block + 8);
+        total += ((struct tex_block *)block)->size;
     }
     D_0012B508 = 245;
     mc_set_location(494, D_00171044);
@@ -482,8 +481,8 @@ iptr location_find_door(int id)
     short id_low;
 
     *(int *)&id_low = id;
-    *(iptr *)&door = loaded_location_doors;
-    for (i = 0; i < loaded_location_door_count; i++, (*(char (**)[6])&(*(int *)&door))++) {
+    *(iptr *)&door = (iptr)loaded_location.doors;
+    for (i = 0; i < loaded_location.door_count; i++, (*(char (**)[6])&(*(int *)&door))++) {
         if ((short)*(int *)&id_low == *(short *)(*(char **)&door + 4)) return *(int *)&door;
     }
     return 0;

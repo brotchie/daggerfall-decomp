@@ -78,7 +78,7 @@ unsigned char *career_answer_effect(unsigned char *text)
         kind = text[1];
         person = (struct character *)(D_00147954 + 70000);
         person_class = D_00147954 + 75000;
-        mc_memset(person, 0, 560, D_00170738, 279, 4);
+        mc_memset(person, 0, REC_OFFSETOF(struct character, career), D_00170738, 279, 4);
         mc_memset(person_class, 0, 74, D_00170738, 280, 4);
         text = career_skip_word(text);
         if (*text == 'F')

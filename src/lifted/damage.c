@@ -401,7 +401,7 @@ void quest_prompt_answer(void)
     struct qbn_state *state;
 
     if (((struct bf8_5_1 *)&D_001940DA)->f == 0 || game_mode != 0) return;
-    state = *(struct qbn_state **)((char *)quest_prompt_op + 7 + (((int)D_00196271) * 15));
+    state = (struct qbn_state *)quest_prompt_op->args[(int)D_00196271].record;
     if (state->is_global != 0) {
         quest_global_states[state->value] = 1;
     } else {
