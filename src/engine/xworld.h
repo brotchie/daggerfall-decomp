@@ -60,8 +60,10 @@ extern u8 *xn_world_tile_layer;
 extern u8 *xn_world_water_layer;
 extern u8 *xn_world_layers_alloc;               /* the block, from the game's allocator */
 extern s32 xn_world_height_scale[128];          /* a height byte's height, world units */
-extern u16 xn_world_nature_archive;             /* the nature flats' TEXTURE archive */
-extern u16 xn_world_ground_archive;             /* the ground's TEXTURE archive */
+/* the TEXTURE archives of the nature flats and of the ground: fields of the cell header read
+   last (xn_world_cell_header, one storage) */
+#define xn_world_nature_archive (xn_world_cell_header.nature_archive)
+#define xn_world_ground_archive (xn_world_cell_header.ground_archive)
 
 /* ---- WOODS.WLD and the window ------------------------------------------------------------ */
 extern s32 xn_world_file;                       /* the DOS handle of WOODS.WLD */

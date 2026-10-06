@@ -44,6 +44,15 @@
 
 #include "xpipe.h"
 
+/* ---- tables and state (object 2) --------------------------------------------------------- */
+extern s32 xn_model_angle_or_bits;      /* or-ed into the base angles (xn_model_compose_angles) */
+extern xn_mat3 xn_model_base_matrix, xn_model_object_matrix, xn_model_combined_matrix;
+extern xn_mat3 xn_model_rot_matrix;     /* the model being drawn */
+extern struct xn_sort_pair xn_model_queue[200];     /* the frame's models: {key, handle} */
+extern struct xn_sort_pair *xn_model_queue_ptr;
+extern s32 xn_model_queue_count, xn_model_drawn_count;
+extern char xn_model_msg_too_many_verts[], xn_model_msg_corrupted[];
+
 /* ---- a placement's angles ------------------------------------------------------------------ */
 
 /* The game passes &handle->pad_0c (the instance's "angles"): the base angles are the words at

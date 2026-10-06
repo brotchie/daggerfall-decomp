@@ -109,7 +109,9 @@ the game sees exactly what it saw before.
 Data at fixed addresses: the engine's tables and globals still live where the asm has them
 (`extern` declarations resolved to the loaded game). Moving engine-private state into C
 storage is allowed once nothing asm reads it (see the boundary map for what the game reads:
-those must stay where the game looks).
+those must stay where the game looks). For a build outside FALL.EXE (the port),
+`src/engine_data/` defines all of it in C, shown equal to FALL.EXE's (docs/engine/data.md);
+the harness keeps resolving it to FALL.EXE.
 
 ### Before and after (the pilot)
 

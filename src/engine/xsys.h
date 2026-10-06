@@ -63,8 +63,8 @@ extern u8 xn_sys_divide_error_end[];
 
 /* The game's */
 extern u32 internal_check_failed;           /* not 0: fatal_error reports it */
-s32 dpmi_lock_region(void *addr, u32 size);
-s32 dpmi_unlock_region(void *addr, u32 size);
+int dpmi_lock_region(int address, int size);       /* (the game's own prototypes) */
+int dpmi_unlock_region(int address, int size);
 u32 fatal_error(const char *message);
 
 /* ---- the critical error handler --------------------------------------------------------- */

@@ -1793,3 +1793,21 @@ Not quirks, and not listed here: the asm's private bookkeeping that canonical C 
 - **Visible:** to the screen, for a tick within a frame.
 - **Kept by:** the key from the caller's frame (marked).
 - **Status:** kept.
+
+## Data (src/engine_data/)
+
+### Q-DATA-01: the sine table's entry 1718 is one more than the rounded sine
+
+- **Where:** `xn_sin_table` (0x150200; the cosine is the same table from 0x150A00), entry 1718
+  (0x151CD8), which is also `xn_cos_table[1206]`. Canonical: src/engine_data/dcompute.c
+  (`sine_table`).
+- **Asm:** data in object 2: entry 1718 holds -227665571 (F26E195Dh). sin(2 pi 1718 / 2048)
+  * 2^28 is -227665571.50015, which rounds to -227665572, and the mirror entry 330 holds
+  +227665572. The other 2559 entries are the rounded sine.
+- **Behaviour:** the sine of angle 1718 (and the cosine of 1206) is one unit of 2.28 nearer 0
+  than rounding gives; the table is not exactly odd there.
+- **Visible:** to every reader of the table at that angle (the rotation matrices, the game's
+  rotate_xz): one part in 2^28.
+- **Kept by:** `xn_sin_table[1718] += 1` after the rounded sine (marked); `tools/xn_datagen.py
+  check` compares the generated table with FALL.EXE's byte for byte.
+- **Status:** kept.

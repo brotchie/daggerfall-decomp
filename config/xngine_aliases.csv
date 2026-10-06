@@ -12,3 +12,4 @@ global,0x00142700,xn_kbd_code_start,strong,"alias of xn_kbd_install: the keyboar
 global,0x00152A00,xn_joy,strong,"alias of xn_joy_axis_mask: the joystick's state block (struct xn_joy_state, 6Eh bytes) starts with the axis mask"
 global,0x00152EA0,xn_joy_timer_entry,strong,"alias of xn_joy_timer_isr: the int 1Ch vector's entry, where the build's interrupt stub loads DS and ES and calls the C handler"
 global,0x00152F41,xn_joy_timer_end,strong,the end of the int 1Ch handler's asm (its iretd's end): xn_joy_init locks the entry up to here
+global,0x0015D400,xn_math_asin_values,strong,"the whole of the asin table that xn_math_asin_table (0x15DC00) is the centre of: 1024 dwords asin(i/512) for i = -512..511 (the negative half from here: -512 at 0x15D400); src/engine/xmath.h indexes the centre"

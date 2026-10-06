@@ -66,7 +66,8 @@ extern char xn_light_msg_no_memory[];   /* "ENGINE: Out of memory for shaders.$"
 extern u8 *xn_shade_table;              /* 64 rows of 256 colours, 16K-aligned */
 extern u8 *xn_shade_table_alloc;
 extern u8 *xn_shade_table_last_row;     /* xn_shade_table + 3F00h */
-extern s32 xn_squares_table_mid[];      /* k*k << 8 at index k, k = -4096..4095 */
+extern s32 xn_squares_table[8192];      /* k*k << 8 for k = -4096..4095 (xrender.h) */
+#define xn_squares_table_mid (xn_squares_table + 4096)     /* k*k << 8 at index k */
 extern u8 *xn_light_code_next;          /* where the next shader's asm image goes (Q-LIGHT-07;
                                            xn_render_begin_frame: big_buffer) */
 

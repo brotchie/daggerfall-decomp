@@ -11,25 +11,9 @@
 #include "xmem.h"
 
 extern u8 xn_tex_cache_full;
-extern struct xn_tex_archive *xn_tex_archives[512];
-extern u16 xn_tex_archive_use[512];     /* lookups this frame, per archive */
-extern s32 xn_tex_record_offsets[512];  /* record * 20 */
-extern char xn_tex_path[];              /* the configured path, '\', the file name */
 extern char cfg_last_path[];            /* the game's configured texture path */
 extern u8 xn_tex_size_mask[256];        /* n - 1 for a power of two n, else 0FFh */
 extern u32 xn_anim_ticks;               /* the animation clock (BIOS ticks) */
-/* the heap */
-extern struct xn_tex_block *xn_tex_heap_base;
-extern struct xn_tex_block xn_tex_heap_head;   /* .next: the first block; marked used */
-extern s32 xn_tex_heap_size, xn_tex_heap_free_bytes;
-/* the unpack buffer */
-extern u8 *xn_tex_unpack_buffer;
-extern struct xn_tex_unpack_strip xn_tex_unpack_strips[256];
-extern u32 xn_tex_unpack_strip_count;
-extern u32 xn_tex_unpack_used;          /* bytes of xn_tex_unpack_entries */
-extern struct xn_tex_unpack_entry xn_tex_unpack_entries[256];
-/* 'SET: ...' DOS strings ('$'-ended) */
-extern char xn_tex_msg_out_of_memory[], xn_tex_msg_no_room[], xn_tex_msg_unpack_full[];
 
 #define TEX_UNPACK_SIZE 0xC0000         /* the unpack buffer's bytes */
 #define TEX_UNPACK_MAX  0x800           /* bytes of decoded-frame entries */

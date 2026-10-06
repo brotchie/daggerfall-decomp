@@ -20,7 +20,7 @@ void xn_sys_install_crit_error_handler(void)
     u32 flags = xn_save_flags();
 
     if (xn_sys_int24_installed != 1) {
-        dpmi_lock_region((void *)xn_sys_crit_error_entry, CRIT_ERROR_LOCK_BYTES);
+        dpmi_lock_region((int)xn_sys_crit_error_entry, CRIT_ERROR_LOCK_BYTES);
         xn_cli();
         xn_pc_get_vector(0x24, &xn_sys_old_int24_offset, &xn_sys_old_int24_sel);
         xn_pc_install_vector(0x24, xn_sys_crit_error_entry);
@@ -38,7 +38,7 @@ void xn_sys_restore_crit_error_handler(void)
         xn_cli();
         xn_pc_set_vector(0x24, xn_sys_old_int24_offset, xn_sys_old_int24_sel);
         xn_sti();
-        dpmi_unlock_region((void *)xn_sys_crit_error_entry, CRIT_ERROR_LOCK_BYTES);
+        dpmi_unlock_region((int)xn_sys_crit_error_entry, CRIT_ERROR_LOCK_BYTES);
         /* Quirk Q-SYS-03: xn_sys_int24_installed is not cleared */
     }
     xn_restore_flags(flags);

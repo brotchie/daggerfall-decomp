@@ -17,16 +17,6 @@ void xn_poly_setup_textured(struct xn_poly *poly, const struct xn_span *span, s3
                             u8 *pix);
 
 extern u8 text_colour, text_shadow_colour;
-extern xn_vec3 xn_scratch_vec_b;        /* xn_flat_pick leaves the pick point's x, y here */
-extern s32 xn_pick_flat_x, xn_pick_flat_y, xn_pick_flat_z;
-
-/* the frame's lists and counts */
-extern struct xn_sort_pair xn_model_queue[200];
-extern struct xn_sort_pair *xn_model_queue_ptr;
-extern s32 xn_model_queue_count, xn_model_drawn_count;
-extern struct xn_sort_pair xn_flat_sort_list[512];
-extern struct xn_sort_pair *xn_flat_sort_end;
-extern s32 xn_flat_count, xn_flat_drawn_count;
 
 /* a * b / d with a 64-bit product, truncated; 0 when the quotient does not fit (the asm's
    idiv faulted: Q-SYS-01) */

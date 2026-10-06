@@ -162,6 +162,9 @@ void xn_draw_line_text_colour(s32 x1, s32 y1, s32 x2, s32 y2);
 
 /* ==== images (drawimg.c) =================================================================== */
 
+extern u8 *xn_paperdoll_background;     /* the paperdoll's background copy (the game's) */
+extern u8 xn_cel_row_buffer[330];       /* xn_draw_cel_frame's decoded RLE row */
+
 /* src (rows src_stride bytes apart) copied as a w x h block into dst, whose rows are 320 bytes
    apart (dwords, then the bytes left): the options' joystick picture. */
 void xn_draw_copy_rect_stride(const u8 *src, u8 *dst, s32 w, s32 h, s32 src_stride);
@@ -243,6 +246,8 @@ void xn_draw_mark_matching(const u8 *src, u8 *dst, u8 value, s32 count);
 void xn_draw_remap_rect(u8 *buf, s32 skip, s32 w, s32 h, const u8 *table);
 
 /* ==== unrolled bodies (drawunr.c) ========================================================== */
+
+extern u8 xn_draw_shade_row;            /* the dead shaded blit's shade row (never written) */
 
 /* The hurt flash: colour F6h on every other pixel of the view's rows (clip_top to clip_bottom,
    320 wide), the pattern shifted by one each row. Quirk Q-DRAW-13: an odd row count draws one

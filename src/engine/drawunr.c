@@ -3,8 +3,6 @@
    the dead row remaps and pattern fills, and the dead shaded blit. */
 #include "xdraw.h"
 
-extern u8 xn_draw_shade_row;            /* the dead shaded blit's shade row (never written) */
-
 /* every other pixel of a 320-pixel row, from `first` */
 static void checker_row(u8 *row, int first)
 {
