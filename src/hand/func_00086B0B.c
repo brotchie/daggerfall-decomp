@@ -16,10 +16,8 @@ extern int sky_loaded_frame;
 extern char world_loading;
 extern char night_sky_loaded;
 extern struct map_location *location_here;
-extern char loaded_location[];
-extern char *loaded_location_object;
-extern char *loaded_location_data;
-extern void location_load_exterior(char *, int);
+extern struct loaded_location loaded_location;
+extern void location_load_exterior(struct loaded_location *, int);
 extern void town_load_blocks(void);
 extern void automap_alloc_town_map(void);
 extern void town_map_note_secret_guild_halls(void);
@@ -51,9 +49,9 @@ void town_load(int location_index)
     func_0008EB52();
     if (location_object->image == 65535)
         object_delete_block((iptr)location_object->children, location_object->id);
-    location_load_exterior(loaded_location, location_index);
-    mc_memcpy(location_object, loaded_location_object, 55, D_00176C94, 365, 4);
-    mc_memcpy(current_location, loaded_location_data, 48, D_00176C94, 366, 4);
+    location_load_exterior(&loaded_location, location_index);
+    mc_memcpy(location_object, loaded_location.object, RECORD_LINKS_OFFSET, D_00176C94, 365, 4);
+    mc_memcpy(current_location, loaded_location.data, REC_SIZEOF(struct location), D_00176C94, 366, 4);
     location_object->y = xn_terrain_height_at(location_object->x, location_object->z);
     automap_alloc_town_map();
     town_load_blocks();

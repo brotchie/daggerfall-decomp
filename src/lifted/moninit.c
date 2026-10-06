@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "portio.h"
 
 extern struct monster_template monster_table[];
 extern char D_00176844[];
@@ -298,6 +299,6 @@ int savetree_read_chunk(struct record *buffer)
     int size;
 
     read(save_file_handle, &size, 4);
-    read(save_file_handle, buffer, size);
+    PORT_SAVETREE_READ(save_file_handle, buffer, size);
     return size;
 }

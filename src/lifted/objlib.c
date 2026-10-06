@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "portio.h"
 
 extern int xn_anim_ticks;
 extern char D_00176C20[];
@@ -40,7 +41,7 @@ extern int town_building_counter;
 extern struct block *rmb_record_ptr;
 extern signed char location_is_port;
 extern struct rmb_file *rmb_block;
-extern struct model_node model_cache_nodes[];
+extern struct model_node model_cache_nodes[512];
 extern struct sound_cache_entry sound_cache[];
 extern int model_heap_free;
 extern struct model_node *model_cache_root;
@@ -112,11 +113,11 @@ struct record *rmb_add_subrecord(struct record *parent)
     int unused2;
     int size;
 
-    size = 17;
-    size += rmb_record_ptr->model_count * 66;
+    size = REC_SIZEOF(struct block);
+    size += rmb_record_ptr->model_count * REC_SIZEOF(struct block_model);
     size += rmb_record_ptr->flat_count * 17;
     size += rmb_record_ptr->section3_count << 4;
-    if (size == 17) return 0;
+    if (size == REC_SIZEOF(struct block)) return 0;
     object = object_create_child(parent, 0, size);
     object->type = 43;
     object->x = rmb_origin_x;
@@ -127,10 +128,10 @@ struct record *rmb_add_subrecord(struct record *parent)
     object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     D_001A9438 = object->id;
     block = &object->data.block;
-    mc_memcpy(block, rmb_record_ptr, size, D_00176C20, 803, 4);
-    block->models = (struct block_model *)((iptr)block + 17);
+    PORT_COPY_BLOCK(block, rmb_record_ptr, size, D_00176C20, 803);
+    block->models = (struct block_model *)((iptr)block + REC_SIZEOF(struct block));
     model = block->models;
-    block->flats = (struct block_flat *)((iptr)model + (block->model_count * 66));
+    block->flats = (struct block_flat *)((iptr)model + (block->model_count * REC_SIZEOF(struct block_model)));
     flat = block->flats;
     block->section3 = (struct block_section3 *)((iptr)flat + (block->flat_count * 17));
     entry = block->section3;
@@ -166,7 +167,7 @@ struct record *rmb_add_subrecord(struct record *parent)
         entry->z += rmb_origin_z;
         entry->y += rmb_origin_y;
     }
-    people = (iptr)((char *)rmb_record_ptr + size);
+    people = RMB_PEOPLE(rmb_record_ptr, size);
     doors = people + (rmb_record_ptr->people_count * 17);
     rmb_add_people(parent, people);
     rmb_add_doors(parent, doors);
@@ -209,7 +210,7 @@ struct record *rmb_add_building(struct record *parent, int building_index)
     int saved_seed;
     struct record *object;
 
-    rmb_record_ptr = rmb_block->block_data[building_index];
+    rmb_record_ptr = RMB_BLOCK_DATA(rmb_block, building_index);
     object = rmb_add_subrecord(parent);
     object->flags = 1;
     object->image2 = building_index;
@@ -403,7 +404,7 @@ void model_cache_flush(struct model_node *root)
     }
     root->left = 0;
     root->right = root->left;
-    mc_memset(&model_cache_nodes[1], 0, 10220, D_00176C20, 1189, 4);
+    mc_memset(&model_cache_nodes[1], 0, 511 * REC_SIZEOF(struct model_node), D_00176C20, 1189, 4);
 }
 
 void model_cache_purge_unused(struct model_node *parent, int age, struct model_node *node)

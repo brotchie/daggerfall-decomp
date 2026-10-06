@@ -56,7 +56,7 @@ void quest_unlink_for_save(struct quest *quest)
             if (qbn_place->object == 0) fatal_error(D_001708B7);
             /* +0x03 the place's type (10: a fixed object), +0x04/+0x06 the object id's halves */
             if (qbn_place->scope == 10) {
-                if ((((unsigned short)qbn_place->p2 & 0xffff) | (qbn_place->p1 << 16)) != (iptr)qbn_place->object)
+                if ((unsigned)(((unsigned short)qbn_place->p2 & 0xffff) | (qbn_place->p1 << 16)) != (uptr)qbn_place->object)
                     fatal_error(D_001708D1);
             }
         }

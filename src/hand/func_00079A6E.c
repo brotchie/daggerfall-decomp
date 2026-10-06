@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00079A6E */
 #include "records.h"
 #include "clib.h"
+#include "portio.h"
 
 extern char D_00176884[];        /* __FILE__ */
 extern char D_0017688F[];
@@ -18,13 +19,13 @@ int savetree_write_record(struct record *object)
     int unused2;
 
     buf = (struct record *)scratch_buffer;
-    len = *(int *)((char *)object - 6);     /* the heap block's size */
+    len = RECORD_BLOCK_SIZE(object);        /* the heap block's size */
     if (len == 0) {
         mc_set_location(84, D_00176884);
         mc_sprintf(scratch_buffer, D_0017688F);
         fatal_error(scratch_buffer);
     }
-    write(save_file_handle, &len, 4);
+    PORT_SAVETREE_LEN(save_file_handle, &len);
     mc_memcpy(buf, object, len, D_00176884, 90, 4);
     if (buf->twin != 0) {
         if (buf->quest_id != 0)
@@ -47,5 +48,5 @@ int savetree_write_record(struct record *object)
         *(int *)&buf->parent = object->parent->type;
         buf->parent_id = object->parent->id;
     }
-    return write(save_file_handle, buf, len) != len ? 1 : 0;
+    return PORT_SAVETREE_WRITE(save_file_handle, buf, len) != len ? 1 : 0;
 }

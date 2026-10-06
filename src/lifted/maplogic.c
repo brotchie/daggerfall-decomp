@@ -67,8 +67,6 @@ extern int region_location_count;
 extern struct rmb_file *rmb_block;
 extern struct map_location *location_here;
 extern struct loaded_location loaded_location;
-extern struct record *loaded_location_object;
-extern struct location *loaded_location_data;
 extern struct map_location *region_locations;
 extern int blocks_bsa;
 extern signed char dungeon_block_count;
@@ -193,7 +191,7 @@ void location_free(struct loaded_location *location)
             location->doors = (struct location_door *)(iptr)-1751672937;
         }
     }
-    mc_memset(location, 0, 20, D_00176C94, 91, 4);
+    mc_memset(location, 0, REC_SIZEOF(struct loaded_location), D_00176C94, 91, 4);
 }
 
 struct map_location *region_find_location(int map_id)
@@ -258,7 +256,7 @@ void dungeon_load(int dungeon_index)
     if (location_object->image == 65535) object_delete_block((iptr)location_object->children, location_object->id);
     if (world_loading == 0) {
         player_object->parent_id = player_object->parent->id;
-        mc_memcpy(saved_player_object, player_object, 55, D_00176C94, 235, 4);
+        mc_memcpy(saved_player_object, player_object, RECORD_LINKS_OFFSET, D_00176C94, 235, 4);
     }
     location_id = location_object->id;
     location_unload(location_object->image);
@@ -267,8 +265,8 @@ void dungeon_load(int dungeon_index)
     } else {
         location_load_dungeon(&loaded_location, dungeon_index);
     }
-    mc_memcpy(location_object, loaded_location_object, 55, D_00176C94, 247, 4);
-    mc_memcpy(current_location, loaded_location_data, 48, D_00176C94, 248, 4);
+    mc_memcpy(location_object, loaded_location.object, RECORD_LINKS_OFFSET, D_00176C94, 247, 4);
+    mc_memcpy(current_location, loaded_location.data, REC_SIZEOF(struct location), D_00176C94, 248, 4);
     blocks_bsa = archive_open(D_00176C9F, 0, 0);
     if ((((unsigned)location_object->id) >> 16) == 50015) D_001967A1 = 254;
     for (i = 0; ((int)(unsigned char)dungeon_block_count) > i; i++) {
@@ -445,7 +443,7 @@ void location_pick_random_town(struct loaded_location *location)
 
     map_location = region_locations;
     town_count = 0;
-    mc_memset(location, 0, 20, D_00176C94, 991, 4);
+    mc_memset(location, 0, REC_SIZEOF(struct loaded_location), D_00176C94, 991, 4);
     for (i = 0; i < region_location_count; i++, map_location++) {
         switch ((map_location->x_type_flags << 2) >> 27) {
         case 0:
@@ -482,7 +480,7 @@ void location_pick_random_undiscovered(struct loaded_location *location)
 
     map_location = region_locations;
     count = 0;
-    mc_memset(location, 0, 20, D_00176C94, 1108, 4);
+    mc_memset(location, 0, REC_SIZEOF(struct loaded_location), D_00176C94, 1108, 4);
     for (i = 0; i < region_location_count; i++, map_location++) {
         if ((map_location->x_type_flags & 0x40000000) == 0 && (map_location->x_type_flags & 0x80000000) == 0) {
             count++;

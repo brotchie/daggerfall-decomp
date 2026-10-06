@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "portio.h"
 
 extern char disk_last_file_size[];
 extern iptr D_00147954;
@@ -19,7 +20,7 @@ extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
 extern char *scratch_buffer;
-extern iptr D_001966BC[];
+extern iptr D_001966BC[16];
 extern int rumor_file;
 extern int D_00196708;
 extern int faction_count;
@@ -63,12 +64,12 @@ void faction_link_relations(struct faction *faction)
     while (faction != 0) {
         for (i = 0; i < 3; i++) {
             if (faction->allies[i] != 0) {
-                faction->allies[i] = faction_find_r(factions, (int)(short)*(short *)((char *)((i << 2) + (iptr)faction) + 56));
+                faction->allies[i] = faction_find_r(factions, (int)(short)*(short *)&faction->allies[i]);
             }
         }
         for (i = 0; i < 3; i++) {
             if (faction->enemies[i] != 0) {
-                faction->enemies[i] = faction_find_r(factions, (int)(short)*(short *)((char *)((i << 2) + (iptr)faction) + 68));
+                faction->enemies[i] = faction_find_r(factions, (int)(short)*(short *)&faction->enemies[i]);
             }
         }
         if (faction->child != 0) faction_link_relations(faction->child);
@@ -89,13 +90,13 @@ void faction_add_record(struct faction *parsed, int depth, struct faction *added
     int parent_depth;
 
     D_00196732 = 0;
-    mc_memset((void *)(((iptr)(char *)D_001966BC) + ((depth << 2) + 4)), 0, (int)(iptr)&*(signed char *)((char *)(iptr)((16 - depth) << 2) - 4), D_00170464, 1091, 4);
+    mc_memset((void *)(((iptr)(char *)D_001966BC) + ((depth << PTR_SHIFT) + PTR_SIZE)), 0, (int)(iptr)&*(signed char *)((char *)(iptr)((16 - depth) << PTR_SHIFT) - PTR_SIZE), D_00170464, 1091, 4);
     seed = rand();
     seed <<= 16;
     seed |= rand();
     parsed->seed = seed;
     parsed->politics_factor = rand_range(0, 50) + 20;
-    mc_memcpy(added, parsed, 92, D_00170464, 1097, 4);
+    mc_memcpy(added, parsed, REC_SIZEOF(struct faction), D_00170464, 1097, 4);
     if (depth == 0) {
         added->parent = 0;
     } else {
@@ -103,11 +104,11 @@ void faction_add_record(struct faction *parsed, int depth, struct faction *added
         while (D_001966BC[parent_depth] == 0) parent_depth--;
         added->parent = (struct faction *)(D_001966BC[parent_depth]);
         if (D_001966BC[depth] == 0) {
-            *(iptr *)((char *)D_001966BC[parent_depth] + 84) = (iptr)added;
+            *(iptr *)((char *)D_001966BC[parent_depth] + REC_OFFSETOF(struct faction, child)) = (iptr)added;
         }
     }
     if (D_001966BC[depth] != 0) {
-        *(iptr *)((char *)D_001966BC[depth] + 80) = (iptr)added;
+        *(iptr *)((char *)D_001966BC[depth] + REC_OFFSETOF(struct faction, next)) = (iptr)added;
     }
     D_001966BC[depth] = (iptr)added;
 }
@@ -414,7 +415,7 @@ void faction_save_r(int file, struct faction *faction)
                 faction->enemies[i] = (struct faction *)(iptr)(int)faction->enemies[i]->id;
             }
         }
-        write(file, faction, 92);
+        PORT_WRITE_FACTION(file, faction);
         faction = faction->next;
     }
 }
@@ -431,11 +432,11 @@ void faction_load(int file)
         faction_load_file();
         read(file, &count, 4);
         for (i = 0; i < count; i++) {
-            read(file, &loaded, 92);
+            PORT_READ_FACTION(file, &loaded);
             if (loaded.reputation > 100) loaded.reputation = 100;
             if (loaded.reputation < (-100)) loaded.reputation = 65436;
             faction = faction_find(loaded.id);
-            mc_memcpy(faction, &loaded, 80, D_00170464, 1436, 4);
+            mc_memcpy(faction, &loaded, REC_OFFSETOF(struct faction, next), D_00170464, 1436, 4);
         }
         faction_link_relations(factions);
     }
@@ -590,14 +591,14 @@ iptr rumor_collect_local(void)
 
 iptr rumor_pick_news(short faction_id)
 {
-    short rumor;
+    SHORT_SLOT rumor;
     struct {
         int rolls[4];               /* +0x00: rumor_is_eligible's roll, by index & 3 */
         int count;                  /* +0x10 */
-        int *found;                 /* +0x14: the eligible rumors */
+        iptr *found;                /* +0x14: the eligible rumors */
         iptr end;                    /* +0x18 */
     } state;
-    short index;
+    SHORT_SLOT index;
 
     state.count = 0;
     *(int *)&index = 0;
@@ -610,16 +611,16 @@ iptr rumor_pick_news(short faction_id)
     state.rolls[1] = rand_range(1, 100);
     state.rolls[2] = rand_range(1, 100);
     state.rolls[3] = rand_range(1, 100);
-    state.found = (int *)((iptr)scratch_buffer + 40000);
-    while (((unsigned)*(int *)&rumor) < state.end) {
-        if (rumor_is_eligible(*(int *)&rumor, (int)(short)faction_id, 0, state.rolls[*(int *)&index & 3]) != 0) {
-            state.found[state.count++] = *(int *)&rumor;
+    state.found = (iptr *)((iptr)scratch_buffer + 40000);
+    while (((uptr)*(iptr *)&rumor) < state.end) {
+        if (rumor_is_eligible(*(iptr *)&rumor, (int)(short)faction_id, 0, state.rolls[*(int *)&index & 3]) != 0) {
+            state.found[state.count++] = *(iptr *)&rumor;
         }
-        *(int *)&rumor = (*(int *)&rumor + (*(struct rumor **)&rumor)->text_length) + 34;
+        *(iptr *)&rumor = (*(iptr *)&rumor + (*(struct rumor **)&rumor)->text_length) + 34;
         (*(int *)&index)++;
     }
     if (state.count == 0) return 0;
-    *(int *)&rumor = state.found[rand_range(0, state.count - 1)];
+    *(iptr *)&rumor = state.found[rand_range(0, state.count - 1)];
     mc_memcpy((void *)scratch_buffer, (void *)(*(iptr *)&rumor + 34), (*(struct rumor **)&rumor)->text_length, D_00170464, 1701, 4);
     return (iptr)scratch_buffer;
 }

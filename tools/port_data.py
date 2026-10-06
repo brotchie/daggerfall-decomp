@@ -59,6 +59,28 @@ TARGETS = {"32": ["-target", "i386-unknown-linux-gnu"], "64": []}
 
 # ---- declarations ---------------------------------------------------------------------------
 
+# Globals whose declarations do not say what FALL.EXE keeps there (compiled with records.h):
+# copies of a record's 71-byte header, which hold its six pointer slots (95 bytes natively;
+# the names inside them, like found_marker's x at +7 or D_0019615F, D_00196120's children,
+# become labels at their native offsets), and the NPC buffer that talk fills as a character
+# up to its career (char.c: 560 bytes, 672 natively), and scratch_190de4 (below).
+RECORD_HEADER = ("struct __attribute__((packed)) { char plain[0x2F]; struct record *caster, *twin, *next, *prev, "
+                 "*children, *parent; } __v")
+CHARACTER_TO_CAREER = ("struct __attribute__((packed)) { char a[0x70]; struct record *target; char b[0xFB]; "
+                       "struct record *equipped[27]; char c[0x55]; } __v")
+TYPES = {
+    "D_00196120": RECORD_HEADER,  # a container's header (run_0009401E.c says struct record)
+    "D_00196167": RECORD_HEADER,  # monster.c's copy of a creature's header
+    "found_marker": RECORD_HEADER,  # objcode.c: a marker found by a search
+    "saved_player_object": RECORD_HEADER,  # the player's header (SAVEVARS.DAT)
+    "object_debug_watch_copy": RECORD_HEADER,
+    "npc_record_buffer": CHARACTER_TO_CAREER,
+    # 256 bytes of scratch: a table of 64 pointers (<< 2 under Watcom), and screens' named slots
+    # (scratch_190de8 ..., D_00190E18 ...) inside it, all zero in FALL.EXE: natively 512 bytes,
+    # the slots at twice their offsets
+    "scratch_190de4": "iptr __v[64]",
+}
+
 DECL = re.compile(r"^extern\s+((?:const\s+|volatile\s+|signed\s+|unsigned\s+|struct\s+|union\s+)*"
                   r"[A-Za-z_]\w*(?:\s*\*)*)\s*(\**)\s*([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)\s*;")
 FPTR_DECL = re.compile(r"^extern\s+(.+?)\(\s*\*\s*([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)\s*\)\s*(\(.*\))\s*;")
@@ -369,13 +391,18 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
     pick = {}
     for addr in sorted(chosen):
         name = starts[addr]
+        if name in TYPES:
+            pick[name] = (os.path.join(ROOT, "include", "records.h"), TYPES[name], False)
+            groups[pick[name][0]].append((name, pick[name][1]))
+            continue
         ds = decls.get(name)
         if not ds:
             continue
-        # most pointer-wide declaration first (a disagreement is reported below)
+        # most pointer-wide declaration first (a disagreement is reported below); of those, one
+        # that gives the array's size
         def score(d):
             return (d[1].count("*") + len(re.findall(r"\b(iptr|uptr|struct|union)\b", d[1])))
-        ds = sorted(ds, key=score, reverse=True)
+        ds = sorted(ds, key=lambda d: (score(d), not d[2]), reverse=True)
         pick[name] = ds[0]
         if len({re.sub(r"\s+", " ", d[1]) for d in ds}) > 1 and \
                 len({score(d) for d in ds}) > 1:

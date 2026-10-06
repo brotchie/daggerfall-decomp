@@ -16,10 +16,7 @@ extern signed char D_001841E3[];
 extern signed char text_buffer[];
 extern char D_001911E4[];
 extern signed char quest_global_states[];
-extern iptr D_00195984[];
-extern iptr D_00195988;
-extern iptr D_0019598C;
-extern iptr D_00195990;
+extern iptr D_00195984[4];            /* quest_passed_items: op 75's items for the next quest */
 extern struct record *nonworld_root;
 extern struct record *quest_root;
 extern struct record *player_entity;
@@ -646,9 +643,9 @@ void quest_run_opcodes(struct quest *quest)
             case 75:
                 if (quest_arg_state(op, 0) != 0) {
                     D_00195984[0] = (iptr)op->args[1].record;
-                    D_00195988 = (iptr)op->args[2].record;
-                    D_0019598C = (iptr)op->args[3].record;
-                    D_00195990 = (iptr)op->args[4].record;
+                    D_00195984[1] = (iptr)op->args[2].record;
+                    D_00195984[2] = (iptr)op->args[3].record;
+                    D_00195984[3] = (iptr)op->args[4].record;
                 }
                 break;
             case 76:
@@ -726,7 +723,7 @@ void quest_run_opcodes(struct quest *quest)
                 }
             }
         }
-        D_00195984[0] = (D_00195988 = (D_0019598C = (D_00195990 = 0)));
+        D_00195984[0] = (D_00195984[1] = (D_00195984[2] = (D_00195984[3] = 0)));
         if (ended == 0) quest_timers_update(quest);
         if (quest_reward_container == 0 || quest_reward_container->children == 0 || ((int)(unsigned char)game_mode) == 4) {
             return;

@@ -60,3 +60,11 @@ target_link_libraries(opltest PRIVATE porthost)
 add_executable(musictest ${CMAKE_CURRENT_SOURCE_DIR}/test/musictest.c)
 target_compile_options(musictest PRIVATE -std=gnu11 -Wall)
 target_link_libraries(musictest PRIVATE porthost)
+
+# The game's file layouts through the native converters (port/shim/persist.c): the classic
+# saves, MAPS.BSA, the RMB blocks and the QBN files (port/test/savetest.c)
+target_include_directories(porthost PRIVATE ${ROOT}/include)
+add_executable(savetest ${CMAKE_CURRENT_SOURCE_DIR}/test/savetest.c)
+target_include_directories(savetest PRIVATE ${ROOT}/include)
+target_compile_options(savetest PRIVATE -std=gnu11 -Wall)
+target_link_libraries(savetest PRIVATE porthost)

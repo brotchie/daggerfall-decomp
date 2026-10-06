@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001E614 */
 #include "records.h"
 #include "clib.h"
+#include "portio.h"
 struct bits { unsigned char lo:4; unsigned char b4:1; unsigned char b5:2; };
 extern char D_001704CC[];
 extern char D_00170530[];
@@ -50,5 +51,5 @@ void town_block_load_rmb(int block_index)
         mc_strncpy(((char *)text_buffer), cfg_block_str, 160, D_001704CC, 478);
     }
     record = archive_find_record(blocks_bsa, ((char *)text_buffer), 8);
-    archive_read_record(blocks_bsa, record, (iptr)rmb_block);
+    PORT_READ_RMB(blocks_bsa, record, rmb_block);
 }

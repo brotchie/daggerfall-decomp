@@ -26,7 +26,7 @@ extern struct rdb_model *rdb_model_resource;
 extern int rdb_object_id_count;
 extern short rdb_link_object_id;
 extern iptr spellmaker_settings_image;
-extern struct link links[];
+extern struct link links[1024];
 extern int link_count;
 
 extern int spellmaker_new(void);
@@ -141,7 +141,7 @@ void rdb_build_action_chain(int resource_type)
 void action_record_add(struct rdb_model *model, struct rdb_action *model_action, struct rdb_flat *flat, unsigned char action)
 {
     D_001995EC = (D_001995E4 = &links[link_count++]);
-    mc_memset(D_001995EC, 0, 39, D_00170AB4, 447, 4);
+    mc_memset(D_001995EC, 0, REC_SIZEOF(struct link), D_00170AB4, 447, 4);
     D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
         D_001995EC->trigger = model->trigger_flag_starting_lock;
@@ -166,7 +166,7 @@ void action_record_add_chained(struct rdb_model *model, struct rdb_action *model
 {
     D_001995E4->chain_count++;
     D_001995EC = &links[link_count++];
-    mc_memset(D_001995EC, 0, 39, D_00170AB4, 490, 4);
+    mc_memset(D_001995EC, 0, REC_SIZEOF(struct link), D_00170AB4, 490, 4);
     D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
         D_001995EC->trigger = model->trigger_flag_starting_lock;

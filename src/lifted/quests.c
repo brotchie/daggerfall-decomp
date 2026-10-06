@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "portio.h"
 
 extern char disk_last_file_size[];
 extern char D_00174F47[];
@@ -96,11 +97,11 @@ iptr quest_start(char *file_name)
     close(handle);
     file_data = disk_read_file(file_name, 0);
     logbook_prune_quests();
-    quest_object = object_create_child(quest_root, 0, *(int *)disk_last_file_size);
+    quest_object = object_create_child(quest_root, 0, PORT_QBN_SIZE(file_data, *(int *)disk_last_file_size));
     quest_object->type = 14;
     quest_object->flags = 3;
     quest = &quest_object->data.quest;
-    mc_memcpy(quest, (void *)file_data, (int)(short)*(short *)disk_last_file_size, D_00174F47, 193, 4);
+    PORT_QBN_COPY(quest, file_data, (int)(short)*(short *)disk_last_file_size, D_00174F47, 193);
     if (file_data != 0 && file_data != (-1751672937)) {
         mc_free((void *)file_data, D_00174F47, 194);
         file_data = -1751672937;

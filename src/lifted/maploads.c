@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "portio.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -220,9 +221,9 @@ void location_read_record(struct loaded_location *location, int fd)
     read(fd, &location->door_count, 4);
     location->doors = (struct location_door *)mc_malloc(location->door_count * 6, D_001704CC, 219);
     read(fd, location->doors, location->door_count * 6);
-    location->object = (struct record *)mc_malloc(119, D_001704CC, 223);
+    location->object = (struct record *)mc_malloc(LOCATION_RECORD_SIZE, D_001704CC, 223);
     location->data = &location->object->data.location;
-    read(fd, location->object, 119);
+    PORT_READ_LOCATION(fd, location->object, 119);
     if (location->data->building_count == 0) return;
     location->data->buildings = (struct building *)mc_malloc(location->data->building_count * 26, D_001704CC, 231);
     read(fd, location->data->buildings, location->data->building_count * 26);
@@ -347,11 +348,11 @@ void rmb_index_records(void)
 
     cursor = (iptr)rmb_block->data;
     for (i = 0; rmb_block->block_data_count > i; i++) {
-        rmb_block->block_data[i] = (struct block *)cursor;
+        RMB_BLOCK_DATA(rmb_block, i) = (struct block *)cursor;
         cursor += rmb_block->block_data_sizes[i];
     }
-    rmb_block->misc_models = (struct block_model *)cursor;
-    rmb_block->misc_flats = (struct block_flat *)(rmb_block->misc_models + rmb_block->misc_model_count);
+    RMB_MISC_MODELS(rmb_block) = (struct block_model *)cursor;
+    RMB_MISC_FLATS(rmb_block) = RMB_FLATS_AFTER_MODELS(RMB_MISC_MODELS(rmb_block), rmb_block->misc_model_count);
 }
 
 void town_block_create_misc_objects(struct record *block_object)
@@ -365,8 +366,8 @@ void town_block_create_misc_objects(struct record *block_object)
     int unused1;
     int unused2;
 
-    size = rmb_block->misc_model_count * 66;
-    size += rmb_block->misc_flat_count * 17;
+    size = rmb_block->misc_model_count * REC_SIZEOF(struct block_model);
+    size += rmb_block->misc_flat_count * REC_SIZEOF(struct block_flat);
     object = object_create_child(block_object, 0, size);
     object->type = 56;
     object->model_count = rmb_block->misc_model_count;
@@ -374,8 +375,8 @@ void town_block_create_misc_objects(struct record *block_object)
     object->id = location_object->id;
     model = (struct block_model *)RECORD_DATA(object);
     flat = (struct block_flat *)(model + rmb_block->misc_model_count);
-    mc_memcpy(model, rmb_block->misc_models, rmb_block->misc_model_count * 66, D_001704CC, 565, 4);
-    mc_memcpy(flat, rmb_block->misc_flats, rmb_block->misc_flat_count * 17, D_001704CC, 566, 4);
+    PORT_COPY_BLOCK_MODELS(model, RMB_MISC_MODELS(rmb_block), rmb_block->misc_model_count, D_001704CC, 565);
+    mc_memcpy(flat, RMB_MISC_FLATS(rmb_block), rmb_block->misc_flat_count * REC_SIZEOF(struct block_flat), D_001704CC, 566, 4);
     for (i = 0; rmb_block->misc_model_count > i; i++, model++) {
         model->model = 0;
         model->x += block_origin_x;

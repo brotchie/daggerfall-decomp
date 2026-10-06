@@ -23,7 +23,7 @@ extern int screen_shake;
 extern signed char text_rsc_buffer[];
 extern char arena2_path[];
 extern struct record *nonworld_root;
-extern struct record *inventory_containers[];
+extern struct record *inventory_containers[9];
 extern iptr quest_root;
 extern struct building *current_building;
 extern struct record *player_entity;
@@ -112,7 +112,7 @@ int load_game(char *name)
     location_unload(location_object->image);
     if (save_version < 293 || save_version > 294)
         fatal_error(D_0017694A);
-    mc_memset((char *)inventory_containers, 0, 36, D_00176884, 655, 36);
+    mc_memset((char *)inventory_containers, 0, REC_SIZEOF(inventory_containers), D_00176884, 655, REC_SIZEOF(inventory_containers));
     object_unlink(player_object);
     object_free_children(player_object);
     object_free_children(location_object);

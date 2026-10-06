@@ -9,7 +9,7 @@ extern char D_00170A64[];
 extern char D_00178A10[];
 extern short *item_group_templates[];
 extern signed char D_001940D5;
-extern iptr D_00195984[];
+extern iptr D_00195984[4];
 extern struct record *nonworld_root;
 extern struct record *quest_root;
 extern struct record *camera_object;
@@ -137,7 +137,7 @@ struct record *quest_init_foe(struct qbn_foe *foe)
     char *location_data;
     struct character *character;
 
-    foe_object = object_create_child(nonworld_root, 0, 659);
+    foe_object = object_create_child(nonworld_root, 0, REC_SIZEOF(struct monster));
     location_data = RECORD_DATA(location_object);
     foe_object->type = 18;
     foe_object->flags |= 1;
@@ -194,7 +194,7 @@ int quest_init_resources(struct quest *quest)
     qbn_item = (struct qbn_item *)((char *)quest + quest->section_offsets[0]);
     for (i = 0; quest->section_counts[0] > i; i++, qbn_item++) {
         if ((qbn_item->flags & 2) == 0 && qbn_item->group == 100) {
-            mc_memcpy(qbn_item, (void *)D_00195984[qbn_item->index], 19, D_00170A64, 660, 4);
+            mc_memcpy(qbn_item, (void *)D_00195984[qbn_item->index], REC_SIZEOF(struct qbn_item), D_00170A64, 660, 4);
         } else {
             qbn_item->object = 0;
             if (quest_init_item(qbn_item) == 0) return 0;

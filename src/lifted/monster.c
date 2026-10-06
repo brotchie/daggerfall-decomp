@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "portio.h"
 
 extern char D_00175934[];
 extern signed char anim_mirror_facing[];
@@ -35,7 +36,7 @@ extern int D_00196D58;
 extern int D_00196D5C;
 extern char collide_flags[];
 extern int D_00199D74;
-extern char D_00199D9B[];
+extern struct link links[1024];
 extern int link_count;
 
 extern int collide_move_object(struct record *, int, struct move_request *, int);
@@ -76,7 +77,7 @@ void func_000622EB(struct record *monster, struct record *target, int heading, i
     int detour_offset;
 
     monster_char = &monster->data.character;
-    mc_memcpy(D_00196167, monster, 71, D_00175934, 426, 4);
+    mc_memcpy(D_00196167, monster, RECORD_HEADER_SIZE, D_00175934, 426, 4);
     if (monster_char->detour_steps == 1000) {
         func_0006243B(monster, target, heading);
         if (((int)(short)(*(short *)collide_flags & 10)) == 0) {
@@ -101,7 +102,7 @@ void func_000622EB(struct record *monster, struct record *target, int heading, i
         monster_char->detour_steps = 1000;
         monster_char->detour_side ^= 1;
     }
-    mc_memcpy(monster, D_00196167, 71, D_00175934, 457, 4);
+    mc_memcpy(monster, D_00196167, RECORD_HEADER_SIZE, D_00175934, 457, 4);
     func_0006243B(monster, target, monster_char->detour_yaw & 2047);
 }
 
@@ -282,14 +283,14 @@ int ai_pick_ranged_spell(int creature_index)
     while (spell != 0) {
         spell_data = &spell->data.spell;
         if (spell_data->target == 2 || spell_data->target == 4) {
-            *(iptr *)(scratch_190de4 + (count++ << 2)) = (iptr)spell;
+            *(iptr *)(scratch_190de4 + (count++ << PTR_SHIFT)) = (iptr)spell;
         }
         spell = spell->next;
     }
     if (count == 0) return 0;
     spell = first_spell;
     count = rand_range(0, count - 1);
-    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(iptr *)(scratch_190de4 + (count << 2)))->data.spell.id) != 0) {
+    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(iptr *)(scratch_190de4 + (count << PTR_SHIFT)))->data.spell.id) != 0) {
         return 0;
     }
     return 1;
@@ -311,14 +312,14 @@ int ai_pick_touch_spell(int creature_index)
     while (spell != 0) {
         spell_data = &spell->data.spell;
         if (spell_data->target == 0 || spell_data->target == 1) {
-            *(iptr *)(scratch_190de4 + (count++ << 2)) = (iptr)spell;
+            *(iptr *)(scratch_190de4 + (count++ << PTR_SHIFT)) = (iptr)spell;
         }
         spell = spell->next;
     }
     if (count == 0) return 0;
     spell = first_spell;
     count = rand_range(0, count - 1);
-    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(iptr *)(scratch_190de4 + (count << 2)))->data.spell.id) != 0) {
+    if (spell_player_has_spell((ai_chosen_spell = (struct record *)*(iptr *)(scratch_190de4 + (count << PTR_SHIFT)))->data.spell.id) != 0) {
         return 0;
     }
     return 1;
@@ -439,7 +440,7 @@ struct record *monster_summon_near_player(int monster_type)
 {
     struct record *monster;
 
-    monster = object_create_child(player_object->parent, 0, 659);
+    monster = object_create_child(player_object->parent, 0, REC_SIZEOF(struct monster));
     if (spawn_find_point(monster, 96, 300) != 0) {
         monster->type = 18;
         monster_init(monster, monster_type);
@@ -644,7 +645,7 @@ int func_000641CD(iptr id)
     int i;
 
     for (i = 0; i < link_count; i++) {
-        if (*(int *)(D_00199D9B + (i * 39)) == id) return 1;
+        if ((iptr)links[i].object == id) return 1;
     }
     return 0;
 }

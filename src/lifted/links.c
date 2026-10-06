@@ -4,6 +4,7 @@
 #include "records.h"
 #include "clib.h"
 #include "doslow.h"
+#include "portio.h"
 
 extern iptr D_00147954;
 extern char D_00175962[];
@@ -14,8 +15,8 @@ extern struct record *location_object;
 extern struct spell *spell_records;
 extern struct character *player_character;
 extern char *scratch_buffer;
-extern struct link links[];
-extern iptr active_links[];
+extern struct link links[1024];
+extern iptr active_links[64];
 extern int link_count;
 extern int active_link_count;
 
@@ -36,7 +37,7 @@ void links_save(int handle)
     int *indexes;
 
     if (active_link_count < 0) active_link_count = 0;
-    mc_memcpy((void *)D_00147954, links, link_count * 39, D_00175962, 78, 4);
+    mc_memcpy((void *)D_00147954, links, link_count * REC_SIZEOF(struct link), D_00175962, 78, 4);
     copy = (struct link *)D_00147954;
     for (i = 0; i < link_count; i++) {
         if (copy[i].object != 0) {
@@ -44,11 +45,11 @@ void links_save(int handle)
         }
     }
     write(handle, &link_count, 4);
-    write(handle, copy, link_count * 39);
+    PORT_WRITE_LINKS(handle, copy, link_count);
     write(handle, &active_link_count, 4);
     indexes = (int *)D_00147954;
     for (i = 0; i < active_link_count; i++) {
-        indexes[i] = ((unsigned)(active_links[i] - ((iptr)links))) / 39;
+        indexes[i] = ((unsigned)(active_links[i] - ((iptr)links))) / REC_SIZEOF(struct link);
     }
     write(handle, indexes, active_link_count << 2);
 }
@@ -58,7 +59,7 @@ void links_load(int handle)
     int i;
 
     read(handle, &link_count, 4);
-    read(handle, links, link_count * 39);
+    PORT_READ_LINKS(handle, links, link_count);
     for (i = 0; i < link_count; i++) {
         if (links[i].param == 108) {
             links[i].param = 100;
@@ -69,9 +70,9 @@ void links_load(int handle)
     }
     read(handle, &active_link_count, 4);
     if (active_link_count < 0) active_link_count = 0;
-    read(handle, active_links, active_link_count << 2);
+    PORT_READ_INDEXES(handle, active_links, active_link_count);
     for (i = 0; i < active_link_count; i++) {
-        active_links[i] = ((iptr)links) + (active_links[i] * 39);
+        active_links[i] = ((iptr)links) + (active_links[i] * REC_SIZEOF(struct link));
     }
 }
 

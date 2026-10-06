@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "portio.h"
 
 extern char D_00170A08[];
 extern char D_00170A11[];
@@ -40,7 +41,7 @@ extern signed char is_daytime;
 extern signed char D_0019629E;
 extern signed char D_001962A8;
 extern int region_location_count;
-extern int loaded_location_door_count;
+extern struct loaded_location loaded_location;
 extern struct map_location *region_locations;
 extern struct record *quest_reward_container;
 
@@ -137,7 +138,7 @@ void func_0003077F(struct record *object, int delete_twin)
 
     if (object == 0) return;
     twin = object->twin;
-    if (loaded_location_door_count != 0 && (object->id & -65536) == (location_object->id & -65536)) {
+    if (loaded_location.door_count != 0 && (object->id & -65536) == (location_object->id & -65536)) {
         door = location_find_door(object->id);
         if (door != 0) door->flags &= 0xFFF;
     }
@@ -368,7 +369,7 @@ struct record *func_000310E1(struct record *object, struct record *target)
     switch (object->type) {
     case 2:
     case 18:
-        data_size = *(int *)((char *)object - 6) - 71;
+        data_size = RECORD_BLOCK_SIZE(object) - RECORD_HEADER_SIZE;
         twin = object_create_child(target->parent, 0, data_size);
         twin->x = target->x;
         twin->y = target->y;

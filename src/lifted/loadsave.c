@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "portio.h"
 
 extern signed char mouse_buttons;
 extern signed char mouse_double_click;
@@ -46,7 +47,7 @@ extern char saved_region_name[];
 extern char bio_modifiers[];
 extern char saved_positions[];
 extern char D_0018DE44[];
-extern struct region regions[];
+extern struct region regions[62];
 extern signed char text_buffer[];
 extern signed char D_001903A8;
 extern signed char scratch_190d16;
@@ -71,13 +72,13 @@ extern struct record *logbook_object;
 extern struct record *options_object;
 extern int view_look_pitch;
 extern char D_001959C4[];
-extern struct record *inventory_containers[];
+extern struct record *inventory_containers[9];
 extern int spell_points_bonus;
 extern struct record *quest_root;
 extern struct record *bank_accounts;
 extern char D_00195A08[];
 extern int D_00195A0C;
-extern struct quest_face quest_faces[];
+extern struct quest_face quest_faces[10];
 extern int D_00195A78;
 extern int jump_velocity;
 extern struct record *camera_object;
@@ -262,17 +263,17 @@ struct record *savetree_attach_record(struct record *root, struct record *record
         if (object != 0 && object->type == record->type && object->parent->id == record->parent_id) {
             if (object->type == 34) {
                 if ((object->image & 127) != (record->image & 127)) {
-                    object = object_create_child(parent, record, size - 71);
+                    object = object_create_child(parent, record, size - RECORD_HEADER_SIZE);
                     object->parent_id = 0;
                     return object;
                 }
             }
-            mc_memcpy(object, record, 55, D_00176884, 217, 4);
-            mc_memcpy(&object->data, &record->data, (int)(iptr)&*(signed char *)((char *)(iptr)mem_block_size((iptr)object) - 71), D_00176884, 218, 4);
+            mc_memcpy(object, record, RECORD_LINKS_OFFSET, D_00176884, 217, 4);
+            mc_memcpy(&object->data, &record->data, (int)(iptr)&*(signed char *)((char *)(iptr)mem_block_size((iptr)object) - RECORD_HEADER_SIZE), D_00176884, 218, 4);
             object->parent_id = 0;
             return object;
         }
-        object = object_create_child(parent, record, size - 71);
+        object = object_create_child(parent, record, size - RECORD_HEADER_SIZE);
         object->parent_id = 0;
         return object;
     }
@@ -344,7 +345,7 @@ void savetree_register_record(struct record *object)
         quest_root = object;
         return;
     case 23:
-        game_settings = (struct settings *)((*(iptr *)&options_object = (iptr)object) + 71);
+        game_settings = (struct settings *)((*(iptr *)&options_object = (iptr)object) + RECORD_HEADER_SIZE);
         return;
     case 24:
         logbook_object = object;
@@ -666,12 +667,12 @@ void savevars_read(iptr slot)
     read(save_file_handle, bio_modifiers, 64);
     read(save_file_handle, &view_look_pitch, 12);
     read(save_file_handle, &text_macro_imperial, 1);
-    read(save_file_handle, quest_faces, 100);
+    PORT_READ_QUEST_FACES(save_file_handle, quest_faces, 100);
     read(save_file_handle, D_001959C4, 20);
     read(save_file_handle, travel_options, 2);
     read(save_file_handle, D_0018DE44, 512);
     read(save_file_handle, D_00196265, 1);
-    read(save_file_handle, saved_player_object, 71);
+    PORT_READ_HEADER(save_file_handle, saved_player_object, 71);
     read(save_file_handle, &spell_points_bonus, 4);
     read(save_file_handle, D_00195A08, 4);
     read(save_file_handle, &D_00195A0C, 4);
@@ -738,12 +739,12 @@ void savevars_write(int slot)
     write(save_file_handle, bio_modifiers, 64);
     write(save_file_handle, &view_look_pitch, 12);
     write(save_file_handle, &text_macro_imperial, 1);
-    write(save_file_handle, quest_faces, 100);
+    PORT_WRITE_QUEST_FACES(save_file_handle, quest_faces, 100);
     write(save_file_handle, D_001959C4, 20);
     write(save_file_handle, travel_options, 2);
     write(save_file_handle, D_0018DE44, 512);
     write(save_file_handle, D_00196265, 1);
-    write(save_file_handle, saved_player_object, 71);
+    PORT_WRITE_HEADER(save_file_handle, saved_player_object, 71);
     write(save_file_handle, &spell_points_bonus, 4);
     write(save_file_handle, D_00195A08, 4);
     write(save_file_handle, &D_00195A0C, 4);
@@ -869,7 +870,7 @@ void load_fix_object_cb(struct record *object)
             return;
         case 43:
             block = &object->data.block;
-            model = block->models;
+            model = PORT_BLOCK_RELINK(block);
             for (i = 0; block->model_count > i; i++, model++) {
                 model_ptr = &model->model;
                 *model_ptr = 0;
