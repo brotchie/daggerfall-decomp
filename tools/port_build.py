@@ -5,6 +5,7 @@
   port_build.py run ...   prepare a game folder as tools/fallemu.py does, then run the build
                           (arguments after `run` go to fall)
   port_build.py missing   list what the build still lacks, by kind (the stubs it generated)
+  port_build.py app       build/port/Daggerfall.app from the build (SDL3 inside, signed ad hoc)
 
   PORT_BUILD=DIR sets the build folder (build/port by default); PORT_BUILD_TYPE=Release (or
   RelWithDebInfo) configures a new folder optimised (Debug by default).
@@ -220,16 +221,72 @@ def run_game(args):
              [os.path.join(BUILD, "fall"), "--game", game, "--overlay", overlay] + args)
 
 
+INFO_PLIST = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key><string>Daggerfall</string>
+  <key>CFBundleDisplayName</key><string>Daggerfall</string>
+  <key>CFBundleIdentifier</key><string>io.github.brotchie.daggerfall-decomp</string>
+  <key>CFBundleExecutable</key><string>Daggerfall</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>1.07.213</string>
+  <key>CFBundleVersion</key><string>1.07.213</string>
+  <key>LSMinimumSystemVersion</key><string>11.0</string>
+  <key>NSHighResolutionCapable</key><true/>
+  <key>LSApplicationCategoryType</key><string>public.app-category.role-playing-games</string>
+</dict>
+</plist>
+"""
+
+
+def app():
+    """build/port/Daggerfall.app: the fall executable with SDL3 inside the bundle (its install
+    name pointed there) and an ad-hoc signature, so it runs from anywhere on this Mac. The game's
+    own files are not in it: the first launch asks for the install (port/host/launch.c)."""
+    import shutil
+    exe = os.path.join(BUILD, "fall")
+    if not os.path.exists(exe):
+        sys.exit("build first")
+    bundle = os.path.join(BUILD, "Daggerfall.app")
+    contents = os.path.join(bundle, "Contents")
+    if os.path.exists(bundle):
+        shutil.rmtree(bundle)
+    for d in ("MacOS", "Frameworks", "Resources"):
+        os.makedirs(os.path.join(contents, d))
+    target = os.path.join(contents, "MacOS", "Daggerfall")
+    shutil.copy2(exe, target)
+    with open(os.path.join(contents, "Info.plist"), "w") as f:
+        f.write(INFO_PLIST)
+    deps = run(["otool", "-L", target], capture_output=True).stdout.splitlines()[1:]
+    for line in deps:
+        lib = line.strip().split(" (")[0]
+        if "SDL3" not in lib:
+            continue
+        real = os.path.realpath(lib)
+        name = os.path.basename(lib)
+        shutil.copy2(real, os.path.join(contents, "Frameworks", name))
+        os.chmod(os.path.join(contents, "Frameworks", name), 0o755)
+        run(["install_name_tool", "-id", "@rpath/" + name, os.path.join(contents, "Frameworks", name)])
+        run(["install_name_tool", "-change", lib, "@executable_path/../Frameworks/" + name, target])
+    r = run(["codesign", "--force", "--deep", "--sign", "-", bundle], capture_output=True)
+    if r.returncode:
+        sys.exit("codesign: " + r.stderr)
+    print("port: built", os.path.relpath(bundle, ROOT))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", nargs="?", default="build", choices=["build", "run", "missing"])
+    ap.add_argument("cmd", nargs="?", default="build", choices=["build", "run", "missing", "app"])
     ap.add_argument("rest", nargs=argparse.REMAINDER)
     a = ap.parse_args()
     if a.cmd == "build":
         build()
     elif a.cmd == "missing":
         missing()
+    elif a.cmd == "app":
+        app()
     else:
         run_game(a.rest)
 

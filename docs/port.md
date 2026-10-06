@@ -38,6 +38,9 @@ work on `main`.
 | `port/test/opltest.c`, `musictest.c` | the OPL3 against the datasheet's numbers; a song rendered offline through the whole music path to a WAV (`--all`: every song) |
 | `port/test/vpcdemo.c` | the virtual PC on its own, through XnGine's entry points, with the game's image, palette and sounds; `--selftest` checks it end to end |
 | `port/host/host.c` | stopping SDL and the virtual PC, stopping on a stub or fault with the call chain, `port_check_ptr` |
+| `port/host/launch.c` | the game folder (`--game`, `$DAGGER_GAME`, the remembered one, or a folder dialog) and the overlay (`--overlay`, `$DAGGER_OVERLAY`, `~/Library/Application Support/Daggerfall`) |
+| `port/host/packed.c` | ARCH3D.BSA and DAGGER.SND unpacked from PACKED.DAT into the overlay (PKWARE DCL) |
+| `port/host/zeropage.c` | reads and writes through a null pointer finished against the virtual PC's low memory, as DOS's flat memory gave them |
 | `port/host/vpc_script.c` | the scripted driver: `PORT_SCRIPT` (a timeline of `shot`, `key`, `type`, `click` ... steps), `PORT_SHOT_EVERY`/`PORT_SHOT_DIR`, `PORT_EXIT_AFTER` |
 | `port/host/main.c` | `main`: SDL, the folders, then the game's main (0x10010) with `Z.CFG`, as `FALL.EXE Z.CFG` ran; a backtrace for a stub or a fault; `port_check_ptr` stops on a pointer that lost its top half |
 | `tools/port_build.py` | configure, build and generate; `run` prepares a game folder as `tools/fallemu.py` does and starts the build; `missing` lists the stubs |
@@ -46,6 +49,13 @@ work on `main`.
 | `tools/port_data.py` | the game's data (phase 2): object 3 in address order, globals whose types hold pointers in native layouts with 8-byte relocations from FALL.EXE's fixups; `report` lists declarations still too narrow |
 
 ## Building and running
+
+As an app: `tools/port_build.py` then `tools/port_build.py app` makes
+`build/port/Daggerfall.app`, with SDL3 inside the bundle and an ad-hoc signature. On its first
+launch it asks for the folder Daggerfall is installed in (the one with ARENA2; Bethesda's free
+release of the CD works) and remembers it. The game's files are only read. Saves, the game's
+config and the archives unpacked from PACKED.DAT go to `~/Library/Application Support/Daggerfall`,
+and the install's own SAVE0-SAVE5 show on the load screen too.
 
 ```sh
 .venv/bin/python tools/port_build.py                 # build/port/fall

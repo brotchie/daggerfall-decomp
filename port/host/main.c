@@ -3,8 +3,10 @@
    config file, as the DOS game was started (`FALL.EXE Z.CFG`).
 
    usage: fall [--game DIR] [--overlay DIR] [--nosound] [CONFIG]
-     --game DIR     the installed game (only read): ARENA2, the .BNK and .CFG files
-     --overlay DIR  where the game's writes go (saves, its config), read before DIR
+     --game DIR     the installed game (only read): ARENA2, the .BNK and .CFG files; else
+                    $DAGGER_GAME, the one remembered, or a folder dialog (launch.c)
+     --overlay DIR  where the game's writes go (saves, its config), read before DIR; else
+                    $DAGGER_OVERLAY or ~/Library/Application Support/Daggerfall
      --nosound      keep the install's HMISET.CFG ("No Digital Device"), as the emulator runs;
                     otherwise the overlay gets one with a Sound Blaster 16: its sound effects,
                     and its OPL3 for the music
@@ -44,8 +46,8 @@ static int run_game(void *arg)
 
 int main(int argc, char **argv)
 {
-    const char *game = getenv("DAGGER_GAME");
-    const char *overlay = getenv("DAGGER_OVERLAY");
+    const char *game = NULL;
+    const char *overlay = NULL;
     const char *config = "Z.CFG";
     int nosound = 0;
     char path[1024];
@@ -58,15 +60,19 @@ int main(int argc, char **argv)
             overlay = argv[++i];
         else if (strcmp(argv[i], "--nosound") == 0)
             nosound = 1;
+        else if (strncmp(argv[i], "-psn_", 5) == 0)
+            ;                           /* what Finder passed to apps on older macOS */
         else
             config = argv[i];
     }
     host_install_fault_handlers();
+    overlay = launch_overlay_dir(overlay);
+    game = launch_game_dir(game);
     if (game == NULL) {
-        fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [CONFIG]\n");
+        fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [--nosound] [CONFIG]\n");
         return 2;
     }
-    dos_set_dirs(game, overlay ? overlay : "overlay");
+    dos_set_dirs(game, overlay);
     if (!dos_host_path(config, 0, path, sizeof path)) {
         FILE *f;
         dos_host_path(config, 1, path, sizeof path);
@@ -84,7 +90,7 @@ int main(int argc, char **argv)
     if (!nosound) {
         char hmi[1024];
         FILE *f;
-        snprintf(hmi, sizeof hmi, "%s/HMISET.CFG", overlay ? overlay : "overlay");
+        snprintf(hmi, sizeof hmi, "%s/HMISET.CFG", overlay);
         if (access(hmi, F_OK) != 0 && (f = fopen(hmi, "wb")) != NULL) {
             fwrite(hmiset_sb16, 1, sizeof hmiset_sb16 - 1, f);
             fclose(f);

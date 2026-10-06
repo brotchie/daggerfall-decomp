@@ -25,6 +25,10 @@ void host_install_fault_handlers(void);
 /* ARCH3D.BSA and DAGGER.SND from ARENA2\PACKED.DAT into the overlay when the install lacks
    them, as the installer did (port/host/packed.c); 0 when both are there */
 int port_unpack_packed(void);
+/* the overlay folder (given, $DAGGER_OVERLAY or ~/Library/Application Support/Daggerfall) and
+   the game folder (given, $DAGGER_GAME, the remembered one, or the player picks it): launch.c */
+const char *launch_overlay_dir(const char *given);
+const char *launch_game_dir(const char *given);
 /* a fault at a low address: finish the access against the virtual PC's low memory, as DOS's
    flat memory did (port/host/zeropage.c); 1 when handled */
 int port_zero_page_fault(void *siginfo, void *ucontext);
