@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00088A68 */
+#pragma pack(1)                 /* Watcom's packing (the native build's default differs) */
 struct rec131 {
     short f0;
     unsigned char f2[129];
@@ -14,7 +15,7 @@ extern int ground_texture_archive;
 extern int nature_texture_archive;
 extern struct rec131 region_flats[];
 extern int climate_category(void);
-extern void mc_memcpy(char *, unsigned char *, int, char *, int, int);
+#include "clib.h"
 
 void climate_set_textures(void)
 {

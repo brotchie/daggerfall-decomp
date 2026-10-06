@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00175ACC[];
 extern unsigned char player_environment;
@@ -29,32 +30,18 @@ extern char music_current[];
 extern signed char sound_enabled;
 extern int D_001A5AD0;
 
-extern int sos_load_song(iptr, ...);
+#pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+extern int sos_load_song(char *);
+#pragma aux (sosconv) sos_load_song;
 extern int climate_category(void);
 extern int ai_angle_diff(int, int, int *);
 extern int sound_play_sample(iptr, int, struct record *, int);
 extern iptr sound_cache_load(int);
 extern int dpmi_lock_region(iptr, int);
 extern int dpmi_unlock_region(iptr, int);
-extern int func_0009E2BB();
-extern int func_0009E61A();
-extern int mc_free();
-extern int mc_memset();
-extern int func_000A0517();
-extern int mc_strncpy();
-extern int stricmp();
-extern int mc_memcpy();
-extern int func_000A1D3C();
-extern int func_000A2460();
-extern int func_000A2504();
-extern int func_000A2687();
-extern int func_000A277F();
-extern int func_000A27A0();
-extern int func_000A2857();
-extern int func_000A2941();
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
-extern int xn_math_angle_to_point();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
 int sound_play_sample_flat(iptr, int);
 int sound_play_ambient_loop(int, struct record *, int);
 void sound_stop_channel(int);
@@ -65,7 +52,7 @@ void sound_channel_set_source(struct record *object, int channel)
 {
     sound_channels[channel].source = object;
     if (object == 0) return;
-    mc_memcpy(sound_channels[channel].position, &object->x, 12, (iptr)D_00175ACC, 95, 4);
+    mc_memcpy(sound_channels[channel].position, &object->x, 12, D_00175ACC, 95, 4);
 }
 
 void sound_volume_pan(int *listener, int *source, int *volume, int *pan, struct record *object)
@@ -76,7 +63,7 @@ void sound_volume_pan(int *listener, int *source, int *volume, int *pan, struct 
     int offset;
     int saved_distance;
 
-    mc_memcpy(listener, source, 12, (iptr)D_00175ACC, 148, 4);
+    mc_memcpy(listener, source, 12, D_00175ACC, 148, 4);
     listener = &player_object->x;
     distance = xn_math_approx_hypot(listener[1] - source[1], xn_math_approx_dist2d(listener[0], listener[2], source[0], source[2]));
     saved_distance = distance;
@@ -131,7 +118,7 @@ int func_00069281(iptr sample, int length)
     if (channel == 3) return -1;
     volume = 32767;
     pan = 32768;
-    mc_memset(&sound_channels[channel].sample, 0, 240, (iptr)D_00175ACC, 291, 4);
+    mc_memset(&sound_channels[channel].sample, 0, 240, D_00175ACC, 291, 4);
     sound_channels[channel].priority = 127;
     sound_channels[channel].sample.data = (char *)sample;
     sound_channels[channel].sample.length = length;
@@ -172,7 +159,7 @@ int sound_play_sample_flat(iptr sample, int length)
         }
     }
     if (channel == 3) return -1;
-    mc_memset(&sound_channels[channel].sample, 0, 240, (iptr)D_00175ACC, 336, 4);
+    mc_memset(&sound_channels[channel].sample, 0, 240, D_00175ACC, 336, 4);
     sound_channels[channel].priority = 90;
     sound_channels[channel].sample.data = (char *)sample;
     sound_channels[channel].sample.length = length;
@@ -203,12 +190,12 @@ int sound_channel_done(int channel)
 void music_play(char *name)
 {
     if (sound_enabled == 0) return;
-    if (stricmp((iptr)music_current, name) == 0) return;
+    if (stricmp(music_current, name) == 0) return;
     music_stop();
-    mc_strncpy((iptr)music_current, name, 13, (iptr)D_00175ACC, 374);
-    D_001A3F30 = sos_load_song((iptr)music_current);
+    mc_strncpy(music_current, name, 13, D_00175ACC, 374);
+    D_001A3F30 = sos_load_song(music_current);
     if (D_0018DC34 != 0) {
-        dpmi_lock_region(D_0018DC34, func_000A277F(D_0018DC34));
+        dpmi_lock_region(D_0018DC34, func_000A277F((void *)D_0018DC34));
     }
     func_000A27A0(D_001A3F30);
 }
@@ -218,9 +205,9 @@ void music_stop(void)
     if (sound_enabled == 0 || D_001A3F48 == 0) return;
     func_000A2857(D_001A3F30);
     func_000A0517(D_001A3F30);
-    dpmi_unlock_region(D_0018DC34, func_000A277F(D_0018DC34));
+    dpmi_unlock_region(D_0018DC34, func_000A277F((void *)D_0018DC34));
     if (D_001A3F48 != 0 && D_001A3F48 != (-1751672937)) {
-        mc_free(D_001A3F48, (iptr)D_00175ACC, 393);
+        mc_free((void *)D_001A3F48, D_00175ACC, 393);
         D_001A3F48 = -1751672937;
     }
     D_0018DC34 = 0;
@@ -283,7 +270,7 @@ int sound_timer_add(iptr callback, int rate)
     int handle;
 
     if (sound_enabled == 0) return -1;
-    func_0009E2BB(rate, callback, (iptr)&handle);
+    func_0009E2BB(rate, (void (*)(void))callback, &handle);
     return handle;
 }
 

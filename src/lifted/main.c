@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern int xn_cam_pitch;
 extern int xn_cam_yaw;
@@ -22,7 +23,7 @@ extern char D_001700A0[];
 extern int D_001788E8[];
 extern int D_00178968[];
 extern unsigned char player_environment;
-extern int D_001845C8;
+extern iptr D_001845C8;
 extern signed char D_00187CA8;
 extern int D_0018DBF8;
 extern int frame_checkpoint;
@@ -63,21 +64,19 @@ extern short ground_texture_archive;
 extern short nature_texture_archive;
 
 extern struct record *object_reparent(struct record *, struct record *);
-extern int rand();
-extern int abs();
-extern int xn_world_update();
-extern int xn_sky_snow_update_speeds();
-extern int xn_math_mul_sin();
-extern int xn_render_begin_frame();
-extern int xn_render_frame();
-extern int xn_font_select();
-extern int xn_water_draw();
-extern int xn_tex_cache_flush();
-extern int xn_tex_cache_begin_frame();
-extern int xn_light_reset();
-extern int xn_mat_from_angles();
-extern int xn_cam_scale_matrix();
-extern int xn_terrain_draw();
+extern void xn_world_update(void);
+extern void xn_sky_snow_update_speeds(void);
+extern int xn_math_mul_sin(int, int);
+extern void xn_render_begin_frame(void);
+extern int xn_render_frame(int);
+extern int xn_font_select(int);
+extern void xn_water_draw(void);
+extern void xn_tex_cache_flush(void);
+extern void xn_tex_cache_begin_frame(void);
+extern void xn_light_reset(void);
+extern void xn_mat_from_angles(int, int, int, void *);
+extern void xn_cam_scale_matrix(void *, void *);
+extern void xn_terrain_draw(void);
 extern void player_frame_update(void);
 extern void marquee_update(void);
 extern void talk_update(void);
@@ -334,8 +333,8 @@ L10C1B:;
         xn_tex_cache_begin_frame();
         xn_render_begin_frame();
         xn_light_reset();
-        xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (iptr)xn_cam_rotation);
-        xn_cam_scale_matrix((iptr)xn_cam_rotation, (iptr)xn_cam_view_matrix);
+        xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, xn_cam_rotation);
+        xn_cam_scale_matrix(xn_cam_rotation, xn_cam_view_matrix);
         frame_checkpoint = 201;
         world_draw_objects();
         frame_checkpoint = 202;

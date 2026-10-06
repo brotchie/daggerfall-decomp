@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern char item_group_templates[];
+extern short *item_group_templates[];
 
 extern int rand_range(int, int);
 extern void item_init_from_template(unsigned short, short, short, struct item *);
@@ -30,6 +30,6 @@ void item_make_in_range(unsigned short group, int min_index, int max_index, stru
         item_init_from_template(287, 27, 8, item);
         return;
     default:
-        item_init_from_template((int)(unsigned short)*(short *)((char *)(iptr)(*(char **)(item_group_templates + (((int)(unsigned short)group) << 2)) + (index * 2))), (int)(short)group, (int)(short)*(short *)&index, item);
+        item_init_from_template((int)(unsigned short)*(short *)(((char *)item_group_templates[((int)(unsigned short)group)] + (index * 2))), (int)(short)group, (int)(short)*(short *)&index, item);
     }
 }

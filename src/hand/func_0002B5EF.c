@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002B5EF */
 #include "records.h"
+#include "clib.h"
 
 extern signed char D_0012B508;
 extern short font_height;
@@ -27,10 +28,8 @@ extern void quest_debug_next(void);
 extern void *quest_section(struct quest *, int);
 extern void text_draw(char *, int, int);
 extern int key_pressed_once(unsigned char);
-extern int xn_font_select();
+extern int xn_font_select(int);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, ...);
 
 
 #define COLOR (*(unsigned char *)&D_0012B508)

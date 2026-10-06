@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 struct missile_step { int x, y, z; struct record *light; };   /* a step vector, then the missile's light */
 extern short xn_cam_centre_x;
@@ -22,7 +23,7 @@ extern char D_00175881[];
 extern short cast_anim_state;
 extern signed char spell_effect_school[];
 extern char spell_effect_settings[];
-extern int D_0018509B;
+extern iptr D_0018509B;
 extern short spell_last_cast_id;
 extern char spell_missile_textures[];
 extern char spell_cast_sounds[];
@@ -77,20 +78,17 @@ extern struct record *object_create_child(struct record *, struct record *, int)
 extern struct record *object_reparent(struct record *, struct record *);
 extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
-extern int mc_memset();
-extern int mc_strncpy();
-extern int mc_memcpy();
-extern int xn_vec_unit_direction();
-extern int xn_vec_advance();
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
-extern int xn_math_angle_to_point();
-extern int spell_effect_dispatch();
-extern int xn_draw_spell_icon();
-extern int xn_draw_cast_anim_mirrored();
-extern int spell_find_effect_type();
-extern int func_000CE4E0();
-extern int xn_math_advance_pitch_yaw();
+extern void *xn_vec_unit_direction(void *, void *, void *);
+extern void *xn_vec_advance(void *, int, void *);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
+extern int spell_effect_dispatch(int, void *, int, void *);
+extern void xn_draw_spell_icon(int, int, int);
+extern void xn_draw_cast_anim_mirrored(void *, int, int);
+extern int spell_find_effect_type(char *, int);
+extern int func_000CE4E0(void *);
+extern void xn_math_advance_pitch_yaw(int, int, int, void *);
 extern void damage_spawn_splash(struct record *, int, int);
 extern void damage_knockback(struct record *, int, int, int);
 extern void spell_add_skill_uses(struct spell *, int);
@@ -117,7 +115,7 @@ int cast_item_strike_spell(int spell_id, struct record *target)
     while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
     spell->type = 9;
     spell->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (iptr)D_001757F4, 121, 4);
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, D_001757F4, 121, 4);
     spell->data.spell.icon = 250;
     i = spell_cost(&spell->data.spell, player_character);
     if (cast_item_spell_at(spell, target) != 0) object_delete(spell);
@@ -135,7 +133,7 @@ int cast_creature_spell(struct record *caster, struct record *target, int spell_
     spell->type = 9;
     spell->id = object_new_id(((unsigned)location_object->id) >> 16);
     spell->caster = caster;
-    mc_memcpy(&spell->data.spell, &spell_records[i], 89, (iptr)D_001757F4, 144, 4);
+    mc_memcpy(&spell->data.spell, &spell_records[i], 89, D_001757F4, 144, 4);
     if (D_00196292 != 0) spell->data.spell.icon = 250;
     i = spell_cost((struct spell *)((char *)spell + 89), &caster->data.character);
     if (cast_creature_spell_at(spell, caster, target) != 0) object_delete(spell);
@@ -246,7 +244,7 @@ int cast_recast_last(void)
     cast = object_create_child(player_object->parent, 0, 89);
     cast->type = 9;
     cast->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&cast->data.spell, &found->data.spell, 89, (iptr)D_001757F4, 443, 4);
+    mc_memcpy(&cast->data.spell, &found->data.spell, 89, D_001757F4, 443, 4);
     if (cast_player_spell(cast) != 0) object_delete(cast);
     return 1;
 }
@@ -430,14 +428,14 @@ void cast_fire_missile(struct record *missile)
             missile->yaw = ((camera_object->yaw + ((((((int)(short)mouse_x) + 6) - ((int)(short)xn_cam_centre_x)) * 160) / 100)) + view_look_yaw) & 2047;
         }
         step.light->angle_z = (missile->angle_z = 0);
-        mc_memset((iptr)aim, 0, 12, (iptr)D_001757F4, 711, 4);
-        xn_math_advance_pitch_yaw(missile->angle_x, missile->yaw, 1024, (iptr)aim);
+        mc_memset(aim, 0, 12, D_001757F4, 711, 4);
+        xn_math_advance_pitch_yaw(missile->angle_x, missile->yaw, 1024, aim);
         aim[0] += missile->x;
         aim[1] += missile->y;
         aim[2] += missile->z;
-        mc_memset((iptr)&step, 0, 12, (iptr)D_001757F4, 717, 4);
-        xn_vec_unit_direction(&missile->x, (iptr)aim, missile->data.spell.missile_direction);
-        xn_vec_advance(missile->data.spell.missile_direction, 110, (iptr)&step);
+        mc_memset(&step, 0, 12, D_001757F4, 717, 4);
+        xn_vec_unit_direction(&missile->x, aim, missile->data.spell.missile_direction);
+        xn_vec_advance(missile->data.spell.missile_direction, 110, &step);
         missile->x += step.x;
         missile->y += step.y;
         missile->z += step.z;
@@ -581,7 +579,7 @@ void cast_anim_update(void)
         } else {
             last_y = -hud_bar_image->height;
         }
-        xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, last_y);
+        xn_draw_cast_anim_mirrored((void *)spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], 0, last_y);
         cast_anim_state = 65535;
         return;
     }
@@ -590,7 +588,7 @@ void cast_anim_update(void)
     } else {
         y = -hud_bar_image->height;
     }
-    xn_draw_cast_anim_mirrored(spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), y);
+    xn_draw_cast_anim_mirrored((void *)spell_cast_anim_fire[(((int)(short)cast_anim_state) >> 4)], (int)(short)(cast_anim_state & 15), y);
     cast_anim_state++;
 }
 
@@ -610,7 +608,7 @@ void func_0005CA28(struct record *object)
 {
     if (object->type != 9) return;
     if ((signed char)D_00199D64->id != (signed char)object->data.spell.id) return;
-    mc_strncpy((iptr)D_00199D64 + 47, object->data.spell.name, 25, (iptr)D_001757F4, 958);
+    mc_strncpy((char *)((iptr)D_00199D64 + 47), object->data.spell.name, 25, D_001757F4, 958);
 }
 
 void spell_lookup_name(struct spell *spell)
@@ -628,7 +626,7 @@ void spell_lookup_name(struct spell *spell)
         object_foreach(spellbook->children, func_0005CA28);
         return;
     }
-    mc_strncpy(spell->name, (iptr)(signed char *)&spell_records[i].name[0], 25, (iptr)D_001757F4, 974);
+    mc_strncpy(spell->name, (char *)(signed char *)&spell_records[i].name[0], 25, D_001757F4, 974);
 }
 
 void spell_hud_draw_icons(void)

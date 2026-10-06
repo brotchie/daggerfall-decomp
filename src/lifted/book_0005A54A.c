@@ -3,7 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 
 
-extern int xn_font_draw_string();
+extern int xn_font_draw_string(int, int, char *);
 
 void text_draw(char *text, short x, short y)
 {

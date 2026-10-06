@@ -15,9 +15,9 @@ extern void func_0005C856(struct record *, struct record *);
 extern void links_trigger(struct record *, int);
 extern int sound_play(int, struct record *, int);
 extern struct record *monster_nearest_to_point(int, int, int);
-extern int xn_vec_advance(int *, int, struct vec3 *);
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
+extern iptr xn_vec_advance(int *, int, struct vec3 *);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
 
 int spell_missile_update(struct record *m, int launch)
 {

@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170A08[];
 extern char D_00170A11[];
@@ -59,12 +60,7 @@ extern struct record *object_reparent(struct record *, struct record *);
 extern struct record *object_find_by_id(struct record *, iptr);
 extern int object_new_id(int);
 extern struct record *object_find_quest(struct record *, unsigned char);
-extern int strnicmp();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int func_000A148C(iptr, ...);
-extern int xn_draw_image_transparent();
+extern void xn_draw_image_transparent(int, int, int, int, char *);
 extern void maploads_load_region(int);
 extern void tavern_close(void);
 extern void func_0002FE02(struct record *);
@@ -93,11 +89,11 @@ void qaction_op04_give_reward(struct quest *quest, struct qbn_op *op)
     int i;
     int j;
 
-    if (strnicmp(quest->name, (iptr)D_00170A08, 8) == 0) {
+    if (strnicmp(quest->name, D_00170A08, 8) == 0) {
         guild_join_dark_brotherhood();
         return;
     }
-    if (strnicmp(quest->name, (iptr)D_00170A11, 8) == 0) {
+    if (strnicmp(quest->name, D_00170A11, 8) == 0) {
         guild_join_thieves_guild();
         return;
     }
@@ -126,8 +122,8 @@ void qaction_op04_give_reward(struct quest *quest, struct qbn_op *op)
                 item->y = player_object->y;
                 item->z = player_object->z;
             } else {
-                mc_set_location(332, (iptr)D_00170A1A);
-                mc_sprintf((iptr)text_buffer, (iptr)D_00170A22, (iptr)quest->name, qbn_item->symbol);
+                mc_set_location(332, D_00170A1A);
+                mc_sprintf((char *)text_buffer, D_00170A22, (iptr)quest->name, qbn_item->symbol);
                 hud_message_add(text_buffer);
             }
         }
@@ -345,7 +341,7 @@ void qaction_op69_cast_spell_on_foe(struct quest *quest, struct qbn_op *op)
     spell_object->type = 9;
     spell_object->caster = player_entity;
     spell_object->id = object_new_id(((unsigned)location_object->id) >> 16);
-    mc_memcpy(&spell_object->data.spell, &spell_records[spell_index], 89, (iptr)D_00170A1A, 679, 4);
+    mc_memcpy(&spell_object->data.spell, &spell_records[spell_index], 89, D_00170A1A, 679, 4);
     object_foreach(location_object, quest_cast_spell_on_foe_cb);
     object_delete(spell_object);
 }
@@ -377,7 +373,7 @@ struct record *func_000310E1(struct record *object, struct record *target)
         twin->x = target->x;
         twin->y = target->y;
         twin->z = target->z;
-        mc_memcpy(&twin->data, &object->data, data_size, (iptr)D_00170A1A, 734, 4);
+        mc_memcpy(&twin->data, &object->data, data_size, D_00170A1A, 734, 4);
         twin->type = object->type;
         twin->flags = object->flags;
         twin->image = object->image;
@@ -394,7 +390,7 @@ struct record *func_000310E1(struct record *object, struct record *target)
             child_twin->x = target->x;
             child_twin->y = target->y;
             child_twin->z = target->z;
-            mc_memcpy(&child_twin->data, &object->data, 107, (iptr)D_00170A1A, 754, 4);
+            mc_memcpy(&child_twin->data, &object->data, 107, D_00170A1A, 754, 4);
             child_twin->type = object->type;
             child_twin->flags = object->flags;
             child_twin->image = object->image;
@@ -444,8 +440,8 @@ struct record *func_000310E1(struct record *object, struct record *target)
             person->faction_id = object->data.building.faction_id;
         }
         if (person->faction_id == 0) {
-            mc_set_location(819, (iptr)D_00170A1A);
-            func_000A148C((iptr)D_00170A4F, 819);
+            mc_set_location(819, D_00170A1A);
+            func_000A148C(D_00170A4F, 819);
             person->faction_id = 510;
         }
         if (object->image != 0) {

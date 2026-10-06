@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00032A05 */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 #pragma pack()
@@ -23,9 +24,6 @@ extern int quest_object_in_use(int);
 extern void location_free(short *);
 extern void quest_pick_location(short *, unsigned short, short, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern int rand();
-extern int mc_strncpy();
-extern int mc_memcpy();
 
 int quest_init_place(struct qbn_place *place)
 {

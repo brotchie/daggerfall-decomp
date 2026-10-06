@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000537B6 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_0012B508;
 extern iptr screen_buffer;
@@ -11,12 +12,10 @@ extern char *scratch_190df8;
 extern struct character *player_character;
 extern void msgbox_update(void);
 extern void text_draw_centred_coloured(char *, short, short, int, unsigned char);
-extern char *itoa(int, char *, int);
-extern int mc_memcpy();
-extern int xn_mouse_cursor_erase();
-extern int xn_mouse_cursor_draw();
+extern void xn_mouse_cursor_erase(void);
+extern void xn_mouse_cursor_draw(void);
 extern void xn_draw_fill_rect(short, short, short, short);
-extern int xn_draw_image();
+extern void xn_draw_image(int, int, int, int, char *);
 
 void classmaker_draw_reputations(void)
 {
@@ -27,7 +26,7 @@ void classmaker_draw_reputations(void)
     short height;
 
     xn_mouse_cursor_erase();
-    mc_memcpy(screen_buffer, scratch_190df4, 64000, D_00175420, 283, 4);
+    mc_memcpy((void *)screen_buffer, (void *)scratch_190df4, 64000, D_00175420, 283, 4);
     xn_draw_image(39, 5, *(unsigned short *)(scratch_190df8 + 4), *(unsigned short *)(scratch_190df8 + 6), scratch_190df8 + 12);
     width = classmaker_reputation_buttons[0].x1 - classmaker_reputation_buttons[0].x0 + 1;
     centre = (classmaker_reputation_buttons[0].y0 + classmaker_reputation_buttons[0].y1) >> 1;

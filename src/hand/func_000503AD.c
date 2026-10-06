@@ -3,7 +3,7 @@
 extern char D_0017531A[];
 extern signed char text_buffer[];
 extern struct flat_cfg flats_cfg[];
-extern int scratch_buffer;
+extern iptr scratch_buffer;
 extern int flats_cfg_count;
 extern void cfg_read_line(int *, char *);
 extern int cfg_read_number(int *);

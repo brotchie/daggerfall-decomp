@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003EAB4 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170D55[];
 extern char D_00170DA2[];
@@ -9,18 +10,13 @@ extern signed char text_buffer[];
 extern signed char text_rsc_buffer[];
 extern char D_00190FEC;
 extern int text_rsc_file;
-extern int msgbox_next_page;
+extern iptr msgbox_next_page;
 extern struct quest *current_quest;
 extern char *text_rsc_load(short, short, short);
 extern void msgbox_render(char *, char **);
 extern void msgbox_show_more_pages(char **);
 extern int disk_open_data(char *);
-extern void close(int);
-extern void mc_free(void *, char *, int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 int msgbox_render_quest_text(struct quest *quest, short message_id, char **image, short flags)
 {

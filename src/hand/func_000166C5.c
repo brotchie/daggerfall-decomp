@@ -19,7 +19,7 @@ extern int talk_find_regional(int);
 extern void town_map_note_building(struct record *, iptr);
 extern int rand_range(int, int);
 extern struct record *object_find_by_id(struct record *, iptr);
-extern int xn_math_approx_dist2d();
+extern int xn_math_approx_dist2d(int, int, int, int);
 
 
 int talk_hint_text_id(int variant)

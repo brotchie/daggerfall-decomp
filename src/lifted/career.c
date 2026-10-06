@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char disk_last_file_size[];
 extern signed char mouse_buttons;
@@ -48,21 +49,12 @@ extern int place_marker_in_range(struct record *, int);
 extern iptr text_rsc_load(int, int, int);
 extern int sound_play(int, struct record *, int);
 extern iptr disk_read_file(char *, iptr);
-extern int disk_write_arena2_file(char *, iptr, iptr);
+extern int disk_write_arena2_file(char *, iptr, int);
 extern int rand_range(int, int);
-extern int rand();
-extern int mc_free();
-extern int mc_memset();
-extern int atoi();
-extern int strlen();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern iptr memchr();
-extern int xn_gfx_present_inclusive();
-extern iptr xn_str_find_byte_pair();
-extern int xn_mouse_poll_clamped();
-extern int xn_mouse_cursor_move();
+extern void xn_gfx_present_inclusive(int);
+extern char *xn_str_find_byte_pair(char *, int, unsigned);
+extern int xn_mouse_poll_clamped(void);
+extern void xn_mouse_cursor_move(int, int);
 extern void msgbox_show_rsc(int, int);
 extern void text_draw_coloured(iptr, int, int, int, unsigned char);
 extern void object_free_later(struct record *);
@@ -86,22 +78,22 @@ void career_background_summary(int class_id, int ask)
     iptr start;
 
     career_bio_ask = *(signed char *)&ask;
-    mc_memcpy((iptr)&reputation_baseline, (iptr)(signed char *)&player_character->reputation[0], 10, (iptr)D_00170738, 48, 10);
+    mc_memcpy(&reputation_baseline, (signed char *)&player_character->reputation[0], 10, D_00170738, 48, 10);
     text_macro_imperial = rand() % 6;
     scratch_190d68 = (unsigned short)(unsigned char)D_00179FF8[rand_range(0, 9)];
     scratch_190d6a = 1;
     D_00190C74 = rand();
     *(int *)D_00190C78 = rand();
     if (class_id == 18) class_id = career_nearest_class();
-    mc_set_location(59, (iptr)D_00170738);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00170741, class_id);
-    mc_memset((int)(iptr)scratch_buffer, 0, 64000, (iptr)D_00170738, 60, 4);
-    disk_read_file(text_buffer, (int)(iptr)scratch_buffer + 1);
+    mc_set_location(59, D_00170738);
+    mc_sprintf((char *)text_buffer, D_00170741, class_id);
+    mc_memset(scratch_buffer, 0, 64000, D_00170738, 60, 4);
+    disk_read_file(text_buffer, (iptr)scratch_buffer + 1);
     *scratch_buffer = 10;
     if (ask != 0) disk_read_file(D_00170750, D_00147954);
     for (question = 0; question < 12; question++) {
         if (ask != 0) {
-            mc_memcpy(screen_buffer, D_00147954, 64000, (iptr)D_00170738, 69, 4);
+            mc_memcpy((void *)screen_buffer, (void *)D_00147954, 64000, D_00170738, 69, 4);
             xn_mouse_cursor_drawn &= 254;
         }
         career_find_question(question + 1);
@@ -123,9 +115,9 @@ void career_background_summary(int class_id, int ask)
         }
         cursor++;
     }
-    disk_write_arena2_file(D_0017075D, start, (iptr)cursor - start + 1);
+    disk_write_arena2_file(D_0017075D, start, (int)((iptr)cursor - start) + 1);
     if (start != 0 && start != (-1751672937)) {
-        mc_free(start, (iptr)D_00170738, 94);
+        mc_free((void *)start, D_00170738, 94);
         start = -1751672937;
     }
     msgbox_show_rsc(35, 1);
@@ -228,7 +220,7 @@ void career_apply_answer(int question)
 
     scratch_190cac = question;
     letter = ((int)(short)*(short *)scratch_190d66) + 97;
-    text = (unsigned char *)xn_str_find_byte_pair(*(int *)scratch_190de4, letter + 11776, 2000);
+    text = (unsigned char *)xn_str_find_byte_pair((char *)*(iptr *)scratch_190de4, letter + 11776, 2000);
     text = (unsigned char *)memchr(text, 10, 2000);
     text++;
     while (*text == 9) {
@@ -297,11 +289,11 @@ void career_show_biography(void)
         }
     }
     if (career_bio_text != 0 && career_bio_text != (-1751672937)) {
-        mc_free(career_bio_text, (iptr)D_00170738, 506);
+        mc_free((void *)career_bio_text, D_00170738, 506);
         career_bio_text = -1751672937;
     }
     if (window_image == 0 || window_image == (-1751672937)) return;
-    mc_free(window_image, (iptr)D_00170738, 507);
+    mc_free((void *)window_image, D_00170738, 507);
     window_image = -1751672937;
 }
 
@@ -312,10 +304,10 @@ void career_bio_draw(void)
 
     row = 0;
     line = career_bio_page;
-    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_00170738, 515, 4);
+    mc_memcpy((void *)screen_buffer, (void *)window_image, 64000, D_00170738, 515, 4);
     while (((unsigned)line) < D_00196D70 && row < 21) {
         text_draw_coloured(line, 10, (int)(short)((row * 7) + 25), 145, 156);
-        line += strlen(line) + 1;
+        line += strlen((char *)line) + 1;
         row++;
     }
     cursor_draw_arrow();
@@ -333,7 +325,7 @@ int career_bio_count_lines(void)
     count = 0;
     while (((unsigned)line) < D_00196D70) {
         count++;
-        line += strlen(line) + 1;
+        line += strlen((char *)line) + 1;
     }
     return count;
 }

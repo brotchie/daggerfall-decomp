@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00176E44[];
 extern char D_00176E4D[];
@@ -47,12 +48,7 @@ extern struct location_door *location_find_door(int);
 extern iptr mem_pool_alloc(iptr, int);
 extern int mem_pool_release(iptr);
 extern int object_count_type(struct record *, short);
-extern int rand();
-extern int mc_memset();
-extern int mc_set_location(int, iptr);
-extern int mc_memcpy();
-extern int func_000A148C(iptr, ...);
-extern int xn_math_approx_dist2d();
+extern int xn_math_approx_dist2d(int, int, int, int);
 extern void unequip_object(struct record *);
 extern void fatal_error(char *);
 extern void mem_pool_init(iptr, int);
@@ -62,11 +58,11 @@ struct record *object_free_single(struct record *);
 struct record *object_delete(struct record *);
 struct record *object_alloc(struct record *, struct record *, int);
 struct record *object_create_child(struct record *, struct record *, int);
-int object_find(struct record *, int (*)());
-int object_find_type_cb(struct record *);
+int object_find(struct record *, iptr (*)(struct record *));
+iptr object_find_type_cb(struct record *);
 iptr object_find_by_id_cb(struct record *);
 struct record *object_find_by_id(struct record *, iptr);
-int object_random_type_cb(struct record *);
+iptr object_random_type_cb(struct record *);
 int object_new_id(int);
 iptr object_find_quest_cb(struct record *);
 void object_free_node(struct record *);
@@ -76,9 +72,9 @@ void object_set_position(struct record *, int, int, int, int, int, int);
 void object_unlink(struct record *);
 void object_insert_after(struct record *, struct record *);
 void object_add_child(struct record *, struct record *);
-void object_foreach_pre(struct record *, void (*)());
-void object_foreach_post(struct record *, void (*)());
-void object_foreach(struct record *, void (*)());
+void object_foreach_pre(struct record *, void (*)(struct record *));
+void object_foreach_post(struct record *, void (*)(struct record *));
+void object_foreach(struct record *, void (*)(struct record *));
 void object_delete_block_cb(struct record *);
 void func_0008EB25(struct record *);
 void object_delete_quest_cb(struct record *);
@@ -96,8 +92,8 @@ void object_heap_init(void)
         }
     }
     object_heap_free = object_heap_size;
-    mc_set_location(55, (iptr)D_00176E44);
-    func_000A148C((iptr)D_00176E4D, object_heap_size);
+    mc_set_location(55, D_00176E44);
+    func_000A148C(D_00176E4D, object_heap_size);
     mem_pool_init((iptr)object_heap, object_heap_size);
     (location_object = object_alloc(0, 0, 48))->type = 1;
     location_object->image = 65535;
@@ -166,11 +162,11 @@ struct record *object_alloc(struct record *after, struct record *source, int dat
     object = (struct record *)mem_pool_alloc((iptr)object_heap, size);
     if (object == 0) fatal_error(D_00176E70);
     if (source != 0) {
-        mc_memcpy(object, source, 55, (iptr)D_00176E44, 163, 4);
-        mc_memcpy(&object->data, &source->data, size - 71, (iptr)D_00176E44, 164, 4);
-        mc_memset(&object->next, 0, 16, (iptr)D_00176E44, 165, 4);
+        mc_memcpy(object, source, 55, D_00176E44, 163, 4);
+        mc_memcpy(&object->data, &source->data, size - 71, D_00176E44, 164, 4);
+        mc_memset(&object->next, 0, 16, D_00176E44, 165, 4);
     } else {
-        mc_memset(object, 0, size, (iptr)D_00176E44, 169, 4);
+        mc_memset(object, 0, size, D_00176E44, 169, 4);
         object->id = object_new_id(1);
     }
     if (after != 0) object_insert_after(after, object);
@@ -195,8 +191,8 @@ struct record *object_clone(struct record *object)
     block = (struct mem_block *)((char *)object - 18);
     size = block->size;
     clone = object_create_child(object->parent, 0, size - 71);
-    mc_memcpy(clone, object, 55, (iptr)D_00176E44, 203, 4);
-    mc_memcpy(&clone->data, &object->data, size - 71, (iptr)D_00176E44, 204, 4);
+    mc_memcpy(clone, object, 55, D_00176E44, 203, 4);
+    mc_memcpy(&clone->data, &object->data, size - 71, D_00176E44, 204, 4);
     return clone;
 }
 
@@ -318,7 +314,7 @@ void object_swap_siblings(struct record *first, struct record *second)
     second->parent->children = (struct record *)second;
 }
 
-void object_foreach_near_player(struct record *object, void (*callback)(), int max_dist)
+void object_foreach_near_player(struct record *object, void (*callback)(struct record *), int max_dist)
 {
     while (object != 0) {
         if (xn_math_approx_dist2d(object->x, object->z, player_object->x, player_object->z) < max_dist) {
@@ -329,7 +325,7 @@ void object_foreach_near_player(struct record *object, void (*callback)(), int m
     }
 }
 
-void object_foreach_pre(struct record *object, void (*callback)())
+void object_foreach_pre(struct record *object, void (*callback)(struct record *))
 {
     struct record *next;
 
@@ -341,7 +337,7 @@ void object_foreach_pre(struct record *object, void (*callback)())
     }
 }
 
-void object_foreach_post(struct record *object, void (*callback)())
+void object_foreach_post(struct record *object, void (*callback)(struct record *))
 {
     struct record *next;
 
@@ -353,7 +349,7 @@ void object_foreach_post(struct record *object, void (*callback)())
     }
 }
 
-void object_foreach(struct record *object, void (*callback)())
+void object_foreach(struct record *object, void (*callback)(struct record *))
 {
     struct record *next;
 
@@ -365,7 +361,7 @@ void object_foreach(struct record *object, void (*callback)())
     }
 }
 
-void object_foreach_skip_player(struct record *object, void (*callback)())
+void object_foreach_skip_player(struct record *object, void (*callback)(struct record *))
 {
     struct record *next;
 
@@ -377,7 +373,7 @@ void object_foreach_skip_player(struct record *object, void (*callback)())
     }
 }
 
-void object_foreach_open(struct record *object, void (*callback)())
+void object_foreach_open(struct record *object, void (*callback)(struct record *))
 {
     while (object != 0) {
         callback(object);
@@ -386,7 +382,7 @@ void object_foreach_open(struct record *object, void (*callback)())
     }
 }
 
-void object_foreach_until(struct record *object, int (*callback)())
+void object_foreach_until(struct record *object, int (*callback)(struct record *))
 {
     struct record *next;
 
@@ -397,7 +393,7 @@ void object_foreach_until(struct record *object, int (*callback)())
     }
 }
 
-int object_find(struct record *object, int (*callback)())
+int object_find(struct record *object, iptr (*callback)(struct record *))
 {
     while (object != 0) {
         if (callback(object) != 0) return 1;
@@ -407,7 +403,7 @@ int object_find(struct record *object, int (*callback)())
     return 0;
 }
 
-int object_find_open(struct record *object, int (*callback)())
+int object_find_open(struct record *object, iptr (*callback)(struct record *))
 {
     while (object != 0) {
         if (callback(object) != 0) return 1;
@@ -430,7 +426,7 @@ void object_find_item_cb(struct record *object)
     found_object = object;
 }
 
-int object_find_type_cb(struct record *object)
+iptr object_find_type_cb(struct record *object)
 {
     if ((short)object->type != D_001A9B42) return 0;
     found_object = object;
@@ -465,7 +461,7 @@ struct record *object_create_in_block(struct record *parent, int type, int data_
     object->pad13 = pad13;
     object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     if (object->id == (-1016397758)) {
-        mc_memcpy((iptr)object_debug_watch_copy, object, 71, (iptr)D_00176E44, 634, 4);
+        mc_memcpy(object_debug_watch_copy, object, 71, D_00176E44, 634, 4);
         object_debug_watch = (iptr)object;
     }
     return object;
@@ -493,7 +489,7 @@ struct record *object_find_by_id(struct record *root, iptr id)
     return object_search_result;
 }
 
-int object_random_type_cb(struct record *object)
+iptr object_random_type_cb(struct record *object)
 {
     if (object->type != scratch_190ce4[0]) return 0;
     if (*(int *)scratch_190be4 == 0) {

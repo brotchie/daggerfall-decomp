@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern struct region regions[];
 extern signed char mouse_buttons;
@@ -14,7 +15,7 @@ extern signed char D_001841E3[];
 extern signed char text_buffer[];
 extern char D_001911E4[];
 extern signed char quest_global_states[];
-extern char D_00195984[];
+extern iptr D_00195984[];
 extern iptr D_00195988;
 extern iptr D_0019598C;
 extern iptr D_00195990;
@@ -58,15 +59,12 @@ extern int qcond_op57_item_used(struct quest *, struct qbn_op *);
 extern int quest_deliveries_done(struct quest *);
 extern iptr quest_start(char *);
 extern int sound_play(int, struct record *, int);
-extern int disk_resolve_path(iptr);
+extern iptr disk_resolve_path(iptr);
 extern int rand_range(int, int);
 extern int location_contains(int, int);
 extern struct record *object_find_by_id(struct record *, iptr);
-extern int mc_memset();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int xn_vid_play();
-extern int xn_mouse_poll_clamped();
+extern int xn_vid_play(char *, int, int, int);
+extern int xn_mouse_poll_clamped(void);
 extern void region_flag_set(int, int);
 extern void region_flag_clear(int, int);
 extern void faction_change_reputation(struct faction *, int);
@@ -139,7 +137,7 @@ void quest_run_opcodes(struct quest *quest)
     int i;
     struct record *object;
     struct faction *faction;
-    int path;
+    iptr path;
     {
         int unused1;
         int unused2;
@@ -174,8 +172,8 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 8:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0 && ((int)(unsigned char)current_region) != 31) {
-                    mc_set_location(64, (iptr)D_001707F0);
-                    mc_sprintf((iptr)D_001911E4, (iptr)D_001707F7, rand_range(op->args[1].value, op->args[2].value));
+                    mc_set_location(64, D_001707F0);
+                    mc_sprintf(D_001911E4, D_001707F7, rand_range(op->args[1].value, op->args[2].value));
                     quest_start(D_001911E4);
                     quest_op_done(quest, op);
                 }
@@ -428,12 +426,12 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 50:
                 if (((int)(short)(op->flags & 1)) == 0 && quest_arg_state(op, 0) != 0) {
-                    mc_set_location(358, (iptr)D_001707F0);
-                    mc_sprintf((iptr)text_buffer, (iptr)D_00170801, op->args[1].value);
+                    mc_set_location(358, D_001707F0);
+                    mc_sprintf((char *)text_buffer, D_00170801, op->args[1].value);
                     while (mouse_buttons != 0) xn_mouse_poll_clamped();
                     path = disk_resolve_path((iptr)text_buffer);
-                    xn_vid_play(path, 0, 0, 1);
-                    mc_memset(655360, 0, 64000, (iptr)D_001707F0, 362, 4);
+                    xn_vid_play((char *)path, 0, 0, 1);
+                    mc_memset((void *)655360, 0, 64000, D_001707F0, 362, 4);
                     palette_restore();
                     sky_loaded_frame = 10000;
                     night_sky_loaded = 0;
@@ -646,7 +644,7 @@ void quest_run_opcodes(struct quest *quest)
                 break;
             case 75:
                 if (quest_arg_state(op, 0) != 0) {
-                    *(iptr *)D_00195984 = (iptr)op->args[1].record;
+                    D_00195984[0] = (iptr)op->args[1].record;
                     D_00195988 = (iptr)op->args[2].record;
                     D_0019598C = (iptr)op->args[3].record;
                     D_00195990 = (iptr)op->args[4].record;
@@ -727,7 +725,7 @@ void quest_run_opcodes(struct quest *quest)
                 }
             }
         }
-        *(iptr *)D_00195984 = (D_00195988 = (D_0019598C = (D_00195990 = 0)));
+        D_00195984[0] = (D_00195988 = (D_0019598C = (D_00195990 = 0)));
         if (ended == 0) quest_timers_update(quest);
         if (quest_reward_container == 0 || quest_reward_container->children == 0 || ((int)(unsigned char)game_mode) == 4) {
             return;
@@ -885,7 +883,7 @@ void quest_relink_after_load(struct quest *quest)
     op = (struct qbn_op *)((iptr)quest + quest->section_offsets[8]);
     for (i = 0; quest->section_counts[8] > i; i++, op++) {
         arg = op->args;
-        op->arg_count = ((int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)&qbn_opcode_arg_counts + op->opcode))) - 48;
+        op->arg_count = ((int)(unsigned char)*(signed char *)((*(char **)&qbn_opcode_arg_counts + op->opcode))) - 48;
         for (j = 0; op->arg_count > j; j++, arg++) {
             if (arg->record != 0) arg->record += (iptr)quest;
             if (arg->object != 0) {
@@ -966,7 +964,7 @@ int quest_event_clicked_faction(unsigned short faction_id)
     return found;
 }
 
-iptr quest_place_or_person_object(struct quest *quest, int record_index, short is_person)
+iptr quest_place_or_person_object(struct quest *quest, iptr record_index, short is_person)
 {
     if (is_person == 0) return (iptr)((struct qbn_place *)quest_record(quest, 4, (int)(short)*(short *)&record_index))->object;
     return (iptr)((struct qbn_person *)quest_record(quest, 3, (int)(short)*(short *)&record_index))->object;

@@ -1,5 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006AE87 */
-extern int strlen(char *);
+#include "clib.h"
 
 char *str_list_skip(char *list, int count)
 {

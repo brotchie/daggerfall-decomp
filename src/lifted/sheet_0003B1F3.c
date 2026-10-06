@@ -4,6 +4,7 @@
 
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern char D_00170C40[];
 extern char D_00170C4D[];
@@ -34,7 +35,6 @@ extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
 extern iptr disk_read_file(char *, iptr);
 extern int rand_range(int, int);
-extern int mc_memcpy();
 extern void sheet_place_spinner(int);
 
 int sheet_open(short opening)
@@ -70,7 +70,7 @@ int sheet_open(short opening)
             *(short *)scratch_190d64 = rand_range(4, 6);
         }
         *(int *)scratch_190be4 = 0;
-        mc_memcpy((iptr)D_00190D8C, (iptr)(signed char *)&player_character->base_attributes[0], 16, (iptr)D_00170C67, 97, 4);
+        mc_memcpy(D_00190D8C, (signed char *)&player_character->base_attributes[0], 16, D_00170C67, 97, 4);
         sheet_place_spinner(13);
         D_0019626C = 0;
         D_00187CA8 = 0;

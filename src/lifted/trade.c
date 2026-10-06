@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char D_000CDDA8[];
 extern signed char D_0012B508;
@@ -19,7 +20,7 @@ extern int D_0018DD54;
 extern int D_0018DD5C;
 extern signed char text_buffer[];
 extern struct building *current_building;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern signed char msgbox_button_keys;
 extern signed char D_00196034;
 extern signed char D_00196035;
@@ -40,17 +41,16 @@ extern int D_001A3F40;
 extern int midi_bsa;
 extern signed char sound_enabled;
 
-extern int sos_init(int, ...);
+#pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+extern int sos_init(int, int);
+#pragma aux (sosconv) sos_init;
 extern int sos_shutdown(void);
-extern int sos_read_settings(iptr, ...);
+extern int sos_read_settings(char *);
+#pragma aux (sosconv) sos_read_settings;
 extern int archive_open(char *, iptr, int);
 extern int sound_timer_add(iptr, int);
 extern int dpmi_lock_region(iptr, int);
 extern int dpmi_unlock_region(iptr, int);
-extern int strlen();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int func_000A1D3C();
 extern void archive_close(int);
 extern void msgbox_show_string(char *, short);
 extern void sound_stop_channel(int);
@@ -70,8 +70,8 @@ void trade_haggle_show_offer(void)
     msgbox_button_keys = 30;
     D_00196034 = 19;
     D_00196035 = 46;
-    mc_set_location(131, (iptr)D_00175A30);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00175A38, (int)trade_haggle_asking);
+    mc_set_location(131, D_00175A30);
+    mc_sprintf((char *)text_buffer, D_00175A38, (int)trade_haggle_asking);
     msgbox_show_string(text_buffer, 5);
 }
 
@@ -80,9 +80,9 @@ void trade_counter_offer(void)
     char *text;
 
     D_0012B508 = 146;
-    text = *(char **)scratch_buffer + 55000;
-    mc_set_location(141, (iptr)D_00175A30);
-    mc_sprintf((iptr)text, (iptr)D_00175A6A);
+    text = scratch_buffer + 55000;
+    mc_set_location(141, D_00175A30);
+    mc_sprintf(text, D_00175A6A);
     *(strlen(text) + text + 1) = 0;
     msgbox_show_string(text, 2);
     inpstr_begin_number((int)trade_haggle_asking);
@@ -116,7 +116,7 @@ int sound_init_music(void)
 {
     int i;
 
-    if ((short)sos_read_settings((iptr)D_00175AB8) == 0) return 0;
+    if ((short)sos_read_settings(D_00175AB8) == 0) return 0;
     if (sos_init(D_0018DD5C, D_0018DD54) != 0) return 0;
     D_0018DC64 = 2048;
     func_000A1D3C(127);

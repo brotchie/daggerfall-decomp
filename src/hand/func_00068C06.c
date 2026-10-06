@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00068C06 */
 #include "records.h"
+#include "clib.h"
 
 extern int D_0018DD60;
 extern struct record *player_object;
@@ -12,9 +13,6 @@ extern int D_001A3F38;
 extern char sound_enabled;
 extern void sound_volume_pan(int *, int *, int *, int *, struct record *);
 extern void sound_stop_channel(int);
-extern int func_000A1ED5(int, int, int);
-extern int func_000A20BF(int, int, int);
-extern short func_000A2460(int, int);
 
 void sound_update_channels(void)
 {

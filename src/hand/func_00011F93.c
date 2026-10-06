@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00011F93 */
 #include "structs.h"
+#include "clib.h"
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_get_number;
 extern int profile_hex_to_int(char *);
-extern int atoi(signed char *);
 
 int profile_get_number(struct profile *r, int *out)
 {

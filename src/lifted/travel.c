@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -23,10 +24,10 @@ extern char D_00177493[];
 extern char D_001774A3[];
 extern signed char travel_filter;
 extern char travel_options[];
-extern int D_001835E8[];
-extern int D_001837E4[];
-extern char region_names[];
-extern int D_001846F4;
+extern iptr D_001835E8[];
+extern iptr D_001837E4[];
+extern char *region_names[];
+extern iptr D_001846F4;
 extern signed char D_00187CA8;
 extern signed char location_type_dot_colour[];
 extern signed char location_type_category[];
@@ -60,7 +61,7 @@ extern char cheat_flags[];
 extern struct image *D_00195B5C;
 extern struct character *player_character;
 extern iptr window_image;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern int sky_loaded_frame;
 extern iptr text_macro_travel_city;
 extern signed char current_region;
@@ -78,9 +79,9 @@ extern struct image *D_001AA64C;
 extern struct image *D_001AA650;
 extern struct image *D_001AA654;
 extern struct image *D_001AA658;
-extern char D_001AA65C[];
+extern char *D_001AA65C[];
 extern iptr D_001AA660;
-extern int D_001AA664;
+extern iptr D_001AA664;
 extern struct image *D_001AA668;
 extern iptr D_001AA66C;
 extern struct image *D_001AA670;
@@ -91,7 +92,7 @@ extern int D_001AA680;
 extern char *D_001AA684;
 extern char D_001AA688[];
 extern char D_001AA68C[];
-extern int D_001AA690;
+extern iptr D_001AA690;
 extern int D_001AA694;
 extern int travel_transport_factor;
 extern iptr D_001AA6A0;
@@ -107,24 +108,15 @@ extern int key_pressed_once(unsigned char);
 extern int gold_can_afford(int);
 extern int travel_map_open(int);
 extern int travel_route(int, int, int, int, int);
-extern int mc_free();
-extern int mc_memset();
-extern int mc_strncpy();
-extern int strlen();
-extern int stricmp();
-extern int strnicmp();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int func_000A134C();
-extern int xn_math_approx_dist2d();
-extern int xn_draw_zoom4x();
-extern int xn_draw_mark_matching();
-extern int xn_gfx_present_inclusive();
-extern int xn_kbd_flush();
-extern int xn_draw_image();
-extern int xn_draw_image_transparent();
-extern int xn_draw_line_to();
+extern int func_000A134C(int, int, int);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern void xn_draw_zoom4x(char *, char *, int);
+extern void xn_draw_mark_matching(char *, char *, int, int);
+extern void xn_gfx_present_inclusive(int);
+extern void xn_kbd_flush(void);
+extern void xn_draw_image(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
+extern void xn_draw_line_to(int, int);
 extern void maploads_load_region(int);
 extern void region_load_location_names(int);
 extern void region_location_names_release(void);
@@ -174,26 +166,26 @@ void travel_map_update(void)
     int *cancel_ticks;
 
     if (travel_map_open(0) == 0) return;
-    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_0017743D, 198, 4);
+    mc_memcpy((void *)screen_buffer, (void *)window_image, 64000, D_0017743D, 198, 4);
     travel_draw_buttons();
     if (scratch_190ce4[0] != 0) {
         if (D_00190CE8 != 0) {
             func_0009D5AC(*(char **)&screen_buffer + 3840, D_001AA668->pixels, 51200);
         } else {
-            mc_memcpy((iptr)(*(char **)&screen_buffer + 3840), (iptr)D_001AA668->pixels, 51200, (iptr)D_0017743D, 208, 4);
-            xn_draw_image_transparent(D_001AA670->x, D_001AA670->y, D_001AA670->width, D_001AA670->height, (iptr)D_001AA670->pixels);
+            mc_memcpy((*(char **)&screen_buffer + 3840), D_001AA668->pixels, 51200, D_0017743D, 208, 4);
+            xn_draw_image_transparent(D_001AA670->x, D_001AA670->y, D_001AA670->width, D_001AA670->height, D_001AA670->pixels);
         }
         if (((int)(unsigned char)D_001AA6A4) > 1) {
             if (((int)(unsigned char)(D_001AA6A5 & 1)) == 0) {
-                xn_draw_image(D_001AA654->x, D_001AA654->y, D_001AA654->width, D_001AA654->height, (iptr)D_001AA654->pixels);
+                xn_draw_image(D_001AA654->x, D_001AA654->y, D_001AA654->width, D_001AA654->height, D_001AA654->pixels);
             } else {
-                xn_draw_image(D_001AA658->x, D_001AA658->y, D_001AA658->width, D_001AA658->height, (iptr)D_001AA658->pixels);
+                xn_draw_image(D_001AA658->x, D_001AA658->y, D_001AA658->width, D_001AA658->height, D_001AA658->pixels);
             }
             if (((int)(unsigned char)D_001AA6A4) > 2) {
                 if (((int)(unsigned char)(D_001AA6A5 & 2)) == 0) {
-                    xn_draw_image(D_001AA64C->x, D_001AA64C->y, D_001AA64C->width, D_001AA64C->height, (iptr)D_001AA64C->pixels);
+                    xn_draw_image(D_001AA64C->x, D_001AA64C->y, D_001AA64C->width, D_001AA64C->height, D_001AA64C->pixels);
                 } else {
-                    xn_draw_image(D_001AA650->x, D_001AA650->y, D_001AA650->width, D_001AA650->height, (iptr)D_001AA650->pixels);
+                    xn_draw_image(D_001AA650->x, D_001AA650->y, D_001AA650->width, D_001AA650->height, D_001AA650->pixels);
                 }
             }
         }
@@ -221,7 +213,7 @@ void travel_map_update(void)
                         D_0014292C = *(short *)D_001AA68C;
                         xn_draw_line_to(320, (int)(short)*(short *)D_001AA68C);
                     } else {
-                        xn_draw_mark_matching(D_001AA66C, screen_buffer, ((int)(unsigned char)current_region) + 128, 64000);
+                        xn_draw_mark_matching((char *)D_001AA66C, (char *)screen_buffer, ((int)(unsigned char)current_region) + 128, 64000);
                     }
                 }
             }
@@ -239,7 +231,7 @@ void travel_map_update(void)
                 origin_x = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
                 origin_z = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
             } else {
-                origin_x = ((int)(short)*(short *)((char *)(iptr)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
+                origin_x = ((int)(short)*(short *)((D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
                 origin_z = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
             }
             x = ((unsigned)((location->x_type_flags & 33554431) - origin_x)) >> 15;
@@ -313,7 +305,7 @@ void travel_button_exit(int button)
         return;
     }
     sound_play(203, player_object, 110);
-    mc_memset(screen_buffer, 0, 64000, (iptr)D_0017743D, 367, 4);
+    mc_memset((void *)screen_buffer, 0, 64000, D_0017743D, 367, 4);
     xn_gfx_present_inclusive(1);
     palette_restore();
     sky_loaded_frame = 10000;
@@ -322,51 +314,51 @@ void travel_button_exit(int button)
     maploads_load_region((int)(unsigned char)current_region);
     region_location_names_release();
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_0017743D, 380);
+        mc_free((void *)window_image, D_0017743D, 380);
         window_image = -1751672937;
     }
     if (D_001AA6A0 != 0 && D_001AA6A0 != (-1751672937)) {
-        mc_free(D_001AA6A0, (iptr)D_0017743D, 381);
+        mc_free((void *)D_001AA6A0, D_0017743D, 381);
         D_001AA6A0 = -1751672937;
     }
     if (D_001AA66C != 0 && D_001AA66C != (-1751672937)) {
-        mc_free(D_001AA66C, (iptr)D_0017743D, 382);
+        mc_free((void *)D_001AA66C, D_0017743D, 382);
         D_001AA66C = -1751672937;
     }
     if ((iptr)D_00195B5C != 0 && (iptr)D_00195B5C != (-1751672937)) {
-        mc_free((iptr)D_00195B5C, (iptr)D_0017743D, 383);
+        mc_free(D_00195B5C, D_0017743D, 383);
         D_00195B5C = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)D_001AA670 != 0 && (iptr)D_001AA670 != (-1751672937)) {
-        mc_free((iptr)D_001AA670, (iptr)D_0017743D, 384);
+        mc_free(D_001AA670, D_0017743D, 384);
         D_001AA670 = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)D_001AA64C != 0 && (iptr)D_001AA64C != (-1751672937)) {
-        mc_free((iptr)D_001AA64C, (iptr)D_0017743D, 385);
+        mc_free(D_001AA64C, D_0017743D, 385);
         D_001AA64C = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)D_001AA650 != 0 && (iptr)D_001AA650 != (-1751672937)) {
-        mc_free((iptr)D_001AA650, (iptr)D_0017743D, 386);
+        mc_free(D_001AA650, D_0017743D, 386);
         D_001AA650 = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)D_001AA654 != 0 && (iptr)D_001AA654 != (-1751672937)) {
-        mc_free((iptr)D_001AA654, (iptr)D_0017743D, 387);
+        mc_free(D_001AA654, D_0017743D, 387);
         D_001AA654 = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)D_001AA658 != 0 && (iptr)D_001AA658 != (-1751672937)) {
-        mc_free((iptr)D_001AA658, (iptr)D_0017743D, 388);
+        mc_free(D_001AA658, D_0017743D, 388);
         D_001AA658 = (struct image *)(iptr)-1751672937;
     }
-    if (*(int *)D_001AA65C != 0 && *(int *)D_001AA65C != (-1751672937)) {
-        mc_free(*(int *)D_001AA65C, (iptr)D_0017743D, 389);
-        *(int *)D_001AA65C = -1751672937;
+    if ((iptr)D_001AA65C[0] != 0 && (iptr)D_001AA65C[0] != (-1751672937)) {
+        mc_free((void *)D_001AA65C[0], D_0017743D, 389);
+        *(iptr *)&D_001AA65C[0] = -1751672937;
     }
     if (D_001AA660 != 0 && D_001AA660 != (-1751672937)) {
-        mc_free(D_001AA660, (iptr)D_0017743D, 390);
+        mc_free((void *)D_001AA660, D_0017743D, 390);
         D_001AA660 = -1751672937;
     }
     if ((iptr)D_001AA668 != 0 && (iptr)D_001AA668 != (-1751672937)) {
-        mc_free((iptr)D_001AA668, (iptr)D_0017743D, 392);
+        mc_free(D_001AA668, D_0017743D, 392);
         D_001AA668 = (struct image *)(iptr)-1751672937;
     }
     game_mode = 0;
@@ -390,7 +382,7 @@ void travel_draw_locations(void)
         origin_x = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
         origin_z = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
     } else {
-        origin_x = ((int)(short)*(short *)((char *)(iptr)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
+        origin_x = ((int)(short)*(short *)((D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
         origin_z = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
     }
     for (i = 0; i < region_location_count; i++, location++) {
@@ -424,11 +416,11 @@ void travel_open_region(int region)
         travel_load_region_part();
     } else {
         if ((iptr)D_001AA668 != 0 && (iptr)D_001AA668 != (-1751672937)) {
-            mc_free((iptr)D_001AA668, (iptr)D_0017743D, 460);
+            mc_free(D_001AA668, D_0017743D, 460);
             D_001AA668 = (struct image *)(iptr)-1751672937;
         }
-        mc_set_location(461, (iptr)D_0017743D);
-        mc_sprintf((iptr)text_buffer, (iptr)D_00177446, region);
+        mc_set_location(461, D_0017743D);
+        mc_sprintf((char *)text_buffer, D_00177446, region);
         D_001AA668 = (struct image *)disk_read_file(text_buffer, 0);
         maploads_load_region(region);
         region_load_location_names(region);
@@ -469,7 +461,7 @@ void travel_mark_player(int region)
             origin_x = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
             origin_z = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
         } else {
-            origin_x = ((int)(short)*(short *)((char *)(iptr)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
+            origin_x = ((int)(short)*(short *)((D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
             origin_z = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
         }
         x = (player_object->x - origin_x) / 32768;
@@ -501,26 +493,26 @@ void travel_draw_hover_name(void)
         if (location_index != (-1)) {
             if (((struct bf8_3_1 *)&cheat_flags)->f != 0) {
                 if ((((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)((region_locations)[location_index].x_type_flags << 2)) >> 27]))) != 0) {
-                    mc_set_location(541, (iptr)D_0017743D);
-                    mc_sprintf((iptr)text_buffer, (iptr)D_00177455, D_001837E4[((int)(signed char)scratch_190ce4[0])], (iptr)(D_00196A7C + (location_index << 5)) + 4);
+                    mc_set_location(541, D_0017743D);
+                    mc_sprintf((char *)text_buffer, D_00177455, D_001837E4[((int)(signed char)scratch_190ce4[0])], (iptr)(D_00196A7C + (location_index << 5)) + 4);
                 } else {
-                    mc_strncpy((iptr)text_buffer, D_001AA664, 160, (iptr)D_0017743D, 543);
+                    mc_strncpy((char *)text_buffer, (char *)D_001AA664, 160, D_0017743D, 543);
                 }
             } else if ((((region_locations)[location_index].x_type_flags & 0x40000000) != 0 || ((region_locations)[location_index].x_type_flags & 0x80000000) == 0) && (((int)(unsigned char)travel_filter) & (1 << ((int)(unsigned char)location_type_category[((unsigned)((region_locations)[location_index].x_type_flags << 2)) >> 27]))) != 0) {
-                mc_set_location(548, (iptr)D_0017743D);
-                mc_sprintf((iptr)text_buffer, (iptr)D_00177455, D_001837E4[((int)(signed char)scratch_190ce4[0])], (iptr)(D_00196A7C + (location_index << 5)) + 4);
+                mc_set_location(548, D_0017743D);
+                mc_sprintf((char *)text_buffer, D_00177455, D_001837E4[((int)(signed char)scratch_190ce4[0])], (iptr)(D_00196A7C + (location_index << 5)) + 4);
             } else {
-                mc_strncpy((iptr)text_buffer, D_001AA664, 160, (iptr)D_0017743D, 550);
+                mc_strncpy((char *)text_buffer, (char *)D_001AA664, 160, D_0017743D, 550);
             }
         } else {
-            mc_strncpy((iptr)text_buffer, D_001AA664, 160, (iptr)D_0017743D, 554);
+            mc_strncpy((char *)text_buffer, (char *)D_001AA664, 160, D_0017743D, 554);
         }
         y = 2;
     } else {
-        pixel = (int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)&D_001AA66C + ((((int)(short)mouse_y) * 320) + ((int)(short)mouse_x))));
+        pixel = (int)(unsigned char)*(signed char *)((*(char **)&D_001AA66C + ((((int)(short)mouse_y) * 320) + ((int)(short)mouse_x))));
         if (pixel < 128 || pixel > 191) return;
-        mc_set_location(562, (iptr)D_0017743D);
-        mc_sprintf((iptr)text_buffer, (iptr)D_0017745D, D_001835E8[pixel]);
+        mc_set_location(562, D_0017743D);
+        mc_sprintf((char *)text_buffer, D_0017745D, D_001835E8[pixel]);
         y = 2;
     }
     if (text_buffer[0] == 0) return;
@@ -544,10 +536,10 @@ void travel_button_map(void)
     }
     D_00190CE8 = 0;
     sound_play(203, player_object, 110);
-    pixel = (int)(unsigned char)*(signed char *)((char *)(iptr)(*(char **)&D_001AA66C + ((((int)(short)mouse_y) * 320) + ((int)(short)mouse_x))));
+    pixel = (int)(unsigned char)*(signed char *)((*(char **)&D_001AA66C + ((((int)(short)mouse_y) * 320) + ((int)(short)mouse_x))));
     if (pixel < 128 || pixel == 255) return;
     D_001889BC = *(signed char *)&pixel - 128;
-    D_001AA664 = *(int *)(region_names + (((int)(unsigned char)D_001889BC) << 2));
+    D_001AA664 = (iptr)region_names[((int)(unsigned char)D_001889BC)];
     travel_open_region((int)(unsigned char)D_001889BC);
 }
 
@@ -555,7 +547,7 @@ void func_0009BE38(void)
 {
     if ((iptr)D_001AA668 != 0) {
         if ((iptr)D_001AA668 != 0 && (iptr)D_001AA668 != (-1751672937)) {
-            mc_free((iptr)D_001AA668, (iptr)D_0017743D, 605);
+            mc_free(D_001AA668, D_0017743D, 605);
             D_001AA668 = (struct image *)(iptr)-1751672937;
         }
         *(int *)D_001AA688 = -1;
@@ -618,15 +610,15 @@ void travel_button_find(void)
     sound_play(203, player_object, 110);
     D_0012B508 = 145;
     xn_kbd_flush();
-    prompt = *(int *)scratch_buffer + 55000;
-    mc_set_location(807, (iptr)D_0017743D);
-    mc_sprintf(prompt, (iptr)D_00177460, D_001846F4);
-    *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
+    prompt = (iptr)scratch_buffer + 55000;
+    mc_set_location(807, D_0017743D);
+    mc_sprintf((char *)prompt, D_00177460, D_001846F4);
+    *(signed char *)((char *)(strlen((char *)prompt) + prompt) + 1) = 0;
     text_rsc_buffer[0] = 0;
     inpstr_begin_text(text_rsc_buffer, 32);
     msgbox_show_string(prompt, 2);
-    if (strnicmp((iptr)D_0017748E, (iptr)text_rsc_buffer, 4) == 0) {
-        mc_memcpy((iptr)text_rsc_buffer, (iptr)D_00190FE8, (int)(iptr)&*(signed char *)((char *)(iptr)strlen((iptr)text_rsc_buffer) + 1), (iptr)D_0017743D, 812, 2048);
+    if (strnicmp(D_0017748E, (char *)text_rsc_buffer, 4) == 0) {
+        mc_memcpy(text_rsc_buffer, D_00190FE8, (int)(iptr)&*(signed char *)((char *)(iptr)strlen((char *)text_rsc_buffer) + 1), D_0017743D, 812, 2048);
     }
     scratch_190ce7 = 1;
 }
@@ -660,7 +652,7 @@ int travel_location_at_cursor(void)
         origin_x = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
         origin_z = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
     } else {
-        origin_x = ((int)(short)*(short *)((char *)(iptr)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
+        origin_x = ((int)(short)*(short *)((D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
         origin_z = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
     }
     if (((int)(signed char)scratch_190ce4[0]) == 62 || ((int)(signed char)scratch_190ce4[0]) == 20) {
@@ -706,7 +698,7 @@ int travel_find_location(char *name)
             continue;
         }
         location_name = D_00196A7C + (i << 5) + 4;
-        if (strnicmp((iptr)D_0017748E, location_name, 4) == 0) location_name += 4;
+        if (strnicmp(D_0017748E, location_name, 4) == 0) location_name += 4;
         if (stricmp(name, location_name) == 0) return i;
     }
     location = region_locations;
@@ -715,7 +707,7 @@ int travel_find_location(char *name)
             continue;
         }
         location_name = D_00196A7C + (i << 5) + 4;
-        if (strnicmp((iptr)D_0017748E, location_name, 4) == 0) location_name += 4;
+        if (strnicmp(D_0017748E, location_name, 4) == 0) location_name += 4;
         if (strnicmp(name, location_name, length) == 0) return i;
     }
     return -1;
@@ -760,7 +752,7 @@ int func_0009CD32(int type)
         origin_x = ((int)(short)*(short *)(region_map_origins + (((int)(signed char)scratch_190ce4[0]) << 2))) << 15;
         origin_z = (499 - ((int)(short)*(short *)(D_0018889A + (((int)(signed char)scratch_190ce4[0]) << 2)))) << 15;
     } else {
-        origin_x = ((int)(short)*(short *)((char *)(iptr)(D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
+        origin_x = ((int)(short)*(short *)((D_001AA684 + (((int)(unsigned char)D_001AA6A5) << 2)))) << 15;
         origin_z = (499 - ((int)(short)(((short *)D_001AA684))[((int)(unsigned char)D_001AA6A5) * 2 + 1])) << 15;
     }
     for (i = 0; i < region_location_count; i++) {
@@ -822,11 +814,11 @@ void travel_load_region_part(void)
     iptr saved_screen;
 
     if ((iptr)D_001AA668 != 0 && (iptr)D_001AA668 != (-1751672937)) {
-        mc_free((iptr)D_001AA668, (iptr)D_0017743D, 1119);
+        mc_free(D_001AA668, D_0017743D, 1119);
         D_001AA668 = (struct image *)(iptr)-1751672937;
     }
-    mc_set_location(1121, (iptr)D_0017743D);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00177493, ((int)(unsigned char)D_001AA6A5) + 97, ((int)(signed char)scratch_190ce4[0]) - 1);
+    mc_set_location(1121, D_0017743D);
+    mc_sprintf((char *)text_buffer, D_00177493, ((int)(unsigned char)D_001AA6A5) + 97, ((int)(signed char)scratch_190ce4[0]) - 1);
     D_001AA668 = (struct image *)disk_read_file(text_buffer, 0);
     saved_screen = screen_buffer;
     screen_buffer = (iptr)D_001AA668;
@@ -912,9 +904,9 @@ void travel_draw_buttons(void)
     int width;
 
     if (scratch_190ce4[0] != 0) {
-        xn_draw_image(3, 175, 45, 22, (iptr)D_00195B5C);
+        xn_draw_image(3, 175, 45, 22, (char *)D_00195B5C);
     } else {
-        xn_draw_image(3, 186, 45, 11, (iptr)D_00195B5C + 495);
+        xn_draw_image(3, 186, 45, 11, (char *)((iptr)D_00195B5C + 495));
     }
     for (i = 0; i < 4; i++) {
         frame = 1;
@@ -925,7 +917,7 @@ void travel_draw_buttons(void)
             width = 99;
         }
         for (row = 0; row < 11; row++) {
-            mc_memcpy(((int)(short)D_00188790[i]) + (iptr)(*(char **)&screen_buffer + ((((int)(short)D_00188798[i]) + row) * 320)), (iptr)(*(char **)(D_001AA65C + (frame << 2)) + (((((int)(short)D_00188798[i]) + row) - 175) * 179)) + (((int)(short)D_00188790[i]) - 50), width, (iptr)D_0017743D, 1222, 4);
+            mc_memcpy((void *)(((int)(short)D_00188790[i]) + (iptr)(*(char **)&screen_buffer + ((((int)(short)D_00188798[i]) + row) * 320))), (void *)((iptr)(D_001AA65C[frame] + (((((int)(short)D_00188798[i]) + row) - 175) * 179)) + (((int)(short)D_00188790[i]) - 50)), width, D_0017743D, 1222, 4);
         }
     }
 }
@@ -960,9 +952,9 @@ int func_0009D960(int unused1, int unused2)
 
 void travel_show_days_left(int minutes)
 {
-    mc_memcpy(screen_buffer, D_001AA690, 64000, (iptr)D_0017743D, 1259, 4);
-    mc_set_location(1260, (iptr)D_0017743D);
-    mc_sprintf((iptr)text_buffer, (iptr)D_001774A3, ((unsigned)minutes) / 1440);
+    mc_memcpy((void *)screen_buffer, (void *)D_001AA690, 64000, D_0017743D, 1259, 4);
+    mc_set_location(1260, D_0017743D);
+    mc_sprintf((char *)text_buffer, D_001774A3, ((unsigned)minutes) / 1440);
     text_draw_coloured((iptr)text_buffer, 240, 2, 145, 156);
     xn_gfx_present_inclusive(1);
 }

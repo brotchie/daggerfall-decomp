@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern int dungeon_water_level;
 extern struct monster_template monster_table[];
@@ -62,16 +63,14 @@ extern int D_00196D5C;
 extern int collide_height;
 extern char collide_flags[];
 
-extern int object_find_open(struct record *, int (*)());
+extern int object_find_open(struct record *, iptr (*)());
 extern int door_start_swing(struct record *, int);
-extern int mc_memcpy();
-extern int memcmp();
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
-extern int xn_collide_segment_model();
-extern int xn_collide_spheres_model();
-extern int xn_collide_segment_flat_stk();
-extern int xn_terrain_height_at();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_collide_segment_model(void *, void *, void *, int);
+extern int xn_collide_spheres_model(void *, void *, int);
+extern int xn_collide_segment_flat_stk(void *, void *, void *, unsigned, unsigned, int, int);
+extern int xn_terrain_height_at(int, int);
 extern unsigned char ground_tile_at(int, int);
 extern void collide_for_each_nearby(struct record *, iptr);
 extern void fatal_error(char *);
@@ -104,8 +103,8 @@ int collide_move_missile(struct record *object, int *position, int *angles)
     *(int *)D_00196B10 = object->x;
     D_00196B14 = object->y;
     D_00196B18 = object->z;
-    mc_memcpy((iptr)D_00196B28, position, 12, (iptr)D_00170710, 61, 4);
-    if (angles != 0) mc_memcpy((iptr)&D_00196B34, angles, 12, (iptr)D_00170710, 63, 4);
+    mc_memcpy(D_00196B28, position, 12, D_00170710, 61, 4);
+    if (angles != 0) mc_memcpy(&D_00196B34, angles, 12, D_00170710, 63, 4);
     collide_for_each_nearby(object, (iptr)collide_segment_model_cb);
     if (((int)(short)(*(short *)collide_flags & 10)) == 0) {
         object_set_position(object, *(int *)D_00196B28, D_00196B2C, D_00196B30, D_00196B34, D_00196B38, D_00196B3C);
@@ -133,7 +132,7 @@ void collide_segment_model_cb(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B28, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                    if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B28, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                         click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
@@ -148,7 +147,7 @@ void collide_segment_model_cb(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B28, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                    if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B28, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                         click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         *(signed char *)collide_flags |= 2;
                         D_00195C48 = object;
@@ -164,7 +163,7 @@ void collide_segment_model_cb(struct record *object)
         if (((int)(short)(*(short *)collide_flags & 4)) == 0 || ((int)(short)(*(short *)collide_flags & 2)) != 0) {
             return;
         }
-        if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B28, 0)) == 0 || (iptr)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B28, 0)) == 0 || (iptr)D_00196D48 == (-1)) {
             return;
         }
         click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
@@ -191,7 +190,7 @@ void collide_vertical_cb(struct record *object)
         for (i = 0; block->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                     for (j = 0; j < D_00196D48->count; j++) {
                         if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
                             collide_height = D_00196D48->hits[j].y;
@@ -210,7 +209,7 @@ void collide_vertical_cb(struct record *object)
         for (i = 0; object->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B28, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B28, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                     for (j = 0; j < D_00196D48->count; j++) {
                         if ((*(int *)scratch_190be4 != 0 && D_00196D48->hits[j].y > collide_height) || D_00196D48->hits[j].y < collide_height) {
                             collide_height = D_00196D48->hits[j].y;
@@ -228,7 +227,7 @@ void collide_vertical_cb(struct record *object)
     case 32:
         model = &object->data.instance.model;
         if (*model == 0) return;
-        if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B1C, 0)) == 0 || (iptr)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B1C, 0)) == 0 || (iptr)D_00196D48 == (-1)) {
             return;
         }
         for (j = 0; j < D_00196D48->count; j++) {
@@ -264,7 +263,7 @@ void func_00022174(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (iptr)D_00196D4C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                    if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, D_00196D4C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                         D_00196D50 = (iptr)D_00196D48;
                         click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         D_00195CD4 = (iptr)D_00196D48->hits;
@@ -281,7 +280,7 @@ void func_00022174(struct record *object)
             if (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0) {
                 model = &block_model->model;
                 if (*model != 0) {
-                    if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (iptr)D_00196D4C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                    if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, D_00196D4C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                         D_00196D50 = (iptr)D_00196D48;
                         click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                         D_00195CD4 = (iptr)D_00196D48->hits;
@@ -308,7 +307,7 @@ L22468:;
         model = &object->data.instance.model;
         if (*model != 0) {
             if (object->move_frame == *(int *)frame_counter || (((int)(short)(*(short *)collide_flags & 4)) != 0 && ((int)(short)(*(short *)collide_flags & 2)) == 0)) {
-                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (iptr)D_00196D4C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, D_00196D4C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                     D_00196D50 = (iptr)D_00196D48;
                     click_face_texture = (struct arch3d_plane *)(*model + D_00196D48->hits[0].face);
                     D_00195CD4 = (iptr)D_00196D48->hits;
@@ -321,7 +320,7 @@ L22468:;
         return;
     case 18:
         if (found_object == object) return;
-        if ((*(int *)&D_00196D48 = xn_collide_segment_flat_stk(&object->x, (iptr)D_00196B10, (iptr)D_00196B28, object->image, 4, 0, 0)) == 0 || (iptr)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_segment_flat_stk(&object->x, D_00196B10, D_00196B28, object->image, 4, 0, 0)) == 0 || (iptr)D_00196D48 == (-1)) {
             return;
         }
         D_00195C48 = object;
@@ -355,7 +354,7 @@ int collide_step_player(struct record *object, int unused_arg, struct move_reque
     } else {
         collide_height = object->y + 1000;
     }
-    mc_memcpy((iptr)D_00196B28, request, 12, (iptr)D_00170710, 474, 4);
+    mc_memcpy(D_00196B28, request, 12, D_00170710, 474, 4);
     if (((int)(short)(*(short *)collide_flags & 4)) != 0 && memcmp(request, &object->x, 12) == 0) {
         *(signed char *)collide_flags &= 251;
     }
@@ -498,7 +497,7 @@ void collide_gather_cb(struct record *object)
         for (i = 0; block->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (iptr)D_00196D4C, 2)) == 0 && (iptr)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, D_00196D4C, 2)) == 0 && (iptr)D_00196D48 != (-1)) {
                     collide_candidates[collide_candidate_count++] = object;
                     if (collide_candidate_count > 128) fatal_error(D_0017071B);
                 }
@@ -510,7 +509,7 @@ void collide_gather_cb(struct record *object)
         for (i = 0; object->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (iptr)D_00196D4C, 2)) == 0 && (iptr)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, D_00196D4C, 2)) == 0 && (iptr)D_00196D48 != (-1)) {
                     collide_candidates[collide_candidate_count++] = object;
                     if (collide_candidate_count > 128) fatal_error(D_0017071B);
                 }
@@ -522,7 +521,7 @@ void collide_gather_cb(struct record *object)
     case 6:
         model = &object->data.instance.model;
         if (*model == 0) return;
-        if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, (iptr)D_00196D4C, 2)) != 0 || (iptr)D_00196D48 == (-1)) {
+        if ((*(int *)&D_00196D48 = xn_collide_spheres_model(model, D_00196D4C, 2)) != 0 || (iptr)D_00196D48 == (-1)) {
             return;
         }
         collide_candidates[collide_candidate_count++] = object;
@@ -556,7 +555,7 @@ int collide_line_of_sight_cb(struct record *object)
         for (i = 0; block->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                     scratch_190ce4[0] = 1;
                     return 1;
                 }
@@ -568,7 +567,7 @@ int collide_line_of_sight_cb(struct record *object)
         for (i = 0; object->model_count > i; i++, block_model++) {
             model = &block_model->model;
             if (*model != 0) {
-                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+                if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                     scratch_190ce4[0] = 1;
                     return 1;
                 }
@@ -580,7 +579,7 @@ int collide_line_of_sight_cb(struct record *object)
     case 6:
         model = &object->data.instance.model;
         if (*model != 0) {
-            if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, (iptr)D_00196B10, (iptr)D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
+            if ((*(int *)&D_00196D48 = xn_collide_segment_model(model, D_00196B10, D_00196B1C, 0)) != 0 && (iptr)D_00196D48 != (-1)) {
                 scratch_190ce4[0] = 1;
                 return 1;
             }
@@ -592,8 +591,8 @@ int collide_line_of_sight_cb(struct record *object)
 int collide_line_of_sight(struct record *from, struct record *to)
 {
     scratch_190ce4[0] = 0;
-    mc_memcpy((iptr)D_00196B10, (iptr)&from->x, 12, (iptr)D_00170710, 923, 4);
-    mc_memcpy((iptr)D_00196B1C, (iptr)&to->x, 12, (iptr)D_00170710, 924, 4);
+    mc_memcpy(D_00196B10, &from->x, 12, D_00170710, 923, 4);
+    mc_memcpy(D_00196B1C, &to->x, 12, D_00170710, 924, 4);
     D_00196B14 -= 40;
     D_00196B20 -= 40;
     grid_visit_func = (iptr)object_find_open;
@@ -614,7 +613,7 @@ void creatures_find_nearest(void)
         distance = xn_math_approx_hypot(player_object->y - creature_list[i]->y, xn_math_approx_dist2d(player_object->x, player_object->z, creature_list[i]->x, creature_list[i]->z));
         if (distance < best) {
             nearest_creature_distance = distance;
-            nearest_creature = (struct record *)((iptr)creature_list[i]);
+            nearest_creature = (struct record *)(creature_list[i]);
             best = distance;
         }
     }
@@ -631,7 +630,7 @@ int collide_creature_near(struct record *object, struct move_request *request)
         dy = creature_list[i]->y - request->y;
         if (dy < 0 || dy > 100) continue;
         if (xn_math_approx_dist2d(creature_list[i]->x, creature_list[i]->z, request->x, request->z) < 50) {
-            D_00195C48 = (struct record *)((iptr)creature_list[i]);
+            D_00195C48 = (struct record *)(creature_list[i]);
             return 1;
         }
     }
@@ -649,7 +648,7 @@ int collide_creature_within(struct record *object, int *position, int radius)
         dy = creature_list[i]->y - position[1];
         if (dy < 0 || dy > 100) continue;
         if (xn_math_approx_dist2d(creature_list[i]->x, creature_list[i]->z, position[0], position[2]) < radius) {
-            D_00195C48 = (struct record *)((iptr)creature_list[i]);
+            D_00195C48 = (struct record *)(creature_list[i]);
             return 1;
         }
     }
@@ -679,7 +678,7 @@ int func_00023FA5(struct record *object, int unused_arg, struct move_request *re
     } else {
         collide_height = object->y + 1000;
     }
-    mc_memcpy((iptr)D_00196B28, request, 12, (iptr)D_00170710, 1021, 4);
+    mc_memcpy(D_00196B28, request, 12, D_00170710, 1021, 4);
     if (((int)(short)(*(short *)collide_flags & 4)) != 0 && memcmp(request, &object->x, 12) == 0) {
         *(signed char *)collide_flags &= 251;
     }
@@ -774,8 +773,8 @@ int func_00023FA5(struct record *object, int unused_arg, struct move_request *re
 
 int collide_floor_height(struct record *object)
 {
-    mc_memcpy((iptr)D_00196B10, (iptr)&object->x, 12, (iptr)D_00170710, 1143, 4);
-    mc_memcpy((iptr)D_00196B1C, (iptr)&object->x, 12, (iptr)D_00170710, 1144, 4);
+    mc_memcpy(D_00196B10, &object->x, 12, D_00170710, 1143, 4);
+    mc_memcpy(D_00196B1C, &object->x, 12, D_00170710, 1144, 4);
     D_00196B14 -= 20;
     D_00196B20 += 40;
     collide_height = 100000;

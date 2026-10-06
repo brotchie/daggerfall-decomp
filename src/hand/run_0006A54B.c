@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of jmem.c from 0x0006A0D4 to 0x0006A54B, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 struct msg { int a; short b; char pad[10]; };
 extern char *screen_buffer;
@@ -29,15 +30,10 @@ extern struct qbn_place *quest_section(struct quest *, int);
 extern void fatal_error(char *);
 extern void object_foreach(struct record *, void (*)());
 extern struct record *object_find_by_id(struct record *, iptr);
-extern int mc_memset();
-extern int func_000A2A2B(void);
 extern int func_000A2A76(struct msg *);
-extern int xn_sys_zero_page_check();
+extern void xn_sys_zero_page_check(int);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
 #pragma aux func_000A29BA parm routine [];
-extern int func_000A29BA(char *);
-extern int func_000A148C(char *, ...);
 
 int mem_pool_release(char *data)
 {

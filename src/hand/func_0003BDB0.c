@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003BDB0 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170C67[];
 extern char D_00170CC0[];
@@ -16,14 +17,10 @@ extern void sheet_format_skill(char *, short, int);
 extern int skill_raised_recently(int);
 extern void msgbox_show_string(char *, short);
 extern void paperdoll_draw(int, int);
-extern int strlen(char *);
-extern void func_000A1054(char *, char *, char *, int, int);
 extern void xn_draw_fullscreen_overlay_shaded(iptr);
 extern void xn_gfx_present_inclusive(int);
 extern void xn_font_select(int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void sheet_show_career_skills(short first, short all_six)
 {

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008CCC8 */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
@@ -7,9 +8,6 @@ struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 extern char D_00176E38[];
 extern struct bits8 D_001940D8;
 extern void picklist_update_thumb(struct picklist *);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern void mc_memmove(void *, void *, int, char *, int, int);
-extern int stricmp(char *, char *);
 
 void picklist_add(struct picklist *l, char *name, short flags)
 {

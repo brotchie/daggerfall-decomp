@@ -12,8 +12,7 @@ extern void text_draw(char *, short, short);
 extern int inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
 extern int inpstr_text_width(char *, short);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern short strlen(char *);
+#include "clib.h"
 extern void xn_gfx_wait_vretrace_start(void);
 extern void xn_gfx_wait_vretrace_end(void);
 extern void xn_gfx_present_inclusive(int);

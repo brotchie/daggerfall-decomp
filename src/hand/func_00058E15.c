@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00058E15 */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
@@ -18,7 +19,7 @@ extern char D_00175797[];
 extern signed char text_buffer[];
 extern struct bits8 D_001940D8;
 extern struct record *player_entity;
-extern int D_00195B64;
+extern iptr D_00195B64;
 extern char *paperdoll_mask;
 extern char *hud_portrait;
 extern iptr D_00195B80;
@@ -28,22 +29,16 @@ extern char *scratch_buffer;
 extern char *paperdoll_slots;
 extern char *paperdoll_items;
 extern struct item D_00199B54[];
-extern int color_remap_tables;
+extern iptr color_remap_tables;
 extern void character_update_armor_values(struct record *);
 extern void paperdoll_add_item(struct item *, int);
 extern void paperdoll_draw_items(int, int);
 extern void func_0005E7FC(char *);
 extern struct image *disk_read_file(char *, iptr);
-extern void mc_free(void *, char *, int);
-extern void mc_memset(void *, int, int, char *, int, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
-extern void xn_draw_get_rect(int, int, int, int, int, int);
+extern void xn_draw_get_rect(int, int, int, int, iptr, int);
 extern void xn_draw_image(int, int, int, int, char *);
 extern void xn_draw_image_transparent(int, int, int, int, char *);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void paperdoll_draw(int x, int y)
 {

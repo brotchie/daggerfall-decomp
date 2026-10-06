@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00051026 */
 #include "records.h"
+#include "clib.h"
 
 struct anims {
     char *a;
@@ -43,12 +44,7 @@ extern void class_question_answer_anim(short);
 extern int class_question_get_answer(void);
 extern int class_question_pick_class(void);
 extern char *disk_read_file(char *, iptr);
-extern void mc_free(char *, char *, int);
-extern void mc_memset(void *, int, int, char *, int, int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern void xn_pal_set_range_8bit(unsigned char *, int, int);
 extern void xn_pal_set_all_8bit(char *);
 extern void xn_mouse_poll_clamped(void);
@@ -71,7 +67,7 @@ int class_questions_run(void)
     mc_memset(class_answer_counts, 0, 3, D_0017539B, 82, 3);
     rgb[0] = rgb[1] = rgb[2] = 0;
     xn_mouse_cursor_drawn.b0 = 0;
-    disk_read_file(D_001753A6, (int)(iptr)scratch_buffer);
+    disk_read_file(D_001753A6, (iptr)scratch_buffer);
     for (sel = 0; sel < 768; sel++)
         (sel + scratch_buffer)[64000] <<= 2;
     xn_pal_set_all_8bit(scratch_buffer + 64000);

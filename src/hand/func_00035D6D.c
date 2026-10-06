@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00035D6D */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170AB4[];       /* __FILE__ */
 extern char D_00170ABC[];
@@ -22,10 +23,8 @@ extern iptr archive_read_record(int, int, char *);
 extern void rdb_create_objects(struct record *, struct rdb_object *, int);
 extern void rdb_link_actions(struct record *, struct rdb_object *, int);
 extern struct record *object_create_in_block(struct record *, int, int, int, int);
-extern int xn_tex_cache_begin_frame();
+extern void xn_tex_cache_begin_frame(void);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void dungeon_load_rdb_block(struct dungeon_block *block)
 {

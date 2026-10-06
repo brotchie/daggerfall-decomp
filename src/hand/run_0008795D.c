@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of maplogic from 0x874C0 to 0x8795D, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 struct bits { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 struct flags { struct bits f[4]; };
 extern int xn_cam_x;
@@ -24,8 +25,7 @@ extern void dungeon_load(int);
 extern void location_unload(int);
 extern void building_enter(struct building *);
 extern int player_to_nearest_marker(struct record *, int);
-extern int mc_memset();
-extern int xn_world_reload();
+extern void xn_world_reload(void);
 extern int xn_terrain_height_at(int, int);
 
 void location_place_player_at_edge(unsigned edge)

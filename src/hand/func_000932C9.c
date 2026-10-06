@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000932C9 */
 #include "structs.h"
+#include "clib.h"
 extern char *screen_buffer;
 extern char D_0017704C[];        /* __FILE__ */
 extern struct rect inv_buttons[];
-extern void mc_memcpy(char *, char *, int, char *, int, int);
 
 void inv_blit_rect_from_image(int button, char *image)
 {

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00096CCF */
 #include "records.h"
+#include "clib.h"
 
 extern char D_0017704C[];
 extern struct record *location_object;
@@ -8,10 +9,9 @@ extern int D_00195B44;
 extern struct character *player_character;
 extern int game_minutes;
 extern int spell_cost(struct spell *, struct character *);
-extern int cast_item_spell_at();
+extern int cast_item_spell_at(struct record *);
 extern void item_damage(struct record *, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern int mc_memcpy();
 
 
 void item_apply_equip_effects(struct record *object, int slot)
@@ -35,7 +35,7 @@ void item_apply_equip_effects(struct record *object, int slot)
             spell_object = object_create_child(location_object, 0, 89);
             spell_object->type = 9;
             spell_object->flags = 3;
-            mc_memcpy(&spell_object->data.spell, &spell_records[j], 89, (iptr)D_0017704C, 2092, 4);
+            mc_memcpy(&spell_object->data.spell, &spell_records[j], 89, D_0017704C, 2092, 4);
             spell = &spell_object->data.spell;
             spell->icon = *(signed char *)&slot + 200;
             for (j = 0; j < 3; j++) {

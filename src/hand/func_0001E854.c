@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001E854 */
 #include "records.h"
+#include "clib.h"
 extern char D_00170533[];
 extern int D_001967EC;
 extern int rmb_origin_z;
@@ -10,8 +11,7 @@ extern int D_00196804;
 extern struct rmb_file *rmb_block;
 extern int block_origin_x;
 extern int block_origin_z;
-extern int stricmp();
-extern int xn_terrain_height_at();
+extern int xn_terrain_height_at(int, int);
 
 void town_block_place_building(struct building *building, int building_index)
 {

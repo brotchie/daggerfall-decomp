@@ -2,6 +2,7 @@
  * aligns to 4 bytes from the start of the code segment, so it is compiled with the run of its
  * unit's functions from building_access_level (the nearest one at a multiple of 4) */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00176A10[];
 extern struct record *location_grid[];         /* 32 x 32 grid of object lists */
@@ -17,9 +18,8 @@ extern void (*grid_visit_func)(struct record *, void (*)());
 extern int location_grid_x;
 extern int location_grid_z;
 extern struct building *object_building(struct record *);
-extern int mc_memset();
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
 
 int building_access_level(struct building *building)
 {
@@ -98,7 +98,7 @@ void dungeon_grid_build(void)
     block = location_object->children;
     min_x = 10000;
     min_z = 10000;
-    mc_memset((iptr)location_grid, 0, 4096, (iptr)D_00176A10, 849, 4096);
+    mc_memset(location_grid, 0, 4096, D_00176A10, 849, 4096);
     while (block != 0) {
         if (block->type == 47) {
             if ((block->x - location_object->x) < min_x) min_x = block->x - location_object->x;
@@ -136,7 +136,7 @@ void town_grid_build(void)
     block = location_object->children;
     min_x = 10000;
     min_z = 10000;
-    mc_memset((iptr)location_grid, 0, 4096, (iptr)D_00176A10, 880, 4096);
+    mc_memset(location_grid, 0, 4096, D_00176A10, 880, 4096);
     block = location_object->children;
     while (block != 0) {
         if (block->type == 38) {

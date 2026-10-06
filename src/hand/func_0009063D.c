@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009063D */
 #include "records.h"
+#include "clib.h"
 
 #define FREED ((void *)0x97979797)
 #define FREE(p, line) if ((p) != 0 && (p) != FREED) { mc_free((p), D_00176F41, (line)); (p) = FREED; }
@@ -31,7 +32,7 @@ extern void *D_00195B60;
 extern struct character *player_character;
 extern void *window_image;
 extern struct career *player_class;
-extern int scratch_buffer;
+extern iptr scratch_buffer;
 extern void *chargen_face_images;
 extern void *chargen_reflex_image;
 extern unsigned char chargen_roll_saved;
@@ -47,11 +48,7 @@ extern int chargen_screen_loop(int, int);
 extern void chargen_select_skill(int);
 extern void chargen_roll_attributes(void);
 extern void chargen_select_attribute(short);
-extern void mc_free(void *, char *, int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 int chargen_name_character(void)
 {

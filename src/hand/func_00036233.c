@@ -24,7 +24,7 @@ extern struct record *rmb_make_flat(struct record *, short, short, int);
 extern struct record *object_free_single(struct record *);
 extern struct record *object_create_in_block(struct record *, int, int, int, int);
 extern void xn_model_set_angles(int, int, int, int *);
-extern struct tex_cache_entry *xn_tex_cache_lookup(int, int, int);
+extern struct tex_cache_entry *xn_tex_cache_lookup(int, int, iptr);
 extern void xn_tex_cache_flush(void);
 
 void rdb_create_objects(struct record *quarter, struct rdb_object *rdb_object, int block_index)

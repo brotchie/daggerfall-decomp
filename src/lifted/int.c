@@ -3,10 +3,10 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
 #include <i86.h>
+#include "clib.h"
 
 extern char D_00177348[];
 
-extern int mc_memset();
 #undef _FP_SEG      /* <i86.h>'s is FP_SEG, without the modify list */
 extern unsigned short _FP_SEG( const volatile void __far * );
 #pragma aux _FP_SEG = parm caller [eax dx] value [dx] modify exact [];
@@ -17,9 +17,9 @@ void dpmi_get_free_memory(iptr info)
     union REGS regs;
     struct SREGS sregs;
 
-    mc_memset(&sregs, 0, 12, (iptr)D_00177348, 39, 4);
+    mc_memset(&sregs, 0, 12, D_00177348, 39, 4);
     regs.x.eax = 1280;
-    regs.x.edi = info;
+    regs.x.edi = (unsigned)info;           /* the offset: ES has the rest (port/shim/dos.c) */
     sregs.es = _FP_SEG((void *)info);
     int386x(49, &regs, &regs, &sregs);
 }
@@ -30,7 +30,7 @@ int dpmi_lock_region(iptr address, int size)
     union REGS regs;
 
     if (address == 0 || size == 0) return 0;
-    mc_memset(&regs, 0, 28, (iptr)D_00177348, 66, 4);
+    mc_memset(&regs, 0, 28, D_00177348, 66, 4);
     regs.w.ax = 1536;
     regs.w.bx = address >> 16;
     regs.w.cx = address;
@@ -45,7 +45,7 @@ int dpmi_unlock_region(iptr address, int size)
     union REGS regs;
 
     if (address == 0 || size == 0) return 0;
-    mc_memset(&regs, 0, 28, (iptr)D_00177348, 86, 4);
+    mc_memset(&regs, 0, 28, D_00177348, 86, 4);
     regs.w.ax = 1537;
     regs.w.bx = address >> 16;
     regs.w.cx = address;

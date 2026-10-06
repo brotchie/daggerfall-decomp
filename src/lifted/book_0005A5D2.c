@@ -4,7 +4,7 @@
 
 
 extern int font_text_width(char *);
-extern int xn_font_draw_string();
+extern int xn_font_draw_string(int, int, char *);
 
 void text_draw_centred(char *text, int x, short y)
 {

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009C00A */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 struct Q { char pad[4]; char name[28]; };
@@ -17,11 +18,8 @@ extern unsigned char D_001AA6A6;
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern void text_draw_centred_coloured(char *, short, short, int, unsigned char);
 extern int travel_trip_cost(void);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern char *utoa(int, char *, int);
-extern char *itoa(int, char *, int);
 extern void xn_draw_fill_rect(short, short, short, short);
-extern int xn_draw_image();
+extern void xn_draw_image(int, int, int, int, char *);
 
 void travel_draw_trip_popup(void)
 {

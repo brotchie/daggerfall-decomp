@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -16,13 +17,13 @@ extern char D_0017607C[];
 extern char D_001760A4[];
 extern int trade_price_scale;
 extern struct spell *selected_spell;
-extern char spell_effect_names[];
-extern char spell_effect_subtype_names[];
+extern char *spell_effect_names[];
+extern char *spell_effect_subtype_names[][12];
 extern signed char guild_rank_primary_skill[];
 extern signed char guild_rank_secondary_skill[];
 extern iptr guild_skill_lists[];
 extern short guild_service_factions[];
-extern int guild_service_labels[];
+extern iptr guild_service_labels[];
 extern struct rect guild_menu_buttons[];
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
@@ -63,7 +64,7 @@ extern struct membership *guild_membership;
 extern short D_001A4A18;
 extern short D_001A4A1A;
 extern signed char D_001A4A1C;
-extern char rest_image[];
+extern struct image *rest_image;
 extern signed char rest_loitering;
 extern char shared_picklist[];
 
@@ -82,17 +83,11 @@ extern struct record *object_create_child(struct record *, struct record *, int)
 extern struct record *object_reparent(struct record *, struct record *);
 extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
-extern int rand();
-extern int srand();
-extern int mc_free();
-extern iptr mc_malloc();
-extern int itoa();
-extern int mc_memcpy();
-extern int xn_draw_spell_icon();
-extern int xn_gfx_present_inclusive();
-extern int xn_draw_copy_rect_stride_bytes();
-extern int xn_mouse_poll_clamped();
-extern int xn_draw_image();
+extern void xn_draw_spell_icon(int, int, int);
+extern void xn_gfx_present_inclusive(int);
+extern int xn_draw_copy_rect_stride_bytes(char *, char *, int, int, int);
+extern int xn_mouse_poll_clamped(void);
+extern void xn_draw_image(int, int, int, int, char *);
 extern void msgbox_show_rsc(int, int);
 extern void keys_world_actions(void);
 extern void item_make(int, int, struct item *);
@@ -148,18 +143,18 @@ void guild_buy_potions(void)
 
 void guild_buy_spells(void)
 {
-    guild_saved_screen = mc_malloc(64000, (iptr)D_00175EAA, 871);
-    mc_memcpy(guild_saved_screen, screen_buffer, 64000, (iptr)D_00175EAA, 873, 4);
+    guild_saved_screen = (iptr)mc_malloc(64000, D_00175EAA, 871);
+    mc_memcpy((void *)guild_saved_screen, (void *)screen_buffer, 64000, D_00175EAA, 873, 4);
     spellshop_open();
     while (((int)(unsigned char)game_mode) == 5) {
-        mc_memcpy(screen_buffer, guild_saved_screen, 64000, (iptr)D_00175EAA, 879, 4);
+        mc_memcpy((void *)screen_buffer, (void *)guild_saved_screen, 64000, D_00175EAA, 879, 4);
         keys_world_actions();
         spellshop_update();
         player_movement_update();
         xn_gfx_present_inclusive(1);
     }
     if (guild_saved_screen == 0 || guild_saved_screen == (-1751672937)) return;
-    mc_free(guild_saved_screen, (iptr)D_00175EAA, 886);
+    mc_free((void *)guild_saved_screen, D_00175EAA, 886);
     guild_saved_screen = -1751672937;
 }
 
@@ -205,11 +200,11 @@ int spellshop_close(void)
     D_001940D8 &= 253;
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_00175EAA, 963);
+        mc_free((void *)window_image, D_00175EAA, 963);
         window_image = -1751672937;
     }
     if (magic_window_image != 0 && magic_window_image != (-1751672937)) {
-        mc_free(magic_window_image, (iptr)D_00175EAA, 964);
+        mc_free((void *)magic_window_image, D_00175EAA, 964);
         magic_window_image = -1751672937;
     }
     D_00196272 = 0;
@@ -236,7 +231,7 @@ void spellshop_buy(void)
     object = object_create_child(object, 0, 89);
     object->type = 9;
     object->id = object_new_id(100);
-    mc_memcpy(&object->data.spell, (iptr)selected_spell, 89, (iptr)D_00175EAA, 992, 4);
+    mc_memcpy(&object->data.spell, selected_spell, 89, D_00175EAA, 992, 4);
 }
 
 void spellshop_draw_spell(struct spell *spell)
@@ -246,22 +241,22 @@ void spellshop_draw_spell(struct spell *spell)
 
     D_0012B508 = 145;
     xn_draw_spell_icon(172, 32, spell->icon);
-    xn_draw_copy_rect_stride_bytes((iptr)(*(char **)&magic_window_image + (spell->element * 640)) + 24, (iptr)(*(char **)&screen_buffer + 10486), 16, 16, 40);
-    xn_draw_copy_rect_stride_bytes((iptr)(*(char **)&magic_window_image + (spell->target * 640)), (iptr)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
+    xn_draw_copy_rect_stride_bytes((char *)((iptr)(*(char **)&magic_window_image + (spell->element * 640)) + 24), (*(char **)&screen_buffer + 10486), 16, 16, 40);
+    xn_draw_copy_rect_stride_bytes((*(char **)&magic_window_image + (spell->target * 640)), (char *)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
     text_draw_coloured((iptr)spell->name, 148, 20, 145, 141);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 3; (*(int *)&i)++) {
         if (spell->effects[(int)(short)i].type == 255) continue;
-        text_draw_centred_coloured(*(int *)(spell_effect_names + (spell->effects[(int)(short)i].type << 2)), 219, (int)(short)((*(int *)&i * 38) + 63), 145, 141);
-        if (spell->effects[(int)(short)i].subtype != 255 && *(int *)(spell_effect_subtype_names + (spell->effects[(int)(short)i].type * 48) + (spell->effects[(int)(short)i].subtype << 2)) != 0) {
-            text_draw_centred_coloured(*(int *)(spell_effect_subtype_names + (spell->effects[(int)(short)i].type * 48) + (spell->effects[(int)(short)i].subtype << 2)), 219, (int)(short)((*(int *)&i * 38) + 75), 145, 141);
+        text_draw_centred_coloured((iptr)spell_effect_names[spell->effects[(int)(short)i].type], 219, (int)(short)((*(int *)&i * 38) + 63), 145, 141);
+        if (spell->effects[(int)(short)i].subtype != 255 && (iptr)spell_effect_subtype_names[spell->effects[(int)(short)i].type][spell->effects[(int)(short)i].subtype] != 0) {
+            text_draw_centred_coloured((iptr)spell_effect_subtype_names[spell->effects[(int)(short)i].type][spell->effects[(int)(short)i].subtype], 219, (int)(short)((*(int *)&i * 38) + 75), 145, 141);
         }
     }
     price = spell_cost(spell, player_character) << 2;
     if (holiday_today(game_minutes, (int)(unsigned char)current_region) == 43) {
         price >>= 1;
     }
-    text_draw_coloured(itoa(price, (iptr)text_buffer, 10), 97, 172, 145, 156);
+    text_draw_coloured((iptr)itoa(price, (char *)text_buffer, 10), 97, 172, 145, 156);
 }
 
 void spellshop_effect_button_1(void)
@@ -377,7 +372,7 @@ void guild_expire_blessings(void)
     }
 }
 
-int guild_service_label(short faction_id)
+iptr guild_service_label(short faction_id)
 {
     int i;
 
@@ -389,17 +384,17 @@ int guild_service_label(short faction_id)
     return 0;
 }
 
-int guild_menu(struct image *image, int is_member, int label)
+int guild_menu(struct image *image, int is_member, iptr label)
 {
     int choice;
     int button;
 
     choice = -1;
-    guild_saved_screen = mc_malloc(64000, (iptr)D_00175EAA, 1581);
-    mc_memcpy(guild_saved_screen, screen_buffer, 64000, (iptr)D_00175EAA, 1582, 4);
+    guild_saved_screen = (iptr)mc_malloc(64000, D_00175EAA, 1581);
+    mc_memcpy((void *)guild_saved_screen, (void *)screen_buffer, 64000, D_00175EAA, 1582, 4);
     D_00196272 = 1;
     while (choice == (-1)) {
-        mc_memcpy(screen_buffer, guild_saved_screen, 64000, (iptr)D_00175EAA, 1587, 4);
+        mc_memcpy((void *)screen_buffer, (void *)guild_saved_screen, 64000, D_00175EAA, 1587, 4);
         xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
         text_draw_centred_coloured(label, 159, 71, 145, 141);
         keys_world_actions();
@@ -423,7 +418,7 @@ int guild_menu(struct image *image, int is_member, int label)
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     D_00196272 = 0;
     if (guild_saved_screen != 0 && guild_saved_screen != (-1751672937)) {
-        mc_free(guild_saved_screen, (iptr)D_00175EAA, 1617);
+        mc_free((void *)guild_saved_screen, D_00175EAA, 1617);
         guild_saved_screen = -1751672937;
     }
     return choice;
@@ -511,7 +506,7 @@ void guild_heal(void)
     disease_remove_skill_bonuses();
     object_foreach_post(location_object, guild_heal_cleanup);
     player_character->conditions = 0;
-    mc_memcpy((iptr)player_character->attributes, (iptr)player_character->base_attributes, 16, (iptr)D_00175EAA, 1708, 16);
+    mc_memcpy(player_character->attributes, player_character->base_attributes, 16, D_00175EAA, 1708, 16);
     disease_restore_skill_bonuses();
 }
 
@@ -521,7 +516,7 @@ void rest_open(void)
     int *bios_ticks;
 
     rest_loitering = 0;
-    *(int *)rest_image = 0;
+    *(iptr *)&rest_image = 0;
     if (player_character->race == 8 && ((unsigned)(game_minutes - player_character->last_kill_time)) > 960) {
         msgbox_show_rsc(36, 1);
         return;
@@ -542,7 +537,7 @@ void rest_open(void)
         msgbox_show_rsc(355, 1);
         return;
     }
-    *(iptr *)rest_image = disk_read_file(D_001760A4, 0);
+    *(iptr *)&rest_image = disk_read_file(D_001760A4, 0);
     game_mode = 16;
     D_00196272 = 1;
     D_00190D1A = 0;

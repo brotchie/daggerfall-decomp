@@ -58,8 +58,8 @@ void inv_click_left_item(struct record *object)
         case 2:
 L94793:;
             if (item->group == 23 && trade_mode != 2) return;
-            if (item->group == 23 && (iptr)inv_right_container == (int)(iptr)wagon_container) return;
-            if ((iptr)inv_right_container == (int)(iptr)wagon_container) {
+            if (item->group == 23 && (iptr)inv_right_container == (iptr)wagon_container) return;
+            if ((iptr)inv_right_container == (iptr)wagon_container) {
                 weight = object_weight(object);
                 D_001962AE = 1;
                 wagon_weight = object_weight(wagon_container);

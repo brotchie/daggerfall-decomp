@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007193D */
 #include "records.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -13,7 +14,7 @@ extern char D_001760DD[];
 extern char D_001760EA[];
 extern char D_0017610F[];
 extern char D_0017611C[];
-extern int D_0017D1FA;
+extern iptr D_0017D1FA;
 extern int D_0017D1FE;
 extern signed char text_buffer[];
 extern int D_00190CBC;
@@ -24,7 +25,7 @@ extern int creature_count;
 extern char inpstr_result[];
 extern struct character *player_character;
 extern struct career *player_class;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern unsigned char D_0019626F;
 extern signed char game_mode;
 extern signed char mouse_buttons_prev;
@@ -46,15 +47,10 @@ extern int rest_room_expired(void);
 extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern void inpstr_begin_number(int);
 extern int point_in_rect(short, short, short, short, short, short);
-extern int mc_free();
-extern int itoa();
-extern int strlen();
-extern int xn_mouse_poll_clamped();
-extern int xn_gfx_clear();
-extern int xn_draw_image();
+extern int xn_mouse_poll_clamped(void);
+extern void xn_gfx_clear(int);
+extern void xn_draw_image(int, int, int, int, char *);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
 
 void rest_update(void)
 {
@@ -88,7 +84,7 @@ void rest_update(void)
         return;
     }
     if (D_00190D1A == 0) {
-        xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, (iptr)rest_image->pixels);
+        xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, rest_image->pixels);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 87, 63, 134, 86) != 0) {
             while (mouse_buttons != 0) xn_mouse_poll_clamped();
             if (rest_allowed() == 0) {
@@ -98,14 +94,14 @@ void rest_update(void)
             rest_ticks_per_hour = 9;
             D_00190D1A = 1;
             if ((iptr)rest_image != 0 && (iptr)rest_image != (-1751672937)) {
-                mc_free((iptr)rest_image, (iptr)D_001760D6, 165);
+                mc_free(rest_image, D_001760D6, 165);
                 rest_image = (struct image *)(iptr)-1751672937;
             }
             rest_image = (struct image *)disk_read_file(D_001760DD, 0);
-            prompt = (iptr)(*(char **)scratch_buffer + 55000);
-            mc_set_location(168, (iptr)D_001760D6);
-            mc_sprintf(prompt, (iptr)D_001760EA, D_0017D1FA);
-            *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
+            prompt = (iptr)(scratch_buffer + 55000);
+            mc_set_location(168, D_001760D6);
+            mc_sprintf((char *)prompt, D_001760EA, D_0017D1FA);
+            *(signed char *)((char *)(strlen((char *)prompt) + prompt) + 1) = 0;
             inpstr_begin_number(0);
             msgbox_show_string(prompt, 2);
             while (key_down_enter != 0);
@@ -118,7 +114,7 @@ void rest_update(void)
             rest_ticks_per_hour = 9;
             D_00190D1A = 3;
             if ((iptr)rest_image != 0 && (iptr)rest_image != (-1751672937)) {
-                mc_free((iptr)rest_image, (iptr)D_001760D6, 184);
+                mc_free(rest_image, D_001760D6, 184);
                 rest_image = (struct image *)(iptr)-1751672937;
             }
             rest_image = (struct image *)disk_read_file(D_0017610F, 0);
@@ -128,14 +124,14 @@ void rest_update(void)
             rest_ticks_per_hour = 32;
             D_00190D1A = 1;
             if ((iptr)rest_image != 0 && (iptr)rest_image != (-1751672937)) {
-                mc_free((iptr)rest_image, (iptr)D_001760D6, 193);
+                mc_free(rest_image, D_001760D6, 193);
                 rest_image = (struct image *)(iptr)-1751672937;
             }
             rest_image = (struct image *)disk_read_file(D_001760DD, 0);
-            prompt = (iptr)(*(char **)scratch_buffer + 55000);
-            mc_set_location(196, (iptr)D_001760D6);
-            mc_sprintf(prompt, (iptr)D_0017611C, D_0017D1FE);
-            *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
+            prompt = (iptr)(scratch_buffer + 55000);
+            mc_set_location(196, D_001760D6);
+            mc_sprintf((char *)prompt, D_0017611C, D_0017D1FE);
+            *(signed char *)((char *)(strlen((char *)prompt) + prompt) + 1) = 0;
             inpstr_begin_number(0);
             msgbox_show_string(prompt, 2);
             rest_loitering = 1;
@@ -164,8 +160,8 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) == 2) {
-        xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, (iptr)rest_image->pixels);
-        text_draw_centred_coloured(itoa((int)(short)D_00190DD0, (iptr)text_buffer, 10), 118, 62, 146, 156);
+        xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, rest_image->pixels);
+        text_draw_centred_coloured((iptr)itoa((int)(short)D_00190DD0, (char *)text_buffer, 10), 118, 62, 146, 156);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
             rest_close();
         }
@@ -182,8 +178,8 @@ void rest_update(void)
         return;
     }
     if (((int)(signed char)D_00190D1A) != 3) return;
-    xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, (iptr)rest_image->pixels);
-    text_draw_centred_coloured(itoa((int)(short)D_00190DD0, (iptr)text_buffer, 10), 118, 62, 146, 156);
+    xn_draw_image(rest_image->x, rest_image->y, rest_image->width, rest_image->height, rest_image->pixels);
+    text_draw_centred_coloured((iptr)itoa((int)(short)D_00190DD0, (char *)text_buffer, 10), 118, 62, 146, 156);
     if (mouse_buttons != 0 && mouse_buttons_prev == 0 && point_in_rect((int)(short)mouse_x, (int)(short)mouse_y, 140, 76, 179, 85) != 0) {
         rest_close();
     } else if (((unsigned)(*(int *)1132 - D_00190CBC)) > rest_ticks_per_hour) {

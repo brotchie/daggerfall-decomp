@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -16,10 +17,10 @@ extern char D_00170E11[];
 extern char D_00170E17[];
 extern struct spell *selected_spell;
 extern struct rect spellbook_buttons[];
-extern char spell_effect_names[];
-extern char spell_effect_subtype_names[];
+extern char *spell_effect_names[];
+extern char *spell_effect_subtype_names[][12];
 extern char D_0018320A[];
-extern int D_00184634;
+extern iptr D_00184634;
 extern char monster_category[];
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
@@ -63,17 +64,11 @@ extern struct record *object_create_child(struct record *, struct record *, int)
 extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
 extern int inventory_open(int, int, int);
-extern int mc_free();
-extern int mc_strncpy();
-extern int strlen();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int xn_draw_spell_icon();
-extern int xn_draw_copy_rect_stride_bytes();
-extern int xn_mouse_poll_clamped();
-extern int xn_font_select();
-extern int xn_draw_image_transparent();
+extern void xn_draw_spell_icon(int, int, int);
+extern int xn_draw_copy_rect_stride_bytes(char *, char *, int, int, int);
+extern int xn_mouse_poll_clamped(void);
+extern int xn_font_select(int);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
 extern void spell_add_skill_uses(struct spell *, int);
 extern void msgbox_show_rsc(int, int);
 extern void text_draw_coloured(iptr, int, int, int, unsigned char);
@@ -102,15 +97,15 @@ void spellbook_add_spell_cb(struct record *object)
         cost = spell_cost(spell, player_character);
         if (((int)(unsigned char)spell->name[strlen(spell->name) + 1]) == 36) {
             cost >>= 2;
-            mc_set_location(62, (iptr)D_00170DE4);
-            mc_sprintf((iptr)text_buffer, (iptr)D_00170DEF, cost, spell->name);
+            mc_set_location(62, D_00170DE4);
+            mc_sprintf((char *)text_buffer, D_00170DEF, cost, spell->name);
         } else {
-            mc_set_location(65, (iptr)D_00170DE4);
-            mc_sprintf((iptr)text_buffer, (iptr)D_00170DEF, cost, &spell->name[1]);
+            mc_set_location(65, D_00170DE4);
+            mc_sprintf((char *)text_buffer, D_00170DEF, cost, &spell->name[1]);
         }
     } else {
-        mc_set_location(68, (iptr)D_00170DE4);
-        mc_sprintf((iptr)text_buffer, (iptr)D_00170DEF, spell_cost(spell, player_character), spell->name);
+        mc_set_location(68, D_00170DE4);
+        mc_sprintf((char *)text_buffer, D_00170DEF, spell_cost(spell, player_character), spell->name);
     }
     picklist_add(&shared_picklist, text_buffer, 0);
     *(iptr *)(scratch_190de4 + (((int)(short)(*(short *)scratch_190d64)++) << 2)) = (iptr)object;
@@ -127,11 +122,11 @@ void spellbook_frame(void)
     short button;
 
     if (spellbook_open(0) == 0) return;
-    mc_memcpy(screen_buffer, spellbook_saved_screen, 64000, (iptr)D_00170DE4, 123, 4);
+    mc_memcpy((void *)screen_buffer, (void *)spellbook_saved_screen, 64000, D_00170DE4, 123, 4);
     image = (short *)window_image;
     xn_draw_image_transparent((unsigned short)image[0], (unsigned short)image[1], (unsigned short)image[2], (unsigned short)image[3], (char *)image + 12);
-    mc_set_location(129, (iptr)D_00170DE4);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00170E11, player_character->magicka, player_character->max_magicka);
+    mc_set_location(129, D_00170DE4);
+    mc_sprintf((char *)text_buffer, D_00170E11, player_character->magicka, player_character->max_magicka);
     text_draw_coloured((iptr)text_buffer, 238, 20, 145, 141);
     xn_font_select(4);
     *(int *)&picked = picklist_frame(&shared_picklist);
@@ -166,14 +161,14 @@ void spellbook_frame(void)
             new_spell = object_create_child(player_object->parent, 0, 89);
             new_spell->type = 9;
             new_spell->id = object_new_id(100);
-            mc_memcpy(&new_spell->data.spell, &spell_object->data.spell, 89, (iptr)D_00170DE4, 181, 4);
+            mc_memcpy(&new_spell->data.spell, &spell_object->data.spell, 89, D_00170DE4, 181, 4);
             if (cast_player_spell(new_spell) != 0) object_delete(new_spell);
         }
         return;
     }
     spellbook_draw_spell((selected_spell = (struct spell *)(*(iptr *)(scratch_190de4 + (((int)(unsigned short)shared_picklist.selected) << 2)) + 71)));
     if (((int)(unsigned char)msgbox_kind) == 2) {
-        mc_strncpy(shared_picklist.entries[shared_picklist.selected].text, selected_spell->name, 40, (iptr)D_00170DE4, 193);
+        mc_strncpy(shared_picklist.entries[shared_picklist.selected].text, selected_spell->name, 40, D_00170DE4, 193);
     }
     if (key_down_esc != 0 || ((int)(short)picked) == (-2)) spellbook_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
@@ -199,15 +194,15 @@ int spellbook_close(void)
     D_001940D8 &= 253;
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_00170DE4, 222);
+        mc_free((void *)window_image, D_00170DE4, 222);
         window_image = -1751672937;
     }
     if (magic_window_image != 0 && magic_window_image != (-1751672937)) {
-        mc_free(magic_window_image, (iptr)D_00170DE4, 223);
+        mc_free((void *)magic_window_image, D_00170DE4, 223);
         magic_window_image = -1751672937;
     }
     if (spellbook_saved_screen != 0 && spellbook_saved_screen != (-1751672937)) {
-        mc_free(spellbook_saved_screen, (iptr)D_00170DE4, 224);
+        mc_free((void *)spellbook_saved_screen, D_00170DE4, 224);
         spellbook_saved_screen = -1751672937;
     }
     D_00196272 = 0;
@@ -229,15 +224,15 @@ void spellbook_draw_spell(struct spell *spell)
 
     D_0012B508 = 145;
     xn_draw_spell_icon(172, 32, spell->icon);
-    xn_draw_copy_rect_stride_bytes((iptr)(*(char **)&magic_window_image + (spell->element * 640)) + 24, (iptr)(*(char **)&screen_buffer + 10486), 16, 16, 40);
-    xn_draw_copy_rect_stride_bytes((iptr)(*(char **)&magic_window_image + (spell->target * 640)), (iptr)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
+    xn_draw_copy_rect_stride_bytes((char *)((iptr)(*(char **)&magic_window_image + (spell->element * 640)) + 24), (*(char **)&screen_buffer + 10486), 16, 16, 40);
+    xn_draw_copy_rect_stride_bytes((*(char **)&magic_window_image + (spell->target * 640)), (char *)&*(signed char *)(*(char **)&screen_buffer + 10445), 24, 16, 40);
     text_draw_coloured((iptr)spell->name, 148, 20, 145, 141);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 3; (*(int *)&i)++) {
         if ((spell->effects[(int)(short)i].type) == 255) continue;
-        text_draw_centred_coloured(*(int *)(spell_effect_names + ((spell->effects[(int)(short)i].type) << 2)), 219, (int)(short)((*(int *)&i * 38) + 63), 145, 141);
-        if ((spell->effects[(int)(short)i].subtype) != 255 && *(int *)(spell_effect_subtype_names + ((spell->effects[(int)(short)i].type) * 48) + ((spell->effects[(int)(short)i].subtype) << 2)) != 0) {
-            text_draw_centred_coloured(*(int *)(spell_effect_subtype_names + ((spell->effects[(int)(short)i].type) * 48) + ((spell->effects[(int)(short)i].subtype) << 2)), 219, (int)(short)((*(int *)&i * 38) + 75), 145, 141);
+        text_draw_centred_coloured((iptr)spell_effect_names[(spell->effects[(int)(short)i].type)], 219, (int)(short)((*(int *)&i * 38) + 63), 145, 141);
+        if ((spell->effects[(int)(short)i].subtype) != 255 && (iptr)spell_effect_subtype_names[(spell->effects[(int)(short)i].type)][(spell->effects[(int)(short)i].subtype)] != 0) {
+            text_draw_centred_coloured((iptr)spell_effect_subtype_names[(spell->effects[(int)(short)i].type)][(spell->effects[(int)(short)i].subtype)], 219, (int)(short)((*(int *)&i * 38) + 75), 145, 141);
         }
     }
 }

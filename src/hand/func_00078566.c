@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00078566 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00176844[];
 extern char D_0017684E[];
@@ -9,7 +10,7 @@ extern char D_00176876[];
 extern struct monster_template monster_table[];
 extern signed char class_creature_types[];
 extern signed char text_buffer[];
-extern char D_00190704[];
+extern iptr D_00190704[];
 extern int monster_bsa_handle;
 extern struct character *player_character;
 extern signed char D_00196293;
@@ -24,17 +25,11 @@ extern int monster_roll_class_health(int, int, int);
 extern void monster_init_gear(struct record *);
 extern void monster_maybe_give_map(struct record *, int);
 extern int rand_range(int, int);
-extern int rand();
-extern int mc_memset();
-extern int mc_strncpy();
-extern int mc_memcpy();
-extern int xn_anim_reset();
-extern int xn_tex_archive_set_translucent();
-extern struct tex_cache_entry *xn_tex_cache_lookup(int, int, int);
-extern int xn_tex_cache_flush();
+extern int xn_anim_reset(void *);
+extern int xn_tex_archive_set_translucent(int);
+extern struct tex_cache_entry *xn_tex_cache_lookup(int, int, iptr);
+extern int xn_tex_cache_flush(void);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
 
 void monster_init(struct record *monster, int monster_type)
 {
@@ -85,8 +80,8 @@ void monster_init(struct record *monster, int monster_type)
         } else {
             texture_base = 255;
         }
-        mc_set_location(73, (iptr)D_00176844);
-        mc_sprintf((iptr)text_buffer, (iptr)D_0017684E, monster_type + texture_base);
+        mc_set_location(73, D_00176844);
+        mc_sprintf((char *)text_buffer, D_0017684E, monster_type + texture_base);
         monster_char->anim_slot = monster_alloc_anim_slot();
         monster_char->action = 0;
         xn_anim_reset(anim);
@@ -100,10 +95,10 @@ void monster_init(struct record *monster, int monster_type)
             }
             monster_char->ascr_record = *(signed char *)&ascr;
         }
-        mc_set_location(91, (iptr)D_00176844);
-        mc_sprintf((iptr)text_buffer, (iptr)D_0017685B, monster_char->ascr_record);
+        mc_set_location(91, D_00176844);
+        mc_sprintf((char *)text_buffer, D_0017685B, monster_char->ascr_record);
         record_index = archive_find_record(monster_bsa_handle, text_buffer, 8);
-        *(iptr *)(D_00190704 + (monster_char->anim_slot << 2)) = (iptr)(anim->anim_script = (char *)archive_read_record(monster_bsa_handle, record_index, 0));
+        D_00190704[monster_char->anim_slot] = (iptr)(anim->anim_script = (char *)archive_read_record(monster_bsa_handle, record_index, 0));
         anim->anim_request = 0;
         do {
             texture = xn_tex_cache_lookup(texture_base + monster_type, 5, 0);
@@ -114,12 +109,12 @@ void monster_init(struct record *monster, int monster_type)
         if (monster_type == 23 || monster_type == 18) xn_tex_archive_set_translucent(texture_base + monster_type);
         table_row = &monster_table[monster_type];
         if (monster_type >= 43) {
-            mc_set_location(112, (iptr)D_00176844);
-            mc_sprintf((iptr)text_buffer, (iptr)D_00176868, class_index);
+            mc_set_location(112, D_00176844);
+            mc_sprintf((char *)text_buffer, D_00176868, class_index);
             disk_read_file(text_buffer, (iptr)career);
         } else {
-            mc_set_location(117, (iptr)D_00176844);
-            mc_sprintf((iptr)text_buffer, (iptr)D_00176876, monster_type);
+            mc_set_location(117, D_00176844);
+            mc_sprintf((char *)text_buffer, D_00176876, monster_type);
             record_index = archive_find_record(monster_bsa_handle, text_buffer, 8);
             archive_read_record(monster_bsa_handle, record_index, (iptr)career);
         }
@@ -139,12 +134,12 @@ void monster_init(struct record *monster, int monster_type)
             monster_char->level = table_row->level;
             monster_char->health = (monster_char->max_health = monster_roll_d8_health(career->hp_per_level, table_row->hp_bonus));
         }
-        mc_memset(monster_char->armor_values, table_row->armor * 5, 7, (iptr)D_00176844, 145, 7);
+        mc_memset(monster_char->armor_values, table_row->armor * 5, 7, D_00176844, 145, 7);
         monster_char->loot_table = table_row->loot_table;
         monster_char->table_flags = table_row->flags;
-        mc_memcpy(monster_char->attack_damage, table_row->attack_damage, 10, (iptr)D_00176844, 148, 20);
+        mc_memcpy(monster_char->attack_damage, table_row->attack_damage, 10, D_00176844, 148, 20);
         monster_char->min_metal_to_hit = table_row->min_metal_to_hit;
-        mc_memcpy(monster_char->attributes, career->attributes, 16, (iptr)D_00176844, 150, 16);
+        mc_memcpy(monster_char->attributes, career->attributes, 16, D_00176844, 150, 16);
         if (table_row->range_min == table_row->range_max) {
             monster_char->pad22A = table_row->range_min;
         } else {
@@ -161,7 +156,7 @@ void monster_init(struct record *monster, int monster_type)
         for (i = 0; i < 35; i++) {
             monster_char->skills[i].value = skill_value;
         }
-        mc_strncpy(monster_char->name, career->name, 32, (iptr)D_00176844, 169);
+        mc_strncpy(monster_char->name, career->name, 32, D_00176844, 169);
         monster_init_gear(monster);
         monster_maybe_give_map(monster, monster_char->mobile_id);
         monster->image = (texture_base + monster_type) << 7;

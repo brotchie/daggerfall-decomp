@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern iptr screen_buffer;
@@ -16,13 +17,8 @@ extern char msgbox_image[];
 extern char *msgbox_saved_screen;
 
 extern char *text_expand_wrap(unsigned short, short, char *, char *, char *);
-extern int mc_free();
-extern char *mc_malloc();
-extern int mc_strncpy();
-extern int strlen();
-extern int mc_memcpy();
-extern int xn_mouse_poll_clamped();
-extern int xn_font_select();
+extern void xn_mouse_poll_clamped(void);
+extern int xn_font_select(int);
 extern void msgbox_render(char *, iptr);
 extern void msgbox_wait(void);
 extern void mode_push(void);
@@ -37,7 +33,7 @@ void msgbox_show_string(char *text, short kind)
 
     if (msgbox_kind != 0) return;
     msgbox_saved_screen = mc_malloc(64000, D_00170D55, 697);
-    mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, D_00170D55, 698, 4);
+    mc_memcpy(msgbox_saved_screen, (void *)screen_buffer, 64000, D_00170D55, 698, 4);
     xn_font_select(4);
     length = strlen(text);
     copy = mc_malloc(length + 16, D_00170D55, 702);

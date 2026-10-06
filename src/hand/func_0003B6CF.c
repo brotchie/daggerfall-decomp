@@ -1,18 +1,19 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003B6CF */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern struct rect sheet_buttons[];
 extern short font_height;
 extern char D_00170C67[];
 extern char D_00170C6F[];
 extern char D_00170C73[];
-extern char race_names[];
+extern char *race_names[];
 extern signed char text_buffer[];
 extern signed char D_001940D9;
 extern char D_00195A08[];
 extern struct record *player_entity;
-extern int D_00195B64;
+extern iptr D_00195B64;
 extern struct character *player_character;
 extern struct career *player_class;
 extern void sheet_draw_levelup_points(void);
@@ -21,11 +22,8 @@ extern void text_draw_coloured(char *, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(char *, int, int, int, unsigned char);
 extern int gold_total(void);
 extern int carry_capacity(void);
-extern char *itoa(int, char *, int);
-extern int xn_draw_put_rect();
+extern void xn_draw_put_rect(int, int, int, int, char *, int);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void sheet_draw(void)
 {
@@ -42,7 +40,7 @@ void sheet_draw(void)
     text_draw_coloured(player_class->name, 46, 24, 145, 141);
     level = player_character->level;
     text_draw_coloured(itoa(level, ((char *)text_buffer), 10), 45, 34, 145, 141);
-    text_draw_coloured(*(char **)(race_names + (player_character->race << 2)), 41, 14, 145, 141);
+    text_draw_coloured(race_names[player_character->race], 41, 14, 145, 141);
     mc_set_location(180, D_00170C67);
     mc_sprintf(((char *)text_buffer), D_00170C6F, gold_total());
     text_draw_coloured(((char *)text_buffer), 39, 44, 145, 141);
@@ -68,7 +66,7 @@ void sheet_draw(void)
         else
             text_draw_centred_coloured(itoa(attributes[i], ((char *)text_buffer), 10), x, (short)((sheet_buttons[i + 13].y1 - font_height) - 2), colour, 141);
     }
-    xn_draw_put_rect(192, 1, 125, 197, D_00195B64, 0);
+    xn_draw_put_rect(192, 1, 125, 197, (char *)D_00195B64, 0);
     weight = object_weight(player_entity) >> 2;
     mc_set_location(218, D_00170C67);
     mc_sprintf(((char *)text_buffer), D_00170C73, weight, carry_capacity());

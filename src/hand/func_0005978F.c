@@ -1,11 +1,11 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005978F */
 #include "records.h"
+#include "clib.h"
 
 extern char D_0017573C[];
 extern struct character *player_character;
 extern unsigned char *paperdoll_slots;
 extern unsigned char **paperdoll_items;
-extern int mc_memmove();
 
 /* item +0x42 (the top byte of `message`) is the paperdoll drawing order here */
 void paperdoll_add_item(struct item *item, int slot)

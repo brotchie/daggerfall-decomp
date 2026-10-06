@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004D1E6 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00174FAC[];
 extern char D_00174FB3[];
@@ -29,13 +30,6 @@ extern int sound_play(int, struct record *, int);
 extern iptr disk_read_file(char *, iptr);
 extern int disk_open_rw(char *);
 extern int disk_create(char *);
-extern void mc_memset(char *, int, int, char *, int, int);
-extern long lseek(int, long, int);
-extern char *mc_malloc(int, char *, int);
-extern int read(int, char *, int);
-extern int write(int, char *, int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int filelength(int);
 
 int note_open_notebook(short mode)
 {

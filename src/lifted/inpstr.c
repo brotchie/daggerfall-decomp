@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char xn_font_current;
 extern signed char key_down_home;
@@ -21,16 +22,10 @@ extern signed char D_001A9AB1;
 
 extern int font_char_width(unsigned char);
 extern int font_text_width(iptr);
-extern int mc_strncpy();
-extern int atoi();
-extern int itoa();
-extern int strlen();
-extern int mc_memmove();
-extern int mc_memcpy();
-extern int xn_mouse_cursor_draw();
-extern int xn_kbd_flush();
-extern int xn_kbd_read_key();
-extern int xn_draw_get_rect();
+extern void xn_mouse_cursor_draw(void);
+extern void xn_kbd_flush(void);
+extern int xn_kbd_read_key(void);
+extern void xn_draw_get_rect(int, int, int, int, char *, int);
 
 int inpstr_read_key(void)
 {
@@ -49,10 +44,10 @@ void inpstr_begin_number(int number)
 {
     xn_kbd_flush();
     input_digits_only = 1;
-    itoa(number, (iptr)inpstr_number_text, 10);
+    itoa(number, inpstr_number_text, 10);
     inpstr_text = (iptr)inpstr_number_text;
-    mc_strncpy((iptr)D_00190B44, inpstr_text, 160, (iptr)D_00176E2C, 110);
-    inpstr_cursor = strlen((iptr)inpstr_number_text);
+    mc_strncpy(D_00190B44, (char *)inpstr_text, 160, D_00176E2C, 110);
+    inpstr_cursor = strlen(inpstr_number_text);
     inpstr_max_length = 8;
     D_001A9AB1 = xn_font_current;
 }
@@ -62,12 +57,12 @@ int inpstr_handle_key(unsigned char key)
     switch ((unsigned char)key) {
     case 13:
         xn_mouse_cursor_draw();
-        return atoi(inpstr_text);
+        return atoi((char *)inpstr_text);
     case 131:
         inpstr_cursor = 0;
         break;
     case 130:
-        inpstr_cursor = strlen(inpstr_text);
+        inpstr_cursor = strlen((char *)inpstr_text);
         break;
     case 27:
         xn_mouse_cursor_draw();
@@ -76,31 +71,31 @@ int inpstr_handle_key(unsigned char key)
         if (inpstr_cursor != 0) (inpstr_cursor)--;
         break;
     case 129:
-        if (((unsigned)((int)(short)inpstr_cursor)) < strlen(inpstr_text)) {
+        if (((unsigned)((int)(short)inpstr_cursor)) < strlen((char *)inpstr_text)) {
             inpstr_cursor++;
         }
         break;
     case 8:
         if (inpstr_cursor != 0) {
-            mc_memcpy((iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) - 1, (iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), (int)(iptr)&*(signed char *)((char *)(iptr)(strlen(inpstr_text) - ((int)(short)inpstr_cursor)) + 1), (iptr)D_00176E2C, 217, 4);
+            mc_memcpy((void *)((iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) - 1), (*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), (int)(iptr)&*(signed char *)((char *)(iptr)(strlen((char *)inpstr_text) - ((int)(short)inpstr_cursor)) + 1), D_00176E2C, 217, 4);
             inpstr_cursor--;
         }
         break;
     case 127:
-        if (((unsigned)((int)(short)inpstr_cursor)) < strlen(inpstr_text)) {
-            mc_memcpy((iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), (iptr)&*(signed char *)((char *)(iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) + 1), (int)(iptr)&*(signed char *)((char *)(iptr)(strlen(inpstr_text) - ((int)(short)inpstr_cursor)) + 1), (iptr)D_00176E2C, 226, 4);
+        if (((unsigned)((int)(short)inpstr_cursor)) < strlen((char *)inpstr_text)) {
+            mc_memcpy((*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), &*(signed char *)((char *)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) + 1), (int)(iptr)&*(signed char *)((char *)(iptr)(strlen((char *)inpstr_text) - ((int)(short)inpstr_cursor)) + 1), D_00176E2C, 226, 4);
         }
         break;
     default:
-        if (((int)(unsigned char)key) < 128 && ((unsigned)strlen(inpstr_text)) < ((int)(short)inpstr_max_length)) {
+        if (((int)(unsigned char)key) < 128 && ((unsigned)strlen((char *)inpstr_text)) < ((int)(short)inpstr_max_length)) {
             if (input_digits_only != 0 && (((int)(unsigned char)key) < 48 || ((int)(unsigned char)key) > 57)) {
             } else if (((font_text_width(inpstr_text) + font_char_width((int)(unsigned char)key)) + ((int)(unsigned short)text_cursor_x)) < ((int)(short)xn_gfx_clip_right)) {
-                if (((int)(short)inpstr_cursor) == strlen(inpstr_text)) {
-                    *(signed char *)((char *)(iptr)(*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = key;
-                    *(signed char *)((char *)(iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor))) = 0;
+                if (((int)(short)inpstr_cursor) == strlen((char *)inpstr_text)) {
+                    *(signed char *)((*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = key;
+                    *(signed char *)((*(char **)&inpstr_text + ((int)(short)inpstr_cursor))) = 0;
                 } else {
-                    mc_memmove((iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) + 1, (iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), (int)(iptr)&*(signed char *)((char *)(iptr)(strlen(inpstr_text) - ((int)(short)inpstr_cursor)) + 1), (iptr)D_00176E2C, 245, 4);
-                    *(signed char *)((char *)(iptr)(*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = key;
+                    mc_memmove((void *)((iptr)(*(char **)&inpstr_text + ((int)(short)inpstr_cursor)) + 1), (*(char **)&inpstr_text + ((int)(short)inpstr_cursor)), (int)(iptr)&*(signed char *)((char *)(iptr)(strlen((char *)inpstr_text) - ((int)(short)inpstr_cursor)) + 1), D_00176E2C, 245, 4);
+                    *(signed char *)((*(char **)&inpstr_text + ((int)(short)(inpstr_cursor)++))) = key;
                 }
             }
         }

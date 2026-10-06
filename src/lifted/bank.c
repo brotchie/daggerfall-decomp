@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern int xn_cam_pitch;
 extern int xn_cam_yaw;
@@ -29,7 +30,7 @@ extern char D_00175CB7[];
 extern char D_00175CC4[];
 extern char D_00175CD0[];
 extern char D_00175CEF[];
-extern char region_names[];
+extern char *region_names[];
 extern struct rect bank_buttons[];
 extern signed char D_00187CA8;
 extern char saved_location_name[];
@@ -44,13 +45,13 @@ extern struct record *bank_accounts;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern struct record *location_object;
-extern char D_00195B5C[];
+extern struct image *D_00195B5C;
 extern struct location *current_location;
 extern struct character *player_character;
 extern iptr window_image;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern int trade_price;
 extern signed char climate_weathers[];
 extern short text_cursor_x;
@@ -85,29 +86,20 @@ extern iptr model_get(int, int, int);
 extern int inpstr_update(void);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern int mc_free();
-extern int mc_memset();
-extern iptr mc_malloc();
-extern int mc_strncpy();
-extern int atoi();
-extern int itoa();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int xn_gfx_present_inclusive();
-extern int xn_cam_set_view_window();
-extern int xn_render_begin_frame();
-extern int xn_render_frame();
-extern int xn_mouse_poll_clamped();
-extern int xn_tex_cache_flush();
-extern int xn_tex_cache_begin_frame();
-extern int xn_light_reset();
-extern int xn_mat_from_angles();
-extern int xn_cam_scale_matrix();
-extern int xn_model_submit();
-extern int xn_kbd_flush();
-extern int xn_draw_image_transparent();
-extern int xn_shade_set_fog();
+extern void xn_gfx_present_inclusive(int);
+extern void xn_cam_set_view_window(int, int, int, int);
+extern void xn_render_begin_frame(void);
+extern int xn_render_frame(int);
+extern int xn_mouse_poll_clamped(void);
+extern void xn_tex_cache_flush(void);
+extern void xn_tex_cache_begin_frame(void);
+extern void xn_light_reset(void);
+extern void xn_mat_from_angles(int, int, int, void *);
+extern void xn_cam_scale_matrix(void *, void *);
+extern void xn_model_submit(void *, int);
+extern void xn_kbd_flush(void);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
+extern void xn_shade_set_fog(int);
 extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void msgbox_update(void);
@@ -137,7 +129,7 @@ int bank_open(int opening)
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         D_001A41E4 = 0;
         window_image = disk_read_file(D_00175C90, 0);
-        *(iptr *)D_00195B5C = disk_read_file(D_00175C9D, 0);
+        *(iptr *)&D_00195B5C = disk_read_file(D_00175C9D, 0);
         D_001A41E8 = disk_read_file(D_00175CAA, 0);
         D_001A4140 = disk_read_file(D_00175CB7, 0);
         xn_cam_set_view_window(51, 45, 216, 72);
@@ -147,8 +139,8 @@ int bank_open(int opening)
         bank_house_count = (bank_ship_count = (bank_screen = (bank_selected = 0)));
         *(int *)bank_list_top = 0;
         D_001A41E0 = 1500;
-        bank_saved_screen = mc_malloc(64000, (iptr)D_00175CC4, 89);
-        mc_memcpy(bank_saved_screen, screen_buffer, 64000, (iptr)D_00175CC4, 90, 4);
+        bank_saved_screen = (iptr)mc_malloc(64000, D_00175CC4, 89);
+        mc_memcpy((void *)bank_saved_screen, (void *)screen_buffer, 64000, D_00175CC4, 90, 4);
         bank_account = &bank_accounts->data.bank_accounts[(int)(unsigned char)current_region];
         object_foreach(location_object, bank_add_house_for_sale);
         bank_init_ships();
@@ -165,26 +157,26 @@ void bank_close(void)
         xn_cam_set_view_window(160, 77, 160, 77);
     }
     if (bank_saved_screen != 0 && bank_saved_screen != (-1751672937)) {
-        mc_free(bank_saved_screen, (iptr)D_00175CC4, 110);
+        mc_free((void *)bank_saved_screen, D_00175CC4, 110);
         bank_saved_screen = -1751672937;
     }
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_00175CC4, 111);
+        mc_free((void *)window_image, D_00175CC4, 111);
         window_image = -1751672937;
     }
-    if (*(int *)D_00195B5C != 0 && *(int *)D_00195B5C != (-1751672937)) {
-        mc_free(*(int *)D_00195B5C, (iptr)D_00175CC4, 112);
-        *(int *)D_00195B5C = -1751672937;
+    if ((iptr)D_00195B5C != 0 && (iptr)D_00195B5C != (-1751672937)) {
+        mc_free((void *)D_00195B5C, D_00175CC4, 112);
+        *(iptr *)&D_00195B5C = -1751672937;
     }
     if (D_001A41E8 != 0 && D_001A41E8 != (-1751672937)) {
-        mc_free(D_001A41E8, (iptr)D_00175CC4, 113);
+        mc_free((void *)D_001A41E8, D_00175CC4, 113);
         D_001A41E8 = -1751672937;
     }
     if (D_001A4140 != 0 && D_001A4140 != (-1751672937)) {
-        mc_free(D_001A4140, (iptr)D_00175CC4, 114);
+        mc_free((void *)D_001A4140, D_00175CC4, 114);
         D_001A4140 = -1751672937;
     }
-    mc_memset((iptr)text_rsc_buffer, 0, 2048, (iptr)D_00175CC4, 116, 2048);
+    mc_memset(text_rsc_buffer, 0, 2048, D_00175CC4, 116, 2048);
     func_0006CB02();
     game_mode = 0;
     D_00196272 = 0;
@@ -448,8 +440,8 @@ void bank_draw_preview(int model_count, struct block_model *models)
     xn_tex_cache_begin_frame();
     xn_render_begin_frame();
     xn_light_reset();
-    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, (iptr)xn_cam_rotation);
-    xn_cam_scale_matrix((iptr)xn_cam_rotation, (iptr)xn_cam_view_matrix);
+    xn_mat_from_angles(xn_cam_pitch, xn_cam_yaw, xn_cam_roll, xn_cam_rotation);
+    xn_cam_scale_matrix(xn_cam_rotation, xn_cam_view_matrix);
     for (i = 0; i < model_count; i++, model++) {
         if (model->id > 10 && model->id != 415) continue;
         origin_x = model->x;
@@ -468,7 +460,7 @@ void bank_draw_preview(int model_count, struct block_model *models)
         if (model->model != 0) {
             bios_ticks = (int *)1132;
             model->yaw = ((*bios_ticks & 2047) << 4) & 2047;
-            xn_model_submit((iptr)&model->model, 0);
+            xn_model_submit(&model->model, 0);
             break;
         }
     }
@@ -497,8 +489,8 @@ void bank_draw_house_list(void)
         } else {
             colour = 146;
         }
-        mc_set_location(573, (iptr)D_00175CC4);
-        mc_sprintf((iptr)text_buffer, (iptr)D_00175CEF, bank_houses_for_sale[row].price);
+        mc_set_location(573, D_00175CC4);
+        mc_sprintf((char *)text_buffer, D_00175CEF, bank_houses_for_sale[row].price);
         text_draw_coloured((iptr)text_buffer, 52, (int)(short)(((row - *(short *)bank_list_top) * 7) + 38), (int)(short)*(short *)&colour, 156);
     }
     if (*(int *)bank_list_top != 0) {
@@ -506,13 +498,13 @@ void bank_draw_house_list(void)
     } else {
         arrow_image = D_001A4140;
     }
-    xn_draw_image_transparent(153, 38, 9, 20, arrow_image);
+    xn_draw_image_transparent(153, 38, 9, 20, (char *)arrow_image);
     if ((*(int *)bank_list_top + 11) < ((int)(unsigned char)bank_house_count)) {
         arrow_image = D_001A41E8;
     } else {
         arrow_image = D_001A4140;
     }
-    xn_draw_image_transparent(153, 102, 9, 16, arrow_image + 576);
+    xn_draw_image_transparent(153, 102, 9, 16, (char *)(arrow_image + 576));
 }
 
 void bank_draw_ship_list(void)
@@ -526,7 +518,7 @@ void bank_draw_ship_list(void)
         } else {
             *(int *)&colour = 146;
         }
-        text_draw_coloured(itoa(bank_ships_for_sale[row].price, (iptr)text_rsc_buffer, 10), 52, (int)(short)((row * 7) + 38), (int)(short)colour, 156);
+        text_draw_coloured((iptr)itoa(bank_ships_for_sale[row].price, (char *)text_rsc_buffer, 10), 52, (int)(short)((row * 7) + 38), (int)(short)colour, 156);
     }
 }
 
@@ -573,8 +565,8 @@ void bank_house_bought(void)
     D_001A41E4 = (iptr)((char *)bank_houses_for_sale[(unsigned char)bank_selected].block - 71);
     D_001A41DC = (iptr)bank_houses_for_sale[(unsigned char)bank_selected].building;
     msgbox_show_rsc(282, 1);
-    mc_strncpy((iptr)saved_region_name, *(int *)(region_names + (((int)(unsigned char)current_region) << 2)), 32, (iptr)D_00175CC4, 647);
-    mc_strncpy((iptr)saved_location_name, (iptr)current_location, 32, (iptr)D_00175CC4, 648);
+    mc_strncpy(saved_region_name, region_names[((int)(unsigned char)current_region)], 32, D_00175CC4, 647);
+    mc_strncpy(saved_location_name, (char *)current_location, 32, D_00175CC4, 648);
     bank_screen = 0;
 }
 
@@ -618,7 +610,7 @@ int bank_input_amount(void)
 
     done = 0;
     D_0012B508 = 146;
-    input = *(char **)scratch_buffer + 55000;
+    input = scratch_buffer + 55000;
     *input = 0;
     *(signed char *)D_00191020 = 0;
     text_cursor_x = 157;
@@ -631,7 +623,7 @@ int bank_input_amount(void)
         done = inpstr_update();
         xn_gfx_present_inclusive(1);
     }
-    return atoi((iptr)D_00191020);
+    return atoi(D_00191020);
 }
 
 void func_0006CB02(void)

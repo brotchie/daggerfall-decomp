@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00063FCF */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 /* a struct move_request (records.h) and 14 bytes of the frame after it (the shared struct moves
@@ -29,9 +30,7 @@ extern int D_00196D5C;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct Hit *, int);
 extern struct record *object_delete(struct record *);
-extern int abs();
-extern int mc_memcpy(void *, void *, int, char *, int, int);
-extern int xn_math_approx_dist2d();
+extern int xn_math_approx_dist2d(int, int, int, int);
 
 int func_00063FCF(struct record *m, int dest_x, int dest_z)
 {

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006BA50 */
 #include "records.h"
+#include "clib.h"
 
 extern char *screen_buffer;
 extern char D_00175CC4[];        /* __FILE__ */
@@ -21,9 +22,7 @@ extern void bank_draw_house_list(void);
 extern void bank_draw_ship_list(void);
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern int gold_total(void);
-extern char *itoa(int, char *, int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int xn_draw_image();
+extern void xn_draw_image(int, int, int, int, char *);
 
 void bank_draw(void)
 {

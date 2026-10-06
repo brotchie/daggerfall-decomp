@@ -10,5 +10,5 @@ int inv_paperdoll_slot_at(int x, int y, int unused)
 {
     x += -41;
     y += -5;
-    return (int)(unsigned char)*(signed char *)((char *)(iptr)(((char *)paperdoll_mask) + ((y * 125) + x)));
+    return (int)(unsigned char)*(signed char *)((((char *)paperdoll_mask) + ((y * 125) + x)));
 }

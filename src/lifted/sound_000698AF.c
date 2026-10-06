@@ -6,7 +6,7 @@ extern int D_00186DEC;
 extern int D_0018DD54;
 extern signed char sound_enabled;
 
-extern int func_000A1D3C();
+#include "clib.h"
 
 void sound_set_volume(int volume)
 {

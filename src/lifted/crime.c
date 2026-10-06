@@ -2,12 +2,13 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern struct region regions[];
 extern char region_legal_reputation[];  /* court_frame: regions[].legal_reputation evaluates in another order */
 extern iptr screen_buffer;
 extern char D_001706E1[];
-extern char D_00179EA8[];
+extern iptr D_00179EA8[];
 extern signed char D_00187CA8;
 extern struct record *creature_list[];
 extern int scratch_190cac;
@@ -33,16 +34,14 @@ extern char court_reputation_change[];
 extern int D_001A4A70[];
 extern int D_001A4A74;
 
-extern int faction_find_type_in_region(int, short);
+extern iptr faction_find_type_in_region(int, short);
 extern int court_open(int);
 extern int rand_range(int, int);
 extern int gold_can_afford(int);
 extern int gold_total_alias(void);
 extern struct record *object_delete(struct record *);
 extern int player_to_random_marker(struct record *, int);
-extern int mc_free();
-extern int mc_memcpy();
-extern void faction_change_reputation(int, int);
+extern void faction_change_reputation(iptr, int);
 extern void prison_serve_sentence(int);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_rsc(int, int);
@@ -62,7 +61,7 @@ void court_frame(void)
     int unused;
 
     if (court_open(0) == 0) return;
-    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_001706E1, 172, 4);
+    mc_memcpy((void *)screen_buffer, (void *)window_image, 64000, D_001706E1, 172, 4);
     if (((int)(unsigned char)game_mode) == 8) return;
     D_001940D5 |= 64;
     D_00195F34 = 194;
@@ -174,16 +173,16 @@ void court_frame(void)
 
 void crime_reputation_penalty(void)
 {
-    int faction;
+    iptr faction;
 
-    regions[(unsigned char)current_region].legal_reputation -= *(short *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2));
+    regions[(unsigned char)current_region].legal_reputation -= *(short *)&D_00179EA8[((int)(unsigned char)crime_current)];
     faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
-    faction_change_reputation(faction, -(*(int *)(D_00179EA8 + (((int)(unsigned char)crime_current) << 2)) >> 1));
+    faction_change_reputation(faction, (int)(-(D_00179EA8[((int)(unsigned char)crime_current)] >> 1)));
 }
 
 void court_reputation_restore(void)
 {
-    int faction;
+    iptr faction;
 
     regions[(unsigned char)current_region].legal_reputation += *(short *)court_reputation_change - 1;
     faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
@@ -203,7 +202,7 @@ void court_close(void)
     game_mode = 0;
     D_00196272 = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_001706E1, 350);
+        mc_free((void *)window_image, D_001706E1, 350);
         window_image = -1751672937;
     }
     court_remove_creatures();

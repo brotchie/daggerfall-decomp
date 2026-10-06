@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "structs.h"
+#include "clib.h"
 
 extern char D_00170129[];
 extern char D_00170133[];
@@ -9,16 +10,16 @@ extern char D_00170137[];
 extern char D_0017013B[];
 extern iptr D_00178848[];
 
-extern int profile_find_section(struct profile *, ...);
-extern int profile_find_item(struct profile *, ...);
-extern int profile_get_string(struct profile *, ...);
-extern int profile_set_string(struct profile *, ...);
-extern int strlen();
-extern int mc_memmove();
-extern int stricmp();
-extern int toupper();
-int profile_hex_digit(signed char);
+extern int profile_find_section(struct profile *, char *);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+#pragma aux (sosconv) profile_find_section;
+extern int profile_find_item(struct profile *, char *);
+#pragma aux (sosconv) profile_find_item;
+extern int profile_get_string(struct profile *, char *, int);
+#pragma aux (sosconv) profile_get_string;
+extern int profile_set_string(struct profile *, char *);
+#pragma aux (sosconv) profile_set_string;
+int profile_hex_digit(signed char);
 #pragma aux (sosconv) profile_get_raw_line;
 #pragma aux (sosconv) profile_get_yes;
 #pragma aux (sosconv) profile_get_item_string;
@@ -57,8 +58,8 @@ int profile_get_yes(struct profile *profile, char *item)
     char value[32];
 
     if ((short)profile_find_item(profile, item) == 0) return 0;
-    if ((short)profile_get_string(profile, (iptr)value, 32) == 0) return 0;
-    if (stricmp((iptr)value, (iptr)D_00170133) == 0) return 1;
+    if ((short)profile_get_string(profile, value, 32) == 0) return 0;
+    if (stricmp(value, D_00170133) == 0) return 1;
     return 0;
 }
 
@@ -73,8 +74,8 @@ int profile_set_yes_no(struct profile *profile, char *item, short yes)
 {
     if ((short)profile_find_item(profile, item) == 0) return 0;
     if (yes != 0) {
-        if ((short)profile_set_string(profile, (iptr)D_00170137) == 0) return 0;
-    } else if ((short)profile_set_string(profile, (iptr)D_0017013B) == 0) {
+        if ((short)profile_set_string(profile, D_00170137) == 0) return 0;
+    } else if ((short)profile_set_string(profile, D_0017013B) == 0) {
         return 0;
     }
     return 1;
@@ -93,7 +94,7 @@ int profile_delete_section(struct profile *profile, char *section)
     while (start[length] != 91 && start + length < end) {
         length++;
     }
-    mc_memmove(start, start + length, end - (start + length), (iptr)D_00170129, 1179, 4);
+    mc_memmove(start, start + length, (int)(end - (start + length)), D_00170129, 1179, 4);
     profile->length -= length;
     profile->flags |= 128;
     return 1;

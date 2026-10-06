@@ -1,15 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00011A6B */
 #include "structs.h"
+#include "clib.h"
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_open;
 extern char D_00170129[];        /* __FILE__ */
-extern void close(int);
-extern void mc_free(void *, char *, int);
-extern int lseek(int, int, int);
-extern void *mc_malloc(int, char *, int);
-extern int read(int, void *, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern int open(char *, ...);
 
 int profile_open(struct profile *r, char *name)
 {

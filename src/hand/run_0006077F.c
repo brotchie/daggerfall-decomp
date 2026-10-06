@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of equip.c from 0x00060430 to 0x0006077F, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 extern char D_001758B8[];        /* __FILE__ */
 extern unsigned char D_001865CA[];
@@ -13,7 +14,6 @@ extern void item_make(int, int, struct item *);
 extern void item_roll_material(struct item *);
 extern int armor_image_for_type(int, int);
 extern int rand_range(int, int);
-extern void mc_strncpy(void *, char *, int, char *, int);
 
 void item_make_magic(struct item *item, int which)
 {

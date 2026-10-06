@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern struct monster_template monster_table[];
 extern char D_00176844[];
@@ -22,7 +23,7 @@ extern iptr monster_class_spell_lists[];
 extern signed char monster_class_map_chance[];
 extern signed char wabbajack_creatures[];
 extern signed char monster_map_chance[];
-extern char D_00190704[];
+extern iptr D_00190704[];
 extern struct record *nonworld_root;
 extern struct record *location_object;
 extern struct spell *spell_records;
@@ -33,11 +34,6 @@ extern struct record *monster_make_item(struct record *, int, int, int, int, int
 extern int rand_range(int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
-extern int rand();
-extern int mc_free();
-extern int mc_memset();
-extern int read();
-extern int mc_memcpy();
 extern void character_update_armor_values(struct record *);
 extern void item_make(int, int, struct item *);
 extern void item_damage(struct record *, int);
@@ -54,10 +50,10 @@ void monster_reload_anims(void)
     int slot;
 
     for (slot = 0; slot < 128; slot++) {
-        if (*(int *)(D_00190704 + (slot << 2)) != 0) {
-            if (*(int *)(D_00190704 + (slot << 2)) != 0 && *(int *)(D_00190704 + (slot << 2)) != (-1751672937)) {
-                mc_free(*(int *)(D_00190704 + (slot << 2)), (iptr)D_00176844, 211);
-                *(int *)(D_00190704 + (slot << 2)) = -1751672937;
+        if (D_00190704[slot] != 0) {
+            if (D_00190704[slot] != 0 && D_00190704[slot] != (-1751672937)) {
+                mc_free((void *)D_00190704[slot], D_00176844, 211);
+                D_00190704[slot] = -1751672937;
             }
         }
     }
@@ -191,7 +187,7 @@ void monster_give_spells(struct record *monster, char *spell_ids)
         spell->type = 9;
         spell->flags = 1;
         spell->id = object_new_id(((unsigned)monster->id) >> 16);
-        mc_memcpy(&spell->data.spell, &spell_records[spell_index], 89, (iptr)D_00176844, 370, 4);
+        mc_memcpy(&spell->data.spell, &spell_records[spell_index], 89, D_00176844, 370, 4);
         i++;
     }
 }
@@ -201,7 +197,7 @@ void monster_give_equipment(struct record *monster, struct character *monster_ch
     int poison_chance;
     int i;
 
-    mc_memset(monster_char->equipped, 0, 108, (iptr)D_00176844, 400, 108);
+    mc_memset(monster_char->equipped, 0, 108, D_00176844, 400, 108);
     switch ((unsigned)tier) {
     case 0:
         monster_char->equipped[19] = monster_make_item(monster, 3, 5, 7, -1, 100);
@@ -301,7 +297,7 @@ int savetree_read_chunk(struct record *buffer)
 {
     int size;
 
-    read(save_file_handle, (iptr)&size, 4);
+    read(save_file_handle, &size, 4);
     read(save_file_handle, buffer, size);
     return size;
 }

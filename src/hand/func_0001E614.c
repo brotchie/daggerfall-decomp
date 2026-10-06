@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001E614 */
 #include "records.h"
+#include "clib.h"
 struct bits { unsigned char lo:4; unsigned char b4:1; unsigned char b5:2; };
 extern char D_001704CC[];
 extern char D_00170530[];
@@ -16,11 +17,7 @@ extern char cfg_block_str[];
 extern char cfg_debug;
 extern int archive_find_record(int, char *, int);
 extern iptr archive_read_record(int, int, iptr);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern char *itoa(int, char *, int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern void mc_sprintf(char *, char *, ...);
 
 void town_block_load_rmb(int block_index)
 {

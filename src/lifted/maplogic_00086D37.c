@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern int dungeon_water_level;
 extern char D_00176C94[];
@@ -24,9 +25,7 @@ extern char terrain_cell_dirty[];
 extern int terrain_cell_at_player;
 
 extern struct record *object_reparent(struct record *, struct record *);
-extern int mc_memset();
-extern int mc_memcpy();
-extern int xn_world_reload();
+extern void xn_world_reload(void);
 extern void automap_free_town_map(void);
 extern void automap_save(void);
 extern void people_clear(void);
@@ -56,7 +55,7 @@ void location_unload(int image)
         object_foreach(player_entity->children, inv_assign_item_id);
         people_clear();
         creature_count = 0;
-        mc_memset((iptr)((char *)creature_list), 0, 512, (iptr)D_00176C94, 450, 512);
+        mc_memset(((char *)creature_list), 0, 512, D_00176C94, 450, 512);
         object_delete_block((iptr)location_object->children, location_object->id);
         location_id = location_object->id;
         location_object->image = 65535;
@@ -64,8 +63,8 @@ void location_unload(int image)
         model_cache_flush_count = 1;
         D_00187F2C = 0;
         location_free(&loaded_location);
-        mc_memset((iptr)&loaded_location, 0, 20, (iptr)D_00176C94, 461, 4);
-        mc_memset((iptr)current_location, 0, 48, (iptr)D_00176C94, 462, 4);
+        mc_memset(&loaded_location, 0, 20, D_00176C94, 461, 4);
+        mc_memset(current_location, 0, 48, D_00176C94, 462, 4);
         automap_save();
         automap_free_town_map();
         if (((int)player_environment) == 3) {
@@ -74,11 +73,11 @@ void location_unload(int image)
             terrain_cell_at_player = -1;
             func_00064301();
             xn_world_reload();
-            mc_memset((iptr)terrain_cell_dirty, 0, 16, (iptr)D_00176C94, 477, 16);
-            mc_memset((iptr)terrain_cell_ids, 0, 16, (iptr)D_00176C94, 478, 16);
+            mc_memset(terrain_cell_dirty, 0, 16, D_00176C94, 477, 16);
+            mc_memset(terrain_cell_ids, 0, 16, D_00176C94, 478, 16);
             camera_object->yaw = player_object->yaw;
             if ((location_id - 65536) == D_00187F28) {
-                mc_memcpy((int)(iptr)player_object, (iptr)saved_player_object, 55, (iptr)D_00176C94, 483, 4);
+                mc_memcpy(player_object, saved_player_object, 55, D_00176C94, 483, 4);
             } else {
                 D_00187F2C++;
             }

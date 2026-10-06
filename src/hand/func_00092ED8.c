@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00092ED8 */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 #pragma pack(1)
 extern char *screen_buffer;
 extern char D_0017704C[];
@@ -8,7 +9,7 @@ extern struct rect inv_mode_buttons[][7];   /* 5 trade modes */
 extern struct rect inv_buttons[];
 extern signed char text_buffer[];
 extern unsigned char player_motion_flags;
-extern int wagon_container;
+extern iptr wagon_container;
 extern char *D_00195B64;
 extern struct character *player_character;
 extern int game_minutes;
@@ -22,7 +23,7 @@ extern char *D_001AA420;
 extern struct image *D_001AA434;
 extern struct image *D_001AA438;
 extern struct image *D_001AA43C;
-extern int inv_left_container;
+extern iptr inv_left_container;
 extern unsigned char D_001AA5F8;
 extern unsigned char inv_tab;
 extern int holiday_today(int, int);
@@ -40,10 +41,8 @@ extern void inv_draw_scroll_arrows(void);
 extern int trade_total_sell(void);
 extern void trade_total_identify(void);
 extern void inv_draw_armor_values(void);
-extern char *itoa(int, char *, int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int xn_draw_copy_rect_stride_bytes();
-extern int xn_draw_image();
+extern int xn_draw_copy_rect_stride_bytes(char *, char *, int, int, int);
+extern void xn_draw_image(int, int, int, int, char *);
 
 void inventory_draw(void)
 {

@@ -9,21 +9,37 @@ FALL.EXE cannot change, and `long` in the native build. This tool:
   - follows each value that holds an address to where it is kept, and retypes that place
     iptr/uptr: a local, a parameter, a global, a struct field, a function's return. A
     parameter, return or global is retyped in every file that declares it (each file declares
-    what it uses);
+    what it uses), and wherever one declaration (or the definition) is pointer-wide, all are;
   - finds the places that hold addresses from the other side as well: an int cast to a
-    pointer, compared with one, or passed where a pointer is wanted;
-  - writes a pointer difference kept in an int as `(int)(p - q)`: an offset, not an address.
-It repeats until nothing changes (a fixed point). Everything it writes is the same code under
-Watcom (iptr is int there), so the matching build cannot change; tools/build-and-verify.sh
-checks it anyway.
+    pointer, compared with one, read through `*(char **)&x`, or stored in a 4-byte slot
+    (`*(int *)g` where another file declares g a pointer: `*(iptr *)g`);
+  - writes a number made from addresses (`p - q`, a product, a sizeof...) kept in an int as
+    `(int)(p - q)`, and the lifter's integer arithmetic written as pointer arithmetic
+    (`(int)&*(char *)((char *)(y) + 2)`, Watcom's lea) as `(int)(iptr)...(char *)(iptr)(y)`:
+    numbers, not addresses;
+  - makes the conversions a prototype asks for explicit (tools/port_protos.py adds the
+    prototypes): an int passed or assigned where a pointer goes gets a cast, `(iptr)p` passed
+    where a pointer goes loses its cast, a pointer used as an int gets `(iptr)`.
+It repeats until nothing changes (a fixed point), then settles the lea forms and repeats again.
+Everything it writes is the same code under Watcom except the explicit conversions, which are
+no-ops there too; tools/build-and-verify.sh checks every batch.
 
   port_iptr.py run [--in-place] [--max-iter N] [--log FILE] [FILES]
-  port_iptr.py show FILE          what one file's AST asks for (no changes)
+        [--globals NAMES]   also retype these globals (tables of addresses declared int:
+                            tools/port_data.py's `narrow` list)
+        [--returns F ...]   also retype these functions' returns (callbacks read through one
+                            function pointer type)
+        [--tidy]            also drop the round trip of `(T *)(iptr)p`; not always the same
+                            code (Watcom's register choice can follow the cast): verify
+  port_iptr.py show FILE    what one file's AST asks for (no changes)
 
-Places it cannot retype are logged (`residue`): an address kept in a short or a char, an
-address stored through a cast to `int *` (a 4-byte slot that natively needs 8: those are
-retyped `(iptr *)` and listed, since the slot's layout changes), calls through function
-pointers, initialiser lists.
+The log lists each retyped declaration with the use that asked for it, the places it could
+not handle (`residue`: an address kept in a short or a char, a cast inside a macro's body, a
+number the lifter reads as a pointer), and the slots retyped `(iptr *)` (4-byte memory that
+natively holds 8: its layout changes).
+
+Known numbers (NOT_ADDR: hp_cost, game_minutes, head_bob_offset), ids kept in pointer fields
+(NEVER_FIELDS: id) and library calls that return no address (INT_LIBC) stop the dataflow.
 """
 import argparse
 import collections
@@ -51,7 +67,10 @@ def game_files():
 
 
 def editable(path):
-    """Files this pass may change: the game's C and its headers."""
+    """Files this pass may change: the game's C and its headers (not clib.h, which declares
+    the library as it is)."""
+    if path == "include/clib.h":
+        return False
     return path.startswith(("src/lifted/", "src/hand/", "include/")) or \
         (path.startswith("src/") and path.count("/") == 1)
 
@@ -115,6 +134,10 @@ def where(locd):
         return None, None, False
     if "expansionLoc" in locd:
         e = locd["expansionLoc"]
+        if e.get("isMacroArgExpansion") and "spellingLoc" in locd:
+            # a macro's argument (port.h's read(...)): its text is where it was written
+            s = locd["spellingLoc"]
+            return s.get("_file"), s.get("offset"), False
         return e.get("_file"), e.get("offset"), True
     return locd.get("_file"), locd.get("offset"), False
 
@@ -174,7 +197,8 @@ def end_of(rng):
     f, o, _m = where(rng["end"])
     e = rng["end"]
     if "expansionLoc" in e:
-        e = e["expansionLoc"]
+        e = e["spellingLoc"] if e["expansionLoc"].get("isMacroArgExpansion") and \
+            "spellingLoc" in e else e["expansionLoc"]
     return o + e.get("tokLen", 0)
 
 
@@ -227,7 +251,7 @@ INT_LIBC = {"atoi", "strlen", "abs", "rand", "stricmp", "strcmp", "strncmp", "st
 # pointer to it goes (`arg->object = (struct record *)arg->object->id`)
 NEVER_FIELDS = {"id"}
 # ints the lifter reads as pointers for the arithmetic (`*(char **)&hp_cost + k`): numbers
-NOT_ADDR = {"hp_cost"}
+NOT_ADDR = {"hp_cost", "game_minutes", "head_bob_offset"}
 
 
 def int_globals_scan(files):
@@ -240,7 +264,16 @@ def int_globals_scan(files):
     return out
 
 
-def analyze(path, final=False, int_globals=frozenset()):
+def ptr_globals_scan(files):
+    """The globals some file declares pointer-wide (`extern char *g;`, `extern iptr g;`)."""
+    out = set()
+    pat = re.compile(r"^extern\s+(?:[^;()]*\*\s*|(?:[iu]ptr)\s+)(\w+)\s*;", re.M)
+    for f in files + ["include/dagger.h", "include/records.h", "include/structs.h"]:
+        out |= set(pat.findall(open(os.path.join(ROOT, f), encoding="latin-1").read()))
+    return out
+
+
+def analyze(path, final=False, int_globals=frozenset(), ptr_globals=frozenset(), tidy=False):
     """The facts one translation unit gives: the declarations it holds, the places that must
     hold addresses, and the text edits (casts) it needs. With `final`, also the lifter's
     integer arithmetic written as pointer arithmetic (is_lea) whose base nothing showed to be
@@ -300,6 +333,9 @@ def analyze(path, final=False, int_globals=frozenset()):
         ident = ident_of_decl(d, None)
         if ident is None:
             note(ff.residue, n, "declaration without identity (%s)" % d.get("kind"))
+            return
+        if ident[0] == "g" and ident[1] in NOT_ADDR:
+            note(ff.residue, n, "%s (a number) given an address" % ident[1])
             return
         add_want((ident, mode))
 
@@ -536,7 +572,7 @@ def analyze(path, final=False, int_globals=frozenset()):
             d = decl_of(b.get("referencedDecl"))
             if d is not None and d.get("kind") == "VarDecl" and \
                     (d.get("_p") or {}).get("kind") == "TranslationUnitDecl" and \
-                    d.get("name") in int_globals and dqt(d).endswith("*"):
+                    d.get("name") in NOT_ADDR and dqt(d).endswith("*"):
                 note(ff.puns, b, "%s declared %s here, an int elsewhere" % (d.get("name"), dqt(d)))
                 return b
         if b is not None and b.get("kind") == "UnaryOperator" and b.get("opcode") == "*":
@@ -558,9 +594,56 @@ def analyze(path, final=False, int_globals=frozenset()):
             return None
         if b is None or b.get("kind") != "CStyleCastExpr" or b.get("castKind") != "IntegralToPointer":
             return None
-        if is_wide(strip(kids(b)[0])):
+        if is_wide(strip(kids(b)[0])) and classify(kids(b)[0]) != {"num"}:
             return None
         return b
+
+    def tidy_cast(n):
+        """`(T *)(iptr)p` with p a pointer: the round trip through an integer goes (and the
+        outer cast too when p is a T * already)."""
+        c = kids(n)[0]
+        while c is not None and c.get("kind") == "ParenExpr":
+            c = kids(c)[0]
+        if c is None or c.get("kind") != "CStyleCastExpr" or c.get("castKind") != "PointerToIntegral" \
+                or not is_wide(c):
+            return False
+        e = kids(c)[0]
+        f, o, m = where(n["range"]["begin"])
+        cf, co, cm = where(c["range"]["begin"])
+        ef, eo, em = where(e["range"]["begin"])
+        if m or cm or em or f != cf or not f or not editable(f):
+            return False
+        mm = re.match(r"\(\s*[iu]ptr\s*\)", text(f)[co:co + 10])
+        if not mm:
+            return False
+        et = dqt(e)
+        if re.sub(r"\s+", "", et) == re.sub(r"\s+", "", dqt(n)) and \
+                (n.get("_p") or {}).get("kind") in ("ParenExpr", "CallExpr", "ImplicitCastExpr"):
+            ff.edits.append((f, o, co + mm.end(), "", "tidy"))
+        else:
+            ff.edits.append((f, co, co + mm.end(), "", "tidy"))
+        return True
+
+    def int_slot_of_ptr_global(n):
+        """`*(int *)g` where this file declares g as bytes and another file as a pointer: the
+        slot holds the pointer, so it is read pointer-wide (`*(iptr *)g`)."""
+        o = kids(n)[0]
+        while o is not None and o.get("kind") in ("ParenExpr", "ImplicitCastExpr"):
+            o = kids(o)[0]
+        if o is None or o.get("kind") != "CStyleCastExpr" or \
+                re.sub(r"\s+", "", dqt(o)) not in ("int*", "unsignedint*"):
+            return False
+        g = kids(o)[0]
+        while g is not None and g.get("kind") in ("ParenExpr", "ImplicitCastExpr"):
+            g = kids(g)[0]
+        if g is None or g.get("kind") != "DeclRefExpr":
+            return False
+        d = decl_of(g.get("referencedDecl"))
+        if d is None or d.get("kind") != "VarDecl" or d.get("name") not in ptr_globals or \
+                d.get("name") in NOT_ADDR or not re.match(r"^(signed |unsigned )?char ?\[", dqt(d)):
+            return False
+        slot_cast(o, "pointer global read as an int")
+        return True
 
     def punned_load(n):
         """`*(char **)p`: memory read as a pointer through a cast; returns p."""
@@ -582,16 +665,95 @@ def analyze(path, final=False, int_globals=frozenset()):
     def insert_after_cast(cast, word, why):
         """`(T *)(x)` -> `(T *)(iptr)(x)`."""
         f, o, m = where(cast["range"]["begin"])
-        if m or not f or not editable(f):
+        cf, co, cm = where(kids(cast)[0]["range"]["begin"])
+        if m or cm:
+            # in a macro's body: edit the body when the game's file defines the macro (not
+            # when the operand starts with one of the macro's arguments)
+            f, o = spelling(cast["range"]["begin"])
+            cf, co = spelling(kids(cast)[0]["range"]["begin"])
+            if cf != f or kids(cast)[0]["range"]["begin"].get("expansionLoc", {}).get(
+                    "isMacroArgExpansion"):
+                note(ff.residue, cast, "cast inside a macro")
+                return
+        if not f or not editable(f):
             note(ff.residue, cast, "cast inside a macro")
             return
-        t = text(f)
-        c = strip(kids(cast)[0])
-        cf, co, cm = where(kids(cast)[0]["range"]["begin"])
-        if cm or co is None or co <= o:
+        if co is None or co <= o:
             note(ff.residue, cast, "cast operand position")
             return
         ff.edits.append((f, co, co, word, why))
+
+    SIMPLE = {"DeclRefExpr", "MemberExpr", "ArraySubscriptExpr", "CallExpr", "ParenExpr",
+              "IntegerLiteral", "CharacterLiteral", "StringLiteral", "CStyleCastExpr",
+              "UnaryOperator", "UnaryExprOrTypeTraitExpr"}
+
+    def operand(n):
+        """The written expression under implicit casts."""
+        while n is not None and n.get("kind") == "ImplicitCastExpr":
+            n = kids(n)[0]
+        return n
+
+    def cast_before(c, word, why):
+        """`word` (a cast) before the expression c, in parentheses unless c is simple."""
+        f, b, m = where(c["range"]["begin"])
+        if m and operand(c).get("kind") == "CallExpr":
+            # a call through one of port.h's macros (fopen(...)): before the macro's name
+            e0 = c["range"]["begin"].get("expansionLoc", {})
+            f, b, m = e0.get("_file"), e0.get("offset"), False
+        if m or not f or not editable(f):
+            note(ff.residue, c, "conversion inside a macro")
+            return
+        e = end_of(c["range"])
+        if operand(c).get("kind") in SIMPLE:
+            ff.edits.append((f, b, b, word, why))
+        else:
+            ff.edits.append((f, b, b, word + "(", why))
+            ff.edits.append((f, e, e, ")", why))
+
+    def spelled_cast(s):
+        """(file, start, end, int or iptr) of the cast text of a CStyleCastExpr `(iptr)`."""
+        f, o, m = where(s["range"]["begin"])
+        if m or not f or not editable(f):
+            return None
+        mm = re.match(r"\(\s*(int|unsigned|unsigned int|[iu]ptr)\s*\)\s*(\(\s*[iu]ptr\s*\))?",
+                      text(f)[o:o + 40])
+        if not mm:
+            return None
+        return f, o, o + mm.end()
+
+    def fix_to_pointer(n):
+        """An int used where a pointer goes (a prototype's parameter, an assignment): an
+        explicit cast; `(iptr)p` loses its cast."""
+        dest = qt(n)
+        c = kids(n)[0]
+        s = strip(operand(c))
+        e = None
+        if s is not None and s.get("kind") == "CStyleCastExpr":
+            if s.get("castKind") == "PointerToIntegral":
+                e = kids(s)[0]
+            elif s.get("castKind") == "IntegralCast":
+                inner = strip(kids(s)[0])
+                if inner is not None and inner.get("kind") == "CStyleCastExpr" and \
+                        inner.get("castKind") == "PointerToIntegral":
+                    e = kids(inner)[0]
+        if e is not None:
+            sc = spelled_cast(s)
+            if sc is None:
+                note(ff.residue, n, "cast to an int not spelled as expected")
+                return
+            f, a, b = sc
+            et = dqt(e)
+            if dqt(n) == "void *" and "(*)" not in et or re.sub(r"\s+", "", et) == re.sub(r"\s+", "", dqt(n)):
+                ff.edits.append((f, a, b, "", "fix"))
+            else:
+                ff.edits.append((f, a, b, "(%s)" % dest, "fix"))
+            return
+        cast_before(c, "(%s)" % dest, "fix")
+
+    def fix_to_int(n):
+        """A pointer used where an int goes: `(iptr)`."""
+        c = kids(n)[0]
+        cast_before(c, "(uptr)" if dqt(n).startswith("unsigned") else "(iptr)", "fix")
 
     def small_const(n):
         n = strip(n)
@@ -721,6 +883,12 @@ def analyze(path, final=False, int_globals=frozenset()):
             if f and o is not None:
                 seed[0] = "%s %s" % (lineof(f, o), k)
         if k == "CStyleCastExpr" and n.get("castKind") == "PointerToIntegral":
+            if dqt(n) in WIDE and final and lea_base(n) is not None and \
+                    (n.get("_p") or {}).get("kind") != "CStyleCastExpr":
+                # an earlier pass made the lifter's integer arithmetic `(iptr)`: it is a number
+                f, o, m = where(n["range"]["begin"])
+                if f and not m and editable(f) and re.match(r"\(\s*iptr\s*\)", text(f)[o:o + 10]):
+                    ff.edits.append((f, o, o, "(int)", "lea"))
             if dqt(n) in NARROW_INT:
                 f, o, m = where(n["range"]["begin"])
                 if m:
@@ -739,10 +907,18 @@ def analyze(path, final=False, int_globals=frozenset()):
                             ff.edits.append((f, o, o + mm.end(), "(%s)" % w, "cast"))
                     else:
                         note(ff.residue, n, "pointer cast not spelled (int): %r" % t[o:o + 20])
+        elif k == "CStyleCastExpr" and n.get("castKind") == "IntegralToPointer" and tidy and \
+                tidy_cast(n):
+            pass
         elif k in ("CStyleCastExpr", "ImplicitCastExpr") and n.get("castKind") == "IntegralToPointer":
             c = kids(n)[0]
-            if id(n) in lea_inner:
-                if final and not is_const(c):
+            idf = strip(operand(c))
+            if idf is not None and idf.get("kind") == "MemberExpr" and \
+                    idf.get("name") in NEVER_FIELDS and k == "CStyleCastExpr":
+                # an id kept where a pointer goes (the save's links): a number
+                insert_after_cast(n, "(uptr)" if dqt(idf).startswith("unsigned") else "(iptr)", "id")
+            elif id(n) in lea_inner:
+                if final and not is_const(c) and not is_wide(strip(c)):
                     insert_after_cast(n, "(iptr)", "lea")
             elif not is_wide(strip(c)) and not is_const(c):
                 st = source(c, "to pointer")
@@ -752,15 +928,17 @@ def analyze(path, final=False, int_globals=frozenset()):
                             insert_after_cast(n, "(iptr)", "int")
                     else:
                         note(ff.residue, n, "int that is no address used as a pointer")
-                elif st == "ok" and k == "ImplicitCastExpr":
-                    note(ff.residue, n, "pointer cast to int, then used as a pointer")
+            if k == "ImplicitCastExpr":
+                fix_to_pointer(n)
         elif k == "ImplicitCastExpr" and n.get("castKind") == "IntegralCast" and \
                 dqt(n) in NARROW_INT and is_wide(kids(n)[0]):
             inner = kids(n)[0]
             narrowed(n, inner, lambda: dest_of_narrowing(n))
         elif k == "ImplicitCastExpr" and n.get("castKind") == "PointerToIntegral" and \
-                dqt(n) in NARROW_INT:
-            dest_of_narrowing(n)
+                (dqt(n) in NARROW_INT or dqt(n) in WIDE):
+            fix_to_int(n)
+        elif k == "UnaryOperator" and n.get("opcode") == "*" and int_slot_of_ptr_global(n):
+            pass
         elif k == "UnaryOperator" and n.get("opcode") == "*" and punned_load(n) is not None:
             x = strip(punned_load(n))
             if x is not None and x.get("kind") == "UnaryOperator" and x.get("opcode") == "&":
@@ -813,6 +991,33 @@ def new_base(spec_text):
     if not m:
         return None
     return m, ("uptr" if m.group(1).startswith("unsigned") else "iptr")
+
+
+def wide_decl(site):
+    """Whether a declaration gives its place a pointer-wide type (a pointer, iptr, uptr)."""
+    ident, _f, _b, _lo, _e, dq, q = site
+    if ident[0] == "f":
+        dq = re.match(r"^(.*?)\s*\(.*\)$", dq).group(1) if "(" in dq else dq
+        q = q.split("(")[0]
+    else:
+        dq = re.sub(r"\[[^\]]*\]", "", dq).strip()
+    return dq.endswith("*") or "(*)" in dq or bool(re.search(r"\b[iu]ptr\b", q))
+
+
+def agreement_wants(sites):
+    """Every file must see a pointer-wide type where any declaration (or the definition) of
+    the same function parameter, return or global has one."""
+    by_ident = collections.defaultdict(list)
+    for s in sites:
+        if s[0][0] in ("f", "p", "g"):
+            by_ident[s[0]].append(s)
+    out = set()
+    for ident, ss in by_ident.items():
+        if ident[0] == "g" and (ident[1] in NOT_ADDR or re.match(r"^scratch_[0-9a-f]{6}$", ident[1])):
+            continue        # a number one file reads as a pointer; scratch reused for both
+        if any(wide_decl(s) for s in ss) and not all(wide_decl(s) for s in ss):
+            out.add((ident, "r" if ident[0] == "f" else "v"))
+    return out
 
 
 def plan_decl_edits(sites, wants, texts):
@@ -980,17 +1185,19 @@ def ensure_include(text):
 
 # ---- the driver -----------------------------------------------------------------------------
 
-def run(files, in_place, max_iter, log, extra_wants=()):
+def run(files, in_place, max_iter, log, extra_wants=(), tidy=False):
     """Iterate to a fixed point; then settle the lifter's integer arithmetic (final) and
     iterate again, until a final round changes nothing."""
     os.chdir(ROOT)
     total_done, whys = [], {}
     all_res, all_slots = [], []
     final = False
+    ptr_globals_seen = ptr_globals_scan(files)
     for it in range(1, max_iter + 1):
         with ThreadPoolExecutor(os.cpu_count()) as ex:
             ig = frozenset(int_globals_scan(files))
-            facts = list(ex.map(lambda p: analyze(p, final, ig), files))
+            pg = frozenset(ptr_globals_seen)
+            facts = list(ex.map(lambda p: analyze(p, final, ig, pg, tidy), files))
         sites, wants, edits, res, slots = [], set(extra_wants), [], [], []
         puns = []
         for ff in facts:
@@ -1003,6 +1210,11 @@ def run(files, in_place, max_iter, log, extra_wants=()):
             for w, y in ff.why.items():
                 whys.setdefault(w, y)
         sites = list(set(sites))
+        ptr_globals_seen |= {s[0][1] for s in sites if s[0][0] == "g" and wide_decl(s)}
+        agree = agreement_wants(sites)
+        for w in agree:
+            whys.setdefault(w, "another declaration is pointer-wide")
+        wants |= agree
         texts = {}
         for f in {s[1] for s in sites} | {e[0] for e in edits}:
             texts[f] = open(os.path.join(ROOT, f), encoding="latin-1").read()
@@ -1047,6 +1259,12 @@ def main():
     ap.add_argument("--in-place", action="store_true")
     ap.add_argument("--max-iter", type=int, default=40)
     ap.add_argument("--log", help="write the retyped declarations, residue and slots here")
+    ap.add_argument("--tidy", action="store_true", help="also drop the integer round trip of "
+                    "`(T *)(iptr)p` (not always the same code: verify with Watcom)")
+    ap.add_argument("--returns", nargs="*", help="functions whose return to retype iptr (the "
+                    "callbacks a caller reads through one function pointer type)")
+    ap.add_argument("--globals", help="a file of global names to retype iptr as well (tables of "
+                    "addresses declared int: tools/port_data.py's `narrow` list)")
     a = ap.parse_args()
     os.chdir(ROOT)
     files = a.files or game_files()
@@ -1063,7 +1281,12 @@ def main():
             for s in ff.slots:
                 print("slot", s)
         return
-    done, res, slots = run(files, a.in_place, a.max_iter, print)
+    extra = set()
+    if a.globals:
+        extra = {(("g", n.strip()), "v") for n in open(a.globals) if n.strip()}
+    for w in a.returns or ():
+        extra.add((("f", w), "r"))
+    done, res, slots = run(files, a.in_place, a.max_iter, print, extra, a.tidy)
     print("%d declarations retyped; %d residue notes; %d slots" % (len(done), len(res), len(slots)))
     if a.log:
         with open(a.log, "w") as f:

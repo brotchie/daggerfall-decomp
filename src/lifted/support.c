@@ -4,6 +4,7 @@
 #include <i86.h>
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -59,8 +60,8 @@ extern struct character *player_character;
 extern int game_minutes;
 extern iptr hud_message_ptrs[];
 extern iptr D_00195C3C;
-extern char scratch_buffer[];
-extern void (*grid_visit_func)();
+extern char *scratch_buffer;
+extern void (*grid_visit_func)(struct record *, void (*)());
 extern int D_00195CF0;
 extern int spell_cast_queue_count;
 extern int free_later_count;
@@ -91,7 +92,7 @@ extern struct record *nearest_fire;
 extern int D_001A3F40;
 extern char spell_cast_queue_list[];
 extern char D_001A4FEC[];
-extern char free_later_list[];
+extern iptr free_later_list[];
 extern signed char mode_stack[];
 extern signed char D_001A53E9[];
 extern int D_001A5408[];
@@ -123,34 +124,25 @@ extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_reparent(struct record *, struct record *);
-extern int object_find(struct record *, int (*)());
+extern int object_find(struct record *, iptr (*)());
 extern struct record *object_find_by_id(struct record *, iptr);
 extern int object_new_id(int);
-extern int rand();
-extern int mc_memset();
-extern int mc_strncpy();
-extern int strlen();
-extern int toupper();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern iptr memchr();
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
-extern int xn_math_angle_to_point();
-extern int xn_timer_read_pit();
-extern int xn_mouse_poll_clamped();
-extern int xn_mouse_cursor_move();
-extern int xn_font_select();
-extern iptr xn_tex_cache_lookup_image();
-extern int xn_tex_cache_flush();
-extern int xn_kbd_read_key();
-extern int xn_draw_image();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
+extern int xn_timer_read_pit(void);
+extern int xn_mouse_poll_clamped(void);
+extern void xn_mouse_cursor_move(int, int);
+extern int xn_font_select(int);
+extern void *xn_tex_cache_lookup_image(int, int);
+extern void xn_tex_cache_flush(void);
+extern int xn_kbd_read_key(void);
+extern void xn_draw_image(int, int, int, int, char *);
 extern void msgbox_show_string(char *, short);
 extern void msgbox_show_quest_text(struct quest *, short, int);
 extern void msgbox_show_rsc(int, int);
 extern void holiday_announce(void);
-extern void cast_spell_on(int, int, int);
+extern void cast_spell_on(iptr, iptr, int);
 extern void text_draw_coloured(iptr, int, int, int, unsigned char);
 extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern void detect_consider_creature(struct record *, int);
@@ -172,8 +164,8 @@ iptr hud_message_add(char *);
 int picklist_frame(struct picklist *);
 struct building *object_building(struct record *);
 int gold_total(void);
-int gold_find_credit_cb(struct record *);
-int gold_spend_credit_cb(struct record *);
+iptr gold_find_credit_cb(struct record *);
+iptr gold_spend_credit_cb(struct record *);
 struct record *gold_find_credit(int);
 int carry_capacity(void);
 void object_free_later(struct record *);
@@ -287,7 +279,7 @@ int wait_key_from_list(signed char *keys, short key_count)
                 }
             }
         }
-        mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00176A10, 234, 4);
+        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00176A10, 234, 4);
     }
     return -2;
 }
@@ -390,7 +382,7 @@ int picklist_frame(struct picklist *picklist)
 
 int list_popup_update(void)
 {
-    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, (iptr)list_popup_image->pixels);
+    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, list_popup_image->pixels);
     return picklist_frame((struct picklist *)list_popup_picklist);
 }
 
@@ -402,7 +394,7 @@ int rand_range(int low, int high)
 void object_free_later(struct record *object)
 {
     if (object == 0) return;
-    *(iptr *)(free_later_list + (free_later_count++ << 2)) = (iptr)object;
+    free_later_list[free_later_count++] = (iptr)object;
 }
 
 void object_free_pending(void)
@@ -410,7 +402,7 @@ void object_free_pending(void)
     int i;
 
     for (i = 0; i < free_later_count; i++) {
-        object_delete((struct record *)*(iptr *)(free_later_list + (i << 2)));
+        object_delete((struct record *)free_later_list[i]);
     }
     free_later_count = 0;
 }
@@ -441,7 +433,7 @@ void world_collect_object(struct record *object)
         if (((struct bf8_4_1 *)&D_001940D6)->f != 0 && player_character->detect_kind == 2) {
             if ((object->image >> 7) == 216 || object->image == 26112) detect_consider(object);
         }
-        if ((object->image >> 7) == 210 && memchr((iptr)fire_flat_records, (int)(unsigned short)(object->image & 127), 8) != 0) {
+        if ((object->image >> 7) == 210 && memchr(fire_flat_records, (int)(unsigned short)(object->image & 127), 8) != 0) {
             distance = xn_math_approx_hypot(player_object->y - object->y, xn_math_approx_dist2d(player_object->x, player_object->z, object->x, object->z));
             if (distance < nearest_fire_distance) {
                 nearest_fire_distance = distance;
@@ -569,9 +561,9 @@ void msgbox_prompt_number(int number, char *prompt)
     char *text;
 
     D_0012B508 = 146;
-    text = *(char **)scratch_buffer + 55000;
-    mc_set_location(610, (iptr)D_00176A10);
-    mc_sprintf((iptr)text, (iptr)D_00176A27, prompt);
+    text = scratch_buffer + 55000;
+    mc_set_location(610, D_00176A10);
+    mc_sprintf(text, D_00176A27, prompt);
     text[strlen(text) + 1] = 0;
     inpstr_begin_number(number);
     msgbox_show_string(text, 2);
@@ -750,7 +742,7 @@ void save_thumbnail_capture(void)
     out = 24000;
     for (y = 0; y < 200; y += 4) {
         for (x = 0; x < 320; x += 4) {
-            *(signed char *)((char *)(iptr)(*(char **)&D_00147954 + out++)) = *(signed char *)((char *)(iptr)(*(char **)&screen_buffer + ((y * 320) + x)));
+            *(signed char *)((*(char **)&D_00147954 + out++)) = *(signed char *)((*(char **)&screen_buffer + ((y * 320) + x)));
         }
     }
 }
@@ -779,7 +771,7 @@ void func_0007EF20(void)
     struct SREGS sregs;
 
     if (D_00196281 == 0) return;
-    mc_memset(&sregs, 0, 12, (iptr)D_00176A10, 1064, 4);
+    mc_memset(&sregs, 0, 12, D_00176A10, 1064, 4);
     regs.w.ax = 257;
     regs.w.dx = D_001A5A54;
     int386x(49, &regs, &regs, &sregs);
@@ -852,7 +844,7 @@ int gold_total(void)
     return *(int *)D_00195B84 + player_character->gold;
 }
 
-int gold_find_credit_cb(struct record *object)
+iptr gold_find_credit_cb(struct record *object)
 {
     struct item *item_data;
 
@@ -865,7 +857,7 @@ int gold_find_credit_cb(struct record *object)
     return 0;
 }
 
-int gold_spend_credit_cb(struct record *object)
+iptr gold_spend_credit_cb(struct record *object)
 {
     struct item *item_data;
 
@@ -992,7 +984,7 @@ void location_restore_stored(void)
             if (stored->type == 64 && ((unsigned)stored->building_id) < game_minutes) {
                 object_delete(stored);
             } else if (stored->type == 64 && object_find_by_id(location_object, stored->building_id) != 0) {
-                mc_memcpy(&current_location->buildings[stored->image], RECORD_DATA(stored), 26, (iptr)D_00176A10, 1350, 4);
+                mc_memcpy(&current_location->buildings[stored->image], RECORD_DATA(stored), 26, D_00176A10, 1350, 4);
             }
             stored = next_stored;
         }
@@ -1025,14 +1017,14 @@ void location_store_objects(void)
                 stored_room->type = 64;
                 stored_room->image = building_index;
                 stored_room->building_id = building->id;
-                mc_memcpy(RECORD_DATA(stored_room), building, 26, (iptr)D_00176A10, 1392, 4);
+                mc_memcpy(RECORD_DATA(stored_room), building, 26, D_00176A10, 1392, 4);
             }
         }
     }
     if (player_character->house != 0 && (((unsigned)player_character->house) >> 16) == (((unsigned)location_object->id) >> 16)) {
         object_free_children(house_container);
         if ((*(iptr *)&scratch_object = (iptr)house_container) == 0) {
-            scratch_object = (struct record *)((iptr)(house_container = object_create_child(player_entity, 0, 0)));
+            scratch_object = (struct record *)((house_container = object_create_child(player_entity, 0, 0)));
             house_container->type = 52;
             house_container->flags = 3;
             house_container->container_index = 5;
@@ -1041,7 +1033,7 @@ void location_store_objects(void)
     } else if (player_character->ship_owned != 0 && ((unsigned)(((unsigned)location_object->id) >> 16)) < 1000) {
         object_free_children(ship_container);
         if ((*(iptr *)&scratch_object = (iptr)ship_container) == 0) {
-            scratch_object = (struct record *)((iptr)(ship_container = object_create_child(player_entity, 0, 0)));
+            scratch_object = (struct record *)((ship_container = object_create_child(player_entity, 0, 0)));
             ship_container->type = 52;
             ship_container->flags = 3;
             ship_container->container_index = 6;
@@ -1169,8 +1161,8 @@ L800F0:;
         if (building->type == 15) {
             tavern_building = building;
             if (tavern_room_rented() != 0) {
-                mc_set_location(1570, (iptr)D_00176A10);
-                mc_sprintf((iptr)text_buffer, (iptr)D_00176A42, building_name(building), (((unsigned)(building->rent_expires - game_minutes)) / 60) + 1);
+                mc_set_location(1570, D_00176A10);
+                mc_sprintf((char *)text_buffer, D_00176A42, building_name(building), (((unsigned)(building->rent_expires - game_minutes)) / 60) + 1);
                 hud_message_add(text_buffer);
             }
         }

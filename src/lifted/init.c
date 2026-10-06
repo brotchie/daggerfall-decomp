@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern char disk_last_file_size[];
 extern int xn_cam_x;
@@ -45,18 +46,18 @@ extern char saved_positions[];
 extern struct region regions[];
 extern signed char text_buffer[];
 extern struct record *creature_list[];
-extern char D_00190704[];
-extern int hud_compass_image;
-extern int D_00190908;
-extern int D_0019090C;
-extern int D_00190910;
+extern iptr D_00190704[];
+extern iptr hud_compass_image;
+extern iptr D_00190908;
+extern iptr D_0019090C;
+extern iptr D_00190910;
 extern char arena2_path[];
 extern char arena2_cd_path[];
 extern struct flat_cfg flats_cfg[];
 extern unsigned char D_001940D7;
 extern signed char D_001940D8;
-extern int horse_overlay_image;
-extern int cart_overlay_image;
+extern iptr horse_overlay_image;
+extern iptr cart_overlay_image;
 extern int last_skill_check_minutes;
 extern struct record *nonworld_root;
 extern struct record *logbook_object;
@@ -81,23 +82,23 @@ extern struct image *list_popup_image;
 extern struct spell *spell_records;
 extern int creature_count;
 extern struct region *current_region_data;
-extern int D_00195B64;
+extern iptr D_00195B64;
 extern struct image *hud_bar_image;
 extern iptr hud_mode_icons;
 extern iptr paperdoll_mask;
-extern char hud_portrait[];
-extern int icon_image;
+extern char *hud_portrait;
+extern iptr icon_image;
 extern char *buttons_rci;
 extern struct character *player_character;
 extern iptr window_image;
 extern struct career *player_class;
 extern int game_minutes;
 extern struct settings *game_settings;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern signed char cfg_map_file;
-extern int hud_vital_bar_images;
-extern int D_00195C80;
-extern int D_00195C84;
+extern iptr hud_vital_bar_images;
+extern iptr D_00195C80;
+extern iptr D_00195C84;
 extern int flats_cfg_count;
 extern iptr spell_cast_anim_fire[];
 extern iptr spell_cast_anim_frost;
@@ -105,16 +106,16 @@ extern iptr spell_cast_anim_poison;
 extern iptr spell_cast_anim_shock;
 extern iptr spell_cast_anim_magic;
 extern iptr D_00195CF4;
-extern int D_00195CF8;
+extern iptr D_00195CF8;
 extern iptr quest_face_images[];
-extern int D_00195D18;
-extern int D_00195D20;
-extern int D_00195D24;
+extern iptr D_00195D18;
+extern iptr D_00195D20;
+extern iptr D_00195D24;
 extern iptr magic_def;
 extern iptr hud_portrait_overlays;
 extern iptr books_path;
-extern int compass_image;
-extern int compass_box_image;
+extern iptr compass_image;
+extern iptr compass_box_image;
 extern iptr qbn_opcode_arg_counts;
 extern signed char climate_weathers[];
 extern signed char view_cursor_active;
@@ -125,11 +126,11 @@ extern signed char player_underwater;
 extern signed char fog_colour;
 extern signed char exiting;
 extern int maps_bsa;
-extern int D_001997F0;
+extern iptr D_001997F0;
 extern iptr D_001997F4;
 extern int D_001997FC;
 extern int D_00199800;
-extern int D_00199804;
+extern iptr D_00199804;
 extern int daylight;
 extern char D_001A3F60[];
 extern int D_001A3F7C;
@@ -149,52 +150,37 @@ extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int marker_count(struct record *, int);
 extern int player_to_nearest_marker(struct record *, int);
-extern int func_0009DA1C(int, iptr);
-extern int printf(char *, ...);
-extern int exit();
-extern int open(int, ...);
-extern int close();
-extern int mc_free();
-extern int mc_memset();
-extern iptr mc_malloc();
-extern int mc_strncpy();
-extern int atoi();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int unlink();
-extern int func_000A148C(iptr, ...);
-extern int func_000A18C3(iptr);
-extern int xn_anim_rand_seed();
-extern int xn_sys_restore_crit_error_handler();
-extern int xn_world_init();
-extern int xn_world_open();
-extern int xn_sys_set_dos_transfer_buffer();
-extern int xn_shade_keep_colours_0_255();
-extern int xn_draw_fullscreen_overlay_shaded();
-extern int xn_mouse_set_range_320x200();
-extern int xn_mouse_set_sensitivity();
-extern int xn_mouse_get_sensitivity();
-extern int xn_timer_wait_ticks();
-extern int xn_kbd_numlock_off();
-extern int xn_render_init();
-extern int xn_render_shutdown();
-extern int xn_render_set_mode();
-extern int xn_cam_set_focal();
-extern int xn_cam_set_view_window();
-extern int xn_mouse_init();
-extern int xn_pal_set();
-extern int xn_font_init();
-extern int xn_light_init();
-extern int xn_shade_load();
-extern int xn_kbd_install();
-extern int xn_kbd_remove();
-extern int xn_gfx_set_mode();
-extern int xn_gfx_restore_mode();
-extern int xn_gfx_clear();
-extern int xn_mem_init();
-extern int xn_mem_shutdown();
-extern int xn_shade_set_fog();
-extern int xn_joy_shutdown();
+extern void xn_anim_rand_seed(void);
+extern void xn_sys_restore_crit_error_handler(void);
+extern void xn_world_init(void);
+extern void xn_world_open(char *);
+extern void xn_sys_set_dos_transfer_buffer(void);
+extern void xn_shade_keep_colours_0_255(void);
+extern void xn_draw_fullscreen_overlay_shaded(char *);
+extern void xn_mouse_set_range_320x200(void);
+extern void xn_mouse_set_sensitivity(int, int);
+extern void xn_mouse_get_sensitivity(char *, char *);
+extern void xn_timer_wait_ticks(unsigned);
+extern void xn_kbd_numlock_off(void);
+extern void xn_render_init(void);
+extern void xn_render_shutdown(void);
+extern void xn_render_set_mode(int);
+extern void xn_cam_set_focal(int, int);
+extern void xn_cam_set_view_window(int, int, int, int);
+extern void xn_mouse_init(void);
+extern void xn_pal_set(char *);
+extern void xn_font_init(void);
+extern void xn_light_init(void);
+extern void xn_shade_load(int, int);
+extern void xn_kbd_install(void);
+extern void xn_kbd_remove(void);
+extern int xn_gfx_set_mode(int, int);
+extern void xn_gfx_restore_mode(void);
+extern void xn_gfx_clear(int);
+extern void xn_mem_init(unsigned);
+extern void xn_mem_shutdown(void);
+extern void xn_shade_set_fog(int);
+extern void xn_joy_shutdown(void);
 extern void archive_close(int);
 extern void faction_load_file(void);
 extern void faction_free(void);
@@ -253,8 +239,8 @@ void debug_show_mem_used(void)
         dpmi_get_free_memory((iptr)D_001A3F60);
         D_001A3F9C = D_001A3F90 - (D_001A3F7C << 2);
     }
-    mc_set_location(47, (iptr)D_00175040);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00175047, D_001A3F9C);
+    mc_set_location(47, D_00175040);
+    mc_sprintf((char *)text_buffer, D_00175047, D_001A3F9C);
     D_0012B508 = 146;
     text_draw(text_buffer, 246, 23);
 }
@@ -263,11 +249,11 @@ void player_refresh_paperdoll(void)
 {
     D_001940D8 |= 8;
     mem_check_crt_heap(0);
-    xn_draw_fullscreen_overlay_shaded((window_image = disk_read_file(D_00175207, 0)));
+    xn_draw_fullscreen_overlay_shaded((char *)(window_image = disk_read_file(D_00175207, 0)));
     paperdoll_draw(0, 0);
     xn_gfx_clear(0);
     if (window_image == 0 || window_image == (-1751672937)) return;
-    mc_free(window_image, (iptr)D_00175040, 246);
+    mc_free((void *)window_image, D_00175040, 246);
     window_image = -1751672937;
 }
 
@@ -323,16 +309,16 @@ void shutdown_free_all(void)
     archive_close(dagger_snd);
     archive_close(monster_bsa_handle);
     for (i = 0; ((int)(short)*(short *)&i) < 127; i++) {
-        if (*(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) != 0) {
-            if (*(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) != 0 && *(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) != (-1751672937)) {
-                mc_free(*(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)), (iptr)D_00175040, 314);
-                *(int *)(D_00190704 + (((int)(short)*(short *)&i) << 2)) = -1751672937;
+        if (D_00190704[((int)(short)*(short *)&i)] != 0) {
+            if (D_00190704[((int)(short)*(short *)&i)] != 0 && D_00190704[((int)(short)*(short *)&i)] != (-1751672937)) {
+                mc_free((void *)D_00190704[((int)(short)*(short *)&i)], D_00175040, 314);
+                D_00190704[((int)(short)*(short *)&i)] = -1751672937;
             }
         }
     }
     xn_mouse_set_sensitivity(D_001997FC, D_00199800);
     if (qbn_opcode_arg_counts != 0 && qbn_opcode_arg_counts != (-1751672937)) {
-        mc_free(qbn_opcode_arg_counts, (iptr)D_00175040, 319);
+        mc_free((void *)qbn_opcode_arg_counts, D_00175040, 319);
         qbn_opcode_arg_counts = -1751672937;
     }
     region_free_tables();
@@ -341,120 +327,120 @@ void shutdown_free_all(void)
     object_heap_shutdown();
     intrface_free();
     func_0007EF20();
-    if (*(int *)hud_portrait != 0 && *(int *)hud_portrait != (-1751672937)) {
-        mc_free(*(int *)hud_portrait, (iptr)D_00175040, 326);
-        *(int *)hud_portrait = -1751672937;
+    if ((iptr)hud_portrait != 0 && (iptr)hud_portrait != (-1751672937)) {
+        mc_free((void *)hud_portrait, D_00175040, 326);
+        *(iptr *)&hud_portrait = -1751672937;
     }
     if (D_001AA5FC != 0 && D_001AA5FC != (-1751672937)) {
-        mc_free(D_001AA5FC, (iptr)D_00175040, 327);
+        mc_free((void *)D_001AA5FC, D_00175040, 327);
         D_001AA5FC = -1751672937;
     }
     if ((iptr)spell_records != 0 && (iptr)spell_records != (-1751672937)) {
-        mc_free((iptr)spell_records, (iptr)D_00175040, 328);
+        mc_free(spell_records, D_00175040, 328);
         spell_records = (struct spell *)(iptr)-1751672937;
     }
     if ((iptr)buttons_rci != 0 && (iptr)buttons_rci != (-1751672937)) {
-        mc_free((iptr)buttons_rci, (iptr)D_00175040, 329);
+        mc_free(buttons_rci, D_00175040, 329);
         *(int *)&buttons_rci = -1751672937;
     }
     if (icon_image != 0 && icon_image != (-1751672937)) {
-        mc_free(icon_image, (iptr)D_00175040, 330);
+        mc_free((void *)icon_image, D_00175040, 330);
         icon_image = -1751672937;
     }
     if (hud_vital_bar_images != 0 && hud_vital_bar_images != (-1751672937)) {
-        mc_free(hud_vital_bar_images, (iptr)D_00175040, 331);
+        mc_free((void *)hud_vital_bar_images, D_00175040, 331);
         hud_vital_bar_images = -1751672937;
     }
     if (D_00195C80 != 0 && D_00195C80 != (-1751672937)) {
-        mc_free(D_00195C80, (iptr)D_00175040, 332);
+        mc_free((void *)D_00195C80, D_00175040, 332);
         D_00195C80 = -1751672937;
     }
     if (D_00195C84 != 0 && D_00195C84 != (-1751672937)) {
-        mc_free(D_00195C84, (iptr)D_00175040, 333);
+        mc_free((void *)D_00195C84, D_00175040, 333);
         D_00195C84 = -1751672937;
     }
     if (hud_compass_image != 0 && hud_compass_image != (-1751672937)) {
-        mc_free(hud_compass_image, (iptr)D_00175040, 334);
+        mc_free((void *)hud_compass_image, D_00175040, 334);
         hud_compass_image = -1751672937;
     }
     if (D_00190908 != 0 && D_00190908 != (-1751672937)) {
-        mc_free(D_00190908, (iptr)D_00175040, 335);
+        mc_free((void *)D_00190908, D_00175040, 335);
         D_00190908 = -1751672937;
     }
     if (D_0019090C != 0 && D_0019090C != (-1751672937)) {
-        mc_free(D_0019090C, (iptr)D_00175040, 336);
+        mc_free((void *)D_0019090C, D_00175040, 336);
         D_0019090C = -1751672937;
     }
     if (D_00190910 != 0 && D_00190910 != (-1751672937)) {
-        mc_free(D_00190910, (iptr)D_00175040, 337);
+        mc_free((void *)D_00190910, D_00175040, 337);
         D_00190910 = -1751672937;
     }
     if (magic_def != 0 && magic_def != (-1751672937)) {
-        mc_free(magic_def, (iptr)D_00175040, 338);
+        mc_free((void *)magic_def, D_00175040, 338);
         magic_def = -1751672937;
     }
     if (D_00199804 != 0 && D_00199804 != (-1751672937)) {
-        mc_free(D_00199804, (iptr)D_00175040, 339);
+        mc_free((void *)D_00199804, D_00175040, 339);
         D_00199804 = -1751672937;
     }
     if (D_001997F0 != 0 && D_001997F0 != (-1751672937)) {
-        mc_free(D_001997F0, (iptr)D_00175040, 340);
+        mc_free((void *)D_001997F0, D_00175040, 340);
         D_001997F0 = -1751672937;
     }
     if (D_00195D24 != 0 && D_00195D24 != (-1751672937)) {
-        mc_free(D_00195D24, (iptr)D_00175040, 341);
+        mc_free((void *)D_00195D24, D_00175040, 341);
         D_00195D24 = -1751672937;
     }
     if (D_00195CF8 != 0 && D_00195CF8 != (-1751672937)) {
-        mc_free(D_00195CF8, (iptr)D_00175040, 342);
+        mc_free((void *)D_00195CF8, D_00175040, 342);
         D_00195CF8 = -1751672937;
     }
     if (D_00195B64 != 0 && D_00195B64 != (-1751672937)) {
-        mc_free(D_00195B64, (iptr)D_00175040, 343);
+        mc_free((void *)D_00195B64, D_00175040, 343);
         D_00195B64 = -1751672937;
     }
     if (paperdoll_mask != 0 && paperdoll_mask != (-1751672937)) {
-        mc_free(paperdoll_mask, (iptr)D_00175040, 344);
+        mc_free((void *)paperdoll_mask, D_00175040, 344);
         paperdoll_mask = -1751672937;
     }
     if (hud_portrait_overlays != 0 && hud_portrait_overlays != (-1751672937)) {
-        mc_free(hud_portrait_overlays, (iptr)D_00175040, 345);
+        mc_free((void *)hud_portrait_overlays, D_00175040, 345);
         hud_portrait_overlays = -1751672937;
     }
     if (horse_overlay_image != 0 && horse_overlay_image != (-1751672937)) {
-        mc_free(horse_overlay_image, (iptr)D_00175040, 346);
+        mc_free((void *)horse_overlay_image, D_00175040, 346);
         horse_overlay_image = -1751672937;
     }
     if (cart_overlay_image != 0 && cart_overlay_image != (-1751672937)) {
-        mc_free(cart_overlay_image, (iptr)D_00175040, 347);
+        mc_free((void *)cart_overlay_image, D_00175040, 347);
         cart_overlay_image = -1751672937;
     }
     if (compass_box_image != 0 && compass_box_image != (-1751672937)) {
-        mc_free(compass_box_image, (iptr)D_00175040, 348);
+        mc_free((void *)compass_box_image, D_00175040, 348);
         compass_box_image = -1751672937;
     }
     if (compass_image != 0 && compass_image != (-1751672937)) {
-        mc_free(compass_image, (iptr)D_00175040, 349);
+        mc_free((void *)compass_image, D_00175040, 349);
         compass_image = -1751672937;
     }
     if (hud_mode_icons != 0 && hud_mode_icons != (-1751672937)) {
-        mc_free(hud_mode_icons, (iptr)D_00175040, 350);
+        mc_free((void *)hud_mode_icons, D_00175040, 350);
         hud_mode_icons = -1751672937;
     }
     if ((iptr)hud_bar_image != 0 && (iptr)hud_bar_image != (-1751672937)) {
-        mc_free((iptr)hud_bar_image, (iptr)D_00175040, 351);
+        mc_free(hud_bar_image, D_00175040, 351);
         hud_bar_image = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)list_popup_image != 0 && (iptr)list_popup_image != (-1751672937)) {
-        mc_free((iptr)list_popup_image, (iptr)D_00175040, 352);
+        mc_free(list_popup_image, D_00175040, 352);
         list_popup_image = (struct image *)(iptr)-1751672937;
     }
-    if (*(int *)scratch_buffer != 0 && *(int *)scratch_buffer != (-1751672937)) {
-        mc_free(*(int *)scratch_buffer, (iptr)D_00175040, 353);
-        *(int *)scratch_buffer = -1751672937;
+    if ((iptr)scratch_buffer != 0 && (iptr)scratch_buffer != (-1751672937)) {
+        mc_free((void *)scratch_buffer, D_00175040, 353);
+        *(iptr *)&scratch_buffer = -1751672937;
     }
     if (D_001997F4 != 0 && D_001997F4 != (-1751672937)) {
-        mc_free(D_001997F4, (iptr)D_00175040, 354);
+        mc_free((void *)D_001997F4, D_00175040, 354);
         D_001997F4 = -1751672937;
     }
     weapon_free_sprites();
@@ -462,7 +448,7 @@ void shutdown_free_all(void)
     msgbox_free_borders();
     for (i = 0; ((int)(short)*(short *)&i) < 5; i++) {
         if (quest_face_images[((int)(short)*(short *)&i)] != 0 && quest_face_images[((int)(short)*(short *)&i)] != (-1751672937)) {
-            mc_free(quest_face_images[((int)(short)*(short *)&i)], (iptr)D_00175040, 360);
+            mc_free((void *)quest_face_images[((int)(short)*(short *)&i)], D_00175040, 360);
             quest_face_images[((int)(short)*(short *)&i)] = -1751672937;
         }
     }
@@ -481,9 +467,9 @@ void init_video(void)
     xn_kbd_numlock_off();
     xn_timer_wait_ticks(18);
     xn_sys_set_dos_transfer_buffer();
-    xn_mouse_get_sensitivity((iptr)&D_001997FC, (iptr)&D_00199800);
+    xn_mouse_get_sensitivity((char *)&D_001997FC, (char *)&D_00199800);
     xn_mem_init(102400);
-    *(iptr *)scratch_buffer = mc_malloc(80780, (iptr)D_00175040, 382);
+    *(iptr *)&scratch_buffer = (iptr)mc_malloc(80780, D_00175040, 382);
     file_index_build();
     xn_gfx_set_mode(19, 1);
     xn_kbd_install();
@@ -502,9 +488,9 @@ void init_video(void)
     xn_shade_load(0, 0);
     xn_shade_keep_colours_0_255();
     player_underwater = 0;
-    disk_read_file(D_00175214, (D_001997F4 = mc_malloc(768, (iptr)D_00175040, 410)));
+    disk_read_file(D_00175214, (D_001997F4 = (iptr)mc_malloc(768, D_00175040, 410)));
     xn_world_init();
-    xn_world_open((iptr)D_0017521C);
+    xn_world_open(D_0017521C);
 }
 
 void shutdown_video(void)
@@ -521,29 +507,29 @@ void init_palette(void)
 
 void palette_restore(void)
 {
-    xn_pal_set(D_001997F4);
+    xn_pal_set((char *)D_001997F4);
     D_001940D7 |= 1;
 }
 
 void game_exit(char *message)
 {
-    mc_set_location(440, (iptr)D_00175040);
-    func_000A148C((iptr)D_00175226);
+    mc_set_location(440, D_00175040);
+    func_000A148C(D_00175226);
     engine_running = 0;
     mem_check_level = 0;
     exiting = 1;
     game_shutdown();
     if (message == 0) {
-        func_0009DA1C(449, (iptr)D_00175040);
+        func_0009DA1C(449, D_00175040);
         printf(D_0017523C);
     } else {
-        func_0009DA1C(451, (iptr)D_00175040);
+        func_0009DA1C(451, D_00175040);
         printf(message);
     }
     kludge_print_build(1);
-    mc_set_location(455, (iptr)D_00175040);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00175260, (iptr)arena2_path, (iptr)D_00175253);
-    unlink((iptr)text_buffer);
+    mc_set_location(455, D_00175040);
+    mc_sprintf((char *)text_buffer, D_00175260, (iptr)arena2_path, (iptr)D_00175253);
+    unlink((char *)text_buffer);
     exit(0);
 }
 
@@ -563,30 +549,30 @@ void fatal_error(char *message)
         mem_check_level = 0;
         if (exiting != 0) return;
         if (internal_check_failed != 0) {
-            mc_set_location(480, (iptr)D_00175040);
-            mc_sprintf((iptr)text, (iptr)D_00175266, internal_check_failed);
+            mc_set_location(480, D_00175040);
+            mc_sprintf(text, D_00175266, internal_check_failed);
         } else {
-            mc_strncpy((iptr)text, message, 1024, (iptr)D_00175040, 482);
+            mc_strncpy(text, message, 1024, D_00175040, 482);
         }
-        mc_set_location(484, (iptr)D_00175040);
-        func_000A148C((iptr)D_00175281, frame_checkpoint);
-        mc_set_location(485, (iptr)D_00175040);
-        func_000A148C((iptr)D_001752B6, (iptr)text);
-        mc_set_location(487, (iptr)D_00175040);
-        func_000A18C3((iptr)text);
+        mc_set_location(484, D_00175040);
+        func_000A148C(D_00175281, frame_checkpoint);
+        mc_set_location(485, D_00175040);
+        func_000A148C(D_001752B6, (iptr)text);
+        mc_set_location(487, D_00175040);
+        func_000A18C3(text);
         exiting = 1;
         engine_running = 0;
         mem_check_level = 0;
         game_shutdown();
-        func_0009DA1C(495, (iptr)D_00175040);
+        func_0009DA1C(495, D_00175040);
         printf(D_001752D2, frame_checkpoint);
-        func_0009DA1C(496, (iptr)D_00175040);
+        func_0009DA1C(496, D_00175040);
         printf(D_001752B6, text);
-        func_0009DA1C(497, (iptr)D_00175040);
+        func_0009DA1C(497, D_00175040);
         printf(D_00175307);
-        mc_set_location(499, (iptr)D_00175040);
-        mc_sprintf((iptr)text, (iptr)D_00175260, (iptr)arena2_path, (iptr)D_00175253);
-        unlink((iptr)text);
+        mc_set_location(499, D_00175040);
+        mc_sprintf(text, D_00175260, (iptr)arena2_path, (iptr)D_00175253);
+        unlink(text);
         exit(10);
     }
 }
@@ -599,8 +585,8 @@ void newgame_init_player(void)
 
     player_refresh_paperdoll();
     player_compute_jump_velocity();
-    mc_set_location(514, (iptr)D_00175040);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00175313, (iptr)arena2_path);
+    mc_set_location(514, D_00175040);
+    mc_sprintf((char *)text_buffer, D_00175313, (iptr)arena2_path);
     disk_copy_file(cfg_mapsave_file, text_buffer, arena2_path);
     character = player_character;
     career = player_class;
@@ -762,25 +748,25 @@ void spell_cast_anims_load(void)
 void spell_cast_anims_free(void)
 {
     if (spell_cast_anim_fire[0] != 0 && spell_cast_anim_fire[0] != (-1751672937)) {
-        mc_free(spell_cast_anim_fire[0], (iptr)D_00175040, 754);
+        mc_free((void *)spell_cast_anim_fire[0], D_00175040, 754);
         spell_cast_anim_fire[0] = -1751672937;
     }
     if (spell_cast_anim_frost != 0 && spell_cast_anim_frost != (-1751672937)) {
-        mc_free(spell_cast_anim_frost, (iptr)D_00175040, 755);
+        mc_free((void *)spell_cast_anim_frost, D_00175040, 755);
         spell_cast_anim_frost = -1751672937;
     }
     if (spell_cast_anim_magic != 0 && spell_cast_anim_magic != (-1751672937)) {
-        mc_free(spell_cast_anim_magic, (iptr)D_00175040, 756);
+        mc_free((void *)spell_cast_anim_magic, D_00175040, 756);
         spell_cast_anim_magic = -1751672937;
     }
     if (spell_cast_anim_poison != 0 && spell_cast_anim_poison != (-1751672937)) {
-        mc_free(spell_cast_anim_poison, (iptr)D_00175040, 757);
+        mc_free((void *)spell_cast_anim_poison, D_00175040, 757);
         spell_cast_anim_poison = -1751672937;
     }
     if (spell_cast_anim_shock == 0 || spell_cast_anim_shock == (-1751672937)) {
         return;
     }
-    mc_free(spell_cast_anim_shock, (iptr)D_00175040, 758);
+    mc_free((void *)spell_cast_anim_shock, D_00175040, 758);
     spell_cast_anim_shock = -1751672937;
 }
 
@@ -854,8 +840,8 @@ void game_reset(void)
     for (region = 0; region < 62; region++) {
         regions[region].price_adjustment = rand_range(0, 500) + 750;
     }
-    mc_memset((iptr)saved_positions, 0, 48, (iptr)D_00175040, 851, 48);
-    mc_memset((iptr)((char *)creature_list), 0, 512, (iptr)D_00175040, 852, 512);
+    mc_memset(saved_positions, 0, 48, D_00175040, 851, 48);
+    mc_memset(((char *)creature_list), 0, 512, D_00175040, 852, 512);
     creature_count = 0;
 }
 
@@ -863,9 +849,9 @@ void books_find_path(void)
 {
     int handle;
 
-    mc_set_location(860, (iptr)D_00175040);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00175365, (iptr)arena2_path);
-    handle = open((iptr)text_buffer, 512);
+    mc_set_location(860, D_00175040);
+    mc_sprintf((char *)text_buffer, D_00175365, (iptr)arena2_path);
+    handle = open((char *)text_buffer, 512);
     if (handle < 0) {
         books_path = (iptr)arena2_cd_path;
         return;

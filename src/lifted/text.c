@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern int xn_cam_far_z;
 extern signed char mouse_buttons;
@@ -93,20 +94,15 @@ extern int inpstr_update(void);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
-extern int rand();
-extern int abs();
-extern int mc_free();
-extern iptr mc_malloc();
-extern int mc_memcpy();
-extern int xn_math_approx_dist2d();
-extern int xn_math_angle_to_point();
-extern int xn_gfx_present_inclusive();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
+extern void xn_gfx_present_inclusive(int);
 extern void xn_math_yaw_offset_xz(int, int, int *, int *);
-extern int xn_mouse_poll_clamped();
-extern int xn_font_select();
-extern int xn_draw_image();
-extern int xn_draw_image_transparent();
-extern int xn_terrain_height_at();
+extern int xn_mouse_poll_clamped(void);
+extern int xn_font_select(int);
+extern void xn_draw_image(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
+extern int xn_terrain_height_at(int, int);
 extern unsigned char ground_tile_at(int, int);
 extern void marquee_start(char *);
 extern void msgbox_render(char *, char **);
@@ -153,7 +149,7 @@ void str_copy_double_nul(signed char *dest, signed char *src)
 void msgbox_show_more_pages(char **image)
 {
     while (msgbox_next_page != 0) {
-        mc_memcpy(D_00147954, screen_buffer, 64000, (iptr)D_00170D55, 607, 4);
+        mc_memcpy((void *)D_00147954, (void *)screen_buffer, 64000, D_00170D55, 607, 4);
         msgbox_kind = 1;
         mode_push();
         game_mode = 8;
@@ -161,7 +157,7 @@ void msgbox_show_more_pages(char **image)
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         mouse_buttons = (mouse_buttons_prev = 0);
         while (((int)(unsigned char)game_mode) == 8) {
-            mc_memcpy(screen_buffer, D_00147954, 64000, (iptr)D_00170D55, 618, 4);
+            mc_memcpy((void *)screen_buffer, (void *)D_00147954, 64000, D_00170D55, 618, 4);
             keys_world_actions();
             msgbox_update();
             player_movement_update();
@@ -180,7 +176,7 @@ void msgbox_show_more_pages(char **image)
     D_00196272 = 1;
     mouse_buttons = (mouse_buttons_prev = 0);
     while (((int)(unsigned char)game_mode) == 8) {
-        mc_memcpy(screen_buffer, D_00147954, 64000, (iptr)D_00170D55, 641, 4);
+        mc_memcpy((void *)screen_buffer, (void *)D_00147954, 64000, D_00170D55, 641, 4);
         keys_world_actions();
         msgbox_update();
         player_movement_update();
@@ -194,8 +190,8 @@ void msgbox_show_quest_text(struct quest *quest, short message_id, int kind)
 
     if (msgbox_kind != 0) return;
     current_quest = quest;
-    msgbox_saved_screen = mc_malloc(64000, (iptr)D_00170D55, 735);
-    mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, (iptr)D_00170D55, 736, 4);
+    msgbox_saved_screen = (iptr)mc_malloc(64000, D_00170D55, 735);
+    mc_memcpy((void *)msgbox_saved_screen, (void *)screen_buffer, 64000, D_00170D55, 736, 4);
     xn_font_select(4);
     if ((short)kind == 5) {
         D_00196271 = 0;
@@ -243,8 +239,8 @@ void msgbox_show_rsc(int text_id, int kind)
 
         if (msgbox_kind != 0) return;
         cursor_restore_background();
-        msgbox_saved_screen = mc_malloc(64000, (iptr)D_00170D55, 824);
-        mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, (iptr)D_00170D55, 825, 4);
+        msgbox_saved_screen = (iptr)mc_malloc(64000, D_00170D55, 824);
+        mc_memcpy((void *)msgbox_saved_screen, (void *)screen_buffer, 64000, D_00170D55, 825, 4);
         xn_font_select(4);
         if ((short)kind == 5) {
             D_00196271 = 0;
@@ -270,8 +266,8 @@ void msgbox_open_rsc(int text_id, int kind)
 
         if (msgbox_kind != 0) return;
         cursor_restore_background();
-        msgbox_saved_screen = mc_malloc(64000, (iptr)D_00170D55, 854);
-        mc_memcpy(msgbox_saved_screen, screen_buffer, 64000, (iptr)D_00170D55, 855, 4);
+        msgbox_saved_screen = (iptr)mc_malloc(64000, D_00170D55, 854);
+        mc_memcpy((void *)msgbox_saved_screen, (void *)screen_buffer, 64000, D_00170D55, 855, 4);
         xn_font_select(4);
         if ((short)kind == 5) {
             D_00196271 = 0;
@@ -295,7 +291,7 @@ void msgbox_wait(void)
 
     mouse_buttons = (mouse_buttons_prev = 1);
     while (((int)(unsigned char)game_mode) == 8) {
-        mc_memcpy(screen_buffer, msgbox_saved_screen, 64000, (iptr)D_00170D55, 882, 4);
+        mc_memcpy((void *)screen_buffer, (void *)msgbox_saved_screen, 64000, D_00170D55, 882, 4);
         if (key_down_ctrl != 0 && key_down_x != 0 && key_down_lshift != 0) {
             game_exit(0);
         }
@@ -307,7 +303,7 @@ void msgbox_wait(void)
     bios_ticks = (int *)1132;
     realtime_clock_tick = *bios_ticks;
     if (msgbox_saved_screen != 0 && msgbox_saved_screen != (-1751672937)) {
-        mc_free(msgbox_saved_screen, (iptr)D_00170D55, 893);
+        mc_free((void *)msgbox_saved_screen, D_00170D55, 893);
         msgbox_saved_screen = -1751672937;
     }
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -322,9 +318,9 @@ void msgbox_update(void)
     }
     D_0012B508 = 146;
     if (((struct bf8_6_1 *)&D_001940D5)->f != 0) {
-        xn_draw_image_transparent(160 - (((int)(short)msgbox_w) >> 1), ((int)(short)D_00195F34) - ((int)(short)msgbox_h), (int)(short)msgbox_w, (int)(short)msgbox_h, *(int *)msgbox_image);
+        xn_draw_image_transparent(160 - (((int)(short)msgbox_w) >> 1), ((int)(short)D_00195F34) - ((int)(short)msgbox_h), (int)(short)msgbox_w, (int)(short)msgbox_h, (char *)*(iptr *)msgbox_image);
     } else {
-        xn_draw_image_transparent(160 - (((int)(short)msgbox_w) >> 1), 100 - (((int)(short)msgbox_h) >> 1), (int)(short)msgbox_w, (int)(short)msgbox_h, *(int *)msgbox_image);
+        xn_draw_image_transparent(160 - (((int)(short)msgbox_w) >> 1), 100 - (((int)(short)msgbox_h) >> 1), (int)(short)msgbox_w, (int)(short)msgbox_h, (char *)*(iptr *)msgbox_image);
     }
     if (((int)(unsigned char)msgbox_kind) == 1) {
         if (D_00195F2E != 0) {
@@ -367,7 +363,7 @@ void msgbox_close(void)
     if (*(int *)msgbox_image == 0) return;
     D_001940D5 &= 158;
     if (*(int *)msgbox_image != 0 && *(int *)msgbox_image != (-1751672937)) {
-        mc_free(*(int *)msgbox_image, (iptr)D_00170D55, 950);
+        mc_free((void *)*(iptr *)msgbox_image, D_00170D55, 950);
         *(int *)msgbox_image = -1751672937;
     }
     *(int *)msgbox_image = 0;
@@ -387,11 +383,11 @@ void msgbox_load_borders(void)
 void msgbox_free_borders(void)
 {
     if (msgbox_spop_tiles[0] != 0 && msgbox_spop_tiles[0] != (-1751672937)) {
-        mc_free(msgbox_spop_tiles[0], (iptr)D_00170D55, 977);
+        mc_free((void *)msgbox_spop_tiles[0], D_00170D55, 977);
         msgbox_spop_tiles[0] = -1751672937;
     }
     if (msgbox_mpop_tiles == 0 || msgbox_mpop_tiles == (-1751672937)) return;
-    mc_free(msgbox_mpop_tiles, (iptr)D_00170D55, 978);
+    mc_free((void *)msgbox_mpop_tiles, D_00170D55, 978);
     msgbox_mpop_tiles = -1751672937;
 }
 
@@ -403,17 +399,17 @@ void msgbox_draw_buttons(short y)
         text_cursor_y = y;
     }
     if (D_00196090 == 0) {
-        xn_draw_image(144, y, 32, 16, (iptr)(buttons_rci + ((((int)(unsigned char)msgbox_button_ids) - 1) << 9)));
+        xn_draw_image(144, y, 32, 16, (buttons_rci + ((((int)(unsigned char)msgbox_button_ids) - 1) << 9)));
         return;
     }
     if (D_00196091 == 0) {
-        xn_draw_image(112, y, 32, 16, (iptr)(buttons_rci + ((((int)(unsigned char)msgbox_button_ids) - 1) << 9)));
-        xn_draw_image(176, y, 32, 16, (iptr)(buttons_rci + ((((int)(unsigned char)D_00196090) - 1) << 9)));
+        xn_draw_image(112, y, 32, 16, (buttons_rci + ((((int)(unsigned char)msgbox_button_ids) - 1) << 9)));
+        xn_draw_image(176, y, 32, 16, (buttons_rci + ((((int)(unsigned char)D_00196090) - 1) << 9)));
         return;
     }
-    xn_draw_image(96, y, 32, 16, (iptr)(buttons_rci + ((((int)(unsigned char)msgbox_button_ids) - 1) << 9)));
-    xn_draw_image(144, y, 32, 16, (iptr)(buttons_rci + ((((int)(unsigned char)D_00196090) - 1) << 9)));
-    xn_draw_image(192, y, 32, 16, (iptr)(buttons_rci + ((((int)(unsigned char)D_00196091) - 1) << 9)));
+    xn_draw_image(96, y, 32, 16, (buttons_rci + ((((int)(unsigned char)msgbox_button_ids) - 1) << 9)));
+    xn_draw_image(144, y, 32, 16, (buttons_rci + ((((int)(unsigned char)D_00196090) - 1) << 9)));
+    xn_draw_image(192, y, 32, 16, (buttons_rci + ((((int)(unsigned char)D_00196091) - 1) << 9)));
 }
 
 int msgbox_button_at(short x, short y)
@@ -750,7 +746,7 @@ int town_map_line_blocked(int x, int y)
     step_x = (double)dx / step_count;
     step_y = (double)dy / step_count;
     for (i = 0; (step_count + 1) > i; i++) {
-        pixel = *(signed char *)((char *)(iptr)(*(char **)&D_00196DA4 + (((current_location->width << 6) * player_y) + player_x)));
+        pixel = *(signed char *)((*(char **)&D_00196DA4 + (((current_location->width << 6) * player_y) + player_x)));
         if (pixel != 0 && ((int)(unsigned char)pixel) < 100) return 1;
         player_x += step_x;
         player_y += step_y;

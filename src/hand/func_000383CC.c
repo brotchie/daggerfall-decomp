@@ -11,8 +11,7 @@ extern void spellmaker_pick_effect_cb(short);
 extern int spellmaker_find_effect(short);
 extern void msgbox_show_rsc(int, int);
 extern void list_popup_open_strings(char *);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern int strlen(char *);
+#include "clib.h"
 
 int spellmaker_add_effect(void)
 {

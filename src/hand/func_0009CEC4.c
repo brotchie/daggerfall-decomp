@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009CEC4 */
 #include "records.h"
+#include "clib.h"
 
 extern char *screen_buffer;
 extern char D_0017743D[];
@@ -17,10 +18,6 @@ extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int travel_pixel_time(int, int);
 extern void travel_find_transport(void);
 extern void travel_toggle_zoom(void);
-extern int abs();
-extern int mc_free(char *, char *, int);
-extern char *mc_malloc(int, char *, int);
-extern int mc_memcpy(char *, char *, int, char *, int, int);
 
 int travel_route(int x0, int y0, int x1, int y1, int go)
 {

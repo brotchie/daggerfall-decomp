@@ -25,10 +25,7 @@ extern int font_text_width(char *);
 extern void text_draw_shadow(char *, short, short);
 extern void text_draw_centred_shadow(char *, int, int);
 extern void painting_draw(void);
-extern void mc_free(void *, char *, int);
-extern void mc_memset(char *, int, int, char *, int, int);
-extern char *mc_malloc(int, char *, int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
+#include "clib.h"
 extern void xn_font_select(short);
 extern void xn_draw_get_rect(int, int, int, int, char *, int);
 extern void xn_draw_image(int, int, int, int, char *);

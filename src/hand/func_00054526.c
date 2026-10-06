@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00054526 */
 #include "ptrint.h"
+#include "clib.h"
 struct AB { unsigned char a; unsigned char b; };
 extern short mouse_y;
 extern short font_height;
@@ -30,11 +31,10 @@ extern void classmaker_set_advantage(int, int);
 extern void classmaker_set_disadvantage(int, int);
 extern int classmaker_special_conflicts(int, int, int);
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
-extern int mc_memcpy();
-extern int xn_mouse_cursor_erase();
-extern int xn_mouse_cursor_draw();
-extern int xn_font_select();
-extern int xn_draw_image();
+extern void xn_mouse_cursor_erase(void);
+extern void xn_mouse_cursor_draw(void);
+extern int xn_font_select(int);
+extern void xn_draw_image(int, int, int, int, char *);
 
 void classmaker_specials_screen(void)
 {
@@ -54,7 +54,7 @@ void classmaker_specials_screen(void)
     if ((int)(short)(classmaker_screen & 16) != 0)
         index++;
     xn_mouse_cursor_erase();
-    mc_memcpy(screen_buffer, scratch_190df4, 64000, D_00175420, 675, 4);
+    mc_memcpy((void *)screen_buffer, (void *)scratch_190df4, 64000, D_00175420, 675, 4);
     xn_draw_image(0, 0, *(unsigned short *)(D_00190E00 + 4), *(unsigned short *)(D_00190E00 + 6), D_00190E00 + 12);
     if (index == 2 || index == 3)
         xn_draw_image(0, 0, *(unsigned short *)(scratch_190dfc + 4), *(unsigned short *)(scratch_190dfc + 6), scratch_190dfc + 12);

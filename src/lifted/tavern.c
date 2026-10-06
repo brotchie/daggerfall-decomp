@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern signed char key_down_esc;
@@ -13,7 +14,7 @@ extern char D_001705BE[];
 extern char D_001705D4[];
 extern char D_001705E0[];
 extern char D_001705EC[];
-extern char tavern_food_names[];
+extern char *tavern_food_names[];
 extern signed char tavern_food_prices[];
 extern char scratch_190be4[];
 extern signed char tavern_state;
@@ -29,8 +30,8 @@ extern char inpstr_result[];
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern char scratch_buffer[];
-extern char D_00195CE8[];
+extern char *scratch_buffer;
+extern struct record *D_00195CE8;
 extern int trade_price;
 extern signed char current_region;
 extern unsigned char D_00196271;
@@ -50,25 +51,23 @@ extern iptr disk_read_file(char *, iptr);
 extern int guild_is_local_knight(void);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern int object_find(struct record *, int (*)());
-extern int object_find_by_id(struct record *, iptr);
+extern int object_find(struct record *, iptr (*)());
+extern iptr object_find_by_id(struct record *, iptr);
 extern int trade_adjust_price(int, int);
 extern struct record *marker_find_nth(struct record *, int, int);
 extern struct record *marker_find_random(struct record *, int);
-extern int mc_free();
-extern int mc_memcpy();
-extern int xn_mouse_poll_clamped();
-extern int xn_kbd_flush();
+extern int xn_mouse_poll_clamped(void);
+extern void xn_kbd_flush(void);
 extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
-extern void npc_talk(int);
+extern void npc_talk(iptr);
 extern void list_popup_open(iptr);
 extern void inpstr_begin_number(int);
 extern void object_foreach(struct record *, void (*)());
 extern void trade_make_offer(void);
 int tavern_room_rented(void);
 int tavern_room_days_left(void);
-int func_0001FA3A(struct record *);
+iptr func_0001FA3A(struct record *);
 int func_0001FBF5(struct record *);
 void tavern_close(void);
 void tavern_rent(int);
@@ -89,7 +88,7 @@ void tavern_close(void)
     while (key_down_esc != 0);
     game_mode = 0;
     if (tavern_menu_image != 0 && tavern_menu_image != (-1751672937)) {
-        mc_free(tavern_menu_image, (iptr)D_00170569, 117);
+        mc_free((void *)tavern_menu_image, D_00170569, 117);
         tavern_menu_image = -1751672937;
     }
     D_00196272 = 0;
@@ -176,7 +175,7 @@ void tavern_food_button(void)
         msgbox_show_string(D_001705BE, 1);
         return;
     }
-    list_popup_open((iptr)tavern_food_names);
+    list_popup_open((iptr)(char *)tavern_food_names);
     D_001940D4 |= 1;
 }
 
@@ -206,7 +205,7 @@ void tavern_buy_food(int food)
 void tavern_talk_button(void)
 {
     tavern_close();
-    npc_talk(*(int *)D_00195CE8);
+    npc_talk((iptr)D_00195CE8);
 }
 
 void tavern_go_to_room(void)
@@ -264,12 +263,12 @@ void func_0001F6E2(struct record *object)
     if (func_0001FBF5(object) == 0) return;
     stored = object_create_child(nonworld_root, 0, 107);
     stored->type = 58;
-    mc_memcpy(&stored->x, &object->x, 12, (iptr)D_00170569, 317, 4);
+    mc_memcpy(&stored->x, &object->x, 12, D_00170569, 317, 4);
     stored->image = object->image;
     stored->id = object->id;
     stored->parent_id = object->parent->id;
     stored->repair_due = *(int *)scratch_190be4;
-    mc_memcpy(RECORD_DATA(stored), RECORD_DATA(object), 107, (iptr)D_00170569, 322, 4);
+    mc_memcpy(RECORD_DATA(stored), RECORD_DATA(object), 107, D_00170569, 322, 4);
 }
 
 void func_0001F7B3(struct record *stored)
@@ -283,8 +282,8 @@ void func_0001F7B3(struct record *stored)
     object->type = 2;
     object->image = stored->image;
     object->id = stored->id;
-    mc_memcpy(&object->x, &stored->x, 12, (iptr)D_00170569, 347, 4);
-    mc_memcpy(RECORD_DATA(object), RECORD_DATA(stored), 107, (iptr)D_00170569, 348, 4);
+    mc_memcpy(&object->x, &stored->x, 12, D_00170569, 347, 4);
+    mc_memcpy(RECORD_DATA(object), RECORD_DATA(stored), 107, D_00170569, 348, 4);
     object_delete(stored);
 }
 
@@ -293,7 +292,7 @@ void func_0001F89F(void)
     struct record *stored;
 
     func_0001FE4D();
-    D_00196ABC = (struct building *)*(iptr *)scratch_buffer;
+    D_00196ABC = (struct building *)scratch_buffer;
     *(int *)D_00195B84 = 0;
     func_0001FB3F();
     func_0001FAB2();
@@ -303,7 +302,7 @@ void func_0001F89F(void)
         stored->type = 57;
         stored->owner = *(short *)D_00195B84;
         stored->id = location_object->id;
-        mc_memcpy(RECORD_DATA(stored), (iptr)D_00196ABC, *(int *)D_00195B84 * 26, (iptr)D_00170569, 369, 4);
+        mc_memcpy(RECORD_DATA(stored), D_00196ABC, *(int *)D_00195B84 * 26, D_00170569, 369, 4);
     }
     object_foreach(location_object, func_0001F6E2);
 }
@@ -314,13 +313,13 @@ void func_0001F958(void)
     int j;
 
     func_0001FE4D();
-    D_00196ABC = (struct building *)*(iptr *)scratch_buffer;
+    D_00196ABC = (struct building *)scratch_buffer;
     *(int *)D_00195B84 = 0;
     func_0001FAB2();
     for (i = 0; i < *(int *)D_00195B84; i++) {
         for (j = 0; current_location->building_count > j; j++) {
             if (current_location->buildings[j].id == D_00196ABC[i].id) {
-                mc_memcpy((iptr)&current_location->buildings[j], (iptr)&D_00196ABC[i], 26, (iptr)D_00170569, 388, 4);
+                mc_memcpy(&current_location->buildings[j], &D_00196ABC[i], 26, D_00170569, 388, 4);
                 break;
             }
         }
@@ -328,7 +327,7 @@ void func_0001F958(void)
     object_foreach(nonworld_root, func_0001F7B3);
 }
 
-int func_0001FA3A(struct record *object)
+iptr func_0001FA3A(struct record *object)
 {
     if (found_object != 0) return 0;
     if (object->type != 57) return 0;
@@ -345,7 +344,7 @@ void func_0001FAB2(void)
     found_object = 0;
     object_find(nonworld_root, func_0001FA3A);
     if (found_object == 0) return;
-    mc_memcpy((iptr)&D_00196ABC[*(int *)D_00195B84], (int)(iptr)RECORD_DATA(found_object), found_object->owner * 26, (iptr)D_00170569, 417, 4);
+    mc_memcpy(&D_00196ABC[*(int *)D_00195B84], RECORD_DATA(found_object), found_object->owner * 26, D_00170569, 417, 4);
     *(int *)D_00195B84 += found_object->owner;
 }
 
@@ -355,7 +354,7 @@ void func_0001FB3F(void)
 
     for (i = 0; current_location->building_count > i; i++) {
         if ((current_location->buildings[i].flags & 3) != 0 && ((unsigned)current_location->buildings[i].flags) > game_minutes) {
-            mc_memcpy((iptr)&D_00196ABC[(*(int *)D_00195B84)++], (iptr)&current_location->buildings[i], 26, (iptr)D_00170569, 428, 4);
+            mc_memcpy(&D_00196ABC[(*(int *)D_00195B84)++], &current_location->buildings[i], 26, D_00170569, 428, 4);
         }
     }
 }

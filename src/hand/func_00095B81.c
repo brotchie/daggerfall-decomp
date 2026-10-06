@@ -10,12 +10,12 @@ extern int picked_model_index;
 extern struct record *inv_right_rows[];
 extern int inv_right_scroll;
 extern short D_001AA588;
-extern void inv_draw_item_cell(struct record *, short, int);
+extern void inv_draw_item_cell(struct record *, short, iptr);
 extern int xn_math_approx_dist2d(int, int, int, int);
 extern int xn_math_approx_hypot(int, int);
 extern iptr xn_str_find_u32(char *, struct record *, int);
 
-void inv_list_right_item(struct record *object, int rects)
+void inv_list_right_item(struct record *object, iptr rects)
 {
     struct item *item;
 

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001CF3E */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170464[];        /* __FILE__ */
 extern unsigned char scratch_190d16;
@@ -17,9 +18,6 @@ extern int faction_player_related(struct faction *);
 extern int func_0001D66C(struct rumor *);
 extern void parse_rsc_text(int, int, int);
 extern int rand_range(int, int);
-extern void mc_memset(char *, int, int, char *, int, int);
-extern int write(int, void *, int);
-extern int strlen(char *);
 
 void rumor_add_faction(struct faction *faction1, struct faction *faction2, int kind, unsigned char region, int text_id)
 {

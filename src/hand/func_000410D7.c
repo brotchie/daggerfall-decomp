@@ -1,10 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000410D7 */
 #include "records.h"
+#include "clib.h"
 
 extern unsigned char D_0017B667[];
 extern short D_0017B66D[][2][4];
 extern int climate_category(void);
-extern int rand(void);
 
 void pedestrian_pick_sprite(struct record *pedestrian)
 {

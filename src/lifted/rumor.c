@@ -1,11 +1,12 @@
 #include "records.h"
+#include "clib.h"
 /* rumor.c: functions first lifted from the assembly by tools/lift_all.py (2026-10), now
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 
 extern signed char D_0012B508;
 extern char D_001702CC[];
-extern int marquee_owned_text;
+extern iptr marquee_owned_text;
 extern char region_event_flag_groups[];
 extern signed char region_event_durations[];
 extern signed char D_00178EB0[];
@@ -17,8 +18,6 @@ extern iptr marquee_text;
 extern struct faction *faction_random_of_type(unsigned char);
 extern int font_char_width(unsigned char);
 extern int rand_range(int, int);
-extern int mc_free();
-extern int mc_memcpy();
 extern void text_draw(iptr, int, int);
 void marquee_stop(void);
 
@@ -31,7 +30,7 @@ void marquee_update(void)
     D_0012B508 = 146;
     count = (320 - marquee_x) / 4;
     if (count > 80) count = 80;
-    mc_memcpy((iptr)text_buffer, marquee_text, count, (iptr)D_001702CC, 35, 160);
+    mc_memcpy(text_buffer, (void *)marquee_text, count, D_001702CC, 35, 160);
     text_buffer[count] = 0;
     text_draw((iptr)text_buffer, marquee_x, 140);
     marquee_x -= 2;
@@ -47,7 +46,7 @@ void marquee_update(void)
 void marquee_stop(void)
 {
     if (marquee_owned_text != 0 && marquee_owned_text != (-1751672937)) {
-        mc_free(marquee_owned_text, (iptr)D_001702CC, 62);
+        mc_free((void *)marquee_owned_text, D_001702CC, 62);
         marquee_owned_text = -1751672937;
     }
     marquee_owned_text = 0;

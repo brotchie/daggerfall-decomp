@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of custom.c from 0x0005506F to 0x000553B2, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 struct slot { unsigned char kind; unsigned char bit; };
@@ -10,22 +11,21 @@ extern signed char classmaker_special_counts[];
 extern short scratch_190d68;
 extern short classmaker_special_list;
 extern short D_00190D84;
-extern int scratch_190de4;
+extern iptr scratch_190de4;
 extern unsigned short *scratch_190dec;
 extern struct career *player_class;
 extern struct slot classmaker_specials[][7];
-extern void mc_memcpy(void *, void *, int, char *, int, int);
-extern int xn_mouse_poll_clamped();
+extern void xn_mouse_poll_clamped(void);
 extern void xn_bits_set_or_clear_u8(void *, int, int);     /* sets or clears bits in a byte */
 extern void xn_bits_set_or_clear_u16(void *, int, int);     /* in a u16 */
-extern int xn_draw_image();
-extern int xn_draw_image_transparent();
+extern void xn_draw_image(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
 void classmaker_set_advantage(int, int);
 void classmaker_set_disadvantage(int, int);
 
 void classmaker_draw_dagger(void)
 {
-    xn_draw_image(219, 46, 40, 138, scratch_190de4);
+    xn_draw_image(219, 46, 40, 138, (char *)scratch_190de4);
     xn_draw_image_transparent(219, scratch_190d68, scratch_190dec[2], scratch_190dec[3], (char *)scratch_190dec + 12);
 }
 

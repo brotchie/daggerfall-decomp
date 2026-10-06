@@ -1,17 +1,15 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007B0FC */
 #include <dos.h>
+#include "clib.h"
 extern char *D_00147954;
 extern char D_00176884[];
 extern char D_001768DF[];
 extern char D_0017696F[];
 extern char D_00176977[];
 extern char arena2_path[];
-extern int unlink(char *);
 extern unsigned func_000A13DA(char *, unsigned, struct find_t *);
 extern unsigned func_000A13F7(struct find_t *);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void automap_delete_files(void)
 {

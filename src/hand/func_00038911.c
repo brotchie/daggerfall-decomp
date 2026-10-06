@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00038911 */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 #pragma pack(1)
 extern unsigned char mouse_buttons;
@@ -31,11 +32,9 @@ extern void msgbox_open_rsc(int, int);
 extern void msgbox_update(void);
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern void text_draw_number_in_box(short, short, short, short, short, short, short);
-extern int abs();
-extern char *itoa(int, char *, int);
-extern int spell_cost_formula_dispatch();
-extern int xn_draw_fullscreen_overlay_shaded();
-extern int xn_mouse_set_position();
+extern int spell_cost_formula_dispatch(int);
+extern void xn_draw_fullscreen_overlay_shaded(char *);
+extern void xn_mouse_set_position(int, int);
 
 void spellmaker_settings_update(void)
 {
@@ -58,7 +57,7 @@ void spellmaker_settings_update(void)
         spellmaker_settings_kind = 0;
         return;
     }
-    xn_draw_fullscreen_overlay_shaded(spellmaker_settings_image);
+    xn_draw_fullscreen_overlay_shaded((char *)spellmaker_settings_image);
     msgbox_update();
     if ((int)(unsigned char)(mouse_buttons & 1) != 0 && mouse_buttons != mouse_buttons_prev) {
         for (i = 11; i < 33; i++) {

@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004C274 */
 #include "records.h"
 #include <dos.h>
+#include "clib.h"
 
 extern char D_00174F47[];        /* __FILE__ */
 extern char D_00174F69[];
@@ -12,11 +13,7 @@ extern char *scratch_buffer;
 extern char D_001961F5[];
 extern int quest_file_list_add(char *, int);
 extern int rand_range(int, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern int strlen(char *);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 

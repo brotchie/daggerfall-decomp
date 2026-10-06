@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000202C5 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170604[];
 extern char D_00170634[];
@@ -10,7 +11,7 @@ extern unsigned char D_00179E7F[];
 extern unsigned char D_00179E90[];
 extern unsigned char D_00179E94[];
 extern unsigned char D_001850D4[];
-extern int D_001850E5[];
+extern iptr D_001850E5[];
 extern signed char text_buffer[];
 extern unsigned game_minutes;
 extern struct settings *game_settings;
@@ -19,25 +20,19 @@ extern unsigned char climate_weathers[];
 extern char D_001961F5[];
 extern unsigned char D_00196271;
 extern struct faction *D_0019671C;
-extern int current_quest;
+extern iptr current_quest;
 extern struct faction *faction_find(short);
 extern int climate_category(void);
 extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
-extern int flc_play_with_text(int, char *, int, int);
+extern int flc_play_with_text(iptr, char *, int, int);
 extern struct record *monster_summon_near_player(int);
 extern int rand_range(int, int);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
-extern int rand(void);
-extern int srand(int);
-extern int mc_memset();
-extern int mc_strncpy();
 extern char *xn_str_find_u16(char *, short, int);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, ...);
 
 #define REGION(o) D_001850D4[D_00179E94[(o)->id]]
 

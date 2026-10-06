@@ -1,8 +1,14 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004633F */
+/* 9 bytes in FALL.EXE (Watcom packs to 1 byte); natively the handler keeps its alignment: the
+   linker takes no unaligned pointer in data (tools/port_data.py lays the table out again) */
+#if !defined(DAGGER_PORT) || defined(__i386__)
+#pragma pack(1)
+#endif
 struct macro { char name[5]; char *(*fn)(void); };   /* 9 bytes */
 extern char D_0017110C[];        /* __FILE__ */
 extern char D_00171114[];
 extern unsigned char D_00178630[];   /* _IsTable */
+extern struct macro macro_table[];     /* the 255 macros, by first letter (the data: tools/port_data.py) */
 extern struct macro *macro_letter_tables[];
 extern short macro_letter_counts[];
 extern char D_001911E4[];
@@ -13,15 +19,9 @@ extern char *quest_symbol_text(int, int, int);
 extern int parse_read_number(signed char *);
 extern void fatal_error(char *);
 extern int string_hash(char *);
-extern int rand(void);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern int strlen(char *);
-extern void mc_memcpy(char *, unsigned char *, int, char *, int, int);
-extern int strcmp(struct macro *, char *);
-extern int xn_str_copy_alnum();
+#include "clib.h"
+extern int xn_str_copy_alnum(char *, char *);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void parse_expand(unsigned char *src, char *out)
 {

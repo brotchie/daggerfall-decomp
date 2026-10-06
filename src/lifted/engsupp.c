@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern char D_001702D4[];
 extern unsigned char player_environment;
@@ -33,11 +34,7 @@ extern short texture_archive_for_climate(int, int);
 extern int climate_category(void);
 extern int rand_range(int, int);
 extern int object_find(struct record *, iptr);
-extern int rand();
-extern int srand();
-extern int mc_memset();
-extern int mc_memcpy();
-extern iptr xn_render_pick();
+extern void *xn_render_pick(int, int);
 extern void shop_generate_stock(iptr, int, int, int, int);
 extern void func_0007E815(struct record *, iptr);
 extern void town_grid_visit_near(struct record *, iptr);
@@ -54,7 +51,7 @@ int engine_pick_object(int x, int y, struct pick_result *result)
 
     view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     if (y > view_bottom) return 0;
-    mc_memset((iptr)result, 0, 18, (iptr)D_001702D4, 38, 4);
+    mc_memset(result, 0, 18, D_001702D4, 38, 4);
     pick_result = result;
     if ((pick_hit = (struct xn_pick_hit *)xn_render_pick(x, y))->model == 1) return 0;
     if (pick_hit->model != 0) {
@@ -184,7 +181,7 @@ void dungeon_choose_textures(void)
     srand(((unsigned)location_object->id) >> 16);
     texture_set = (int)(unsigned char)climate_texture_sets[climate_category()];
     if (texture_set == 1) return;
-    mc_memcpy((iptr)D_00179966, (iptr)D_0017995C, 10, (iptr)D_001702D4, 279, 10);
+    mc_memcpy(D_00179966, D_0017995C, 10, D_001702D4, 279, 10);
     for (i = 0; i < 5; i++) {
         archive = rand_range(0, 4);
         if (archive == 2) archive += 2;
@@ -243,7 +240,7 @@ void world_for_each_object(iptr callback)
             children = object->children;
             flags = object->flags;
             if (object->type != 38) {
-                ((int (*)())(callback))(object);
+                ((int (*)(struct record *))(callback))(object);
                 if (((int)(unsigned short)(*(int *)&flags & 1)) == 0) object_find(children, callback);
             }
             object = next;
@@ -260,7 +257,7 @@ void world_for_each_object(iptr callback)
             children = object->children;
             flags = object->flags;
             if (object->type != 47) {
-                ((int (*)())(callback))(object);
+                ((int (*)(struct record *))(callback))(object);
                 if (((int)(unsigned short)(*(int *)&flags & 1)) == 0) object_find(children, callback);
             }
             object = next;

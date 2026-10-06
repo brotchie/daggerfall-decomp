@@ -37,10 +37,8 @@ extern void player_movement_update(void);
 extern void config_read(char *);
 extern int dpmi_lock_region(void *, int);
 extern void causeway_disable_error_dump(void);
-extern void exit(int);
+#include "clib.h"
 extern void func_0009DBF9(void);
-extern void srand(int);
-extern void close(int);
 extern void xn_sys_install_crit_error_handler(void);
 extern void xn_sys_yield(void);
 extern void xn_gfx_present_inclusive(int);
@@ -49,13 +47,10 @@ extern void xn_sys_zero_page_save(void);
 extern void xn_render_set_mode(int);
 extern void xn_mouse_read_motion(short *, short *);
 #pragma aux func_0009DA1C parm routine [];
-extern void func_0009DA1C(int, char *);
 #pragma aux func_0009DB3F parm routine [];
 extern void func_0009DB3F(void (*)(void));
 #pragma aux func_0009DBFE parm routine [];
 extern void func_0009DBFE(void (*)(void));
-extern void printf(char *, ...);
-extern int open(char *, ...);
 
 int func_00010010(short argc, char **argv)
 {

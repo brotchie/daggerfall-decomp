@@ -1,8 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00030275 */
 #include "records.h"
+#include "clib.h"
 
 extern unsigned char quest_global_states[];
-extern int rand(void);
 
 void qaction_op34_pick_one_state(struct quest *quest, struct qbn_op *op)
 {

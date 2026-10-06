@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of qcom.c from 0x0002C4FA to 0x0002C5ED, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 /* the timer flags are read signed here: (short)t->flags */
 extern short travel_options;
@@ -13,7 +14,6 @@ extern void quest_timer_clear_state(struct qbn_timer *);
 extern unsigned int quest_travel_minutes(struct quest *, struct record *, struct record *);
 extern struct qbn_timer *quest_section(struct quest *, int);
 extern int rand_range(int, int);
-extern iptr memchr(char *, int, int);
 
 void quest_timers_update(struct quest *quest)
 {

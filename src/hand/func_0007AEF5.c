@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007AEF5 */
 #include <dos.h>
+#include "clib.h"
 extern char D_00176884[];       /* __FILE__ */
 extern char D_00176909[];
 extern char D_0017696F[];
@@ -10,8 +11,6 @@ extern void disk_copy_file(char *, char *, char *);
 extern unsigned func_000A13DA(char *, unsigned, struct find_t *);   /* _dos_findfirst */
 extern unsigned func_000A13F7(struct find_t *);                     /* _dos_findnext */
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void save_copy_automap_files(int slot)
 {

@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_y;
@@ -13,13 +14,13 @@ extern iptr screen_buffer;
 extern char D_0017539B[];
 extern char D_001753DB[];
 extern char D_001753E7[];
-extern int class_answer_cels[];
+extern iptr class_answer_cels[];
 extern signed char text_buffer[];
 extern char scratch_190d64[];
 extern char scratch_190d66[];
 extern short scratch_190d68;
 extern char frame_counter[];
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern signed char mouse_buttons_prev;
 extern signed char class_question_answer_row[];
 extern char class_questions_asked[];
@@ -31,22 +32,12 @@ extern signed char D_0019981A;
 extern signed char D_0019981B;
 
 extern char *text_rsc_load(short, unsigned short, short);
-extern int pflc_play(int, iptr);
+extern int pflc_play(iptr, iptr);
 extern int sound_play_ui(int);
 extern iptr disk_read_file(char *, iptr);
-extern int rand();
-extern int mc_free();
-extern int mc_memset();
-extern iptr mc_malloc();
-extern int atoi();
-extern int strlen();
-extern int mc_memcpy();
-extern iptr memchr();
-extern iptr strchr();
-extern int func_000A1944();
-extern int xn_draw_cel_frame();
-extern int xn_str_copy_until();
-extern int xn_str_append_char();
+extern void xn_draw_cel_frame(void *, int, int);
+extern void xn_str_copy_until(char *, char *, int);
+extern void xn_str_append_char(char *, int);
 extern void fatal_error(char *);
 extern void class_question_scroll(int *, short);
 extern void text_draw(iptr, int, int);
@@ -79,8 +70,8 @@ void class_question_show(int *scroll_cels)
     text += 2;
     *(signed char *)memchr(text, 123, 32000) = 0;
     saved_screen = (char *)mc_malloc(64000, D_0017539B, 176);
-    mc_memcpy(saved_screen, screen_buffer, 64000, D_0017539B, 178, 4);
-    mc_memset(screen_buffer, 0, 64000, D_0017539B, 179, 4);
+    mc_memcpy(saved_screen, (void *)screen_buffer, 64000, D_0017539B, 178, 4);
+    mc_memset((void *)screen_buffer, 0, 64000, D_0017539B, 179, 4);
     while (*(signed char *)text != 0 && *(signed char *)(text - 1) != 0) {
         xn_str_copy_until(text_buffer, text, 252);
         text += strlen(text_buffer) + 1;
@@ -91,8 +82,8 @@ void class_question_show(int *scroll_cels)
         text_draw((iptr)text_buffer, 20, font_height * (short)line);
         (*(short *)&line)++;
     }
-    mc_memcpy(*(int *)scratch_buffer, screen_buffer, 64000, D_0017539B, 193, 4);
-    mc_memcpy(screen_buffer, saved_screen, 64000, D_0017539B, 194, 4);
+    mc_memcpy((void *)scratch_buffer, (void *)screen_buffer, 64000, D_0017539B, 193, 4);
+    mc_memcpy((void *)screen_buffer, saved_screen, 64000, D_0017539B, 194, 4);
     if (saved_screen != 0 && saved_screen != (char *)(iptr)-1751672937) {
         mc_free(saved_screen, D_0017539B, 195);
         saved_screen = (char *)(iptr)-1751672937;
@@ -104,7 +95,7 @@ void class_question_show(int *scroll_cels)
     rsc_text = (char *)(iptr)-1751672937;
 }
 
-void class_question_scroll_step(int *scroll_cels, short delta)
+void class_question_scroll_step(iptr *scroll_cels, short delta)
 {
     if (delta < 0 && *(short *)scratch_190d64 != 0) {
         *(short *)scratch_190d64 += *(int *)&delta;
@@ -112,7 +103,7 @@ void class_question_scroll_step(int *scroll_cels, short delta)
         *(short *)scratch_190d64 += *(int *)&delta;
     }
     *(int *)frame_counter = (int)(short)(*(short *)scratch_190d64 & 7);
-    xn_draw_cel_frame(scroll_cels[(short)(*(short *)scratch_190d64 & 15) >> 3], 0, 119);
+    xn_draw_cel_frame((void *)scroll_cels[(short)(*(short *)scratch_190d64 & 15) >> 3], 0, 119);
 }
 
 void class_question_answer_anim(short kind)
@@ -120,7 +111,7 @@ void class_question_answer_anim(short kind)
 {
     char flc[44];
 
-    func_000A1944((iptr)flc, 0, 44);
+    func_000A1944(flc, 0, 44);
     *(short *)flc = 16;
     sound_play_ui(18);
     pflc_play(class_answer_cels[((int)(short)kind)], (iptr)flc);
@@ -175,8 +166,8 @@ int class_question_pick_class(void)
     int answers;
     short i;
 
-    disk_read_file(D_001753DB, *(int *)scratch_buffer);
-    *(int *)&entry = *(int *)scratch_buffer + 18;
+    disk_read_file(D_001753DB, (iptr)scratch_buffer);
+    *(iptr *)&entry = (iptr)scratch_buffer + 18;
     answers = ((((int)(unsigned char)D_0019981B) << 16) | (((int)(unsigned char)D_0019981A) << 8)) | ((int)(unsigned char)class_answer_counts);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 48; (*(int *)&i)++) {

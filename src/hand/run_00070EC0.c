@@ -1,8 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of guilds from 0x70AFA to 0x70EC0, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 extern unsigned char key_down_enter;
-extern int D_00185077;
+extern iptr D_00185077;
 extern unsigned char *D_00187545;
 extern struct region regions[];
 extern int inpstr_result;
@@ -15,10 +16,9 @@ extern void msgbox_show_rsc(int, int);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void npc_talk(struct record *);
 extern int rand_range(int, int);
-extern void msgbox_prompt_number(int, int);
+extern void msgbox_prompt_number(int, iptr);
 extern void gold_spend(int);
 extern int gold_can_afford(int);
-extern int abs(short);
 
 void blessing_remove(struct blessing *blessing)
 {

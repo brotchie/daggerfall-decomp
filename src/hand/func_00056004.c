@@ -13,17 +13,17 @@ extern signed char D_001940D4;
 extern struct record *player_object;
 extern iptr list_popup_callback;
 extern iptr window_image;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern signed char mouse_buttons_prev;
 extern int list_popup_poll(void);
 extern int itemmaker_open(int);
 extern int itemmaker_close(void);
 extern void itemmaker_draw(void);
 extern int sound_play(int, struct record *, int);
-extern int xn_draw_fullscreen_overlay_shaded();
-extern int xn_mouse_poll_clamped();
-extern int xn_font_select();
-extern int xn_tex_cache_begin_frame();
+extern void xn_draw_fullscreen_overlay_shaded(char *);
+extern int xn_mouse_poll_clamped(void);
+extern int xn_font_select(int);
+extern void xn_tex_cache_begin_frame(void);
 
 #define FLAG (((struct bf8_2_1 *)&D_001940D4)->f)
 #define MX (mouse_x)
@@ -39,7 +39,7 @@ void itemmaker_update(void)
     if (itemmaker_open(0) == 0) return;
     xn_tex_cache_begin_frame();
     D_0012B508 = 146;
-    xn_draw_fullscreen_overlay_shaded(window_image);
+    xn_draw_fullscreen_overlay_shaded((char *)window_image);
     xn_font_select(4);
     itemmaker_draw();
     xn_font_select(3);
@@ -48,7 +48,7 @@ void itemmaker_update(void)
         while (*((char *)&key_down_esc) != 0) ;
         while (*((char *)&mouse_buttons) != 0) xn_mouse_poll_clamped();
         *((char *)&mouse_double_click) = 0;
-        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)scratch_buffer)[index + 64000]);
+        (*(void (**)(int))((char *)&list_popup_callback))(((unsigned char *)scratch_buffer)[index + 64000]);
         while (*((char *)&mouse_buttons) != 0) xn_mouse_poll_clamped();
         *((char *)&mouse_double_click) = 0;
         return;

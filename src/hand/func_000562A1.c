@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000562A1 */
 #include "records.h"
+#include "clib.h"
 
 extern struct rect itemmaker_buttons[];
 extern unsigned char D_0012B508;
@@ -11,9 +12,9 @@ extern char D_001756B9[];
 extern char *enchant_power_names[];
 extern char *enchant_side_effect_names[];
 extern char *monster_names[];
-extern char **enchant_power_params[];
+extern iptr enchant_power_params[];
 extern unsigned char *enchant_spell_lists[];
-extern char **enchant_side_effect_params[];
+extern iptr enchant_side_effect_params[];
 extern signed char text_buffer[];
 extern signed char scratch_190ce4[];
 extern signed char scratch_190cee[];
@@ -35,12 +36,9 @@ extern void text_draw_coloured(char *, short, short, short, unsigned char);
 extern int gold_total_alias(void);
 extern int inv_draw_item_cell(struct record *, int, struct rect *);
 extern void inv_draw_left_list(struct rect *);
-extern char *itoa(int, char *, int);
 extern void xn_font_select(int);
 extern void xn_draw_image(int, int, int, int, char *);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern void mc_sprintf(char *, char *, ...);
 
 void itemmaker_draw(void)
 {
@@ -85,7 +83,7 @@ void itemmaker_draw(void)
                     mc_sprintf(((char *)text_buffer), D_001756B9, spell_name_by_id(enchant_spell_lists[itemmaker_slots[slot].type][itemmaker_slots[slot].param]));
                 } else {
                     mc_set_location(191, D_001756A3);
-                    mc_sprintf(((char *)text_buffer), D_001756B9, enchant_power_params[itemmaker_slots[slot].type][itemmaker_slots[slot].param]);
+                    mc_sprintf(((char *)text_buffer), D_001756B9, ((char **)enchant_power_params[itemmaker_slots[slot].type])[itemmaker_slots[slot].param]);
                 }
                 text_draw_coloured(((char *)text_buffer), 10, power_row * font_height + 60, D_0012B508, 156);
                 power_row += 2;
@@ -107,7 +105,7 @@ void itemmaker_draw(void)
                     mc_sprintf(((char *)text_buffer), D_001756B9, monster_names[itemmaker_slots[slot].param]);
                 } else {
                     mc_set_location(212, D_001756A3);
-                    mc_sprintf(((char *)text_buffer), D_001756B9, enchant_side_effect_params[itemmaker_slots[slot].type][itemmaker_slots[slot].param]);
+                    mc_sprintf(((char *)text_buffer), D_001756B9, ((char **)enchant_side_effect_params[itemmaker_slots[slot].type])[itemmaker_slots[slot].param]);
                 }
                 text_draw_coloured(((char *)text_buffer), 108, side_row * font_height + 60, D_0012B508, 156);
                 side_row += 2;

@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char D_0012B508;
 extern char D_00176D55[];
@@ -11,17 +12,17 @@ extern char D_00176D7D[];
 extern unsigned char player_environment;
 extern struct spell *selected_spell;
 extern signed char D_001841E3[];
-extern int D_00184620;
-extern int D_00184624;
-extern int D_00184628;
-extern int D_0018462C;
-extern int D_00184630;
-extern int D_00184634;
-extern int D_00184638;
-extern int D_0018463C;
-extern int D_00184640;
-extern int D_00185083;
-extern int D_00185097;
+extern iptr D_00184620;
+extern iptr D_00184624;
+extern iptr D_00184628;
+extern iptr D_0018462C;
+extern iptr D_00184630;
+extern iptr D_00184634;
+extern iptr D_00184638;
+extern iptr D_0018463C;
+extern iptr D_00184640;
+extern iptr D_00185083;
+extern iptr D_00185097;
 extern signed char undead_daedra_ids[];
 extern char spell_resist_flags[];
 extern int D_0018DDD8;
@@ -40,7 +41,7 @@ extern iptr spfx_popup_handler;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern int game_minutes;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern int free_later_count;
 extern short spell_ready_cost;
 extern signed char current_region;
@@ -65,12 +66,7 @@ extern struct record *object_free_single(struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int inventory_open(int, int, int);
-extern int rand();
-extern int srand();
-extern int mc_memset();
-extern int mc_strncpy();
-extern int strlen();
-extern int spell_find_effect_type();
+extern int spell_find_effect_type(char *, int);
 extern void damage_creature_death(struct record *);
 extern void msgbox_show_rsc(int, int);
 extern void spell_remove_effect_type(struct record *, int);
@@ -102,21 +98,21 @@ void spfx_dispel(struct record *spell, int slot, struct record *target)
     struct spell *spell_data;
     struct spell *active_data;
     struct record *active;
-    int text;
+    iptr text;
     int count;
 
     spell_data = &spell->data.spell;
     switch (spell_data->effects[slot].subtype) {
     case 0:
         count = 0;
-        text = *(int *)scratch_buffer;
+        text = (iptr)scratch_buffer;
         active = player_entity->children;
         while (active != 0) {
             if (active->type == 9) {
                 active_data = &active->data.spell;
-                mc_strncpy(text, active_data->name, 4, (iptr)D_00176D55, 284);
+                mc_strncpy((char *)text, active_data->name, 4, D_00176D55, 284);
                 *(iptr *)(scratch_190ee4 + (count << 2)) = (iptr)active;
-                *(int *)(scratch_190de4 + (count++ << 2)) = text;
+                *(iptr *)(scratch_190de4 + (count++ << 2)) = text;
                 text += strlen(active_data->name) + 1;
             }
             active = active->next;
@@ -686,7 +682,7 @@ default:;
 }
 }
 
-void spfx_walk_effect_records(struct record *object, int (*callback)())
+void spfx_walk_effect_records(struct record *object, int (*callback)(struct disease *))
 {
     struct record *next;
 
@@ -869,13 +865,13 @@ void spfx_popup_update(void)
         } else {
             map_goto_location(recall_anchor_region, recall_anchor_environment, recall_anchor_location, D_001A9A00);
             player_position_restore(1);
-            mc_memset((iptr)saved_positions, 0, 48, (iptr)D_00176D55, 1342, 48);
+            mc_memset(saved_positions, 0, 48, D_00176D55, 1342, 48);
         }
         spfx_popup_handler = 0;
         return;
     }
     if (((struct bf8_2_1 *)&D_001940D4)->f == 0 || (choice = list_popup_poll()) <= (-1)) return;
-    ((int (*)())(spfx_popup_handler))(choice);
+    ((int (*)(int))(spfx_popup_handler))(choice);
     spfx_popup_handler = 0;
 }
 

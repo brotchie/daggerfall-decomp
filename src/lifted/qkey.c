@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern iptr D_00147954;
 extern char D_001708F0[];
@@ -22,12 +23,12 @@ extern char D_0017CAFA[];
 extern char material_to_hit[];
 extern char weapon_damage_min[];
 extern char weapon_damage_max[];
-extern char monster_names[];
-extern char region_names[];
+extern char *monster_names[];
+extern char *region_names[];
 extern signed char D_001841E3[];
 extern int text_blank;
 extern char monster_category[];
-extern int D_0018506F;
+extern iptr D_0018506F;
 extern signed char body_part_armor_slots[];
 extern char weapon_proficiency_bits[];
 extern int D_0018DDDC;
@@ -73,13 +74,6 @@ extern int spfx_resist_roll(int, int, struct character *, struct career *, int, 
 extern iptr name_generate_seeded(unsigned char, unsigned char, int);
 extern iptr building_name(struct building *);
 extern struct record *object_free_single(struct record *);
-extern int rand();
-extern int close();
-extern int read();
-extern int mc_strncpy();
-extern int itoa();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
 extern void crime_reputation_penalty(void);
 extern void damage_weapon_strike_effects(struct item *, struct record *, struct record *, int);
 extern void damage_creature_death(struct record *);
@@ -135,16 +129,16 @@ iptr quest_symbol_text(int symbol, int form, int second_symbol)
                 object = qbn_item->object;
                 if (object != 0) {
                     if ((text_macro_item = &object->data.item)->group == 28 && text_macro_item->index == 0) {
-                        return itoa(text_macro_item->value, (iptr)text_rsc_buffer, 10);
+                        return (iptr)itoa(text_macro_item->value, (char *)text_rsc_buffer, 10);
                     }
                     if (text_macro_item->group == 7) {
                         book_header = *(char **)&D_00147954 + 90000;
-                        mc_set_location(115, (iptr)D_001708F0);
-                        mc_sprintf((iptr)text_buffer, (iptr)D_001708F7, (int)(unsigned short)(short)text_macro_item->message);
+                        mc_set_location(115, D_001708F0);
+                        mc_sprintf((char *)text_buffer, D_001708F7, (int)(unsigned short)(short)text_macro_item->message);
                         book_file = disk_open_data(text_buffer);
                         read(book_file, book_header, 234);
                         close(book_file);
-                        mc_strncpy((iptr)text_rsc_buffer, book_header, 2048, (iptr)D_001708F0, 119);
+                        mc_strncpy((char *)text_rsc_buffer, book_header, 2048, D_001708F0, 119);
                         return (iptr)text_rsc_buffer;
                     }
                     parse_expand(D_00170909, D_00190B44);
@@ -169,7 +163,7 @@ iptr quest_symbol_text(int symbol, int form, int second_symbol)
                     }
                     if ((form & 240) <= 32) return (iptr)object->data.quest_npc.location_name;
                     if ((form & 240) != 0) {
-                        return *(int *)(region_names + (((int)(unsigned short)object->region) << 2));
+                        return (iptr)region_names[((int)(unsigned short)object->region)];
                     }
                 }
             }
@@ -212,7 +206,7 @@ iptr quest_symbol_text(int symbol, int form, int second_symbol)
             case 32:
                 return (iptr)object->data.quest_npc.location_name;
             case 48:
-                return *(int *)(region_names + (object->home_region << 2));
+                return (iptr)region_names[object->home_region];
             default:
 L2D3DB:;
                 foe = quest_section(current_quest, 7);
@@ -232,7 +226,7 @@ L2D3DB:;
                         if (creature->mobile_id >= 128) {
                             return *(int *)(D_0017CAFA + (creature->mobile_id << 2));
                         }
-                        return *(int *)(monster_names + (creature->race << 2));
+                        return (iptr)monster_names[creature->race];
                     }
                 }
             }
@@ -250,9 +244,9 @@ L2D3DB:;
             }
             if (current_quest->section_counts[6] > i) {
                 if ((form & 15) != 0) {
-                    return itoa((minutes + 1439) / 1440, (iptr)text_rsc_buffer, 10);
+                    return (iptr)itoa((minutes + 1439) / 1440, (char *)text_rsc_buffer, 10);
                 }
-                return itoa(minutes, (iptr)text_rsc_buffer, 10);
+                return (iptr)itoa(minutes, (char *)text_rsc_buffer, 10);
             }
         }
         return text_blank;

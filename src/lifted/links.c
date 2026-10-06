@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern iptr D_00147954;
 extern char D_00175962[];
@@ -11,7 +12,7 @@ extern struct record *player_entity;
 extern struct record *location_object;
 extern struct spell *spell_records;
 extern struct character *player_character;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern struct link links[];
 extern iptr active_links[];
 extern int link_count;
@@ -23,14 +24,9 @@ extern int spfx_damage(struct record *, int, struct record *);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_find_by_id(struct record *, iptr);
-extern int read();
-extern int write();
-extern int strlen();
-extern int stricmp();
-extern int mc_memcpy();
-extern int xn_str_count_nonzero();
+extern int xn_str_count_nonzero(char *, unsigned);
 extern void parse_rsc_text(int, int, int);
-extern void parse_rsc_text_copy(int, int);
+extern void parse_rsc_text_copy(int, iptr);
 
 void links_save(int handle)
 {
@@ -39,16 +35,16 @@ void links_save(int handle)
     int *indexes;
 
     if (active_link_count < 0) active_link_count = 0;
-    mc_memcpy(D_00147954, (iptr)links, link_count * 39, (iptr)D_00175962, 78, 4);
+    mc_memcpy((void *)D_00147954, links, link_count * 39, D_00175962, 78, 4);
     copy = (struct link *)D_00147954;
     for (i = 0; i < link_count; i++) {
         if (copy[i].object != 0) {
-            copy[i].object = (struct record *)copy[i].object->id;
+            copy[i].object = (struct record *)(uptr)copy[i].object->id;
         }
     }
-    write(handle, (iptr)&link_count, 4);
+    write(handle, &link_count, 4);
     write(handle, copy, link_count * 39);
-    write(handle, (iptr)&active_link_count, 4);
+    write(handle, &active_link_count, 4);
     indexes = (int *)D_00147954;
     for (i = 0; i < active_link_count; i++) {
         indexes[i] = ((unsigned)(active_links[i] - ((iptr)links))) / 39;
@@ -60,8 +56,8 @@ void links_load(int handle)
 {
     int i;
 
-    read(handle, (iptr)&link_count, 4);
-    read(handle, (iptr)links, link_count * 39);
+    read(handle, &link_count, 4);
+    read(handle, links, link_count * 39);
     for (i = 0; i < link_count; i++) {
         if (links[i].param == 108) {
             links[i].param = 100;
@@ -70,9 +66,9 @@ void links_load(int handle)
             links[i].object = object_find_by_id(location_object, (iptr)links[i].object);
         }
     }
-    read(handle, (iptr)&active_link_count, 4);
+    read(handle, &active_link_count, 4);
     if (active_link_count < 0) active_link_count = 0;
-    read(handle, (iptr)active_links, active_link_count << 2);
+    read(handle, active_links, active_link_count << 2);
     for (i = 0; i < active_link_count; i++) {
         active_links[i] = ((iptr)links) + (active_links[i] * 39);
     }
@@ -83,8 +79,8 @@ void link_show_text(int text_id)
     char *line;
     char *end;
 
-    parse_rsc_text_copy(text_id, *(int *)scratch_buffer);
-    line = *(char **)scratch_buffer;
+    parse_rsc_text_copy(text_id, (iptr)scratch_buffer);
+    line = scratch_buffer;
     while (*line != 0) {
         end = line;
         while (*end != 0 && *end != 252 && *end != 253) {
@@ -102,7 +98,7 @@ int link_answer_matches(int text_id, iptr answer)
     int length;
 
     parse_rsc_text(text_id, 0, 0);
-    length = strlen((iptr)text_rsc_buffer);
+    length = strlen((char *)text_rsc_buffer);
     for (i = 1; i < length; i++) {
         if (((int)(unsigned char)text_rsc_buffer[i]) == 44 || ((int)(unsigned char)text_rsc_buffer[i]) == 34) {
             text_rsc_buffer[i] = 0;
@@ -111,8 +107,8 @@ int link_answer_matches(int text_id, iptr answer)
     D_00190FE5[i] = 0;
     i = 1;
     while (text_rsc_buffer[i] != 0) {
-        if (stricmp(((iptr)text_rsc_buffer) + i, answer) == 0) return 1;
-        i += strlen(((iptr)text_rsc_buffer) + i) + 1;
+        if (stricmp((char *)(((iptr)text_rsc_buffer) + i), (char *)answer) == 0) return 1;
+        i += strlen((char *)(((iptr)text_rsc_buffer) + i)) + 1;
     }
     return 0;
 }

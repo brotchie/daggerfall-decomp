@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004D402 */
 #include "structs.h"
+#include "clib.h"
 extern signed char mouse_buttons;
 extern short mouse_x;
 extern short mouse_y;
@@ -48,13 +49,11 @@ extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern int key_pressed_once(unsigned char);
 extern void inpstr_begin_text(char *, int);
 extern int inpstr_update(void);
-extern int mc_memset();
-extern int itoa();
-extern int xn_draw_fullscreen_overlay_shaded();
-extern int xn_font_select();
-extern int xn_draw_image();
-extern int xn_draw_image_transparent();
-extern int xn_draw_line_to();
+extern void xn_draw_fullscreen_overlay_shaded(char *);
+extern int xn_font_select(int);
+extern void xn_draw_image(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
+extern void xn_draw_line_to(int, int);
 
 void note_update(void)
 {
@@ -63,13 +62,13 @@ void note_update(void)
     int unused2;
 
     if (note_open_notebook(0) == 0) return;
-    xn_draw_fullscreen_overlay_shaded(window_image);
+    xn_draw_fullscreen_overlay_shaded((char *)window_image);
     xn_font_select(4);
-    xn_draw_image(182, 176, 44, 9, (iptr)(*(char **)&note_rci + (((int)(unsigned char)note_tool) * 396)));
-    xn_draw_image(226, 176, 44, 9, (iptr)(*(char **)&note_rci + ((((int)(short)*(short *)note_font) * 396) + 1584)));
-    xn_draw_image_transparent((((int)(unsigned char)D_001997EB) << 3) + 53, 185, 5, 3, (iptr)D_001851F0);
+    xn_draw_image(182, 176, 44, 9, (*(char **)&note_rci + (((int)(unsigned char)note_tool) * 396)));
+    xn_draw_image(226, 176, 44, 9, (*(char **)&note_rci + ((((int)(short)*(short *)note_font) * 396) + 1584)));
+    xn_draw_image_transparent((((int)(unsigned char)D_001997EB) << 3) + 53, 185, 5, 3, D_001851F0);
     D_0012B508 = 145;
-    text_draw_centred_coloured(itoa((((int)(short)note_page_index) + 1), (iptr)text_buffer, 10), 303, 4, 145, 141);
+    text_draw_centred_coloured((iptr)itoa((((int)(short)note_page_index) + 1), (char *)text_buffer, 10), 303, 4, 145, 141);
     note_find();
     note_draw_page();
     if (((int)(unsigned char)note_action) == 1) {
@@ -87,7 +86,7 @@ void note_update(void)
             if (key_down_enter != 0 && text_rsc_buffer[0] != 0) {
                 note_cursor_y += font_height;
                 text_cursor_y = note_cursor_y;
-                mc_memset((iptr)text_rsc_buffer, 0, 81, (iptr)D_00174FAC, 137, 2048);
+                mc_memset(text_rsc_buffer, 0, 81, D_00174FAC, 137, 2048);
                 inpstr_begin_text(text_rsc_buffer, 79);
             } else {
                 D_001940D5 &= 251;

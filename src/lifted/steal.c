@@ -2,17 +2,18 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char D_0012B508;
 extern char D_0017018C[];
 extern short msgbox_wrap_width;
-extern int D_00183258;
-extern int D_0018325C;
-extern int D_00183260;
-extern int D_00183264[];
+extern iptr D_00183258;
+extern iptr D_0018325C;
+extern iptr D_00183260;
+extern iptr D_00183264[];
 extern int D_0018328C;
-extern int D_0018333C;
-extern int D_00183340;
+extern iptr D_0018333C;
+extern iptr D_00183340;
 extern signed char text_buffer[];
 extern char scratch_190be4[];
 extern struct record *found_object;
@@ -20,16 +21,13 @@ extern struct character *player_character;
 extern signed char crime_current;
 
 extern iptr hud_message_add(iptr);
-extern int rand();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
 extern void monster_wake_all(void);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void guards_summon(int);
 extern void guild_count_crime(int, int);
-extern void hud_status_set(int);
+extern void hud_status_set(iptr);
 #pragma aux mc_set_location parm routine [];
 
 void pickpocket_attempt(struct record *target)
@@ -65,8 +63,8 @@ void pickpocket_attempt(struct record *target)
     D_0012B508 = 145;
     gold = (rand() % 5) + 1;
     player_character->gold += gold;
-    mc_set_location(155, (iptr)D_0017018C);
-    mc_sprintf((iptr)text_buffer, D_00183340, gold);
+    mc_set_location(155, D_0017018C);
+    mc_sprintf((char *)text_buffer, (char *)D_00183340, gold);
     msgbox_show_string(text_buffer, 1);
     guild_count_crime(5, 1);
 }

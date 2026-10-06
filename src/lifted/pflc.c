@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern signed char key_down_y;
@@ -14,21 +15,12 @@ extern signed char text_rsc_buffer[];
 extern signed char mouse_buttons_prev;
 extern struct quest *current_quest;
 
-extern int flc_open(int, struct flc_player *);
-extern int close();
-extern int mc_free();
-extern int mc_memset();
-extern int lseek();
-extern int read();
-extern int strlen();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int xn_pal_set_range_8bit();
-extern int xn_mouse_poll_clamped();
-extern int xn_pal_get();
-extern int xn_draw_image();
-extern int xn_draw_image_transparent();
+extern int flc_open(iptr, struct flc_player *);
+extern void xn_pal_set_range_8bit(char *, int, int);
+extern void xn_mouse_poll_clamped(void);
+extern void xn_pal_get(char *);
+extern void xn_draw_image(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
 extern void parse_rsc_text(int, int, int);
 extern void quest_load_text(struct quest *, int, short, int);
 extern void fatal_error(char *);
@@ -47,18 +39,18 @@ void flc_show_frame(struct flc_player *anim)
 {
     if (anim->width != 320 || anim->height != 200) {
         xn_draw_image_transparent(anim->x, anim->y, anim->width, anim->height, anim->image);
-        mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00175404, 113, 4);
+        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 113, 4);
         return;
     }
     if (anim->frames_left != 0) {
-        mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00175404, 117, 4);
+        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 117, 4);
         return;
     }
     if (anim->loops <= 1) return;
-    mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00175404, 118, 4);
+    mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 118, 4);
 }
 
-int flc_play_with_text(int name, struct flc_player *anim, int text_id, int ask_yes_no)
+int flc_play_with_text(iptr name, struct flc_player *anim, int text_id, int ask_yes_no)
 {
     int frame_start;
     char *next_page;
@@ -68,13 +60,13 @@ int flc_play_with_text(int name, struct flc_player *anim, int text_id, int ask_y
     short ticks_addr2;
 
     i = 0;
-    mc_memset(anim, 0, 44, (iptr)D_00175404, 127, 4);
+    mc_memset(anim, 0, 44, D_00175404, 127, 4);
     if (flc_open(name, anim) == 0) {
-        mc_set_location(131, (iptr)D_00175404);
-        mc_sprintf((iptr)text_buffer, (iptr)D_0017540B, name);
+        mc_set_location(131, D_00175404);
+        mc_sprintf((char *)text_buffer, D_0017540B, name);
         fatal_error(text_buffer);
     }
-    mc_memset(screen_buffer, 0, 64000, (iptr)D_00175404, 135, 4);
+    mc_memset((void *)screen_buffer, 0, 64000, D_00175404, 135, 4);
     anim->loops = 255;
     if (current_quest != 0) {
         quest_load_text(current_quest, text_id, 0, 0);
@@ -97,9 +89,9 @@ int flc_play_with_text(int name, struct flc_player *anim, int text_id, int ask_y
             if (flc_next_frame(anim) != 0) break;
             next_page = flc_draw_text_page(page);
             if (anim->frames_left != 0) {
-                mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00175404, 163, 4);
+                mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 163, 4);
             } else if (anim->loops > 1) {
-                mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00175404, 164, 4);
+                mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00175404, 164, 4);
             }
             do {
                 mouse_buttons_prev = mouse_buttons;
@@ -141,19 +133,19 @@ void flc_close(struct flc_player *anim)
 {
     if ((anim->flags & 1) != 0) {
         if (anim->chunk != 0 && anim->chunk != (char *)(iptr)-1751672937) {
-            mc_free(anim->chunk, (iptr)D_00175404, 263);
+            mc_free(anim->chunk, D_00175404, 263);
             anim->chunk = (char *)(iptr)-1751672937;
         }
     }
     if ((anim->flags & 2) != 0) {
         if (anim->palette != 0 && anim->palette != (char *)(iptr)-1751672937) {
-            mc_free(anim->palette, (iptr)D_00175404, 264);
+            mc_free(anim->palette, D_00175404, 264);
             anim->palette = (char *)(iptr)-1751672937;
         }
     }
     if ((anim->flags & 64) != 0) {
         if (anim->image != 0 && anim->image != (char *)(iptr)-1751672937) {
-            mc_free(anim->image, (iptr)D_00175404, 265);
+            mc_free(anim->image, D_00175404, 265);
             anim->image = (char *)(iptr)-1751672937;
         }
     }
@@ -193,15 +185,15 @@ void flc_read_frame(struct flc_player *anim)
 
         handle = anim->handle;
         for (;;) {
-            read((int)(unsigned short)handle, (iptr)&chunk, 6);
+            read((int)(unsigned short)handle, &chunk, 6);
             if (chunk.type == 61946) break;
             lseek((int)(unsigned short)handle, chunk.size - 6, 1);
         }
-        read((int)(unsigned short)handle, (iptr)&chunk_count, 2);
+        read((int)(unsigned short)handle, &chunk_count, 2);
         lseek((int)(unsigned short)handle, 8, 1);
         *(int *)&i = 0;
         for (; (unsigned short)i < (short)chunk_count; (*(int *)&i)++) {
-            read((int)(unsigned short)handle, (iptr)&chunk, 6);
+            read((int)(unsigned short)handle, &chunk, 6);
             chunk.size += -6;
             switch (chunk.type) {
             case 4:
@@ -225,11 +217,11 @@ void flc_read_frame(struct flc_player *anim)
                 }
                 break;
             case 13:
-                mc_memset(anim->image, 0, anim->width * anim->height, (iptr)D_00175404, 347, 4);
+                mc_memset(anim->image, 0, anim->width * anim->height, D_00175404, 347, 4);
                 break;
             case 16:
                 if ((anim->flags & 128) == 0) {
-                    read((int)(unsigned short)handle, screen_buffer, (unsigned short)chunk.size);
+                    read((int)(unsigned short)handle, (void *)screen_buffer, (unsigned short)chunk.size);
                 } else {
                     read((int)(unsigned short)handle, anim->image, (unsigned short)chunk.size);
                 }
@@ -266,11 +258,11 @@ void flc_decode_brun(signed char *chunk, struct flc_player *anim)
         do {
             count = *chunk++;
             if (count > 0) {
-                mc_memset((iptr)(anim->image + (anim->width * ((int)(short)*(short *)&y))) + ((int)(short)x), (int)(unsigned char)*chunk, (int)(signed char)count, (iptr)D_00175404, 443, 4);
+                mc_memset((void *)((iptr)(anim->image + (anim->width * ((int)(short)*(short *)&y))) + ((int)(short)x)), (int)(unsigned char)*chunk, (int)(signed char)count, D_00175404, 443, 4);
                 x += (short)(signed char)count;
                 chunk++;
             } else if (count < 0) {
-                mc_memcpy((iptr)(anim->image + (anim->width * ((int)(short)*(short *)&y))) + ((int)(short)x), chunk, -((int)(signed char)count), (iptr)D_00175404, 449, 4);
+                mc_memcpy((void *)((iptr)(anim->image + (anim->width * ((int)(short)*(short *)&y))) + ((int)(short)x)), chunk, -((int)(signed char)count), D_00175404, 449, 4);
                 x -= (short)(signed char)count;
                 chunk -= (int)(signed char)count;
             }

@@ -15,9 +15,9 @@ extern void parse_rsc_text(int, int, int);
 extern iptr hud_message_add(char *);
 extern struct map_location *region_find_location(int);
 extern void location_flatten_terrain(signed char *, signed char *);
-extern int xn_world_cell_at();
-extern int xn_world_place_nature_flats();
-extern int xn_world_mark_nonplanar_quads();
+extern int xn_world_cell_at(int, int);
+extern void xn_world_place_nature_flats(unsigned);
+extern void xn_world_mark_nonplanar_quads(void);
 
 void terrain_update_cells(void)
 {

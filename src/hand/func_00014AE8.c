@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00014AE8 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_001703C9[];
 extern char D_001703D6[];
@@ -50,25 +51,23 @@ extern char D_001966BA;
 extern char D_001966BB;
 extern void talk_close(void);
 extern void talk_say_text(int);
-extern void talk_say_string(int);
+extern void talk_say_string(iptr);
 extern void talk_init_text(void);
 extern void talk_build_place_topics(void);
 extern void func_00018339(void);
 extern int talk_faction_greeting(int);
 extern int talk_roll_attitude(void);
-extern int func_0001D46A(int);
+extern iptr func_0001D46A(int);
 extern void msgbox_show_rsc(short, int);
 extern void guards_summon(int);
 extern void npc_load_face(struct record *, iptr);
 extern int people_check_witnesses(void);
 extern iptr disk_read_file(char *, iptr);
-extern int rand(void);
-extern void *mc_malloc(int, char *, int);
 extern void xn_font_select(int);
 
 int talk_open(struct record *npc)
 {
-    int rumor_text;
+    iptr rumor_text;
     int greeting;
 
     if (D_0019626F == 12 && game_mode == 8)

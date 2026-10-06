@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char D_001861AA[];
 extern iptr D_0018642F[];
@@ -13,7 +14,6 @@ extern struct record *item_add_to_container(struct record *, int, int, int);
 extern int rand_range(int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
-extern int rand();
 extern void item_make_random(unsigned short, struct item *);
 extern void item_make(int, int, struct item *);
 extern void item_make_magic(struct item *, int);

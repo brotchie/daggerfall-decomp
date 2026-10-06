@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char key_down_enter;
 extern char D_00175AD4[];
@@ -22,13 +23,7 @@ extern char logbook_show_notes[];
 extern int key_action_held(int);
 extern int sound_play(int, struct record *, int);
 extern iptr disk_read_file(char *, iptr);
-extern int func_0009DA1C(int, iptr);
-extern int printf(iptr, ...);
-extern int mc_free();
-extern int mc_memset();
-extern iptr mc_malloc();
-extern int func_000A2D9E();
-extern int xn_gfx_restore_mode();
+extern void xn_gfx_restore_mode(void);
 extern void fatal_error(char *);
 extern void sound_shutdown_music(void);
 extern void mem_check_heap(int);
@@ -41,8 +36,8 @@ void mem_pool_init(struct mem_pool *pool, int size)
 {
     struct mem_block *block;
 
-    mc_memset((iptr)pool, 0, 4, (iptr)D_00175AD4, 60, 4);
-    pool->first = (struct mem_block *)mc_malloc(size, (iptr)D_00175AD4, 62);
+    mc_memset(pool, 0, 4, D_00175AD4, 60, 4);
+    pool->first = (struct mem_block *)mc_malloc(size, D_00175AD4, 62);
     block = pool->first;
     if (block == 0) fatal_error(D_00175ADB);
     pool->size = size;
@@ -55,7 +50,7 @@ void mem_pool_init(struct mem_pool *pool, int size)
 void mem_pool_free(struct mem_pool *pool)
 {
     if (pool->first == 0 || (iptr)pool->first == (-1751672937)) return;
-    mc_free((iptr)pool->first, (iptr)D_00175AD4, 84);
+    mc_free(pool->first, D_00175AD4, 84);
     pool->first = (struct mem_block *)(iptr)-1751672937;
 }
 
@@ -107,8 +102,8 @@ int mem_block_size(char *data)
 void crash_screen(void)
 {
     xn_gfx_restore_mode();
-    func_0009DA1C(394, (iptr)D_00175AD4);
-    printf((iptr)D_00175C2D, frame_checkpoint);
+    func_0009DA1C(394, D_00175AD4);
+    printf(D_00175C2D, frame_checkpoint);
     while (key_down_enter == 0);
     sound_shutdown_music();
     func_000A2D9E();

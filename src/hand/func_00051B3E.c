@@ -1,4 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00051B3E */
+#include "ptrint.h"
+#include "clib.h"
 #pragma pack(1)
 struct Snd {
     char pad0[2];
@@ -14,14 +16,13 @@ struct Snd {
 extern unsigned char mouse_buttons;
 extern char xn_kbd_last_scancode;
 extern void flc_show_frame(struct Snd *);
-extern int flc_open(int, struct Snd *);
+extern int flc_open(iptr, struct Snd *);
 extern void flc_close(struct Snd *);
 extern int flc_next_frame(struct Snd *);
-extern int lseek(unsigned short, int, int);
-extern int xn_kbd_wait_all_released();
-extern int xn_mouse_poll_clamped();
+extern void xn_kbd_wait_all_released(void);
+extern void xn_mouse_poll_clamped(void);
 
-int pflc_play(int file_name, struct Snd *s)
+int pflc_play(iptr file_name, struct Snd *s)
 {
     int t0;
 

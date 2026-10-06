@@ -15,7 +15,7 @@ extern struct record *object_find_by_id(struct record *, iptr);
 #define FIX(o, msg) \
     if (o) { \
         if ((short)o->quest_id != quest->id) fatal_error(msg); \
-        o = (struct record *)o->id; \
+        o = (struct record *)(uptr)o->id; \
     }
 
 void quest_unlink_for_save(struct quest *quest)
@@ -40,7 +40,7 @@ void quest_unlink_for_save(struct quest *quest)
         op->arg_count = (*(unsigned char **)&qbn_opcode_arg_counts)[op->opcode] - '0';
         for (j = 0; j < op->arg_count; j++, arg++) {
             if (arg->record) arg->record -= (iptr)quest;
-            if (arg->object) arg->object = (struct record *)arg->object->id;
+            if (arg->object) arg->object = (struct record *)(uptr)arg->object->id;
         }
     }
     qbn_person = (struct qbn_person *)((char *)quest + quest->section_offsets[3]);
@@ -51,7 +51,7 @@ void quest_unlink_for_save(struct quest *quest)
     for (i = 0; i < quest->section_counts[4]; i++, qbn_place++) {
         if (qbn_place->object) {
             if ((short)qbn_place->object->quest_id != quest->id) fatal_error(D_0017088A);
-            qbn_place->object = (struct record *)qbn_place->object->id;
+            qbn_place->object = (struct record *)(uptr)qbn_place->object->id;
             if (object_find_by_id(nonworld_root, (iptr)qbn_place->object) == 0) fatal_error(D_0017089B);
             if (qbn_place->object == 0) fatal_error(D_001708B7);
             /* +0x03 the place's type (10: a fixed object), +0x04/+0x06 the object id's halves */

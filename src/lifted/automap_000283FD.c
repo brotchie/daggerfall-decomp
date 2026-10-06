@@ -7,7 +7,7 @@ extern int town_map_view_x;
 extern int town_map_view_y;
 
 extern int font_text_width(char *);
-extern int strlen();
+#include "clib.h"
 
 int town_note_at(int x, int y)
 {

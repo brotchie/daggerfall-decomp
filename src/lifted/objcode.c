@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00177358[];
 extern char D_00177364[];
@@ -20,24 +21,24 @@ extern char D_00177423[];
 extern char D_00177430[];
 extern unsigned char player_environment;
 extern char travel_options[];
-extern int D_0018507B;
+extern iptr D_0018507B;
 extern signed char D_00187CA8;
 extern int scratch_190cac;
 extern signed char scratch_190ce4[];
 extern signed char scratch_190ce5;
 extern signed char scratch_190ce7;
 extern signed char D_001940D5;
-extern char location_grid[];
+extern struct record *location_grid[];
 extern struct record *player_object;
 extern struct record *location_object;
 extern struct record *found_object;
 extern int creature_count;
-extern char D_00195B5C[];
+extern struct image *D_00195B5C;
 extern char D_00195B84[];
 extern struct character *player_character;
 extern iptr window_image;
 extern struct career *player_class;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern int location_grid_x;
 extern int location_grid_z;
 extern char found_marker[];
@@ -53,15 +54,15 @@ extern signed char game_mode;
 extern signed char is_daytime;
 extern int marker_best;
 extern int marker_kind;
-extern char D_001AA64C[];
-extern char D_001AA650[];
-extern char D_001AA654[];
-extern char D_001AA658[];
-extern char D_001AA65C[];
+extern struct image *D_001AA64C;
+extern struct image *D_001AA650;
+extern struct image *D_001AA654;
+extern struct image *D_001AA658;
+extern char *D_001AA65C[];
 extern iptr D_001AA660;
-extern char D_001AA668[];
+extern struct image *D_001AA668;
 extern iptr D_001AA66C;
-extern char D_001AA670[];
+extern struct image *D_001AA670;
 extern iptr D_001AA6A0;
 extern signed char D_001AA6A4;
 extern signed char D_001AA6A5;
@@ -69,22 +70,19 @@ extern signed char D_001AA6A6;
 
 extern iptr disk_read_file(char *, iptr);
 extern int gold_can_afford(int);
-extern int object_find_open(struct record *, int (*)());
+extern int object_find_open(struct record *, iptr (*)());
 extern int travel_trip_cost(void);
-extern int rand();
-extern int mc_memset();
-extern int mc_memcpy();
-extern int xn_pal_set_all_8bit();
-extern int xn_math_isqrt();
+extern void xn_pal_set_all_8bit(char *);
+extern int xn_math_isqrt(int);
 extern void msgbox_show_string(iptr, int);
 extern void object_foreach_open(struct record *, void (*)());
-int marker_match_cb(struct record *);
+iptr marker_match_cb(struct record *);
 struct record *marker_find_random(struct record *, int);
 struct record *marker_find_nearest(struct record *, int);
-int location_cell_at(int, int);
+iptr location_cell_at(int, int);
 void marker_nearest_cb(struct record *);
 
-int marker_match_cb(struct record *object)
+iptr marker_match_cb(struct record *object)
 {
     struct block *block;
     struct block_flat *flat;
@@ -96,7 +94,7 @@ int marker_match_cb(struct record *object)
     case 34:
         if ((object->image >> 7) == 199 && ((object->image & 31) - 2) == marker_kind) {
             if (*(int *)D_00195B84 == 0 && marker_best < 0) {
-                mc_memcpy((iptr)found_marker, object, 55, (iptr)D_00177358, 191, 4);
+                mc_memcpy(found_marker, object, 55, D_00177358, 191, 4);
                 return 1;
             }
             *(int *)D_00195B84 += marker_best;
@@ -150,7 +148,7 @@ struct record *marker_find_first(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = -1;
-    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 261, 4);
+    mc_memset(found_marker, 0, 71, D_00177358, 261, 4);
     object_find_open(root, marker_match_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
@@ -158,12 +156,12 @@ struct record *marker_find_first(struct record *root, int kind)
 
 struct record *marker_find_nth(struct record *root, int kind, int n)
 {
-    int cell;
+    iptr cell;
 
     marker_kind = kind;
     *(int *)D_00195B84 = n;
     marker_best = -1;
-    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 287, 4);
+    mc_memset(found_marker, 0, 71, D_00177358, 287, 4);
     object_find_open(root, marker_match_cb);
     cell = location_cell_at(D_00195F71, D_00195F79);
     D_00195F81 = n;
@@ -178,7 +176,7 @@ struct record *marker_find_random(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
-    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 317, 4);
+    mc_memset(found_marker, 0, 71, D_00177358, 317, 4);
     object_find_open(root, marker_match_cb);
     if (*(int *)D_00195B84 == 0) return 0;
     n = (*(int *)D_00195B84 = rand() % *(int *)D_00195B84);
@@ -206,7 +204,7 @@ void marker_nearest_cb(struct record *object)
         if (dist < marker_best) {
             found_object = object;
             marker_best = dist;
-            mc_memcpy((iptr)found_marker, object, 55, (iptr)D_00177358, 363, 4);
+            mc_memcpy(found_marker, object, 55, D_00177358, 363, 4);
         }
         return;
     case 43:
@@ -258,7 +256,7 @@ struct record *marker_find_nearest(struct record *root, int kind)
 {
     marker_kind = kind;
     marker_best = 500000;
-    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 432, 4);
+    mc_memset(found_marker, 0, 71, D_00177358, 432, 4);
     object_foreach_open(root, marker_nearest_cb);
     if (*(signed char *)found_marker != 0) return (struct record *)found_marker;
     return 0;
@@ -269,7 +267,7 @@ int marker_count(struct record *root, int kind)
     marker_kind = kind;
     *(int *)D_00195B84 = 0;
     marker_best = 1;
-    mc_memset((iptr)found_marker, 0, 71, (iptr)D_00177358, 456, 4);
+    mc_memset(found_marker, 0, 71, D_00177358, 456, 4);
     object_find_open(root, marker_match_cb);
     return *(int *)D_00195B84;
 }
@@ -304,14 +302,14 @@ int player_to_random_marker(struct record *root, int kind)
     return 0;
 }
 
-int location_cell_at(int x, int z)
+iptr location_cell_at(int x, int z)
 {
     int cell;
 
     x = ((x - location_object->x) + location_grid_x) / 1024;
     z = ((z - location_object->z) + location_grid_z) / 1024;
     cell = x + (z << 5);
-    return *(int *)(location_grid + (cell << 2));
+    return (iptr)location_grid[cell];
 }
 
 int travel_map_open(int mode)
@@ -345,21 +343,21 @@ int travel_map_open(int mode)
             D_001AA6A0 = disk_read_file(D_001773AE, 0);
         }
         D_001AA66C = disk_read_file(D_001773BB, 0);
-        *(iptr *)D_001AA65C = disk_read_file(D_001773C8, 0);
+        *(iptr *)&D_001AA65C[0] = disk_read_file(D_001773C8, 0);
         D_001AA660 = disk_read_file(D_001773D5, 0);
-        *(iptr *)D_001AA670 = disk_read_file(D_001773E2, 0);
-        *(iptr *)D_001AA64C = disk_read_file(D_001773EF, 0);
-        *(iptr *)D_001AA650 = disk_read_file(D_001773FC, 0);
-        *(iptr *)D_001AA654 = disk_read_file(D_00177409, 0);
-        *(iptr *)D_001AA658 = disk_read_file(D_00177416, 0);
-        *(iptr *)D_00195B5C = disk_read_file(D_00177423, 0);
-        disk_read_file(D_00177430, *(int *)scratch_buffer);
-        xn_pal_set_all_8bit(*(int *)scratch_buffer + 8);
+        *(iptr *)&D_001AA670 = disk_read_file(D_001773E2, 0);
+        *(iptr *)&D_001AA64C = disk_read_file(D_001773EF, 0);
+        *(iptr *)&D_001AA650 = disk_read_file(D_001773FC, 0);
+        *(iptr *)&D_001AA654 = disk_read_file(D_00177409, 0);
+        *(iptr *)&D_001AA658 = disk_read_file(D_00177416, 0);
+        *(iptr *)&D_00195B5C = disk_read_file(D_00177423, 0);
+        disk_read_file(D_00177430, (iptr)scratch_buffer);
+        xn_pal_set_all_8bit((char *)((iptr)scratch_buffer + 8));
         *(int *)&ticks_addr = 1132;
         scratch_190cac = *(int *)(*(char **)&ticks_addr);
         D_001AA6A4 = (D_001AA6A5 = 0);
         scratch_190ce5 = (scratch_190ce4[0] = 0);
-        *(int *)D_001AA668 = 0;
+        *(iptr *)&D_001AA668 = 0;
         game_mode = 19;
         D_00196272 = 1;
         D_00187CA8 = 0;

@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
+#include "clib.h"
 
 extern signed char key_down_esc;
 extern iptr screen_buffer;
@@ -15,8 +16,6 @@ extern iptr options_saved_screen;
 
 extern iptr disk_read_file(char *, iptr);
 extern int key_pressed_once(unsigned char);
-extern iptr mc_malloc();
-extern int mc_memcpy();
 extern void logbook_prune_quests(void);
 extern void save_thumbnail_capture(void);
 
@@ -31,8 +30,8 @@ int options_open(short force)
         game_mode = 7;
         options_image = disk_read_file(D_00170EDB, 0);
         D_00196272 = 1;
-        options_saved_screen = mc_malloc(64000, (iptr)D_00170EE8, 120);
-        mc_memcpy(options_saved_screen, screen_buffer, 64000, (iptr)D_00170EE8, 121, 4);
+        options_saved_screen = (iptr)mc_malloc(64000, D_00170EE8, 120);
+        mc_memcpy((void *)options_saved_screen, (void *)screen_buffer, 64000, D_00170EE8, 121, 4);
         logbook_prune_quests();
     }
     if (((int)(unsigned char)game_mode) == 7) {

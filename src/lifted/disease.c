@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 
 #include "records.h"
+#include "clib.h"
 
 extern signed char D_0012B508;
 extern char D_00175970[];
@@ -13,7 +14,7 @@ extern char D_001759EB[];
 extern char D_001759F8[];
 extern char D_0018320A[];
 extern char monster_category[];
-extern int D_00185083;
+extern iptr D_00185083;
 extern struct disease disease_table[];
 extern short poison_table[];
 extern short D_00186D85[];
@@ -64,10 +65,7 @@ extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_find_item(struct record *, short, short);
 extern int object_new_id(int);
-extern int mc_strncpy();
-extern int strlen();
-extern int mc_memcpy();
-extern int xn_math_approx_dist2d();
+extern int xn_math_approx_dist2d(int, int, int, int);
 extern void msgbox_show_string(char *, short);
 extern void msgbox_show_rsc(int, int);
 extern void paperdoll_draw(int, int);
@@ -112,7 +110,7 @@ void disease_infect(struct record *target, unsigned char *disease_list, int dise
         while (disease_list[count++] != 255);
         disease_id = disease_list[rand_range(0, count - 2)];
     }
-    mc_memcpy(disease_data, &disease_table[disease_id], 47, (iptr)D_00175970, 83, 4);
+    mc_memcpy(disease_data, &disease_table[disease_id], 47, D_00175970, 83, 4);
     if (disease_data->days_left != 255) disease_data->days_left = rand_range(disease_data->days_left, disease_data->stage);
     disease_data->stage = 0;
 }
@@ -321,7 +319,7 @@ void disease_add_vampire_spell(struct record *spellbook, int spell_id)
     spell_data = &spell->data.spell;
     i = 0;
     while (spell_records[i].name[0] == 0 || spell_records[i].id != spell_id) i++;
-    mc_memcpy(spell_data, &spell_records[i], 89, (iptr)D_00175970, 540, 4);
+    mc_memcpy(spell_data, &spell_records[i], 89, D_00175970, 540, 4);
     spell_data->name[strlen(spell_data->name) + 1] = 36;
 }
 
@@ -362,7 +360,7 @@ void disease_cure_vampirism(void)
     player_character->skills[34].value -= 30;
     player_character->skills[18].value -= 30;
     player_character->skills[30].value -= 30;
-    mc_memcpy(player_class, &saved_class->data.career, 74, (iptr)D_00175970, 590, 4);
+    mc_memcpy(player_class, &saved_class->data.career, 74, D_00175970, 590, 4);
     object_foreach(player_entity->children, disease_toggle_memberships_cb);
     player_character->race = player_character->original_race;
     player_character->min_metal_to_hit = 0;
@@ -464,7 +462,7 @@ void disease_become_lycanthrope(int kind)
         saved_class->flags = 3;
         lycanthropy_data = &lycanthropy->data.disease;
         lycanthropy_data->id = *(signed char *)&kind + 101;
-        mc_memcpy(&saved_class->data.career, player_class, 74, (iptr)D_00175970, 697, 4);
+        mc_memcpy(&saved_class->data.career, player_class, 74, D_00175970, 697, 4);
         for (i = 0; i < 4; i++) {
             attribute = (int)(unsigned char)lycanthrope_attributes[i];
             lycanthropy_data->drained[attribute] = 40;
@@ -485,7 +483,7 @@ void disease_become_lycanthrope(int kind)
         spell_data = &spell->data.spell;
         i = 0;
         while (spell_records[i].name[0] == 0 || spell_records[i].id != 92) i++;
-        mc_memcpy(spell_data, &spell_records[i], 89, (iptr)D_00175970, 725, 4);
+        mc_memcpy(spell_data, &spell_records[i], 89, D_00175970, 725, 4);
         spell_data->effect_costs[0] = (spell_data->effect_costs[1] = (spell_data->effect_costs[2] = 0));
         player_character->skills[17].value += 30;
         player_character->skills[18].value += 30;
@@ -619,7 +617,7 @@ void disease_cure_lycanthropy(void)
     player_character->skills[21].value -= 30;
     player_character->skills[34].value -= 30;
     player_character->skills[30].value -= 30;
-    mc_memcpy(player_class, &saved_class->data.career, 74, (iptr)D_00175970, 874, 4);
+    mc_memcpy(player_class, &saved_class->data.career, 74, D_00175970, 874, 4);
     object_delete(saved_class);
     object_delete(lycanthropy);
     player_character->race = player_character->original_race;
@@ -680,7 +678,7 @@ void disease_start_cure_quest(int offer_cure)
 {
     if (player_character->race == 8) {
         if (offer_cure != 0 && rand_range(10, 100) < 30) {
-            mc_strncpy((iptr)D_001961F5, (iptr)D_001759EB, 13, (iptr)D_00175970, 952);
+            mc_strncpy(D_001961F5, D_001759EB, 13, D_00175970, 952);
             return;
         }
         if (offer_cure == 0 && player_character->action != 0 && rand_range(1, 100) < 50) {
@@ -694,7 +692,7 @@ void disease_start_cure_quest(int offer_cure)
         return;
     }
     if (disease_is_lycanthrope() == 0 || offer_cure == 0 || rand_range(1, 100) >= 30) return;
-    mc_strncpy((iptr)D_001961F5, (iptr)D_001759F8, 13, (iptr)D_00175970, 971);
+    mc_strncpy(D_001961F5, D_001759F8, 13, D_00175970, 971);
 }
 
 void reaction_mod_item_cb(struct record *item)

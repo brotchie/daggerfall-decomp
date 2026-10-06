@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008FE48 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00176E94[];
 extern char D_00176EEC[];
@@ -10,8 +11,6 @@ extern unsigned char D_001A9B94[];
 extern unsigned char D_001A9BAC[];
 extern short potion_cauldron_count;
 extern void potion_sort_ingredients(unsigned char *, unsigned char *, unsigned char *, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 int potion_mix_unknown(struct spell *sp)
 {

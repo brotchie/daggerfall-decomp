@@ -4,6 +4,7 @@
 
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern struct record *player_entity;
 extern struct record *scratch_current_object;
@@ -12,14 +13,13 @@ extern char D_00195B84[];
 extern struct character *player_character;
 extern int game_minutes;
 extern int nearest_creature_distance;
-extern char nearest_creature[];
+extern struct record *nearest_creature;
 extern char extra_spell_points[];
 extern int D_001A3AA8;
 
 extern int damage_apply(struct record *, int, struct record *);
 extern int player_in_daylight(void);
 extern int player_in_temple(void);
-extern int rand();
 extern void item_damage(struct record *, int);
 extern void enchant_extra_spell_points(struct item *, int);
 extern void object_foreach(struct record *, void (*)());
@@ -103,7 +103,7 @@ L68256:;
         break;
     case 6:
         if (enchant_param == 0 && nearest_creature_distance < 128 && player_character->health != player_character->max_health) {
-            damage_apply(*(struct record **)nearest_creature, *(int *)D_00195B08, 0);
+            damage_apply(nearest_creature, *(int *)D_00195B08, 0);
             player_character->health += *(short *)D_00195B08;
             if (player_character->health > player_character->max_health) {
                 player_character->health = player_character->max_health;

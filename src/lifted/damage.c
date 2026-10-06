@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern iptr screen_buffer;
@@ -48,21 +49,18 @@ extern short D_001997AA;
 extern int object_weight(struct record *);
 extern int cast_creature_spell(struct record *, struct record *, int);
 extern struct record *spell_find_on_entity(struct record *, int, int);
-extern int disk_resolve_path(iptr);
+extern iptr disk_resolve_path(iptr);
 extern int rand_range(int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int travel_route(int, int, int, int, int);
-extern int rand();
-extern int mc_memset();
-extern iptr memchr();
-extern int xn_vid_play();
-extern int xn_math_angle_to_point();
-extern int xn_timer_bios_ticks();
-extern int xn_math_advance_pitch_yaw();
-extern int xn_mouse_poll_clamped();
-extern int xn_pal_fade_to();
-extern iptr xn_tex_cache_lookup_image();
+extern int xn_vid_play(char *, int, int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
+extern int xn_timer_bios_ticks(void);
+extern void xn_math_advance_pitch_yaw(int, int, int, void *);
+extern int xn_mouse_poll_clamped(void);
+extern void xn_pal_fade_to(char *, int);
+extern void *xn_tex_cache_lookup_image(int, int);
 extern void quest_run_opcodes(struct quest *);
 extern void quest_show_message(struct quest *, int);
 extern void quest_op_done(struct quest *, struct qbn_op *);
@@ -149,7 +147,7 @@ void damage_collapse_exhausted(struct record *target)
     int unused;
 
     start_ticks = xn_timer_bios_ticks();
-    mc_memset(655360, 0, ((((int)(unsigned short)(*(short *)((char *)((iptr)game_settings)) & 1)) != 0) ? 64000 : hud_bar_image->y * 320), (iptr)D_001709E4, 701, 4);
+    mc_memset((void *)655360, 0, ((((int)(unsigned short)(*(short *)((char *)(game_settings)) & 1)) != 0) ? 64000 : hud_bar_image->y * 320), D_001709E4, 701, 4);
     time_pass(20160);
     while ((xn_timer_bios_ticks() - start_ticks) < 22);
 }
@@ -238,7 +236,7 @@ int damage_miss_sound(struct item *weapon, int target_id)
         if (target_id == (-1) || target_id == 200) {
             return (int)(short)*(short *)(weapon_swing_sounds + (weapon->index * 2));
         }
-        if (memchr((iptr)monster_parry_ids, target_id, 28) != 0) {
+        if (memchr(monster_parry_ids, target_id, 28) != 0) {
             if (rand() < 32768) return rand_range(291, 299);
         }
         return (int)(short)*(short *)(weapon_swing_sounds + (weapon->index * 2));
@@ -249,17 +247,17 @@ int damage_miss_sound(struct item *weapon, int target_id)
 void play_death_video(void)
 {
     int unused[11];
-    int path;
+    iptr path;
 
-    xn_pal_fade_to((iptr)D_00196DC4, 50);
-    mc_memset(655360, 0, 64000, (iptr)D_001709E4, 875, 4);
-    mc_memset(screen_buffer, 0, 64000, (iptr)D_001709E4, 876, 4);
+    xn_pal_fade_to(D_00196DC4, 50);
+    mc_memset((void *)655360, 0, 64000, D_001709E4, 875, 4);
+    mc_memset((void *)screen_buffer, 0, 64000, D_001709E4, 876, 4);
     palette_restore();
     path = disk_resolve_path((iptr)D_001709FB);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
-    xn_vid_play(path, 0, 0, 1);
-    mc_memset(655360, 0, 64000, (iptr)D_001709E4, 883, 4);
-    mc_memset(screen_buffer, 0, 64000, (iptr)D_001709E4, 884, 4);
+    xn_vid_play((char *)path, 0, 0, 1);
+    mc_memset((void *)655360, 0, 64000, D_001709E4, 883, 4);
+    mc_memset((void *)screen_buffer, 0, 64000, D_001709E4, 884, 4);
     palette_restore();
     sky_loaded_frame = 10000;
     night_sky_loaded = 0;

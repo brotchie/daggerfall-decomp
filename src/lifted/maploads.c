@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -26,7 +27,7 @@ extern signed char D_001940D4;
 extern struct record *player_object;
 extern struct record *location_object;
 extern struct location *current_location;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern signed char current_region;
 extern signed char mouse_buttons_prev;
 extern int region_location_type_counts[];
@@ -65,23 +66,14 @@ extern struct record *rmb_add_building(struct record *, int);
 extern struct map_location *region_find_location(int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int trade_settle_offer(void);
-extern int rand();
-extern int mc_free();
-extern int mc_memset();
-extern int lseek();
-extern iptr mc_malloc();
-extern int read();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int xn_world_cell_at();
-extern int xn_font_select();
-extern iptr xn_tex_cache_lookup_image();
-extern int xn_tex_cache_flush();
-extern int xn_draw_image();
-extern int xn_terrain_height_at();
+extern int xn_world_cell_at(int, int);
+extern int xn_font_select(int);
+extern void *xn_tex_cache_lookup_image(int, int);
+extern void xn_tex_cache_flush(void);
+extern void xn_draw_image(int, int, int, int, char *);
+extern int xn_terrain_height_at(int, int);
 extern void archive_close(int);
-extern void archive_write_record(int, int, int);
+extern void archive_write_record(int, int, iptr);
 extern void town_block_load_rmb(int);
 extern void town_block_place_building(struct building *, int);
 extern void tavern_close(void);
@@ -111,10 +103,10 @@ void region_locations_load_discovered(int region)
     iptr name;
 
     location = region_locations;
-    saved = *(signed char **)scratch_buffer;
-    name = mc_malloc(4096, (iptr)D_001704CC, 57);
-    mc_set_location(59, (iptr)D_001704CC);
-    mc_sprintf(name, (iptr)D_001704D7, region);
+    saved = (signed char *)scratch_buffer;
+    name = (iptr)mc_malloc(4096, D_001704CC, 57);
+    mc_set_location(59, D_001704CC);
+    mc_sprintf((char *)name, D_001704D7, region);
     archive = archive_open(cfg_mapsave_file, 0, 1);
     record = archive_find_record(archive, name, 12);
     archive_read_record(archive, record, (iptr)saved);
@@ -128,7 +120,7 @@ void region_locations_load_discovered(int region)
         }
     }
     if (name == 0 || name == (-1751672937)) return;
-    mc_free(name, (iptr)D_001704CC, 72);
+    mc_free((void *)name, D_001704CC, 72);
     name = -1751672937;
 }
 
@@ -142,21 +134,21 @@ void region_locations_save_discovered(int region)
     iptr name;
 
     location = region_locations;
-    saved = *(signed char **)scratch_buffer;
-    name = mc_malloc(4096, (iptr)D_001704CC, 88);
+    saved = (signed char *)scratch_buffer;
+    name = (iptr)mc_malloc(4096, D_001704CC, 88);
     for (i = 0; i < region_location_count; i++, location++, saved++) {
         *saved = rand() & -193;
         if ((location->x_type_flags & 0x40000000) != 0) *saved |= 64;
         if ((location->x_type_flags & 0x80000000) != 0) *saved |= 128;
     }
-    mc_set_location(97, (iptr)D_001704CC);
-    mc_sprintf(name, (iptr)D_001704D7, region);
+    mc_set_location(97, D_001704CC);
+    mc_sprintf((char *)name, D_001704D7, region);
     archive = archive_open(cfg_mapsave_file, 0, 1);
     record = archive_find_record(archive, name, 12);
-    archive_write_record(archive, record, *(int *)scratch_buffer);
+    archive_write_record(archive, record, (iptr)scratch_buffer);
     archive_close(archive);
     if (name == 0 || name == (-1751672937)) return;
-    mc_free(name, (iptr)D_001704CC, 103);
+    mc_free((void *)name, D_001704CC, 103);
     name = -1751672937;
 }
 
@@ -167,23 +159,23 @@ void maploads_load_region(int region)
     int size;
     int i;
 
-    if ((int)(iptr)region_locations != 0) {
+    if ((iptr)region_locations != 0) {
         region_locations_save_discovered((int)(unsigned short)region_locations_region);
-        if ((int)(iptr)region_locations != 0 && (int)(iptr)region_locations != (-1751672937)) {
-            mc_free((int)(iptr)region_locations, (iptr)D_001704CC, 123);
+        if ((iptr)region_locations != 0 && (iptr)region_locations != (-1751672937)) {
+            mc_free(region_locations, D_001704CC, 123);
             region_locations = (struct map_location *)(iptr)-1751672937;
         }
     }
     region_locations_region = region;
-    mc_set_location(127, (iptr)D_001704CC);
-    mc_sprintf((iptr)text_buffer, (iptr)D_001704E4, region);
+    mc_set_location(127, D_001704CC);
+    mc_sprintf((char *)text_buffer, D_001704E4, region);
     record = archive_find_record(maps_bsa, (iptr)text_buffer, 13);
     size = archive_record_size(maps_bsa, record);
     region_location_count = ((unsigned)size) / 17;
-    location = (struct map_location *)(*(iptr *)&region_locations = mc_malloc(size, (iptr)D_001704CC, 133));
-    archive_read_record(maps_bsa, record, (int)(iptr)region_locations);
-    mc_memset((iptr)region_location_type_counts, 0, 56, (iptr)D_001704CC, 137, 56);
-    mc_memset((iptr)region_dungeon_type_counts, 0, 76, (iptr)D_001704CC, 138, 76);
+    location = (struct map_location *)(*(iptr *)&region_locations = (iptr)mc_malloc(size, D_001704CC, 133));
+    archive_read_record(maps_bsa, record, (iptr)region_locations);
+    mc_memset(region_location_type_counts, 0, 56, D_001704CC, 137, 56);
+    mc_memset(region_dungeon_type_counts, 0, 76, D_001704CC, 138, 76);
     region_dungeon_count = 0;
     for (i = 0; i < region_location_count; i++, location++) {
         (region_location_type_counts[((location->x_type_flags << 2) >> 27)])++;
@@ -203,8 +195,8 @@ void region_load_location_names(int region)
     int unused2;
     int unused3;
 
-    mc_set_location(170, (iptr)D_001704CC);
-    mc_sprintf((iptr)text_buffer, (iptr)D_001704F2, region);
+    mc_set_location(170, D_001704CC);
+    mc_sprintf((char *)text_buffer, D_001704F2, region);
     *(iptr *)&D_00196A7C = D_00147954;
     record = archive_find_record(maps_bsa, (iptr)text_buffer, 13);
     archive_read_record(maps_bsa, record, D_00147954);
@@ -225,15 +217,15 @@ void location_read_record(struct loaded_location *location, int fd)
 {
     int unused;
 
-    read(fd, (iptr)&location->door_count, 4);
-    location->doors = (struct location_door *)mc_malloc(location->door_count * 6, (iptr)D_001704CC, 219);
-    read(fd, (iptr)location->doors, location->door_count * 6);
-    location->object = (struct record *)mc_malloc(119, (iptr)D_001704CC, 223);
+    read(fd, &location->door_count, 4);
+    location->doors = (struct location_door *)mc_malloc(location->door_count * 6, D_001704CC, 219);
+    read(fd, location->doors, location->door_count * 6);
+    location->object = (struct record *)mc_malloc(119, D_001704CC, 223);
     location->data = &location->object->data.location;
-    read(fd, (iptr)location->object, 119);
+    read(fd, location->object, 119);
     if (location->data->building_count == 0) return;
-    location->data->buildings = (struct building *)mc_malloc(location->data->building_count * 26, (iptr)D_001704CC, 231);
-    read(fd, (iptr)location->data->buildings, location->data->building_count * 26);
+    location->data->buildings = (struct building *)mc_malloc(location->data->building_count * 26, D_001704CC, 231);
+    read(fd, location->data->buildings, location->data->building_count * 26);
 }
 
 void location_load_dungeon(struct loaded_location *location, int dungeon_index)
@@ -243,13 +235,13 @@ void location_load_dungeon(struct loaded_location *location, int dungeon_index)
     int offset;
     struct dungeon_entry *table;
 
-    table = *(struct dungeon_entry **)scratch_buffer;
-    mc_set_location(248, (iptr)D_001704CC);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00170500, (int)(unsigned char)current_region);
+    table = (struct dungeon_entry *)scratch_buffer;
+    mc_set_location(248, D_001704CC);
+    mc_sprintf((char *)text_buffer, D_00170500, (int)(unsigned char)current_region);
     record = archive_find_record(maps_bsa, (iptr)text_buffer, 13);
     offset = archive_record_offset(maps_bsa, record);
     lseek(maps_bsa, offset, 0);
-    read(maps_bsa, (iptr)&dungeon_count, 4);
+    read(maps_bsa, &dungeon_count, 4);
     read(maps_bsa, table, dungeon_count << 3);
     offset = table[dungeon_index].offset;
     lseek(maps_bsa, offset, 1);
@@ -258,8 +250,8 @@ void location_load_dungeon(struct loaded_location *location, int dungeon_index)
     if (&loaded_location != location) return;
     location->data->object_counter = 2;
     location->data->marker_counter = 64000;
-    read(maps_bsa, (iptr)dungeon_header, 10);
-    read(maps_bsa, (iptr)dungeon_blocks, 128);
+    read(maps_bsa, dungeon_header, 10);
+    read(maps_bsa, dungeon_blocks, 128);
 }
 
 void location_load_dungeon_by_id(struct loaded_location *location, int id)
@@ -270,13 +262,13 @@ void location_load_dungeon_by_id(struct loaded_location *location, int id)
     int offset;
     struct dungeon_entry *entry;
 
-    entry = *(struct dungeon_entry **)scratch_buffer;
-    mc_set_location(287, (iptr)D_001704CC);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00170500, (int)(unsigned char)current_region);
+    entry = (struct dungeon_entry *)scratch_buffer;
+    mc_set_location(287, D_001704CC);
+    mc_sprintf((char *)text_buffer, D_00170500, (int)(unsigned char)current_region);
     record = archive_find_record(maps_bsa, (iptr)text_buffer, 13);
     offset = archive_record_offset(maps_bsa, record);
     lseek(maps_bsa, offset, 0);
-    read(maps_bsa, (iptr)&dungeon_count, 4);
+    read(maps_bsa, &dungeon_count, 4);
     read(maps_bsa, entry, dungeon_count << 3);
     for (i = 0; i < dungeon_count; i++, entry++) {
         if (entry->id == id) break;
@@ -288,8 +280,8 @@ void location_load_dungeon_by_id(struct loaded_location *location, int id)
     if (&loaded_location != location) return;
     location->data->object_counter = 2;
     location->data->marker_counter = 64000;
-    read(maps_bsa, (iptr)dungeon_header, 10);
-    read(maps_bsa, (iptr)dungeon_blocks, 128);
+    read(maps_bsa, dungeon_header, 10);
+    read(maps_bsa, dungeon_blocks, 128);
 }
 
 void location_load_exterior(struct loaded_location *location, int location_index)
@@ -300,12 +292,12 @@ void location_load_exterior(struct loaded_location *location, int location_index
     int block_count;
     int location_offset;
 
-    mc_set_location(361, (iptr)D_001704CC);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00170522, (int)(unsigned char)current_region);
+    mc_set_location(361, D_001704CC);
+    mc_sprintf((char *)text_buffer, D_00170522, (int)(unsigned char)current_region);
     record = archive_find_record(maps_bsa, (iptr)text_buffer, 13);
     offset = archive_record_offset(maps_bsa, record);
     lseek(maps_bsa, (location_index << 2) + offset, 0);
-    read(maps_bsa, (iptr)&location_offset, 4);
+    read(maps_bsa, &location_offset, 4);
     lseek(maps_bsa, location_offset + ((region_location_count << 2) + offset), 0);
     location->index = location_index;
     location_read_record(location, maps_bsa);
@@ -313,8 +305,8 @@ void location_load_exterior(struct loaded_location *location, int location_index
     block_count = location->data->width * location->data->height;
     location->data->object_counter = 2;
     location->data->marker_counter = 64000;
-    read(maps_bsa, (iptr)location_exterior, 412);
-    read(maps_bsa, (iptr)&trailer, 4);
+    read(maps_bsa, location_exterior, 412);
+    read(maps_bsa, &trailer, 4);
 }
 
 void location_load_nth_of_type(struct loaded_location *location, int type, int n)
@@ -382,8 +374,8 @@ void town_block_create_misc_objects(struct record *block_object)
     object->id = location_object->id;
     model = (struct block_model *)RECORD_DATA(object);
     flat = (struct block_flat *)(model + rmb_block->misc_model_count);
-    mc_memcpy(model, (iptr)rmb_block->misc_models, rmb_block->misc_model_count * 66, (iptr)D_001704CC, 565, 4);
-    mc_memcpy(flat, (iptr)rmb_block->misc_flats, rmb_block->misc_flat_count * 17, (iptr)D_001704CC, 566, 4);
+    mc_memcpy(model, rmb_block->misc_models, rmb_block->misc_model_count * 66, D_001704CC, 565, 4);
+    mc_memcpy(flat, rmb_block->misc_flats, rmb_block->misc_flat_count * 17, D_001704CC, 566, 4);
     for (i = 0; rmb_block->misc_model_count > i; i++, model++) {
         model->model = 0;
         model->x += block_origin_x;
@@ -424,7 +416,7 @@ void town_block_create_misc_objects(struct record *block_object)
             }
         }
     }
-    mc_memcpy(RECORD_DATA(block_object), (iptr)rmb_block->name, 429, (iptr)D_001704CC, 607, 4);
+    mc_memcpy(RECORD_DATA(block_object), rmb_block->name, 429, D_001704CC, 607, 4);
 }
 
 void town_load_blocks(void)

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005F81F */
 #include <dos.h>
+#include "clib.h"
 struct savehdr { char pad[128]; char f128; char pad81[99]; short f228; };
 struct slot { short id; short f2; };
 struct flags16 { unsigned short f0; };
@@ -14,14 +15,9 @@ extern struct savehdr *scratch_buffer;
 extern char *books_path;
 extern unsigned short book_count;
 extern int disk_open_data(char *);
-extern void close(int);
-extern int read(int, void *, int);
-extern int atoi(char *);
 extern int func_000A13DA(char *, int, struct find_t *);
 extern int func_000A13F7(struct find_t *);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void books_scan(void)
 {

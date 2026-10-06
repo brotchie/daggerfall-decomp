@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern struct monster_template monster_table[];
 extern char D_001758B8[];
@@ -14,7 +15,7 @@ extern unsigned char player_environment;
 extern struct item_template item_templates[];
 extern char potion_recipes[];
 extern char D_00180B42[];
-extern char item_group_templates[];
+extern short *item_group_templates[];
 extern char D_00185FFC[];
 extern char D_0018606B[];
 extern iptr D_00186483[];
@@ -58,7 +59,7 @@ extern struct record *location_object;
 extern int creature_count;
 extern struct location *current_location;
 extern struct character *player_character;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern int trespassing;
 extern int ai_los_index;
 extern char magic_def_count[];
@@ -94,21 +95,10 @@ extern struct record *object_create_child(struct record *, struct record *, int)
 extern struct record *object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
 extern struct record *location_cell_at(int, int);
-extern int rand();
-extern int srand();
-extern int close();
-extern int lseek();
-extern iptr mc_malloc();
-extern int read();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern iptr memchr();
-extern int filelength();
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
-extern int xn_math_angle_to_point();
-extern int xn_draw_image();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
+extern void xn_draw_image(int, int, int, int, char *);
 extern void place_settle_creature(struct record *);
 extern void damage_knockback_move(struct record *, struct character *);
 extern void msgbox_show_rsc(int, int);
@@ -149,7 +139,7 @@ case 11:
     item_init_from_template(287, 27, 8, item);
     return;
 default:
-    item_init_from_template((int)(unsigned short)*(short *)((char *)(iptr)(*(char **)(item_group_templates + (group << 2)) + (index * 2))), (int)(short)*(short *)&group, (int)(short)*(short *)&index, item);
+    item_init_from_template((int)(unsigned short)*(short *)(((char *)item_group_templates[group] + (index * 2))), (int)(short)*(short *)&group, (int)(short)*(short *)&index, item);
 }
 }
 
@@ -387,7 +377,7 @@ void shelf_stock_items(struct record *container, int list_index, int quality)
         if (*entry == 12 && ((int)(unsigned short)(player_character->flags & 1)) == 0) {
             *entry = 6;
         }
-        template_ids = *(short **)(item_group_templates + (*entry << 2));
+        template_ids = item_group_templates[*entry];
         if (template_ids != 0 && *entry != 8 && *entry != 1) {
             if (((struct bf8_1_1 *)&D_001940D7)->f != 0 && (*entry == 4 || *entry == 5)) {
             } else {
@@ -531,10 +521,10 @@ void painting_draw(void)
     int frame;
     struct image *image;
 
-    mc_set_location(625, (iptr)D_001758B8);
-    mc_sprintf((iptr)text_buffer, (iptr)D_001758E2, (((int)(unsigned short)D_00195DC4) >> 3) + 97);
-    disk_read_file(text_buffer, *(int *)scratch_buffer);
-    image = *(struct image **)scratch_buffer;
+    mc_set_location(625, D_001758B8);
+    mc_sprintf((char *)text_buffer, D_001758E2, (((int)(unsigned short)D_00195DC4) >> 3) + 97);
+    disk_read_file(text_buffer, (iptr)scratch_buffer);
+    image = (struct image *)scratch_buffer;
     i = 0;
     frame = (int)(unsigned short)(D_00195DC4 & 7);
     while (i < frame) {
@@ -550,15 +540,16 @@ void item_info_painting(struct item *item)
     int saved_seed;
 
     saved_seed = rand();
-    D_00195DC4 = rand(srand((int)(unsigned short)(short)item->message)) % 180;
+    srand((int)(unsigned short)(short)item->message);
+    D_00195DC4 = rand() % 180;
     fd = disk_open_data(D_001758EE);
     lseek(fd, ((int)(unsigned short)D_00195DC4) * 40, 0);
-    read(fd, *(int *)scratch_buffer, 40);
+    read(fd, (void *)scratch_buffer, 40);
     close(fd);
-    painting_subject_text = pick_random_byte(*(unsigned char **)scratch_buffer) + 6100;
-    painting_adjective_text = pick_random_byte((unsigned char *)(*(iptr *)scratch_buffer + 10)) + 6200;
-    painting_prefix1_text = pick_random_byte(*(unsigned char **)scratch_buffer + 20) + 6300;
-    painting_prefix2_text = (short)pick_random_byte(*(unsigned char **)scratch_buffer + 30) + 6400;
+    painting_subject_text = pick_random_byte((unsigned char *)scratch_buffer) + 6100;
+    painting_adjective_text = pick_random_byte((unsigned char *)((iptr)scratch_buffer + 10)) + 6200;
+    painting_prefix1_text = pick_random_byte((unsigned char *)scratch_buffer + 20) + 6300;
+    painting_prefix2_text = (short)pick_random_byte((unsigned char *)scratch_buffer + 30) + 6400;
     D_001940D6 |= 32;
     msgbox_show_rsc(250, 1);
     srand(saved_seed);
@@ -581,9 +572,9 @@ void item_init_book(struct item *item, int level)
     int saved_seed;
 
     item->message = *(short *)(book_list + (book_pick_random(level) << 2));
-    header = *(int **)scratch_buffer;
-    mc_set_location(674, (iptr)D_001758B8);
-    mc_sprintf((iptr)text_buffer, (iptr)D_001758F8, (int)(unsigned short)(short)item->message);
+    header = (int *)scratch_buffer;
+    mc_set_location(674, D_001758B8);
+    mc_sprintf((char *)text_buffer, D_001758F8, (int)(unsigned short)(short)item->message);
     fd = disk_open_data(text_buffer);
     read(fd, header, 234);
     close(fd);
@@ -625,7 +616,7 @@ int equip_hiding_capacity(int with_armor)
     for (; slot < 27; slot++) {
         if (player_character->equipped[slot] == 0) continue;
         item = &player_character->equipped[slot]->data.item;
-        if (item->group == 1 && memchr((iptr)D_00186583, item->index, 6) != 0) {
+        if (item->group == 1 && memchr(D_00186583, item->index, 6) != 0) {
             capacity += 10;
             continue;
         }
@@ -754,9 +745,9 @@ void magic_def_load(void)
     int fd;
 
     fd = disk_open_data(D_00175927);
-    read(fd, (iptr)magic_def_count, 4);
-    magic_def = mc_malloc(filelength(fd) - 4, (iptr)D_001758B8, 1201);
-    read(fd, magic_def, (int)(iptr)&*(signed char *)((char *)filelength(fd) - 4));
+    read(fd, magic_def_count, 4);
+    magic_def = (iptr)mc_malloc(filelength(fd) - 4, D_001758B8, 1201);
+    read(fd, (void *)magic_def, (int)(iptr)&*(signed char *)((char *)(iptr)filelength(fd) - 4));
     close(fd);
 }
 
@@ -869,7 +860,7 @@ void shop_stock_potions(struct record *container)
         item_data->stack_count = *(signed char *)&recipe;
         item = object_create_child(item, 0, 109);
         item->type = 31;
-        mc_memcpy(&item->data.potion_recipe, ((iptr)potion_recipes) + (recipe * 109), 109, (iptr)D_001758B8, 1330, 4);
+        mc_memcpy(&item->data.potion_recipe, (void *)(((iptr)potion_recipes) + (recipe * 109)), 109, D_001758B8, 1330, 4);
     }
 }
 
@@ -904,7 +895,7 @@ void loot_add_potion(struct record *container)
     item_data->stack_count = *(signed char *)&recipe;
     item = object_create_child(item, 0, 109);
     item->type = 31;
-    mc_memcpy(&item->data.potion_recipe, ((iptr)potion_recipes) + (recipe * 109), 109, (iptr)D_001758B8, 1366, 4);
+    mc_memcpy(&item->data.potion_recipe, (void *)(((iptr)potion_recipes) + (recipe * 109)), 109, D_001758B8, 1366, 4);
 }
 
 void ai_creature_think(struct character *monster_char, struct record *monster, struct record *target, int index)
@@ -921,7 +912,7 @@ void ai_creature_think(struct character *monster_char, struct record *monster, s
     if (((unsigned)monster_char->attack_timer) > 100000) monster_char->attack_timer = 0;
     if (((int)player_environment) == 3) {
         cell = location_cell_at(monster->x, monster->z);
-        if ((iptr)monster->parent != cell) object_reparent(cell, monster);
+        if (monster->parent != cell) object_reparent(cell, monster);
     }
     D_00199D74 = 0;
     ai_monster_flags = (int)(unsigned short)monster_table[monster_char->race].flags;
@@ -1084,8 +1075,8 @@ void ai_update_creatures(void)
     creature_list[creature_count++] = player_entity;
     for (i = 0; i < creature_count; i++) {
         if ((creature_count - 1) != i) place_settle_creature(creature_list[i]);
-        ai_entities[i] = (struct record *)((iptr)creature_list[i]);
-        ai_characters[i] = (struct character *)((iptr)((char *)ai_entities[i] + 71));
+        ai_entities[i] = (struct record *)(creature_list[i]);
+        ai_characters[i] = (struct character *)(((char *)ai_entities[i] + 71));
     }
     for (i = 0; (creature_count - 1) > i; i++) {
         bios_ticks = (int *)1132;
@@ -1094,8 +1085,8 @@ void ai_update_creatures(void)
             if (target_index == (-1)) {
                 removed = i;
             } else {
-                ai_characters[i]->target = (struct record *)((iptr)ai_entities[target_index]);
-                ai_characters[target_index]->target = (struct record *)((iptr)ai_entities[i]);
+                ai_characters[i]->target = (struct record *)(ai_entities[target_index]);
+                ai_characters[target_index]->target = (struct record *)(ai_entities[i]);
             }
         }
     }

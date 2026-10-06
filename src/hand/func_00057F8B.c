@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00057F8B */
 #include "records.h"
+#include "clib.h"
 extern char D_00175710[];
 extern char D_00185716[];
 extern char D_00185717[];
@@ -20,7 +21,7 @@ extern unsigned char D_00185A95[];
 extern char D_00185A96[];
 extern char D_00185A97[];
 extern char D_00185AC4[];
-extern char D_00185AE4[];
+extern char *D_00185AE4[];
 extern signed char scratch_190ce4[];
 extern char scratch_190d64[];
 extern signed char D_0019986A[];
@@ -39,7 +40,6 @@ extern void msgbox_show_string(char *, short);
 extern void func_00057147(short, short, short, short, short, short, short);
 extern int itemmaker_free_slot(void);
 extern int itemmaker_free_slot_count(void);
-extern char *memchr(char *, int, unsigned);
 
 void itemmaker_add_soul_powers(int soul)
 {
@@ -58,7 +58,7 @@ void itemmaker_add_soul_powers(int soul)
     for (i = 0; i < 4; i += 2) {
         if (D_00185A94[soul_row * 4 + i] == 128) {
             for (j = 0; j < 5; j++) {
-                found = memchr(D_00185825, (*(unsigned char **)(D_00185AE4 + D_00185A95[soul_row * 4 + i] * 4))[j], 39);
+                found = memchr(D_00185825, ((unsigned char *)D_00185AE4[D_00185A95[soul_row * 4 + i]])[j], 39);
                 if (found == 0)
                     continue;
                 D_001998CC[j * 2] = 0;
@@ -66,7 +66,7 @@ void itemmaker_add_soul_powers(int soul)
             }
         } else if (D_00185A94[soul_row * 4 + i] == 129) {
             for (j = 0; j < 5; j++) {
-                found = memchr(D_0018584D, (*(unsigned char **)(D_00185AE4 + D_00185A95[soul_row * 4 + i] * 4))[j], 26);
+                found = memchr(D_0018584D, ((unsigned char *)D_00185AE4[D_00185A95[soul_row * 4 + i]])[j], 26);
                 if (found == 0)
                     continue;
                 D_001998D6[j * 2] = 1;

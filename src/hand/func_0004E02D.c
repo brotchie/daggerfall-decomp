@@ -1,13 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004E02D */
 #include "structs.h"
+#include "clib.h"
 extern char D_00174FAC[];
 extern char note_colour;
 extern unsigned char D_001940D5;
 extern union note_entry *note_page;
-extern int note_page_backup;
+extern iptr note_page_backup;
 extern short note_page_free;
 extern void msgbox_show_rsc(int, int);
-extern int mc_memcpy();
 
 void note_add_line(short x0, short y0, short x1, short y1)
 {
@@ -17,7 +17,7 @@ void note_add_line(short x0, short y0, short x1, short y1)
         msgbox_show_rsc(1700, 1);
         return;
     }
-    mc_memcpy(note_page_backup, note_page, 3640, D_00174FAC, 399, 4);
+    mc_memcpy((void *)note_page_backup, note_page, 3640, D_00174FAC, 399, 4);
     D_001940D5 |= 16;
     entry = &note_page->line;
     while (entry->kind != 0) {

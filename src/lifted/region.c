@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern int xn_world_slot_cells[];
 extern char *xn_world_tile_layer;
@@ -18,8 +19,7 @@ extern signed char climate_is_ocean;
 extern iptr politic_pak;
 extern iptr climate_pak;
 
-extern int mc_free();
-extern int xn_world_cell_at();
+extern int xn_world_cell_at(int, int);
 extern void maploads_enter_region(int);
 extern void region_unload(void);
 unsigned char politic_region_at(int, int);
@@ -30,11 +30,11 @@ void region_enter(unsigned char, unsigned char);
 void region_free_tables(void)
 {
     if (politic_pak != 0 && politic_pak != (-1751672937)) {
-        mc_free(politic_pak, (iptr)D_001705F8, 33);
+        mc_free((void *)politic_pak, D_001705F8, 33);
         politic_pak = -1751672937;
     }
     if (climate_pak == 0 || climate_pak == (-1751672937)) return;
-    mc_free(climate_pak, (iptr)D_001705F8, 34);
+    mc_free((void *)climate_pak, D_001705F8, 34);
     climate_pak = -1751672937;
 }
 

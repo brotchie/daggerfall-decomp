@@ -4,16 +4,16 @@
 extern unsigned char player_environment;
 extern struct collide_probe D_00179F48;
 extern unsigned char D_001940D7;
-extern int D_00195C70;
-extern int D_00195CB8;
+extern iptr D_00195C70;
+extern iptr D_00195CB8;
 extern unsigned char player_on_ground;
 extern int collide_candidate_count;
 extern struct collide_probe *D_00196D4C;
 extern struct collide_hits *D_00196D50;
 extern int collide_height;
 extern short collide_flags;
-extern void collide_for_each_nearby(struct record *, void (*)(int));
-extern void collide_gather_cb(int);
+extern void collide_for_each_nearby(struct record *, void (*)(iptr));
+extern void collide_gather_cb(iptr);
 extern int func_00023FA5(struct record *, int, struct move_request *);
 extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern int xn_terrain_height_at(int, int);
@@ -33,8 +33,8 @@ int collide_move_object(struct record *object, int unused_arg, struct move_reque
     int mindot;
     int dot;
     int unused18;
-    int saved_cb8;
-    int saved_c70;
+    iptr saved_cb8;
+    iptr saved_c70;
 
     saved_cb8 = D_00195CB8;
     saved_c70 = D_00195C70;

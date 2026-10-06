@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00019676 */
 #include "records.h"
+#include "clib.h"
 
 extern unsigned char D_00178E59;
 extern unsigned char D_00178E5F;
@@ -37,7 +38,6 @@ extern void rumor_file_open(void);
 extern void rumor_file_close(void);
 extern void rumor_file_purge(void);
 extern int rand_range(int, int);
-extern int rand(void);
 
 void faction_politics_update(int mode)
 {

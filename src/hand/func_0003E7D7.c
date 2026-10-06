@@ -7,11 +7,8 @@ extern char D_001910EC[];
 extern int text_rsc_file;
 extern char *text_rsc_load(short, unsigned short, short);
 extern int disk_open_data(char *);
-extern void close(int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
+#include "clib.h"
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, ...);
 
 char *text_qrc_load(char *name, short message_id, short unused, short width)
 {

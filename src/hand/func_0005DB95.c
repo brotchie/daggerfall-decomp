@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005DB95 */
 #include "records.h"
+#include "clib.h"
 
 extern int xn_cam_yaw;
 extern char *screen_buffer;
@@ -11,9 +12,8 @@ extern char *compass_image;
 extern struct image *compass_box_image;
 extern char game_mode;
 extern int ai_angle_diff(int, int, int *);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int xn_math_angle_to_point();
-extern int xn_draw_image();
+extern int xn_math_angle_to_point(int, int, int, int);
+extern void xn_draw_image(int, int, int, int, char *);
 
 void hud_draw_heading_strip(int on_automap)
 {

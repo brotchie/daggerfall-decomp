@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 
 extern char disk_last_file_size[];
@@ -19,7 +20,7 @@ extern iptr D_00147954;
 extern char D_00175C6C[];
 extern char D_00175C86[];
 extern struct rect logbook_buttons[];
-extern int logbook_notes_file;
+extern iptr logbook_notes_file;
 extern signed char D_00187CA8;
 extern signed char text_buffer[];
 extern char scratch_190be4[];
@@ -30,7 +31,7 @@ extern signed char D_001940D8;
 extern struct record *logbook_object;
 extern struct record *player_object;
 extern iptr window_image;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern iptr text_macro_city;
 extern signed char D_00196272;
 extern signed char game_mode;
@@ -47,19 +48,11 @@ extern int sound_play(int, struct record *, int);
 extern int logbook_open(int);
 extern char *str_list_skip(char *, int);
 extern iptr disk_read_file(iptr, iptr);
-extern int disk_write_arena2_file(int, iptr, iptr);
-extern int disk_open_rw(int);
-extern int disk_create(int);
-extern int disk_file_exists(int);
-extern int close();
-extern int mc_free();
-extern int mc_memset();
-extern int lseek();
-extern int mc_strncpy();
-extern int write();
-extern int strlen();
-extern int mc_memcpy();
-extern int xn_font_select();
+extern int disk_write_arena2_file(iptr, iptr, int);
+extern int disk_open_rw(iptr);
+extern int disk_create(iptr);
+extern int disk_file_exists(iptr);
+extern int xn_font_select(int);
 extern void quest_load_text(struct quest *, int, short, int);
 extern void book_flush_line(void);
 extern void func_0005A1C8(char *);
@@ -76,7 +69,7 @@ void logbook_update(void)
     int i;
 
     if (logbook_open(0) == 0) return;
-    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_00175C86, 53, 4);
+    mc_memcpy((void *)screen_buffer, (void *)window_image, 64000, D_00175C86, 53, 4);
     logbook_draw();
     if (key_down_esc != 0) logbook_close();
     if (mouse_buttons == 0 || (mouse_buttons != 0 && mouse_buttons_prev != 0)) {
@@ -100,7 +93,7 @@ int logbook_close(void)
     game_mode = 0;
     D_00196272 = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_00175C86, 80);
+        mc_free((void *)window_image, D_00175C86, 80);
         window_image = -1751672937;
     }
     if (((struct bf8_5_1 *)&D_001940D8)->f != 0) {
@@ -200,7 +193,7 @@ void logbook_build_entries(void)
     struct quest *quest;
     char *out;
 
-    out = *(char **)scratch_buffer + 20000;
+    out = scratch_buffer + 20000;
     if (*(int *)logbook_show_notes != 0 && disk_file_exists(logbook_notes_file) != 0) {
         logbook_load_notes();
         return;
@@ -213,7 +206,7 @@ void logbook_build_entries(void)
         quest = quest_find_by_id((int)logbook->quest_ids[slot]);
         if (quest == 0) {
             logbook->quest_ids[slot] = 0;
-            mc_memset(logbook->message_ids[slot], 0, 20, (iptr)D_00175C86, 204, 20);
+            mc_memset(logbook->message_ids[slot], 0, 20, D_00175C86, 204, 20);
             continue;
         }
         for (j = 0; j < 10; j++) {
@@ -223,7 +216,7 @@ void logbook_build_entries(void)
             text_rsc_buffer[0] = 0;
             quest_load_text(quest, (int)logbook->message_ids[slot][j], 0, 0);
             if (text_rsc_buffer[0] == 0) continue;
-            mc_strncpy(out, (iptr)text_rsc_buffer, 4, (iptr)D_00175C86, 216);
+            mc_strncpy(out, (char *)text_rsc_buffer, 4, D_00175C86, 216);
             out += strlen(out) + 1;
             logbook_entry_count++;
         }
@@ -238,8 +231,8 @@ void logbook_load_notes(void)
     char *text;
     int unused;
 
-    text = *(char **)scratch_buffer + 20000;
-    mc_memset(text, 0, 35000, (iptr)D_00175C86, 233, 4);
+    text = scratch_buffer + 20000;
+    mc_memset(text, 0, 35000, D_00175C86, 233, 4);
     disk_read_file((iptr)D_00175C6C, (iptr)text);
     while (*(signed char *)text != 0) {
         text += strlen(text) + 1;
@@ -258,7 +251,7 @@ void logbook_draw(void)
     D_0014292C = 25;
     *(short *)scratch_190d66 = 0;
     xn_font_select(4);
-    entry = str_list_skip(*(char **)scratch_buffer + 20000, logbook_first_entry);
+    entry = str_list_skip(scratch_buffer + 20000, logbook_first_entry);
     for (i = logbook_first_entry; i < logbook_entry_count; i++) {
         if (((int)(short)D_0014292C) > 160) return;
         logbook_draw_entry(entry);
@@ -297,7 +290,7 @@ void logbook_copy_text(char *text)
     while (*(signed char *)text != 0) {
         line_width += font_char_width((int)(unsigned char)*(signed char *)text);
         if (line_width > 240 && ((int)(unsigned char)*(signed char *)text) == 32) {
-            write(file, (iptr)&ch, 1);
+            write(file, &ch, 1);
             line_width = 0;
         } else {
             write(file, text, 1);
@@ -306,9 +299,9 @@ void logbook_copy_text(char *text)
     }
     write(file, text, 1);
     *(signed char *)&ch = 32;
-    write(file, (iptr)&ch, 1);
+    write(file, &ch, 1);
     *(signed char *)&ch = 0;
-    write(file, (iptr)&ch, 1);
+    write(file, &ch, 1);
     close(file);
     if (file_size <= 32768) return;
     logbook_trim_notes();
@@ -322,7 +315,7 @@ void logbook_trim_notes(void)
     while (*(int *)disk_last_file_size > 32768) {
         line_end = (char *)D_00147954;
         while (*(signed char *)line_end != 0) line_end++;
-        mc_memcpy(D_00147954, line_end + 1, 40960, (iptr)D_00175C86, 401, 4);
+        mc_memcpy((void *)D_00147954, line_end + 1, 40960, D_00175C86, 401, 4);
         *(int *)disk_last_file_size -= (int)((line_end + 1) - (char *)D_00147954);
     }
     disk_write_arena2_file(logbook_notes_file, D_00147954, *(int *)disk_last_file_size);
@@ -340,7 +333,7 @@ void logbook_prune_quests(void)
             quest = quest_find_by_id((int)logbook->quest_ids[slot]);
             if (quest == 0) {
                 logbook->quest_ids[slot] = 0;
-                mc_memset(logbook->message_ids[slot], 0, 20, (iptr)D_00175C86, 422, 20);
+                mc_memset(logbook->message_ids[slot], 0, 20, D_00175C86, 422, 20);
             }
         }
     }

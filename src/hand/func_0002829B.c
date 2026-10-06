@@ -5,7 +5,7 @@ extern short scratch_190d68;
 extern short scratch_190d6a;
 extern char *scratch_buffer;
 extern int town_notes_size(void);
-extern void mc_strncpy(char *, char *, int, char *, int);
+#include "clib.h"
 
 void town_note_add(char *text)
 {

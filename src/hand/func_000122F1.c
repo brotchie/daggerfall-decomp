@@ -1,11 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000122F1 */
 #include "structs.h"
+#include "clib.h"
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_set_number;
 extern char D_00170129[];        /* __FILE__ */
-extern char *itoa(int, signed char *, int);       /* itoa */
-extern unsigned strlen(signed char *);              /* strlen */
-extern void mc_memmove(char *, char *, int, char *, int, int);
 
 int profile_set_number(struct profile *r, int value)
 {

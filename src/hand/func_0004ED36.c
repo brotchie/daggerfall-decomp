@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004ED36 */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 extern unsigned disk_last_file_size;
@@ -82,7 +83,7 @@ extern char *D_00195D0C;
 extern char *D_00195D10;
 extern char *D_00195D14;
 extern char *D_00195D18;
-extern int D_00195D20;
+extern iptr D_00195D20;
 extern char *D_00195D24;
 extern char *hud_portrait_overlays;
 extern char *compass_image;
@@ -131,31 +132,23 @@ extern void intrface_set_regions(void);
 extern void model_heap_init(int);
 extern void object_foreach_open(struct record *, void (*)());
 extern void color_init_remap_tables(void);
-extern int srand(int);
-extern int close(int);
-extern char *mc_malloc(int, char *, int);
-extern int read(int, void *, int);
-extern int unlink(char *);
-extern int mc_memcpy(void *, void *, int, char *, int, int);
-extern int xn_rand_noise_init();
-extern int xn_sky_snow_init();
-extern int xn_shade_table_63();
-extern int func_000C9EB2();
+extern void xn_rand_noise_init(void);
+extern void xn_sky_snow_init(void);
+extern char *xn_shade_table_63(void);
+extern int func_000C9EB2(void);
 extern int xn_shade_build_translucent_table(char *);
 extern char *xn_mem_align_up(char *, int);
 extern int xn_mouse_set_sensitivity(short, short);
 extern int xn_mouse_get_sensitivity(unsigned char *, unsigned char *);
-extern int xn_font_load();
-extern int xn_font_select();
-extern int xn_water_init();
-extern int xn_tex_cache_init();
-extern int xn_joy_init();
-extern int xn_joy_reset_range();
-extern int xn_joy_calibrate();
-extern int xn_helmet_open();
+extern void *xn_font_load(int, int);
+extern int xn_font_select(int);
+extern void xn_water_init(void);
+extern void xn_tex_cache_init(unsigned);
+extern void xn_joy_init(void);
+extern void xn_joy_reset_range(void);
+extern void xn_joy_calibrate(void);
+extern int xn_helmet_open(int, int);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void init_game_data(void)
 {
@@ -266,7 +259,7 @@ void init_game_data(void)
     disk_read_file(D_001751B8, xn_water_tint_table = xn_mem_align_up(D_00199804, 256));
     D_001997F0 = mc_malloc(4352, D_00175040, 190);
     xn_shade_build_translucent_table(xn_shade_translucent_table = xn_mem_align_up(D_001997F0, 256));
-    D_00195D20 = xn_shade_table_63();
+    D_00195D20 = (iptr)xn_shade_table_63();
     D_00195D24 = mc_malloc(16640, D_00175040, 196);
     disk_read_file(D_001751C2, D_00195CF4 = xn_mem_align_up(D_00195D24, 256));
     D_00195CF8 = mc_malloc(16640, D_00175040, 200);

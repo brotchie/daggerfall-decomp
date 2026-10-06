@@ -661,7 +661,9 @@ RECORD_SIZE(logbook, 3008);
  * XnGine's model instance, which object_draw_cb fills and xn_model_submit draws */
 struct model_instance {
     char *model;                    /* +0x00: model_get's result, 0 none */
-    char pad04[8];                  /* +0x04 */
+    char *lights;                   /* +0x04: the engine's (xn_model_handle): this frame's light
+                                       list */
+    char *matrix;                   /* +0x08: the engine's: this frame's matrix slot */
     char angles[20];                /* +0x0C: xn_model_set_angles, xn_model_compose_angles */
     int x;                          /* +0x20 */
     int y;                          /* +0x24 */
@@ -693,8 +695,11 @@ struct block_model {
                                        ObjectId2: the model is id * 100 + variant) */
     unsigned char kind;             /* +0x03: DFU ObjectType */
     char *model;                    /* +0x04: the loaded model (model_get), 0 none (DFU Unknown1) */
-    char pad08[28];                 /* +0x08: DFU Unknown2, Unknown3, NullValue1 (8 bytes), XPos1,
-                                       YPos1, ZPos1 */
+    char *lights;                   /* +0x08: DFU Unknown2; the engine's, once the block is drawn
+                                       (&model is an xn_model_handle): the light list */
+    char *matrix;                   /* +0x0C: DFU Unknown3; the engine's: the matrix slot */
+    char pad10[20];                 /* +0x10: DFU NullValue1 (8 bytes), XPos1, YPos1, ZPos1 (the
+                                       engine writes +0x18..+0x20) */
     int x;                          /* +0x24: made absolute by rmb_add_subrecord */
     int y;                          /* +0x28 */
     int z;                          /* +0x2C */

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of keys from 0x425F2 to 0x42F0F, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 struct bits8 {
     unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1;
@@ -83,8 +84,6 @@ extern int travel_map_open(int);
 extern void xn_mouse_set_position(short, short);
 extern void xn_tex_cache_begin_frame(void);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 extern short steer_weight_down;
 extern short steer_weight_right;
 extern short steer_weight_left;

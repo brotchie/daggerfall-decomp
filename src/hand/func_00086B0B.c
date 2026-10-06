@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00086B0B */
 #include "records.h"
+#include "clib.h"
 extern int dungeon_water_level;
 extern char D_00176C94[];       /* __FILE__ */
 extern char D_00176CC9[];
@@ -10,7 +11,7 @@ extern unsigned loan_collectors_next;
 extern struct record *location_object;
 extern struct location *current_location;
 extern int game_minutes;
-extern int D_00195CB8;
+extern iptr D_00195CB8;
 extern int sky_loaded_frame;
 extern char world_loading;
 extern char night_sky_loaded;
@@ -39,11 +40,8 @@ extern void object_foreach(struct record *, void (*)());
 extern void object_delete_block(iptr, int);
 extern void func_0008EB52(void);
 extern int player_to_nearest_marker(struct record *, int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern int xn_terrain_height_at(int, int);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 void town_load(int location_index)
 {

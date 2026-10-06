@@ -1,8 +1,8 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00052B50 */
 #include "structs.h"
+#include "clib.h"
 extern char D_00175404[];   /* __FILE__ */
 extern void xn_str_fill_u16(void *, unsigned short, int);   /* fill with a word */
-extern void mc_memcpy(void *, void *, int, char *, int, int); /* copy */
 
 /* decode an FLC DELTA_FLC (word-oriented delta) chunk into f->image */
 void flc_decode_ss2(unsigned char *src, struct flc_player *f)

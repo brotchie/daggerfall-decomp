@@ -2,13 +2,12 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern short font_height;
 extern char D_00176E38[];
 
 extern int font_text_width(char *);
-extern int mc_free();
-extern int strlen(char *);
 
 void picklist_update_thumb(struct picklist *list)
 {
@@ -24,16 +23,16 @@ void picklist_free(struct picklist *list)
 {
     if (list->framed != 0) {
         if (list->list_background != 0 && (iptr)list->list_background != (-1751672937)) {
-            mc_free((iptr)list->list_background, (iptr)D_00176E38, 110);
+            mc_free(list->list_background, D_00176E38, 110);
             list->list_background = (char *)(iptr)-1751672937;
         }
         if (list->bar_background != 0 && (iptr)list->bar_background != (-1751672937)) {
-            mc_free((iptr)list->bar_background, (iptr)D_00176E38, 111);
+            mc_free(list->bar_background, D_00176E38, 111);
             list->bar_background = (char *)(iptr)-1751672937;
         }
     }
     if (list->entries != 0 && (iptr)list->entries != (-1751672937)) {
-        mc_free((iptr)list->entries, (iptr)D_00176E38, 114);
+        mc_free(list->entries, D_00176E38, 114);
         list->entries = (struct picklist_entry *)(iptr)-1751672937;
     }
     list->framed = 0;

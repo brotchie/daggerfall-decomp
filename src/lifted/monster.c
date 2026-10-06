@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern char D_00175934[];
 extern signed char anim_mirror_facing[];
@@ -10,7 +11,7 @@ extern int D_00186A14[];
 extern struct collide_probe D_00187B44;
 extern signed char undead_daedra_ids[];
 extern struct record *creature_list[];
-extern char D_00190704[];
+extern iptr D_00190704[];
 extern char scratch_190de4[];
 extern signed char text_rsc_buffer[];
 extern unsigned char D_001940D7;
@@ -54,16 +55,11 @@ extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_random_child_of_type(struct record *, int);
 extern int object_new_id(int);
-extern int abs();
-extern int mc_free();
-extern int mc_memset();
-extern int mc_memcpy();
-extern iptr memchr();
-extern int xn_math_approx_dist2d();
-extern int xn_math_approx_hypot();
-extern int xn_math_angle_to_point();
-extern int xn_math_yaw_offset_xz();
-extern void weapon_monster_arrow(int, int);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern int xn_math_approx_hypot(int, int);
+extern int xn_math_angle_to_point(int, int, int, int);
+extern void xn_math_yaw_offset_xz(int, int, int *, int *);
+extern void weapon_monster_arrow(iptr, iptr);
 extern void monster_init(struct record *, int);
 extern void object_apply_gravity(struct record *, struct character *);
 extern void object_foreach(struct record *, void (*)());
@@ -80,7 +76,7 @@ void func_000622EB(struct record *monster, struct record *target, int heading, i
     int detour_offset;
 
     monster_char = &monster->data.character;
-    mc_memcpy((iptr)D_00196167, monster, 71, (iptr)D_00175934, 426, 4);
+    mc_memcpy(D_00196167, monster, 71, D_00175934, 426, 4);
     if (monster_char->detour_steps == 1000) {
         func_0006243B(monster, target, heading);
         if (((int)(short)(*(short *)collide_flags & 10)) == 0) {
@@ -105,7 +101,7 @@ void func_000622EB(struct record *monster, struct record *target, int heading, i
         monster_char->detour_steps = 1000;
         monster_char->detour_side ^= 1;
     }
-    mc_memcpy(monster, (iptr)D_00196167, 71, (iptr)D_00175934, 457, 4);
+    mc_memcpy(monster, D_00196167, 71, D_00175934, 457, 4);
     func_0006243B(monster, target, monster_char->detour_yaw & 2047);
 }
 
@@ -133,7 +129,7 @@ void func_0006243B(struct record *monster, struct record *target, int heading)
             dz = 0;
             dx = dz;
         } else {
-            xn_math_yaw_offset_xz(heading, speed, (iptr)&dx, (iptr)&dz);
+            xn_math_yaw_offset_xz(heading, speed, &dx, &dz);
         }
         move.x = monster->x + dx;
         move.y = monster->y;
@@ -163,7 +159,7 @@ void func_0006243B(struct record *monster, struct record *target, int heading)
         } else {
             move.flags &= 65534;
         }
-        mc_memcpy((iptr)&saved_pos.position, (iptr)D_00196D54, 12, (iptr)D_00175934, 512, 4);
+        mc_memcpy(&saved_pos.position, D_00196D54, 12, D_00175934, 512, 4);
         *(int *)D_00196D54 = monster->x;
         D_00196D58 = monster->y - (vertical_velocity / 256);
         D_00196D5C = monster->z;
@@ -172,7 +168,7 @@ void func_0006243B(struct record *monster, struct record *target, int heading)
         }
         collide_move_object(monster, 0, &move, 0);
         player_on_ground = saved_on_ground;
-        mc_memcpy((iptr)D_00196D54, (iptr)&saved_pos.position, 12, (iptr)D_00175934, 521, 4);
+        mc_memcpy(D_00196D54, &saved_pos.position, 12, D_00175934, 521, 4);
         if (saved_pos.character != player_character) {
             saved_pos.character->ceiling_y = ceiling_height;
         }
@@ -364,7 +360,7 @@ int monster_cast_spell(struct record *caster, struct record *target)
     spell = object_create_child(caster->parent, 0, 89);
     spell->type = 9;
     spell->id = object_new_id(100);
-    mc_memcpy(&spell->data.spell, &ai_chosen_spell->data.spell, 89, (iptr)D_00175934, 758, 4);
+    mc_memcpy(&spell->data.spell, &ai_chosen_spell->data.spell, 89, D_00175934, 758, 4);
     cast_creature_spell_at(spell, caster, target);
     caster_char->magicka -= spell_cost(&spell->data.spell, caster_char);
     if (caster_char->magicka < 0) {
@@ -375,7 +371,7 @@ int monster_cast_spell(struct record *caster, struct record *target)
     return 1;
 }
 
-void monster_shoot_arrow(int shooter, int target)
+void monster_shoot_arrow(iptr shooter, iptr target)
 {
     sound_play(6, shooter, 100);
     weapon_monster_arrow(shooter, target);
@@ -418,14 +414,14 @@ int monster_alloc_anim_slot(void)
 {
     int slot;
 
-    mc_memset((iptr)text_rsc_buffer, 0, 128, (iptr)D_00175934, 829, 2048);
+    mc_memset(text_rsc_buffer, 0, 128, D_00175934, 829, 2048);
     object_foreach(location_object->children, monster_mark_anim_slot_cb);
     object_foreach(nonworld_root->children, monster_mark_anim_slot_cb);
     for (slot = 0; slot < 128; slot++) {
-        if (text_rsc_buffer[slot] == 0 && *(int *)(D_00190704 + (slot << 2)) != 0) {
-            if (*(int *)(D_00190704 + (slot << 2)) != 0 && *(int *)(D_00190704 + (slot << 2)) != (-1751672937)) {
-                mc_free(*(int *)(D_00190704 + (slot << 2)), (iptr)D_00175934, 836);
-                *(int *)(D_00190704 + (slot << 2)) = -1751672937;
+        if (text_rsc_buffer[slot] == 0 && D_00190704[slot] != 0) {
+            if (D_00190704[slot] != 0 && D_00190704[slot] != (-1751672937)) {
+                mc_free((void *)D_00190704[slot], D_00175934, 836);
+                D_00190704[slot] = -1751672937;
             }
         }
     }
@@ -436,7 +432,7 @@ int monster_alloc_anim_slot(void)
 
 iptr monster_sees_invisible(int monster_type)
 {
-    return memchr((iptr)undead_daedra_ids, monster_type, 14);
+    return (iptr)memchr((char *)undead_daedra_ids, monster_type, 14);
 }
 
 struct record *monster_summon_near_player(int monster_type)
@@ -547,7 +543,7 @@ void monster_apply_gravity(void)
     saved_velocity = vertical_velocity;
     saved_on_ground = (int)(unsigned char)player_on_ground;
     saved_ceiling = ceiling_height;
-    mc_memcpy((iptr)&saved_pos, (iptr)D_00196D54, 12, (iptr)D_00175934, 1147, 4);
+    mc_memcpy(&saved_pos, D_00196D54, 12, D_00175934, 1147, 4);
     for (i = 0; i < creature_count; i++) {
         monster_char = &creature_list[i]->data.character;
         if (((int)(unsigned short)(monster_char->flags & 2080)) == 0) {
@@ -555,7 +551,7 @@ void monster_apply_gravity(void)
         }
         fall_start = monster_char->fall_velocity;
         vertical_velocity = fall_start;
-        mc_memcpy((iptr)D_00196D54, (iptr)creature_list[i] + 7, 12, (iptr)D_00175934, 1159, 4);
+        mc_memcpy(D_00196D54, (void *)((iptr)creature_list[i] + 7), 12, D_00175934, 1159, 4);
         move.x = creature_list[i]->x;
         move.y = (int)(iptr)(*(char **)((char *)creature_list[i] + 11) + (vertical_velocity / 256));
         move.z = creature_list[i]->z;
@@ -589,7 +585,7 @@ void monster_apply_gravity(void)
     ceiling_height = saved_ceiling;
     player_on_ground = *(signed char *)&saved_on_ground;
     vertical_velocity = saved_velocity;
-    mc_memcpy((iptr)D_00196D54, (iptr)&saved_pos, 12, (iptr)D_00175934, 1201, 4);
+    mc_memcpy(D_00196D54, &saved_pos, 12, D_00175934, 1201, 4);
 }
 
 void func_00063DDC(struct record *source)
@@ -643,7 +639,7 @@ int func_00063ED8(struct record *monster, int quadrant)
     return func_00063FCF(monster, *along, pos);
 }
 
-int func_000641CD(int id)
+int func_000641CD(iptr id)
 {
     int i;
 

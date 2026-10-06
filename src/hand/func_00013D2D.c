@@ -7,7 +7,7 @@ extern char *marquee_owned_text;
 extern struct bits8 D_001940DA;
 extern int marquee_x;
 extern char *marquee_text;
-extern void mc_free(void *, char *, int);
+#include "clib.h"
 
 void marquee_start(char *text)
 {

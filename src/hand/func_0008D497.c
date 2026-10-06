@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008D497 */
 #include "records.h"
+#include "clib.h"
 
 extern unsigned char D_0012B508;
 extern unsigned char font_height;
@@ -7,7 +8,6 @@ extern char D_00176E38[];
 extern char D_001A9AF3;
 extern void text_draw(char *, int, int);
 extern void picklist_clip_text(char *, short);
-extern void mc_strncpy(char *, char *, int, char *, int);
 extern void xn_draw_line_text_colour(int, int, int, int);
 extern void xn_draw_fill_rect(int, int, int, int);
 extern void xn_draw_put_rect(int, int, int, int, char *, int);

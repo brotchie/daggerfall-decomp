@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00020C87 */
 #include "records.h"
+#include "clib.h"
 
 struct shop { unsigned char mul; char pad1; short base; short min; short max; };
 struct res { int f0; int f4; };
@@ -35,7 +36,7 @@ extern void court_reputation_restore(void);
 extern void court_close(void);
 extern void court_restore_vitals(void);
 extern void msgbox_show_rsc(int, int);
-extern void music_play(int);
+extern void music_play(iptr);
 extern char *disk_read_file(char *, iptr);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern void msgbox_choice_rsc(short, short, short, short, unsigned char, unsigned char, unsigned char);
@@ -44,9 +45,7 @@ extern void object_free_pending(void);
 extern int gold_total(void);
 extern void map_goto_location(int, int, int, int);
 extern void object_foreach(struct record *, void (*)());
-extern int rand(void);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
-extern int xn_gfx_present_inclusive();
+extern void xn_gfx_present_inclusive(int);
 
 int court_open(int crime)
 {

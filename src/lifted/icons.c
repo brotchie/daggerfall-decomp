@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -51,12 +52,9 @@ extern iptr disk_read_file(char *, iptr);
 extern int picklist_poll(struct picklist *);
 extern int inventory_open(int, int, int);
 extern int travel_map_open(int);
-extern int mc_free();
-extern iptr mc_malloc();
-extern int mc_memcpy();
-extern iptr xn_str_find_u32();
-extern int xn_mouse_poll_clamped();
-extern int xn_draw_image();
+extern unsigned *xn_str_find_u32(unsigned *, uptr, unsigned);
+extern int xn_mouse_poll_clamped(void);
+extern void xn_draw_image(int, int, int, int, char *);
 extern void automap_open(void);
 extern void status_show(short);
 extern void interaction_mode_cycle(int);
@@ -167,7 +165,7 @@ void magic_items_add_cb(struct record *object)
 
     if (object->type != 2) return;
     parent = object->parent;
-    while (parent != 0 && xn_str_find_u32((iptr)((char *)&house_container), parent, 4) == 0) {
+    while (parent != 0 && xn_str_find_u32((unsigned int *)((char *)&house_container), (uptr)parent, 4) == 0) {
         parent = parent->parent;
     }
     if (parent != 0) return;
@@ -215,8 +213,8 @@ void magic_items_open(void)
     D_001940D4 |= 32;
     magic_items_image = (struct image *)disk_read_file(D_001758A8, 0);
     D_00196272 = 1;
-    magic_items_saved_screen = mc_malloc(64000, (iptr)D_00175898, 358);
-    mc_memcpy(magic_items_saved_screen, screen_buffer, 64000, (iptr)D_00175898, 359, 4);
+    magic_items_saved_screen = (iptr)mc_malloc(64000, D_00175898, 358);
+    mc_memcpy((void *)magic_items_saved_screen, (void *)screen_buffer, 64000, D_00175898, 359, 4);
 }
 
 void magic_items_frame(void)
@@ -224,8 +222,8 @@ void magic_items_frame(void)
     short picked;
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
-    mc_memcpy(screen_buffer, magic_items_saved_screen, 64000, (iptr)D_00175898, 368, 4);
-    xn_draw_image(magic_items_image->x, magic_items_image->y, magic_items_image->width, magic_items_image->height, (iptr)magic_items_image->pixels);
+    mc_memcpy((void *)screen_buffer, (void *)magic_items_saved_screen, 64000, D_00175898, 368, 4);
+    xn_draw_image(magic_items_image->x, magic_items_image->y, magic_items_image->width, magic_items_image->height, magic_items_image->pixels);
     if (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0) {
         while (key_down_esc != 0);
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
@@ -246,7 +244,7 @@ void magic_items_close(void)
 {
     D_001940D4 &= 223;
     if ((iptr)magic_items_image != 0 && (iptr)magic_items_image != (-1751672937)) {
-        mc_free((iptr)magic_items_image, (iptr)D_00175898, 396);
+        mc_free(magic_items_image, D_00175898, 396);
         magic_items_image = (struct image *)(iptr)-1751672937;
     }
     picklist_free(&shared_picklist);
@@ -255,7 +253,7 @@ void magic_items_close(void)
     if (magic_items_saved_screen == 0 || magic_items_saved_screen == (-1751672937)) {
         return;
     }
-    mc_free(magic_items_saved_screen, (iptr)D_00175898, 400);
+    mc_free((void *)magic_items_saved_screen, D_00175898, 400);
     magic_items_saved_screen = -1751672937;
 }
 

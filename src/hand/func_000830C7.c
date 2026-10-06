@@ -22,14 +22,14 @@ extern int flat_anim_finished(struct record *);
 extern void flat_anim_step(struct record *);
 extern iptr model_get(int, int, int);
 extern void flat_animal_sound(int, int, int, int, int);
-extern int xn_anim_update();
-extern int xn_rand_noise_2d();
-extern int xn_model_compose_angles();
-extern int xn_model_set_angles_yaw_offset();
-extern iptr xn_tex_cache_lookup_image();
-extern int xn_light_add();
-extern int xn_model_submit();
-extern int xn_flat_add();
+extern void xn_anim_update(void *);
+extern int xn_rand_noise_2d(unsigned, unsigned);
+extern void xn_model_compose_angles(short *, int, int, int);
+extern void xn_model_set_angles_yaw_offset(short *, int);
+extern void *xn_tex_cache_lookup_image(int, int);
+extern int xn_light_add(int, int, int, int, int, int);
+extern void xn_model_submit(void *, int);
+extern int xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
 
 int object_draw_cb(struct record *object)
 {

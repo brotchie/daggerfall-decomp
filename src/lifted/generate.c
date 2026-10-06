@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -43,7 +44,7 @@ extern signed char game_mode;
 extern signed char mouse_buttons_prev;
 extern char chargen_saved_minimums[];
 extern short chargen_saved_attributes[];
-extern int chargen_face_images;
+extern iptr chargen_face_images;
 extern iptr chargen_reflex_image;
 extern signed char chargen_roll_saved;
 extern signed char chargen_saved_points;
@@ -58,11 +59,9 @@ extern int rand_range(int, int);
 extern struct record *object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
 extern int inventory_open(int, int, int);
-extern int mc_free();
-extern int mc_memcpy();
-extern int xn_mouse_poll_clamped();
-extern int xn_mouse_cursor_move();
-extern int xn_draw_image();
+extern void xn_mouse_poll_clamped(void);
+extern void xn_mouse_cursor_move(int, int);
+extern void xn_draw_image(int, int, int, int, char *);
 extern void msgbox_open_rsc(int, int);
 extern void msgbox_update(void);
 extern void keys_world_actions(void);
@@ -85,7 +84,7 @@ int chargen_draw(void)
 
     mouse_buttons_prev = mouse_buttons;
     xn_mouse_poll_clamped();
-    mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_00176F41, 181, 4);
+    mc_memcpy((void *)screen_buffer, (void *)window_image, 64000, D_00176F41, 181, 4);
     if (((int)(unsigned char)(chargen_screen & 2)) != 0) chargen_draw_face();
     if (((int)(unsigned char)(chargen_screen & 4)) != 0) chargen_draw_attributes();
     if (((int)(unsigned char)(chargen_screen & 8)) != 0) chargen_draw_skills();
@@ -97,7 +96,7 @@ int chargen_draw(void)
             y_offset = 0;
             x_offset = y_offset;
         }
-        xn_draw_image(x_offset + 127, y_offset + ((player_character->reflexes * 9) + 148), 66, 9, (iptr)(*(char **)&chargen_reflex_image + 12 + (player_character->reflexes * 594)));
+        xn_draw_image(x_offset + 127, y_offset + ((player_character->reflexes * 9) + 148), 66, 9, (*(char **)&chargen_reflex_image + 12 + (player_character->reflexes * 594)));
     }
     if (((int)(unsigned char)(chargen_screen & 16)) != 0 && ((int)(unsigned char)chargen_screen) != 255 && ((int)(unsigned char)msgbox_kind) != 4) {
         msgbox_open_rsc(307, 4);
@@ -123,23 +122,23 @@ void chargen_free_images(void)
 {
     chargen_screen = 0;
     if (chargen_face_images != 0 && chargen_face_images != (-1751672937)) {
-        mc_free(chargen_face_images, (iptr)D_00176F41, 224);
+        mc_free((void *)chargen_face_images, D_00176F41, 224);
         chargen_face_images = -1751672937;
     }
     if ((iptr)D_00195B60 != 0 && (iptr)D_00195B60 != (-1751672937)) {
-        mc_free((iptr)D_00195B60, (iptr)D_00176F41, 225);
+        mc_free(D_00195B60, D_00176F41, 225);
         D_00195B60 = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)D_00195B5C != 0 && (iptr)D_00195B5C != (-1751672937)) {
-        mc_free((iptr)D_00195B5C, (iptr)D_00176F41, 226);
+        mc_free(D_00195B5C, D_00176F41, 226);
         D_00195B5C = (struct image *)(iptr)-1751672937;
     }
     if (chargen_reflex_image != 0 && chargen_reflex_image != (-1751672937)) {
-        mc_free(chargen_reflex_image, (iptr)D_00176F41, 227);
+        mc_free((void *)chargen_reflex_image, D_00176F41, 227);
         chargen_reflex_image = -1751672937;
     }
     if (window_image == 0 || window_image == (-1751672937)) return;
-    mc_free(window_image, (iptr)D_00176F41, 228);
+    mc_free((void *)window_image, D_00176F41, 228);
     window_image = -1751672937;
 }
 
@@ -239,7 +238,7 @@ void chargen_save_roll(void)
     mouse_buttons = 0;
 }
 
-int inv_match_arrows(struct record *object)
+iptr inv_match_arrows(struct record *object)
 {
     int unused;
 

@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007EED8 */
 #include <i86.h>
+#include "clib.h"
 extern char D_00176A10[];
 extern signed char D_00196281;
 extern int func_0007EF86(int, int);
-extern int mc_memset();
 
 void func_0007EED8(void)
 {

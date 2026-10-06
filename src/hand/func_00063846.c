@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00063846 */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
@@ -21,8 +22,6 @@ extern struct vec3 D_00196D54;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move_request *, int);
 extern struct record *object_delete(struct record *);
-extern int abs(int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 extern int xn_math_approx_dist2d(int, int, int, int);
 extern void xn_math_yaw_offset_xz(int, int, int *, int *);
 

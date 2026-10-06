@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -28,12 +29,12 @@ extern char D_00170F0C[];
 extern char D_00170F54[];
 extern char D_00170F61[];
 extern char D_00170F6E[];
-extern int controls_file;
+extern iptr controls_file;
 extern int binding_names_base[];
 extern struct rect options_buttons[];
 extern struct rect controls_buttons[];
 extern struct rect options_joystick_buttons[];
-extern int key_names[];
+extern iptr key_names[];
 extern char default_key_map[];
 extern signed char D_00187CA8;
 extern struct record *player_object;
@@ -59,30 +60,24 @@ extern iptr options_saved_screen;
 extern int options_open(short);
 extern int sound_play(int, struct record *, int);
 extern iptr disk_read_file(char *, iptr);
-extern int disk_create(int);
+extern int disk_create(iptr);
 extern int key_pressed_once(unsigned char);
-extern int close();
-extern int abs();
-extern int mc_free();
-extern int mc_memset();
-extern int write();
-extern int mc_memcpy();
-extern int xn_draw_copy_rect_stride();
-extern int xn_gfx_present_inclusive();
-extern iptr xn_str_find_nonzero();
-extern int xn_mouse_set_sensitivity();
-extern int xn_cam_set_focal();
-extern int xn_cam_set_view_window();
-extern int xn_mouse_poll_clamped();
-extern int xn_font_select();
-extern int xn_draw_fill_rect();
-extern int xn_draw_image();
-extern int xn_draw_image_transparent();
-extern int xn_joy_calibrate();
-extern int xn_joy_poll();
+extern void xn_draw_copy_rect_stride(char *, char *, int, int, int);
+extern void xn_gfx_present_inclusive(int);
+extern char *xn_str_find_nonzero(char *, unsigned);
+extern void xn_mouse_set_sensitivity(int, int);
+extern void xn_cam_set_focal(int, int);
+extern void xn_cam_set_view_window(int, int, int, int);
+extern int xn_mouse_poll_clamped(void);
+extern int xn_font_select(int);
+extern void xn_draw_fill_rect(int, int, int, int);
+extern void xn_draw_image(int, int, int, int, char *);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
+extern void xn_joy_calibrate(void);
+extern void xn_joy_poll(void);
 extern void msgbox_show_string(char *, short);
 extern void game_exit(char *);
-extern void text_draw_centred(int, int, int);
+extern void text_draw_centred(iptr, int, int);
 extern void sound_set_volume(int);
 extern void saveload_menu(int);
 extern void msgbox_yes_no_rsc(int);
@@ -127,12 +122,12 @@ int options_close(void)
     D_00187CA8 = 1;
     game_mode = 0;
     if (options_image != 0 && options_image != (-1751672937)) {
-        mc_free(options_image, (iptr)D_00170EE8, 164);
+        mc_free((void *)options_image, D_00170EE8, 164);
         options_image = -1751672937;
     }
     D_00196272 = 0;
     if (options_saved_screen != 0 && options_saved_screen != (-1751672937)) {
-        mc_free(options_saved_screen, (iptr)D_00170EE8, 166);
+        mc_free((void *)options_saved_screen, D_00170EE8, 166);
         options_saved_screen = -1751672937;
     }
     return 1;
@@ -144,7 +139,7 @@ void options_draw(void)
     struct rect *box;
     int i;
 
-    mc_memcpy(screen_buffer, options_saved_screen, 64000, (iptr)D_00170EE8, 176, 4);
+    mc_memcpy((void *)screen_buffer, (void *)options_saved_screen, 64000, D_00170EE8, 176, 4);
     image = (struct image *)options_image;
     xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     D_0012B508 = 246;
@@ -233,13 +228,13 @@ void options_toggle_head_bobbing(void)
     game_settings->view_flags ^= 2;
 }
 
-int options_controls_rebind(int action, int background)
+int options_controls_rebind(int action, iptr background)
 {
     int code;
     signed char *pressed_key;
 
     code = -1;
-    mc_memset((iptr)key_down, 0, 128, (iptr)D_00170EE8, 276, 128);
+    mc_memset(key_down, 0, 128, D_00170EE8, 276, 128);
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     while (code == (-1)) {
         pressed_key = (signed char *)xn_str_find_nonzero(key_down, 128);
@@ -291,9 +286,9 @@ void options_controls_draw(int editing, iptr background)
     int action;
     int colour;
 
-    mc_memcpy(screen_buffer, background, 64000, (iptr)D_00170EE8, 355, 4);
+    mc_memcpy((void *)screen_buffer, (void *)background, 64000, D_00170EE8, 355, 4);
     if (((int)(unsigned char)mouse_control_mode) == 1) {
-        xn_draw_image(controls_view_image->x, controls_view_image->y, controls_view_image->width, controls_view_image->height, (iptr)controls_view_image->pixels);
+        xn_draw_image(controls_view_image->x, controls_view_image->y, controls_view_image->width, controls_view_image->height, controls_view_image->pixels);
     }
     for (action = 0; action < 38; action++) {
         if (editing == action) continue;
@@ -336,17 +331,17 @@ void options_controls_screen(void)
     }
     while (key_down_esc != 0);
     if (background != 0 && background != (-1751672937)) {
-        mc_free(background, (iptr)D_00170EE8, 401);
+        mc_free((void *)background, D_00170EE8, 401);
         background = -1751672937;
     }
     if ((iptr)controls_view_image != 0 && (iptr)controls_view_image != (-1751672937)) {
-        mc_free((iptr)controls_view_image, (iptr)D_00170EE8, 402);
+        mc_free(controls_view_image, D_00170EE8, 402);
         controls_view_image = (struct image *)(iptr)-1751672937;
     }
     file = disk_create(controls_file);
-    mc_memcpy((iptr)D_00195E82, (iptr)xn_joy_calibration, 46, (iptr)D_00170EE8, 405, 4);
-    write(file, (iptr)&mouse_control_mode, 54);
-    write(file, (iptr)key_map, 38);
+    mc_memcpy(D_00195E82, xn_joy_calibration, 46, D_00170EE8, 405, 4);
+    write(file, &mouse_control_mode, 54);
+    write(file, key_map, 38);
     close(file);
 }
 
@@ -368,7 +363,7 @@ int options_controls_check(void)
 
 void options_controls_defaults(void)
 {
-    mc_memcpy((iptr)key_map, (iptr)default_key_map, 38, (iptr)D_00170EE8, 432, 38);
+    mc_memcpy(key_map, default_key_map, 38, D_00170EE8, 432, 38);
 }
 
 void options_mouse_draw(iptr background)
@@ -377,21 +372,21 @@ void options_mouse_draw(iptr background)
     struct image *image;
 
     image = (struct image *)background;
-    mc_memcpy(screen_buffer, options_saved_screen, 64000, (iptr)D_00170EE8, 480, 4);
+    mc_memcpy((void *)screen_buffer, (void *)options_saved_screen, 64000, D_00170EE8, 480, 4);
     xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     D_0012B508 = 246;
     xn_draw_fill_rect((int)(short)((mouse_control_mode == 0) ? 134 : 220), 47, 5, 5);
     for (i = 0; ((int)(unsigned char)mouse_sensitivity_x) > i; i++) {
-        xn_draw_image((i * 7) + 139, 108, D_00195B5C->width, D_00195B5C->height, (iptr)D_00195B5C->pixels);
+        xn_draw_image((i * 7) + 139, 108, D_00195B5C->width, D_00195B5C->height, D_00195B5C->pixels);
     }
     for (i = 0; ((int)(unsigned char)mouse_sensitivity_y) > i; i++) {
-        xn_draw_image((i * 7) + 139, 121, D_00195B5C->width, D_00195B5C->height, (iptr)D_00195B5C->pixels);
+        xn_draw_image((i * 7) + 139, 121, D_00195B5C->width, D_00195B5C->height, D_00195B5C->pixels);
     }
     for (i = 0; ((int)(unsigned char)(mouse_turn_rate & 127)) > i; i++) {
-        xn_draw_image((i * 7) + 139, 134, D_00195B5C->width, D_00195B5C->height, (iptr)D_00195B5C->pixels);
+        xn_draw_image((i * 7) + 139, 134, D_00195B5C->width, D_00195B5C->height, D_00195B5C->pixels);
     }
     if (((int)(unsigned char)(mouse_turn_rate & 128)) == 0) return;
-    xn_draw_image(D_00195B60->x, D_00195B60->y, D_00195B60->width, D_00195B60->height, (iptr)D_00195B60->pixels);
+    xn_draw_image(D_00195B60->x, D_00195B60->y, D_00195B60->width, D_00195B60->height, D_00195B60->pixels);
 }
 
 int options_mouse_cursor_mode(void)
@@ -469,15 +464,15 @@ int options_joystick_screen(void)
         xn_gfx_present_inclusive(0);
     }
     if ((iptr)D_00195B60 != 0 && (iptr)D_00195B60 != (-1751672937)) {
-        mc_free((iptr)D_00195B60, (iptr)D_00170EE8, 580);
+        mc_free(D_00195B60, D_00170EE8, 580);
         D_00195B60 = (struct image *)(iptr)-1751672937;
     }
     if ((iptr)D_00195B5C != 0 && (iptr)D_00195B5C != (-1751672937)) {
-        mc_free((iptr)D_00195B5C, (iptr)D_00170EE8, 581);
+        mc_free(D_00195B5C, D_00170EE8, 581);
         D_00195B5C = (struct image *)(iptr)-1751672937;
     }
     if (background != 0 && background != (-1751672937)) {
-        mc_free(background, (iptr)D_00170EE8, 582);
+        mc_free((void *)background, D_00170EE8, 582);
         background = -1751672937;
     }
     return 0;
@@ -490,7 +485,7 @@ void options_joystick_draw(int calibrating, iptr background)
     iptr pixels;
 
     image = (struct image *)background;
-    mc_memcpy(screen_buffer, options_saved_screen, 64000, (iptr)D_00170EE8, 593, 4);
+    mc_memcpy((void *)screen_buffer, (void *)options_saved_screen, 64000, D_00170EE8, 593, 4);
     xn_draw_image(image->x, image->y, image->width, image->height, image->pixels);
     if (((int)(unsigned char)joystick_setting) == 2) {
         D_0012B508 = 246;
@@ -505,7 +500,7 @@ void options_joystick_draw(int calibrating, iptr background)
         index = 2;
     }
     pixels = (iptr)D_00195B60->pixels;
-    xn_draw_copy_rect_stride((options_joystick_buttons[index + 2].x0 + pixels) - 113, (iptr)(*(char **)&screen_buffer + ((options_joystick_buttons[index + 2].y0 * 320) + options_joystick_buttons[index + 2].x0)), (int)(iptr)&*(signed char *)((char *)(iptr)(options_joystick_buttons[index + 2].x1 - options_joystick_buttons[index + 2].x0) + 1), (int)(iptr)&*(signed char *)((char *)(iptr)(options_joystick_buttons[index + 2].y1 - options_joystick_buttons[index + 2].y0) + 1), D_00195B60->width);
+    xn_draw_copy_rect_stride((char *)((options_joystick_buttons[index + 2].x0 + pixels) - 113), (*(char **)&screen_buffer + ((options_joystick_buttons[index + 2].y0 * 320) + options_joystick_buttons[index + 2].x0)), (int)(iptr)&*(signed char *)((char *)(iptr)(options_joystick_buttons[index + 2].x1 - options_joystick_buttons[index + 2].x0) + 1), (int)(iptr)&*(signed char *)((char *)(iptr)(options_joystick_buttons[index + 2].y1 - options_joystick_buttons[index + 2].y0) + 1), D_00195B60->width);
     if (calibrating == 0) return;
     if (joystick_x == 0) if (joystick_y == 0) return;
     image = D_00195B5C;
@@ -529,7 +524,7 @@ int options_joystick_disable(void)
     return 0;
 }
 
-int options_joystick_calibrate_button(int button, int background)
+int options_joystick_calibrate_button(int button, iptr background)
 {
     int done;
 

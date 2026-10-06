@@ -1,21 +1,16 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001D766 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170464[];
 extern char D_001704BB[];
 extern signed char text_rsc_buffer[];
-extern char *game_minutes;
+extern int game_minutes;
 extern char text_missing_ok;
 extern int rumor_file;
 extern void quest_load_text(struct quest *, int, short, int);
 extern int disk_open_rw(char *);
 extern int disk_file_exists(char *);
-extern int close(int);
-extern int mc_memset();
-extern int lseek(int, int, int);
-extern int mc_strncpy();
-extern int write(int, void *, int);
-extern int strlen(char *);
 
 void rumor_add_quest(struct quest *quest, int message, int target, int flags)
 {
@@ -37,7 +32,7 @@ void rumor_add_quest(struct quest *quest, int message, int target, int flags)
     rumor.message = message;
     rumor.target = target;
     rumor.flags = flags;
-    rumor.expires = (unsigned)(uptr)(game_minutes + days * 1440);
+    rumor.expires = (unsigned)(game_minutes + days * 1440);
     rumor.text_length = strlen(((char *)text_rsc_buffer)) + 1;
     write(rumor_file, &rumor, 34);
     write(rumor_file, ((char *)text_rsc_buffer), rumor.text_length);

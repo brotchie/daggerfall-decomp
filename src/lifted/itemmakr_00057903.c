@@ -7,7 +7,7 @@ extern short font_height;
 extern signed char scratch_190cee[];
 extern signed char D_00190D02[];
 
-extern int xn_font_select();
+extern int xn_font_select(int);
 
 int itemmaker_row_slot(short side)
 {

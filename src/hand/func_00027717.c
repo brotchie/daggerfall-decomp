@@ -1,10 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00027717 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_001707AE[];
 extern char *automap_notes;
-extern int strlen(char *);
-extern void mc_strncpy(char *, char *, int, char *, int);
 
 void automap_add_note(struct record *object, char *text)
 {

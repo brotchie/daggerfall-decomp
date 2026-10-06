@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of guilds from 0x00070496 to 0x00070887, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00175EAA[];        /* __FILE__ */
 extern char D_00176089[];
@@ -28,7 +29,6 @@ extern void trade_make_offer(void);
 extern int trade_settle_offer(void);
 extern int trade_base_price(int);
 extern int travel_map_open(int);
-extern int mc_strncpy();
 void guild_add_membership(int, unsigned char);
 int guild_confirm_price(int);
 
@@ -37,14 +37,14 @@ void guild_check_invitations(void)
     if (player_character->thieves_invite_count != 100 && player_character->thieves_invite_time != 0 && ((unsigned)player_character->thieves_invite_time) < game_minutes && ((int)player_environment) == 1) {
         player_character->thieves_invite_count = 100;
         player_character->thieves_invite_time = 0;
-        mc_strncpy((iptr)D_001961F5, (iptr)D_00176089, 13, (iptr)D_00175EAA, 1233);
+        mc_strncpy(D_001961F5, D_00176089, 13, D_00175EAA, 1233);
     }
     if (player_character->brotherhood_invite_count == 100 || player_character->brotherhood_invite_time == 0 || ((unsigned)player_character->brotherhood_invite_time) >= game_minutes || ((int)player_environment) != 1) {
         return;
     }
     player_character->brotherhood_invite_count = 100;
     player_character->brotherhood_invite_time = 0;
-    mc_strncpy((iptr)D_001961F5, (iptr)D_00176096, 13, (iptr)D_00175EAA, 1243);
+    mc_strncpy(D_001961F5, D_00176096, 13, D_00175EAA, 1243);
 }
 
 void guild_teleport(void)

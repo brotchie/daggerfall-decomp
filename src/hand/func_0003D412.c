@@ -1,18 +1,13 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003D412 */
 #include "structs.h"
+#include "clib.h"
 extern char D_00170D55[];
 extern char D_00170D5C[];
 extern struct text_rsc_entry *scratch_buffer;
 extern int text_rsc_file;
 extern char text_missing_ok;
 extern char *text_expand_wrap(unsigned short, short, char *, char *, char *);
-extern int rand(void);
-extern int lseek(int, int, int);
-extern char *mc_malloc(int, char *, int);
-extern int read(int, void *, int);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, ...);
 
 char *text_rsc_load(short id, unsigned short flags, short width)
 {

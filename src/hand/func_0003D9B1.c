@@ -3,8 +3,7 @@ extern char D_00170D55[];       /* __FILE__ */
 extern short text_format_flags;
 extern void parse_expand(unsigned char *, char *);
 extern int font_char_width(unsigned char);
-extern void mc_free(void *, char *, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
+#include "clib.h"
 
 char *text_expand_wrap(unsigned short flags, short width, char *src, char *buf, char *text)
 {

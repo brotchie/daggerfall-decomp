@@ -13,8 +13,8 @@ extern unsigned char player_environment;
 extern int D_00187CA9;
 extern struct bits8 D_001940D9;
 extern struct bits8 player_motion_flags;
-extern int horse_overlay_image;
-extern int cart_overlay_image;
+extern iptr horse_overlay_image;
+extern iptr cart_overlay_image;
 extern int D_0019597C;
 extern int left_hand_ready_delay;
 extern struct nib frame_counter;
@@ -53,14 +53,14 @@ extern void sound_update_ambient(void);
 extern iptr hud_message_add(char *);
 extern int building_access_level(struct building *);
 extern int func_0007E441(int);
-extern void xn_draw_cif_rle_frame(int, int, int, int);
+extern void xn_draw_cif_rle_frame(iptr, int, int, int);
 extern void xn_tex_archive_set_translucent(int);
 extern void xn_mouse_poll_clamped(void);
 
 void player_frame_update(void)
 {
     struct character *rec;
-    int sound;
+    iptr sound;
     int speed;
     int old;
     int rnd;

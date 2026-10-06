@@ -4,17 +4,17 @@
 #include "ptrint.h"
 
 extern char scratch_190d64[];
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 
-extern int xn_mouse_cursor_erase();
-extern int xn_mouse_cursor_draw();
-extern int xn_draw_image_transparent();
-extern void class_question_scroll_step(int *, short);
+extern void xn_mouse_cursor_erase(void);
+extern void xn_mouse_cursor_draw(void);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
+extern void class_question_scroll_step(iptr *, short);
 
 void class_question_scroll(int *scroll_cels, short delta)
 {
     xn_mouse_cursor_erase();
     class_question_scroll_step(scroll_cels, delta);
-    xn_draw_image_transparent(0, 135, 320, 48, (iptr)(*(char **)scratch_buffer + (((int)(short)*(short *)scratch_190d64) * 320)));
+    xn_draw_image_transparent(0, 135, 320, 48, (scratch_buffer + (((int)(short)*(short *)scratch_190d64) * 320)));
     xn_mouse_cursor_draw();
 }

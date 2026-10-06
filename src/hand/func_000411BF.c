@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000411BF */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170DC9[];
 extern unsigned char D_0017B667[];
@@ -9,11 +10,6 @@ extern struct character *text_macro_npc;
 extern int climate_category(void);
 extern struct flat_cfg *flats_cfg_find(int);
 extern int disk_open_data(char *);
-extern int rand(void);
-extern void srand(int);
-extern void close(int);
-extern void lseek(int, int, int);
-extern void read(int, char *, int);
 extern short *xn_str_find_u16(short *, short, int);
 
 void npc_load_face(struct record *npc, char *face)

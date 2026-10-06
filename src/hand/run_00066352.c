@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of disease.c from 0x0006630B to 0x00066352, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00175970[];        /* __FILE__ */
 extern unsigned char vampire_spells[];
@@ -29,8 +30,6 @@ extern struct record *object_find_item(struct record *, short, short);
 extern void inv_store_item(struct record *);
 extern struct record *marker_find_nth(struct record *, int, int);
 extern int player_to_nearest_marker(struct record *, int);
-extern int rand(void);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 void disease_toggle_memberships_cb(struct record *obj)
 {

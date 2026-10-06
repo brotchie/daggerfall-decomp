@@ -2,13 +2,14 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern int dungeon_water_level;
 extern struct monster_template monster_table[];
 extern char D_00170788[];
 extern unsigned char player_environment;
 extern signed char loan_collector_monsters[];
-extern int encounter_tables[];
+extern iptr encounter_tables[];
 extern struct collide_probe D_00187B6E;
 extern unsigned char D_001940D7;
 extern signed char player_motion_flags;
@@ -44,14 +45,9 @@ extern int location_contains(int, int);
 extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
-extern int rand();
-extern int srand();
-extern int abs();
-extern int mc_memset();
-extern int mc_memcpy();
-extern int xn_math_approx_dist2d();
-extern int xn_math_yaw_offset_xz();
-extern int xn_terrain_height_at();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern void xn_math_yaw_offset_xz(int, int, int *, int *);
+extern int xn_terrain_height_at(int, int);
 extern void monster_init(struct record *, int);
 extern void monster_pacify_check(struct record *);
 extern void object_foreach(struct record *, void (*)());
@@ -105,8 +101,8 @@ int place_spawn_from_marker(struct record *marker)
         D_00196293 = 0;
         D_001940D7 |= 32;
         D_001940D7 |= 128;
-        mc_memcpy((iptr)&request, (iptr)&creature->x, 12, (iptr)D_00170788, 119, 4);
-        mc_memset((iptr)&request.angle_x, 0, 12, (iptr)D_00170788, 120, 4);
+        mc_memcpy(&request, &creature->x, 12, D_00170788, 119, 4);
+        mc_memset(&request.angle_x, 0, 12, D_00170788, 120, 4);
         request.probe = &D_00187B6E;
         player_motion_flags |= 8;
         collide_move_object(creature, 0, &request, 0);

@@ -1,10 +1,10 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006310D */
 #include "records.h"
+#include "clib.h"
 
 extern struct record *player_object;
 extern void monster_play_sound(struct record *, int);
 extern int sound_play(int, struct record *, int);
-extern int rand(void);
 extern int xn_math_approx_dist2d(int, int, int, int);
 
 void monster_ambient_sound(struct record *monster, struct character *monster_char)

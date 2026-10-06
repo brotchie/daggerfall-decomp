@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005209D */
 #include "structs.h"
+#include "clib.h"
 #pragma pack(1)
 struct hdr {
     short type;
@@ -23,10 +24,6 @@ struct info {
 #pragma pack()
 extern char D_00175404[];
 extern int disk_open_data(char *);
-extern int mc_memset();
-extern int lseek(int, int, int);
-extern char *mc_malloc(int, char *, int);
-extern int read(int, void *, int);
 
 int flc_open(char *name, struct flc_player *anim)
 {

@@ -2,15 +2,10 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
+#include "clib.h"
 
 extern char D_001700D5[];
 
-extern int open(char *, ...);
-extern int close();
-extern int mc_free();
-extern int lseek();
-extern iptr mc_malloc();
-extern int read();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) sos_load_file;
 
@@ -24,15 +19,15 @@ iptr sos_load_file(char *path)
     if (handle == (-1)) return 0;
     size = lseek(handle, 0, 2);
     lseek(handle, 0, 0);
-    buffer = mc_malloc(size, (iptr)D_001700D5, 441);
+    buffer = (iptr)mc_malloc(size, D_001700D5, 441);
     if (buffer == 0) {
         close(handle);
         return 0;
     }
-    if (read(handle, buffer, size) != size) {
+    if (read(handle, (void *)buffer, size) != size) {
         close(handle);
         if (buffer != 0 && buffer != (-1751672937)) {
-            mc_free(buffer, (iptr)D_001700D5, 457);
+            mc_free((void *)buffer, D_001700D5, 457);
             buffer = -1751672937;
         }
         return 0;

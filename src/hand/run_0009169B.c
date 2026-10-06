@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of generate.c from 0x00090FA1 to 0x0009169B, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 extern char mouse_buttons;
 extern short mouse_x;
@@ -14,7 +15,7 @@ extern char D_00176FCD[];
 extern char D_00176FD2[];
 extern char D_00176FD7[];
 extern char D_00176FDC[];
-extern char skill_names[];
+extern char *skill_names[];
 extern struct rect chargen_buttons[];
 extern signed char text_buffer[];
 extern char D_00190B44[];
@@ -40,10 +41,8 @@ extern void classmaker_input_text(struct character *, int, int (*)(void));
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
 extern void text_draw_centred_coloured(char *, short, short, int, unsigned char);
 extern int chargen_draw(void);
-extern char *itoa(int, char *, int);
-extern int mc_memcpy();
 extern void xn_font_select(int);
-extern int xn_draw_image();
+extern void xn_draw_image(int, int, int, int, char *);
 extern void xn_draw_image_transparent(int, int, int, int, char *);
 
 int chargen_screen_loop(int first, int last)
@@ -54,7 +53,7 @@ int chargen_screen_loop(int first, int last)
 
     for (;;) {
         chargen_draw();
-        mc_memcpy(655360, screen_buffer, 64000, D_00176F41, 238, 4);
+        mc_memcpy((void *)655360, screen_buffer, 64000, D_00176F41, 238, 4);
         if (mouse_buttons != 0 && mouse_buttons_prev == 0 &&
             mouse_x > chargen_buttons[0].x0 && mouse_x < chargen_buttons[0].x1 &&
             mouse_y > chargen_buttons[0].y0 && mouse_y < chargen_buttons[0].y1) {
@@ -144,7 +143,7 @@ void chargen_draw_skills(void)
     }
     for (i = 0; i < 12; i++) {
         skill = player_class->skills[i];
-        text_draw_coloured(*(char **)(skill_names + (skill << 2)), chargen_buttons[i + 2].x0 + 2, chargen_buttons[i + 2].y0 + 1, 145, 141);
+        text_draw_coloured(skill_names[skill], chargen_buttons[i + 2].x0 + 2, chargen_buttons[i + 2].y0 + 1, 145, 141);
         text_draw_centred_coloured(itoa(player_character->skills[skill].value, ((char *)text_buffer), 10), 192, chargen_buttons[i + 2].y0 + 1, 145, 141);
     }
 }

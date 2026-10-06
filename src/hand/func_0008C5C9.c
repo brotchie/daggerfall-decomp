@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008C5C9 */
 #include "ptrint.h"
+#include "clib.h"
 extern unsigned char D_0012B508;
 extern short font_height;
 extern short D_00142928;
@@ -15,7 +16,6 @@ extern void text_draw(iptr, unsigned short, unsigned short);
 extern int inpstr_read_key(void);
 extern int inpstr_handle_key(unsigned char);
 extern short inpstr_text_width(iptr, short);
-extern void mc_strncpy(iptr, char *, int, char *, int);
 extern void xn_draw_line(int, int, int, int);
 
 int inpstr_update(void)
@@ -46,7 +46,7 @@ int inpstr_update(void)
         if (r == 0x87654321)
             return 0;
         if (r == 0x8000) {
-            mc_strncpy(inpstr_text, D_00190B44, 4, D_00176E2C, 157);
+            mc_strncpy((char *)inpstr_text, D_00190B44, 4, D_00176E2C, 157);
             return 2;
         }
         inpstr_result = r;

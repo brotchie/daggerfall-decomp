@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000295BE */
 #include "records.h"
+#include "clib.h"
 
 extern int game_minutes;
 extern void qaction_place_foe(struct qbn_op *, struct qbn_place *);
-extern int rand(void);
 
 void qaction_op09_spawn_repeat(struct quest *unused, struct qbn_op *o)
 {

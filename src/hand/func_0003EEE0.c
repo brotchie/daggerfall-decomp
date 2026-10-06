@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003EEE0 */
 #include "records.h"
+#include "clib.h"
 
 extern char mouse_buttons;
 extern char *screen_buffer;
@@ -14,10 +15,6 @@ extern char *msgbox_saved_screen;
 extern int msgbox_render_quest_text(struct quest *, short, char *, int);
 extern void msgbox_wait(void);
 extern void mode_push(void);
-extern void mc_memset(void *, int, int, char *, int, int);
-extern void *mc_malloc(int, char *, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
 extern void xn_mouse_poll_clamped(void);
 extern void xn_font_select(int);
 

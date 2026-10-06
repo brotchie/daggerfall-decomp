@@ -17,7 +17,7 @@ extern int D_001A5A60;
 extern int D_001A5A64;
 extern int move_angle_offset;
 extern int collide_move_player(struct record *, int, struct move_request *, int);
-extern int xn_math_yaw_offset_xz();
+extern void xn_math_yaw_offset_xz(int, int, int *, int *);
 
 int player_try_move(int distance)
 {

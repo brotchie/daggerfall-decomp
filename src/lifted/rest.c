@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern signed char D_0012B508;
@@ -10,7 +11,7 @@ extern char D_001760D6[];
 extern char D_00176141[];
 extern char D_0017614E[];
 extern unsigned char player_environment;
-extern int D_00185087;
+extern iptr D_00185087;
 extern signed char D_00187CA8;
 extern int D_0018DDE4;
 extern signed char D_001940D9;
@@ -39,18 +40,16 @@ extern signed char D_00196294;
 extern signed char night_sky_loaded;
 extern signed char D_001962A4;
 extern int breath_last_tick;
-extern char rest_image[];
+extern struct image *rest_image;
 
 extern int tavern_room_rented(void);
-extern int disk_resolve_path(iptr);
+extern iptr disk_resolve_path(iptr);
 extern struct membership *guild_find_membership_by_kind(unsigned char);
 extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
-extern int mc_free();
-extern int mc_memset();
-extern int xn_vid_play();
-extern int xn_mouse_poll_clamped();
-extern int xn_draw_fill_rect();
+extern int xn_vid_play(char *, int, int, int);
+extern int xn_mouse_poll_clamped(void);
+extern void xn_draw_fill_rect(int, int, int, int);
 extern void tavern_go_to_room(void);
 extern void damage_creature_death(struct record *);
 extern void raise_skills(void);
@@ -67,12 +66,12 @@ void fatigue_add(int);
 
 void rest_close(void)
 {
-    int path;
+    iptr path;
 
     if (((int)(unsigned char)game_mode) != 16) return;
-    if (*(int *)rest_image != 0 && *(int *)rest_image != (-1751672937)) {
-        mc_free(*(int *)rest_image, (iptr)D_001760D6, 271);
-        *(int *)rest_image = -1751672937;
+    if ((iptr)rest_image != 0 && (iptr)rest_image != (-1751672937)) {
+        mc_free((void *)rest_image, D_001760D6, 271);
+        *(iptr *)&rest_image = -1751672937;
     }
     D_00196272 = 0;
     game_mode = 0;
@@ -85,9 +84,9 @@ void rest_close(void)
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         path = disk_resolve_path((iptr)D_00176141);
-        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 285, 4);
-        xn_vid_play(path, 0, 0, 1);
-        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 287, 4);
+        mc_memset((void *)655360, 0, 64000, D_001760D6, 285, 4);
+        xn_vid_play((char *)path, 0, 0, 1);
+        mc_memset((void *)655360, 0, 64000, D_001760D6, 287, 4);
         palette_restore();
         night_sky_loaded = 0;
         sky_loaded_frame = 10000;
@@ -95,9 +94,9 @@ void rest_close(void)
         player_character->flags &= ~0x10;
         while (mouse_buttons != 0) xn_mouse_poll_clamped();
         path = disk_resolve_path((iptr)D_0017614E);
-        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 297, 4);
-        xn_vid_play(path, 0, 0, 1);
-        mc_memset(655360, 0, 64000, (iptr)D_001760D6, 299, 4);
+        mc_memset((void *)655360, 0, 64000, D_001760D6, 297, 4);
+        xn_vid_play((char *)path, 0, 0, 1);
+        mc_memset((void *)655360, 0, 64000, D_001760D6, 299, 4);
         palette_restore();
         night_sky_loaded = 0;
         sky_loaded_frame = 10000;

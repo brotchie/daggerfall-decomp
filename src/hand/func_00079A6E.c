@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00079A6E */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00176884[];        /* __FILE__ */
 extern char D_0017688F[];
@@ -7,11 +8,7 @@ extern char *scratch_buffer;
 extern int save_file_handle;
 extern void fatal_error(char *);
 extern void save_unlink_character(struct record *);
-extern int write(int, void *, int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(void *, char *, ...);
 
 int savetree_write_record(struct record *object)
 {
@@ -31,7 +28,7 @@ int savetree_write_record(struct record *object)
     mc_memcpy(buf, object, len, D_00176884, 90, 4);
     if (buf->twin != 0) {
         if (buf->quest_id != 0)
-            buf->twin = (struct record *)buf->twin->id;
+            buf->twin = (struct record *)(uptr)buf->twin->id;
         else
             buf->twin = 0;
     }
@@ -43,7 +40,7 @@ int savetree_write_record(struct record *object)
         break;
     case 9:
         if (object->parent->type == 3 || object->parent->type == 18)
-            buf->caster = (struct record *)buf->caster->id;
+            buf->caster = (struct record *)(uptr)buf->caster->id;
         break;
     }
     if (object->parent != 0) {

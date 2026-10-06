@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170DC0[];
 extern char D_00170DD6[];
@@ -22,11 +23,8 @@ extern int people_count;
 extern int collide_line_of_sight(struct record *, struct record *);
 extern int is_guard_sprite(struct record *);
 extern struct record *object_delete(struct record *);
-extern int mc_memset();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int func_000A134C();
-extern int xn_draw_image_masked_at_origin();
+extern int func_000A134C(int, int, int);
+extern void xn_draw_image_masked_at_origin(int, int, char *);
 extern void pedestrian_place(struct record *);
 extern void guards_summon(int);
 extern void text_draw(iptr, int, int);
@@ -42,7 +40,7 @@ void people_clear(void)
         if (people_list[i] != 0) object_delete(people_list[i]);
     }
     people_count = 0;
-    mc_memset((iptr)((char *)people_list), 0, 120, (iptr)D_00170DC0, 554, 120);
+    mc_memset(((char *)people_list), 0, 120, D_00170DC0, 554, 120);
 }
 
 int people_check_witnesses(void)
@@ -82,7 +80,7 @@ void people_debug_map(void)
 
     if (game_mode != 0) return;
     if (((int)player_environment) != 1) return;
-    xn_draw_image_masked_at_origin(current_location->height << 6, current_location->width << 6, D_00196DA4);
+    xn_draw_image_masked_at_origin(current_location->height << 6, current_location->width << 6, (char *)D_00196DA4);
     for (i = 0; i < people_count; i++) {
         if (people_list[i] == 0) continue;
         x = people_list[i]->x - location_object->x;
@@ -106,7 +104,7 @@ void people_debug_map(void)
     y >>= 6;
     y = ((current_location->height << 6) - y) - 1;
     func_000A134C((short)x, (short)y, 244);
-    mc_set_location(677, (iptr)D_00170DC0);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00170DD6, x, y);
+    mc_set_location(677, D_00170DC0);
+    mc_sprintf((char *)text_buffer, D_00170DD6, x, y);
     text_draw((iptr)text_buffer, 0, (int)(iptr)&*(signed char *)((char *)(iptr)(current_location->height << 6) + 2));
 }

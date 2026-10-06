@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern int xn_snow_turn_shift;
 extern short xn_cam_centre_x;
@@ -21,7 +22,7 @@ extern unsigned char player_environment;
 extern short D_001789FD;
 extern short D_001789FF;
 extern short player_speed;
-extern int D_001845C8;
+extern iptr D_001845C8;
 extern struct collide_probe D_00187B6E;
 extern struct collide_probe D_00187BB8;
 extern struct collide_probe D_00187C12;
@@ -45,7 +46,7 @@ extern struct character *player_character;
 extern iptr cursor_arrow_image;
 extern struct career *player_class;
 extern int game_minutes;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern struct record *D_00195C70;
 extern int ceiling_height;
 extern struct record *D_00195CB8;
@@ -120,19 +121,15 @@ extern int player_try_move(int);
 extern int player_try_move_vertical(int);
 extern int climb_angle_ok(int);
 extern int hex_digit_value(char *);
-extern int rand();
-extern int mc_free();
-extern int mc_memset();
-extern int mc_memcpy();
-extern int xn_math_approx_dist2d();
-extern int xn_math_yaw_offset_xz();
-extern int xn_mouse_poll_clamped();
-extern int xn_mouse_set_cursor_image();
-extern int xn_mouse_read_motion();
-extern int xn_draw_get_rect();
-extern int xn_draw_image_transparent();
-extern int xn_math_isqrt();
-extern int xn_joy_poll();
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern void xn_math_yaw_offset_xz(int, int, int *, int *);
+extern void xn_mouse_poll_clamped(void);
+extern void xn_mouse_set_cursor_image(char *, int, int);
+extern void xn_mouse_read_motion(short *, short *);
+extern void xn_draw_get_rect(int, int, int, int, char *, int);
+extern void xn_draw_image_transparent(int, int, int, int, char *);
+extern int xn_math_isqrt(int);
+extern void xn_joy_poll(void);
 extern void skill_add_uses(int, int);
 extern void cast_fire_missile(struct record *);
 extern void links_trigger(struct record *, int);
@@ -161,12 +158,12 @@ void intrface_init(void)
 
     cursor_region_images = disk_read_file(D_00176A68, 0);
     cursor_arrow_image = disk_read_file(D_00176A72, 0);
-    mc_memset(*(int *)scratch_buffer, 0, 256, (iptr)D_00176A7C, 44, 4);
+    mc_memset((void *)scratch_buffer, 0, 256, D_00176A7C, 44, 4);
     *(int *)&i = 0;
     for (; ((int)(short)i) < 10; (*(int *)&i)++) {
-        mc_memcpy((iptr)(*(char **)scratch_buffer + (((int)(short)i) << 4)), (iptr)(((char *)cursor_arrow_image) + (((int)(short)i) * 10)), 10, (iptr)D_00176A7C, 46, 4);
+        mc_memcpy((scratch_buffer + (((int)(short)i) << 4)), (((char *)cursor_arrow_image) + (((int)(short)i) * 10)), 10, D_00176A7C, 46, 4);
     }
-    xn_mouse_set_cursor_image(*(int *)scratch_buffer, 0, 0);
+    xn_mouse_set_cursor_image(scratch_buffer, 0, 0);
     intrface_set_regions();
     D_00196272 = 0;
 }
@@ -184,27 +181,27 @@ void intrface_set_regions(void)
 void intrface_free(void)
 {
     if (cursor_region_images != 0 && cursor_region_images != (-1751672937)) {
-        mc_free(cursor_region_images, (iptr)D_00176A7C, 67);
+        mc_free((void *)cursor_region_images, D_00176A7C, 67);
         cursor_region_images = -1751672937;
     }
     if (cursor_arrow_image == 0 || cursor_arrow_image == (-1751672937)) return;
-    mc_free(cursor_arrow_image, (iptr)D_00176A7C, 68);
+    mc_free((void *)cursor_arrow_image, D_00176A7C, 68);
     cursor_arrow_image = -1751672937;
 }
 
 void cursor_draw_arrow(void)
 {
-    xn_draw_get_rect((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, (iptr)cursor_saved_background, 0);
+    xn_draw_get_rect((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, cursor_saved_background, 0);
     cursor_saved_x = (int)(short)mouse_x;
     cursor_saved_y = (int)(short)mouse_y;
-    xn_draw_image_transparent((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, cursor_arrow_image);
-    xn_mouse_read_motion((iptr)&mouse_motion_x, (iptr)&mouse_motion_y);
+    xn_draw_image_transparent((int)(short)mouse_x, (int)(short)mouse_y, 10, 10, (char *)cursor_arrow_image);
+    xn_mouse_read_motion(&mouse_motion_x, &mouse_motion_y);
     mouse_motion_x = (mouse_motion_y = 0);
 }
 
 void cursor_restore_background(void)
 {
-    xn_draw_image_transparent(cursor_saved_x, cursor_saved_y, 10, 10, (iptr)cursor_saved_background);
+    xn_draw_image_transparent(cursor_saved_x, cursor_saved_y, 10, 10, cursor_saved_background);
 }
 
 void func_0008066F(int distance)
@@ -552,7 +549,7 @@ void player_movement_update(void)
         if (((int)(short)(*(short *)collide_flags & 2)) != 0) links_trigger(D_00195C70, 3);
     }
     if (landing_check != 0 && player_on_ground != 0) landing_check = 1;
-    if (distance == 0 && (int)(iptr)D_00195CB8 != 0 && links_object_motion((int)(iptr)D_00195CB8) != 0) {
+    if (distance == 0 && (iptr)D_00195CB8 != 0 && links_object_motion((iptr)D_00195CB8) != 0) {
         player_try_move(0);
     }
     dy = 0;
@@ -645,11 +642,11 @@ void player_movement_update(void)
     if (D_00195CD8 != 0) {
         D_001A5B30 = 0;
         if (player_on_ground != 0) vertical_velocity = 0;
-        mc_memcpy((iptr)D_00195E30, D_00195CD8, 30, (iptr)D_00176A7C, 695, 4);
+        mc_memcpy(D_00195E30, (void *)D_00195CD8, 30, D_00176A7C, 695, 4);
         D_00195CD8 = (iptr)D_00195E30;
     }
     if (D_00195CD4 != 0) {
-        mc_memcpy((iptr)D_00195E4E, D_00195CD4, 30, (iptr)D_00176A7C, 701, 4);
+        mc_memcpy(D_00195E4E, (void *)D_00195CD4, 30, D_00176A7C, 701, 4);
         D_00195CD4 = (iptr)D_00195E4E;
     }
     if (vertical_velocity == 0 && prev_velocity != 0) {

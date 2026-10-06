@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of links.c from 0x00064589 to 0x0006480F, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 extern struct link links[];
 extern struct link *active_links[];
@@ -9,7 +10,6 @@ extern void link_start(struct link *);
 extern iptr xn_str_find_u32(struct link **, struct link *, int);
 extern char D_00175962[];
 extern int link_step(struct link *);
-extern int mc_memcpy();
 extern iptr screen_buffer;
 extern iptr D_00147954;
 extern char D_0017596A[];
@@ -49,8 +49,8 @@ extern void inpstr_begin_text(iptr, short);
 extern int inpstr_update(void);
 extern void object_set_position(struct record *, int, int, int, int, int, int);
 extern int door_start_swing(iptr, int);
-extern int xn_gfx_present_inclusive();
-extern int xn_kbd_flush();
+extern void xn_gfx_present_inclusive(int);
+extern void xn_kbd_flush(void);
 
 void links_trigger(struct record *object, int trigger)
 {
@@ -185,7 +185,7 @@ int link_step(struct link *link)
                     child = link->object->twin->children;
                     if (child != 0) {
                         if (child->twin != 0) {
-                            mc_memcpy(&child->twin->x, &link->object->x, 12, (iptr)D_00175962, 264, 4);
+                            mc_memcpy(&child->twin->x, &link->object->x, 12, D_00175962, 264, 4);
                         }
                     }
                 }
@@ -242,7 +242,7 @@ int link_step(struct link *link)
             msgbox_show_rsc((int)(short)(((unsigned short)link->param) + 8600), 1);
             break;
         case 12:
-            mc_memcpy(D_00147954, 655360, 64000, (iptr)D_00175962, 315, 4);
+            mc_memcpy((void *)D_00147954, (void *)655360, 64000, D_00175962, 315, 4);
             D_001940DA |= 1;
             link_show_text(link->param + 5400);
             message = hud_message_add(D_0017596A);
@@ -250,7 +250,7 @@ int link_step(struct link *link)
             xn_kbd_flush();
             inpstr_begin_text(message + 2, 16);
             while (inpstr_update() == 0) {
-                mc_memcpy(screen_buffer, D_00147954, 64000, (iptr)D_00175962, 324, 4);
+                mc_memcpy((void *)screen_buffer, (void *)D_00147954, 64000, D_00175962, 324, 4);
                 hud_messages_draw();
                 xn_gfx_present_inclusive(1);
             }

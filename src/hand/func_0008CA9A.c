@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008CA9A */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00176E38[];
 extern void picklist_save_background(struct picklist *);
-extern char *mc_malloc(int, char *, int);
 
 void picklist_init(struct picklist *list, short list_x, short list_y, short list_w, short list_h, short up_x, short up_y, short up_w, short up_h, short down_x, short down_y, short down_w, short down_h, short bar_x, short bar_y, short bar_w, short bar_h, unsigned char colour_normal, unsigned char colour_flagged, unsigned char colour_selected, unsigned char colour_thumb, unsigned char framed)
 {

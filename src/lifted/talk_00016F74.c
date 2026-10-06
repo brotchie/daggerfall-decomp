@@ -23,7 +23,7 @@ void talk_draw_question(int left, int top, int right, int bottom)
         line = talk_question_line_count - max_lines;
     }
     while (line < talk_question_line_count) {
-        text_draw_coloured(*(int *)((char *)(iptr)(talk_question_lines + (line++ << 2))), (int)(short)*(short *)&left, (int)(short)((row * 7) + top), 145, 156);
+        text_draw_coloured(*(int *)((talk_question_lines + (line++ << 2))), (int)(short)*(short *)&left, (int)(short)((row * 7) + top), 145, 156);
         row++;
     }
 }

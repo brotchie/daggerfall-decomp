@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
+#include "clib.h"
 
 extern char D_001700C0[];
 extern char D_001700CC[];
@@ -10,7 +11,7 @@ extern char D_0018DC38[];
 extern int D_0018DC3C;
 extern int D_0018DC7C;
 extern int D_0018DD3C;
-extern int D_0018DD40;
+extern iptr D_0018DD40;
 extern iptr sos_drum_bank;
 extern iptr sos_melodic_bank;
 extern char D_0018DD4C[];
@@ -23,19 +24,10 @@ extern char D_0018DD64[];
 extern signed char music_uses_fm;
 
 extern int sos_shutdown(void);
-extern iptr sos_load_file(iptr, ...);
-extern int dpmi_lock_region(iptr, int);
-extern int func_0009E1A1();
-extern int func_0009E2BB();
-extern int func_0009E8FF();
-extern int func_0009E95B();
-extern int func_0009E9C2();
-extern int func_0009EC0A();
-extern int func_0009EC82();
-extern int func_0009F4DE();
-extern int func_0009F9A7();
-extern int func_0009FEE5();
+extern iptr sos_load_file(char *);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+#pragma aux (sosconv) sos_load_file;
+extern int dpmi_lock_region(iptr, int);
 #pragma aux (sosconv) sos_init;
 
 int sos_init(int digi_device, int midi_device)
@@ -47,7 +39,7 @@ int sos_init(int digi_device, int midi_device)
     func_0009E9C2(0, 0);
     if (midi_device != (-1)) {
         *(int *)D_0018DD64 = midi_device;
-        if (func_0009EC82((iptr)D_0018DD64, (iptr)&D_0018DD58) != 0) {
+        if (func_0009EC82(D_0018DD64, &D_0018DD58) != 0) {
             func_0009F9A7(D_0018DD60, 1, 1);
             func_0009E95B();
             func_0009EC0A();
@@ -56,19 +48,19 @@ int sos_init(int digi_device, int midi_device)
     }
     if (digi_device != (-1)) {
         D_0018DD3C = digi_device;
-        if (func_0009F4DE((iptr)D_0018DC38, (iptr)&D_0018DD60) != 0) {
+        if (func_0009F4DE(D_0018DC38, &D_0018DD60) != 0) {
             func_0009E95B();
             return 1;
         }
     }
-    if (digi_device != (-1)) func_0009E2BB(90, D_0018DD40, (iptr)D_0018DD50);
+    if (digi_device != (-1)) func_0009E2BB(90, (void (*)(void))D_0018DD40, (int *)D_0018DD50);
     if (midi_device == 40962 || (midi_device == 40969 && midi_device != (-1))) {
         music_uses_fm = 1;
-        if ((sos_melodic_bank = sos_load_file((iptr)D_001700C0)) == 0) {
+        if ((sos_melodic_bank = sos_load_file(D_001700C0)) == 0) {
             sos_shutdown();
             return 3;
         }
-        if ((sos_drum_bank = sos_load_file((iptr)D_001700CC)) == 0) {
+        if ((sos_drum_bank = sos_load_file(D_001700CC)) == 0) {
             sos_shutdown();
             return 4;
         }

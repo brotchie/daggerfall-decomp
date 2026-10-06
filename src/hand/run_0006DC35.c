@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of guilds from 0x0006D91A to 0x0006DC35, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 
 struct msgs {
     short busy;                 /* 0x00 */
@@ -42,8 +43,8 @@ extern char D_00175FEE[];
 extern char D_00176019[];
 extern char D_00176044[];
 extern int trade_price_scale;
-extern int D_001832B0;
-extern char region_names[];
+extern iptr D_001832B0;
+extern char *region_names[];
 extern char D_00186F37[];
 extern char D_00186F4C[];
 extern char D_00186F5F[];
@@ -94,8 +95,8 @@ extern void guild_buy_blessing(void);
 extern void guild_donate(void);
 extern void guild_temple_quest(void);
 extern int guild_kind_of_faction(struct faction *);
-extern int guild_service_label(short);
-extern int guild_menu(iptr, int, int);
+extern iptr guild_service_label(short);
+extern int guild_menu(iptr, int, iptr);
 extern void guild_heal(void);
 extern void shop_open_repair(int, struct record *);
 extern void npc_talk(struct record *);
@@ -106,11 +107,7 @@ extern void object_foreach(struct record *, void (*)());
 extern int potionmaker_open(int);
 extern void inventory_open_container(iptr, int, int);
 extern void inv_store_item(struct record *);
-extern int mc_free();
-extern int mc_strncpy();
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
 
 void guild_join_or_promote(int guild, int joining)
 {
@@ -200,7 +197,7 @@ void guild_service_dispatch(struct record *npc)
     int is_member;
     int refusal_text;
     int not_served;
-    int label;
+    iptr label;
     iptr image;
 
     refusal_text = 0;
@@ -219,40 +216,40 @@ void guild_service_dispatch(struct record *npc)
         return;
     }
     is_member = ((guild_membership != 0) ? 1 : 0);
-    mc_set_location(163, (iptr)D_00175EAA);
-    mc_sprintf((iptr)text_buffer, (iptr)D_00175EB3, is_member + 48);
+    mc_set_location(163, D_00175EAA);
+    mc_sprintf((char *)text_buffer, D_00175EB3, is_member + 48);
     image = disk_read_file(text_buffer, 0);
     choice = guild_menu(image, is_member, label);
     switch (choice) {
     case 0:
         guild_join_or_promote(guild, 1);
         if (image != 0 && image != (-1751672937)) {
-            mc_free(image, (iptr)D_00175EAA, 170);
+            mc_free((void *)image, D_00175EAA, 170);
             image = -1751672937;
         }
         return;
     case 1:
         npc_talk(npc);
         if (image != 0 && image != (-1751672937)) {
-            mc_free(image, (iptr)D_00175EAA, 174);
+            mc_free((void *)image, D_00175EAA, 174);
             image = -1751672937;
         }
         return;
     case 2:
         if (image != 0 && image != (-1751672937)) {
-            mc_free(image, (iptr)D_00175EAA, 177);
+            mc_free((void *)image, D_00175EAA, 177);
             image = -1751672937;
         }
         break;
     case 3:
         if (image != 0 && image != (-1751672937)) {
-            mc_free(image, (iptr)D_00175EAA, 180);
+            mc_free((void *)image, D_00175EAA, 180);
             image = -1751672937;
         }
         return;
     default:
         if (image != 0 && image != (-1751672937)) {
-            mc_free(image, (iptr)D_00175EAA, 183);
+            mc_free((void *)image, D_00175EAA, 183);
             image = -1751672937;
         }
     }
@@ -494,8 +491,8 @@ void guild_service_dispatch(struct record *npc)
                 D_001A41E4 = (struct record *)((char *)bank_houses_for_sale[choice].block - 71);
                 D_001A41DC = (iptr)bank_houses_for_sale[choice].building;
                 msgbox_show_rsc(462, 1);
-                mc_strncpy((iptr)saved_region_name, *(int *)(region_names + (((int)(unsigned char)current_region) << 2)), 32, (iptr)D_00175EAA, 413);
-                mc_strncpy((iptr)saved_location_name, (iptr)current_location, 32, (iptr)D_00175EAA, 414);
+                mc_strncpy(saved_region_name, region_names[((int)(unsigned char)current_region)], 32, D_00175EAA, 413);
+                mc_strncpy(saved_location_name, (char *)current_location, 32, D_00175EAA, 414);
                 break;
             default:
                 not_served = 1;

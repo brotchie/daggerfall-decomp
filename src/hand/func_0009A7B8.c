@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009A7B8 */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 struct header_copy {            /* a copy of a record's 71-byte header (found_marker) */
@@ -14,8 +15,6 @@ extern char D_00177358[];
 extern unsigned char D_001940D5;
 extern struct record *player_object;
 extern struct record *marker_find_nearest(struct record *, int);
-extern int abs(int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 void ladder_climb(void)
 {

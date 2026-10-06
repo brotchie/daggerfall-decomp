@@ -3,13 +3,13 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 
-extern int enchant_side_effect_params[];
+extern iptr enchant_side_effect_params[];
 extern signed char scratch_190ce4[];
 extern char scratch_190d64[];
 extern iptr list_popup_callback;
 extern struct enchantment itemmaker_slots[];
 
-extern int itemmaker_pick_param_list(int);
+extern int itemmaker_pick_param_list(iptr);
 extern int itemmaker_free_slot(void);
 extern void msgbox_show_rsc(int, int);
 extern void itemmaker_set_side_effect_param_cb(short);

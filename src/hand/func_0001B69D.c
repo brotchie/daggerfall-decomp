@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001B69D */
 #include "records.h"
+#include "clib.h"
 
 struct cmd { unsigned short hash; void (*fn)(struct faction *, char **, int *, int *); };
 extern char *D_00147954;
@@ -17,16 +18,7 @@ extern void faction_link_relations(struct faction *);
 extern void faction_add_record(struct faction *, int, struct faction *);
 extern void fatal_error(char *);
 extern int disk_open_data(char *);
-extern void close(int);
-extern void mc_free(struct faction *, char *, int);
-extern void mc_memset(void *, int, int, char *, int, int);
-extern struct faction *mc_malloc(int, char *, int);
-extern int read(int, char *, int);
-extern short atoi(char *);
-extern int tolower(int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern void mc_sprintf(char *, char *, ...);
 
 void faction_load_file(void)
 {

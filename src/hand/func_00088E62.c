@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00088E62 */
 #include "records.h"
-extern int D_00185097;
+extern iptr D_00185097;
 extern struct character *player_character;
 extern void spell_remove_effect_type(struct record *, int);
 extern iptr hud_message_add(iptr);

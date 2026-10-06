@@ -25,7 +25,7 @@ extern short steer_weight_left;
 extern short steer_weight_up;
 extern short steer_key_region;
 
-extern int xn_input_steer_dispatch();
+extern void xn_input_steer_dispatch(int);
 
 void intrface_steer(int unused, int region, int region_x, int region_y)
 {

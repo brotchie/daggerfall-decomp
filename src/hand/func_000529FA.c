@@ -1,8 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000529FA */
 #include "structs.h"
+#include "clib.h"
 extern char D_00175404[];        /* __FILE__ */
-extern void mc_memset(void *, int, int, char *, int, int);
-extern void mc_memcpy(void *, void *, int, char *, int, int);
 
 void flc_decode_lc(unsigned char *chunk, struct flc_player *anim)
 {

@@ -5,7 +5,7 @@ extern char namegen_part_name[];
 extern char namegen_syllable[];
 extern short namegen_file;
 extern void namegen_read_part(short, short);
-extern int func_000A1054();
+#include "clib.h"
 
 char *name_generate_surname(unsigned char bank, unsigned char female)
 {

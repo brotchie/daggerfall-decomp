@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0006AED1 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00175C86[];
 extern struct record *logbook_object;
@@ -7,8 +8,6 @@ extern struct location *current_location;
 extern int game_minutes;
 extern struct quest *quest_find_by_id(int);
 extern void logbook_prune_quests(void);
-extern void mc_memset(void *, int, int, char *, int, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
 
 void logbook_add_entry(unsigned char quest_id, int message_id, int index)
 {

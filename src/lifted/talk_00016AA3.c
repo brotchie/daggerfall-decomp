@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
+#include "clib.h"
 
 extern char D_00170404[];
 extern char D_00170411[];
@@ -10,9 +11,6 @@ extern iptr talk_face_image;
 
 extern int disk_open_data(char *);
 extern int rand_range(int, int);
-extern int close();
-extern int lseek();
-extern int read();
 
 void talk_load_face(int face)
 {
@@ -30,6 +28,6 @@ void talk_load_face(int face)
         file = disk_open_data(D_00170411);
         lseek(file, face << 12, 0);
     }
-    read(file, talk_face_image, 4096);
+    read(file, (void *)talk_face_image, 4096);
     close(file);
 }

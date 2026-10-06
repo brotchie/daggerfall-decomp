@@ -7,14 +7,14 @@ extern signed char mouse_buttons;
 extern char D_0017055C[];
 extern signed char tavern_state;
 extern struct building *current_building;
-extern char tavern_building[];
+extern struct building *tavern_building;
 extern unsigned char D_0019626F;
 extern signed char D_00196272;
 extern signed char game_mode;
 extern iptr tavern_menu_image;
 
 extern iptr disk_read_file(char *, iptr);
-extern int xn_mouse_poll_clamped();
+extern int xn_mouse_poll_clamped(void);
 
 int tavern_open(short opening)
 {
@@ -29,7 +29,7 @@ int tavern_open(short opening)
         tavern_menu_image = disk_read_file(D_0017055C, 0);
         game_mode = 20;
         D_00196272 = 1;
-        *(iptr *)tavern_building = (iptr)current_building;
+        *(iptr *)&tavern_building = (iptr)current_building;
     }
     if (((int)(unsigned char)game_mode) == 20) {
         result = 1;

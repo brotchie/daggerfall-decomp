@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of inven.c from 0x00095D2C to 0x00095F82, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 struct flags8 { unsigned char b0:2; unsigned char b2:1; };
 extern char D_0012B508;
 extern char D_0017704C[];       /* __FILE__ */
@@ -10,7 +11,7 @@ extern short D_00188208[];
 extern signed char text_buffer[];
 extern unsigned char D_001940D8;
 extern struct record *wagon_container;
-extern int player_object;
+extern iptr player_object;
 extern struct record *inv_right_container;
 extern struct record *inv_right_container_base;
 extern struct character *player_character;
@@ -18,10 +19,10 @@ extern unsigned char D_0019626F;
 extern unsigned char game_mode;
 extern unsigned char inv_right_icon;
 extern int D_001AA454;
-extern char inv_right_rows[];
+extern struct record *inv_right_rows[];
 extern struct record *D_001AA558;
 extern struct record *inv_selected_item;
-extern char inv_left_rows[];
+extern iptr inv_left_rows[];
 extern struct record *D_001AA578;
 extern struct record *inv_left_container;
 extern short inv_right_count;
@@ -44,11 +45,8 @@ extern int item_is_two_handed(struct record *);
 extern void item_remove_equip_effects(struct record *, int);
 extern void inv_store_item(struct record *);
 extern int item_forbidden_for_class(struct item *);
-extern void mc_memset(char *, int, int, char *, int, int);
-extern iptr xn_str_find_u32();
+extern unsigned *xn_str_find_u32(unsigned *, uptr, unsigned);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 void inv_equip_item(struct record *object);
 
 void inv_draw_left_list(struct rect *rects)
@@ -56,7 +54,7 @@ void inv_draw_left_list(struct rect *rects)
     struct record *object;
 
     inv_left_count = D_001AA586 = 0;
-    mc_memset(inv_left_rows, 0, 20, D_0017704C, 1627, 20);
+    mc_memset((char *)inv_left_rows, 0, 20, D_0017704C, 1627, 20);
     if (inv_left_container->type == 2 && inv_left_container != wagon_container) {
         inv_draw_item_cell(inv_left_container, 0, rects);
         D_001AA578 = inv_left_container;
@@ -78,7 +76,7 @@ void inv_draw_right_list(struct rect *rects)
     struct record *object;
 
     inv_right_count = D_001AA588 = 0;
-    mc_memset(inv_right_rows, 0, 20, D_0017704C, 1655, 20);
+    mc_memset((char *)inv_right_rows, 0, 20, D_0017704C, 1655, 20);
     if (inv_right_container != inv_right_container_base) {
         inv_draw_item_cell(inv_right_container, 0, rects);
         D_001AA558 = inv_right_container;
@@ -97,7 +95,7 @@ void func_00095EDB(void)
     int unused2;
 
     D_001AA454 = 0;
-    if (xn_str_find_u32(player_character->equipped, inv_selected_item, 27) != 0)
+    if (xn_str_find_u32(player_character->equipped, (uptr)inv_selected_item, 27) != 0)
         return;
     inv_store_item(inv_selected_item);
     inv_equip_item(inv_selected_item);

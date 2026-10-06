@@ -1,9 +1,9 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007CF09 */
 extern signed char mouse_buttons;
-extern int xn_gfx_wait_vretrace_start();
-extern int xn_gfx_wait_vretrace_end();
-extern int xn_mouse_poll_clamped();
-extern char xn_kbd_read_key();
+extern void xn_gfx_wait_vretrace_start(void);
+extern void xn_gfx_wait_vretrace_end(void);
+extern void xn_mouse_poll_clamped(void);
+extern char xn_kbd_read_key(void);
 
 int wait_frames_or_input(short frames)
 {

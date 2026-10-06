@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern signed char mouse_double_click;
@@ -42,8 +43,8 @@ extern short talk_regional_ids[];
 extern short D_00179CC8[];
 extern signed char D_00179CFA[];
 extern char talk_category_building_types[];
-extern int talk_category_names[];
-extern int talk_regional_names[];
+extern iptr talk_category_names[];
+extern iptr talk_regional_names[];
 extern char region_neighbours[];
 extern signed char D_00187CA8;
 extern struct region regions[];
@@ -83,7 +84,7 @@ extern short *talk_topics;
 extern char talk_list_scroll_x[];
 extern iptr talk_text_pool_next;
 extern char *talk_answer_lines;
-extern int talk_saved_screen;
+extern iptr talk_saved_screen;
 extern struct faction *talk_npc_own_faction;
 extern struct faction *talk_npc_faction;
 extern struct talk_place_topic *talk_place_topics;
@@ -143,13 +144,13 @@ extern int town_has_building(short, int);
 extern int building_distance(struct building *);
 extern int talk_faction_relation(short);
 extern struct faction *faction_find(short);
-extern int rumor_pick_news(short);
+extern iptr rumor_pick_news(short);
 extern iptr quest_symbol_text(int, int, int);
 extern iptr quest_section(iptr, int);
 extern struct record *quest_find_site_for_building(struct building *);
 extern iptr parse_bio_answer_text(int);
-extern int quest_find_by_id(int);
-extern int quest_find_potential_questor(void);
+extern iptr quest_find_by_id(int);
+extern iptr quest_find_potential_questor(void);
 extern struct character *npc_talk_record_build(struct record *);
 extern int font_char_width(unsigned char);
 extern int font_text_width(iptr);
@@ -164,21 +165,9 @@ extern int rand_range(int, int);
 extern struct building *object_building(struct record *);
 extern iptr npc_display_name(struct record *);
 extern iptr building_name(iptr);
-extern int rand();
-extern int srand();
-extern int mc_free();
-extern int mc_memset();
-extern iptr mc_malloc();
-extern int mc_strncpy();
-extern int strlen();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int func_000A1054();
-extern iptr memchr();
-extern int xn_mouse_poll_clamped();
-extern int xn_draw_fill_rect();
-extern int xn_draw_image();
+extern int xn_mouse_poll_clamped(void);
+extern void xn_draw_fill_rect(int, int, int, int);
+extern void xn_draw_image(int, int, int, int, char *);
 extern void func_000164EF(void);
 extern void talk_load_face(int);
 extern void talk_draw_answer(int, int, int, int);
@@ -190,7 +179,7 @@ extern void parse_rsc_text(int, int, int);
 extern void quest_load_text(struct quest *, int, short, int);
 extern void time_pass(int);
 extern void logbook_copy_text(iptr);
-extern void text_draw_coloured();
+extern void text_draw_coloured(char *, int, int, int, int);
 extern void text_draw_centred_coloured(iptr, int, int, int, unsigned char);
 extern void msgbox_yes_no_rsc(int);
 extern void location_free(struct loaded_location *);
@@ -242,9 +231,9 @@ void talk_update(void)
 
     if (talk_open(0) == 0) return;
     if (talk_redraw == 0) {
-        mc_memcpy(screen_buffer, talk_saved_screen, 64000, (iptr)D_001703F0, 324, 4);
+        mc_memcpy((void *)screen_buffer, (void *)talk_saved_screen, 64000, D_001703F0, 324, 4);
     } else {
-        mc_memcpy(screen_buffer, window_image, 64000, (iptr)D_001703F0, 326, 4);
+        mc_memcpy((void *)screen_buffer, (void *)window_image, 64000, D_001703F0, 326, 4);
     }
     if (talk_redraw != 0) talk_draw();
     if (key_down_up != 0) {
@@ -311,23 +300,23 @@ void talk_draw(void)
     talk_list_max_width = 0;
     D_0012B508 = 244;
     xn_draw_fill_rect(talk_buttons[((int)(unsigned char)talk_tone) + 6].x0, talk_buttons[((int)(unsigned char)talk_tone) + 6].y0, (int)(short)((talk_buttons[((int)(unsigned char)talk_tone) + 6].x1 - talk_buttons[((int)(unsigned char)talk_tone) + 6].x0) + 1), (int)(short)((talk_buttons[((int)(unsigned char)talk_tone) + 6].y1 - talk_buttons[((int)(unsigned char)talk_tone) + 6].y0) + 1));
-    xn_draw_image(4, 26, 107, 40, D_001965E4);
+    xn_draw_image(4, 26, 107, 40, (char *)D_001965E4);
     if (talk_question_mode != 0) {
         for (offset = (talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].y0) * 320; ((talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].y1) * 320) >= offset; offset += 320) {
-            mc_memcpy((talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].x0) + (screen_buffer + offset), (window_image + offset) + (talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].x0), 107, (iptr)D_001703F0, 417, 4);
+            mc_memcpy((void *)((talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].x0) + (screen_buffer + offset)), (void *)((window_image + offset) + (talk_buttons[((int)(unsigned char)talk_topic_tab) + 2].x0)), 107, D_001703F0, 417, 4);
         }
     }
     src_offset = ((int)(unsigned char)talk_question_mode) * 1070;
     for (offset = (talk_buttons[(int)(unsigned char)talk_question_mode].y0) * 320; ((talk_buttons[(int)(unsigned char)talk_question_mode].y1) * 320) >= offset; offset += 320, src_offset += 107) {
-        mc_memcpy((talk_buttons[(int)(unsigned char)talk_question_mode].x0) + (screen_buffer + offset), D_001965F8 + src_offset, 107, (iptr)D_001703F0, 423, 4);
+        mc_memcpy((void *)((talk_buttons[(int)(unsigned char)talk_question_mode].x0) + (screen_buffer + offset)), (void *)(D_001965F8 + src_offset), 107, D_001703F0, 423, 4);
     }
     D_001966B7 = 1;
     if (((int)(unsigned char)talk_topic_tab) == 3) {
         parse_rsc_text(7211, 0, 0);
-        mc_strncpy((iptr)talk_key_text, (iptr)text_rsc_buffer, 4, (iptr)D_001703F0, 430);
+        mc_strncpy(talk_key_text, (char *)text_rsc_buffer, 4, D_001703F0, 430);
         parse_rsc_text(((int)(unsigned char)talk_tone) + 7212, 0, 0);
         D_00190D0F = 1;
-        mc_strncpy((iptr)(((char *)D_00147954) + 90000), (iptr)text_rsc_buffer, 4, (iptr)D_001703F0, 433);
+        mc_strncpy((((char *)D_00147954) + 90000), (char *)text_rsc_buffer, 4, D_001703F0, 433);
         talk_wrap_text((signed char *)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
         D_00190D0F = 0;
     } else {
@@ -340,26 +329,26 @@ void talk_draw(void)
                 if (talk_list_count == 0) break;
                 parse_rsc_text(((int)(unsigned char)talk_tone) + 7225, 0, 0);
                 D_00190D0F = 1;
-                mc_strncpy((iptr)(((char *)D_00147954) + 90000), (iptr)text_rsc_buffer, 4, (iptr)D_001703F0, 448);
+                mc_strncpy((((char *)D_00147954) + 90000), (char *)text_rsc_buffer, 4, D_001703F0, 448);
                 talk_wrap_text((signed char *)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
                 D_00190D0F = 0;
             }
             break;
         case 0:
             talk_draw_tell_list();
-            if (*(short *)((char *)(iptr)(((char *)talk_topics) + (*(int *)talk_selected_row * 6))) == 0 && talk_topics[*(int *)talk_selected_row * 3 + 1] == 0) {
+            if (*(short *)((((char *)talk_topics) + (*(int *)talk_selected_row * 6))) == 0 && talk_topics[*(int *)talk_selected_row * 3 + 1] == 0) {
                 parse_rsc_text(((int)(unsigned char)talk_tone) + 7231, 0, 0);
             } else {
                 parse_rsc_text(((int)(unsigned char)talk_tone) + 7212, 0, 0);
             }
             D_00190D0F = 1;
-            mc_strncpy((iptr)(((char *)D_00147954) + 90000), (iptr)text_rsc_buffer, 4, (iptr)D_001703F0, 461);
+            mc_strncpy((((char *)D_00147954) + 90000), (char *)text_rsc_buffer, 4, D_001703F0, 461);
             talk_wrap_text((signed char *)(((char *)D_00147954) + 90000), 134, 10, 245, 45);
             D_00190D0F = 0;
         }
     }
     talk_draw_question(125, 10, 245, 45);
-    mc_memcpy(talk_saved_screen, screen_buffer, 64000, (iptr)D_001703F0, 469, 4);
+    mc_memcpy((void *)talk_saved_screen, (void *)screen_buffer, 64000, D_001703F0, 469, 4);
     talk_redraw = 0;
     srand(seed);
 }
@@ -401,7 +390,7 @@ void talk_start(struct record *npc)
     }
     text_macro_npc = talk_npc_record;
     talk_npc_faction = faction_find(talk_npc_record->faction_id);
-    talk_face_image = mc_malloc(4096, (iptr)D_001703F0, 530);
+    talk_face_image = (iptr)mc_malloc(4096, D_001703F0, 530);
     if (talk_npc_faction->type == 4) talk_load_face(talk_npc_faction->face);
     faction = talk_npc_faction;
     while (faction != 0) {
@@ -424,7 +413,7 @@ void talk_start(struct record *npc)
     if (talk_disposition < (-20)) {
         msgbox_show_rsc(7205, 1);
         if (talk_face_image != 0 && talk_face_image != (-1751672937)) {
-            mc_free(talk_face_image, (iptr)D_001703F0, 562);
+            mc_free((void *)talk_face_image, D_001703F0, 562);
             talk_face_image = -1751672937;
         }
         return;
@@ -526,16 +515,16 @@ void talk_button_tell_me_about(void)
 
 int talk_ask_news(void)
 {
-    int news;
+    iptr news;
 
     talk_npc_knows = talk_roll_knows();
     D_001965DC = 3;
     if (*(int *)talk_selected_row != 0) return 0;
     news = rumor_pick_news((int)(short)talk_npc_faction->id);
     if (news == 0) return 0;
-    mc_strncpy(D_00147954 + 90000, news, 4, (iptr)D_001703F0, 699);
+    mc_strncpy((char *)(D_00147954 + 90000), (char *)news, 4, D_001703F0, 699);
     D_001966BB = 1;
-    mc_strncpy(D_00147954 + 95000, news, 4, (iptr)D_001703F0, 701);
+    mc_strncpy((char *)(D_00147954 + 95000), (char *)news, 4, D_001703F0, 701);
     talk_wrap_text((signed char *)(D_00147954 + 90000), 190, 66, 302, 191);
     return 1;
 }
@@ -593,24 +582,24 @@ void talk_close(void)
         if (talk_npc_object->type == 53) talk_npc_object->image2 |= 1;
     }
     if (talk_face_image != 0 && talk_face_image != (-1751672937)) {
-        mc_free(talk_face_image, (iptr)D_001703F0, 760);
+        mc_free((void *)talk_face_image, D_001703F0, 760);
         talk_face_image = -1751672937;
     }
     D_00190D10 = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_001703F0, 762);
+        mc_free((void *)window_image, D_001703F0, 762);
         window_image = -1751672937;
     }
     if (D_001965E4 != 0 && D_001965E4 != (-1751672937)) {
-        mc_free(D_001965E4, (iptr)D_001703F0, 763);
+        mc_free((void *)D_001965E4, D_001703F0, 763);
         D_001965E4 = -1751672937;
     }
     if (talk_saved_screen != 0 && talk_saved_screen != (-1751672937)) {
-        mc_free(talk_saved_screen, (iptr)D_001703F0, 764);
+        mc_free((void *)talk_saved_screen, D_001703F0, 764);
         talk_saved_screen = -1751672937;
     }
     if (D_001965F8 != 0 && D_001965F8 != (-1751672937)) {
-        mc_free(D_001965F8, (iptr)D_001703F0, 765);
+        mc_free((void *)D_001965F8, D_001703F0, 765);
         D_001965F8 = -1751672937;
     }
     game_mode = 0;
@@ -744,17 +733,17 @@ int func_000164CD(void)
 void talk_say_text(int text_id)
 {
     parse_rsc_text(text_id, 0, 0);
-    mc_strncpy(D_00147954 + 90000, (iptr)text_rsc_buffer, 4, (iptr)D_001703F0, 934);
+    mc_strncpy((char *)(D_00147954 + 90000), (char *)text_rsc_buffer, 4, D_001703F0, 934);
     D_001966BB = 1;
-    mc_strncpy(D_00147954 + 95000, (iptr)text_rsc_buffer, 4, (iptr)D_001703F0, 936);
+    mc_strncpy((char *)(D_00147954 + 95000), (char *)text_rsc_buffer, 4, D_001703F0, 936);
     talk_wrap_text((signed char *)(D_00147954 + 90000), 190, 66, 302, 191);
 }
 
-void talk_say_string(int text)
+void talk_say_string(iptr text)
 {
-    mc_strncpy(D_00147954 + 90000, text, 4, (iptr)D_001703F0, 942);
+    mc_strncpy((char *)(D_00147954 + 90000), (char *)text, 4, D_001703F0, 942);
     D_001966BB = 1;
-    mc_strncpy(D_00147954 + 95000, text, 4, (iptr)D_001703F0, 944);
+    mc_strncpy((char *)(D_00147954 + 95000), (char *)text, 4, D_001703F0, 944);
     talk_wrap_text((signed char *)(D_00147954 + 90000), 190, 66, 302, 191);
 }
 
@@ -764,7 +753,7 @@ iptr talk_macro_hint(int variant)
 
     text_id = talk_hint_text_id(variant);
     if ((text_id & 32768) != 0) {
-        *(int *)&current_quest = (*(int *)&quest_tick_data = quest_find_by_id((int)(short)(short)D_00190D11));
+        *(iptr *)&current_quest = (*(iptr *)&quest_tick_data = quest_find_by_id((int)(short)(short)D_00190D11));
         quest_load_text(current_quest, text_id & 32767, 0, 0);
     } else {
         parse_rsc_text(text_id, 0, 0);
@@ -788,7 +777,7 @@ void func_00016907(signed char *src, signed char *dest)
                 text_buffer[length] = 0;
                 in_word = 0;
                 length = in_word;
-                mc_strncpy(dest, func_000169D4((iptr)text_buffer), 4, (iptr)D_001703F0, 1038);
+                mc_strncpy(dest, (char *)func_000169D4((iptr)text_buffer), 4, D_001703F0, 1038);
                 dest += strlen(dest);
             }
             *dest++ = *src++;
@@ -808,14 +797,14 @@ iptr func_000169D4(iptr word)
     count = rand_range(2, 4);
     *(signed char *)D_00191016 = 0;
     for (i = 0; i < count; i++) {
-        func_000A1054((iptr)D_00191016, parse_bio_answer_text((int)(unsigned short)D_001966A6), (iptr)D_001703F0, 1059, 4);
+        func_000A1054(D_00191016, (char *)parse_bio_answer_text((int)(unsigned short)D_001966A6), D_001703F0, 1059, 4);
     }
     return (iptr)D_00191016;
 }
 
 void talk_draw_face(void)
 {
-    xn_draw_image(119, 65, 64, 64, talk_face_image);
+    xn_draw_image(119, 65, 64, 64, (char *)talk_face_image);
 }
 
 void talk_wrap_text(signed char *text, int left, int top, int right, int bottom)
@@ -831,11 +820,11 @@ void talk_wrap_text(signed char *text, int left, int top, int right, int bottom)
     while (*text != 0) {
         word_width = talk_next_word(&text);
         if (((line_width + word_width) + left) < right) {
-            func_000A1054((iptr)text_rsc_buffer, (iptr)text_buffer, (iptr)D_001703F0, 1108, 2048);
+            func_000A1054((char *)text_rsc_buffer, (char *)text_buffer, D_001703F0, 1108, 2048);
             line_width += word_width;
         } else {
             talk_add_line((iptr)text_rsc_buffer);
-            mc_strncpy((iptr)text_rsc_buffer, (iptr)text_buffer, 2048, (iptr)D_001703F0, 1114);
+            mc_strncpy((char *)text_rsc_buffer, (char *)text_buffer, 2048, D_001703F0, 1114);
             line_width = word_width;
         }
     }
@@ -851,8 +840,8 @@ void talk_log_question(void)
 
     talk_add_line((iptr)D_0017041B);
     for (i = 0; i < talk_question_line_count; i++) {
-        *(signed char *)(*(char **)((char *)(iptr)(talk_question_lines + (i << 2)))) |= 128;
-        talk_add_line(*(int *)((char *)(iptr)(talk_question_lines + (i << 2))));
+        *(signed char *)(*(char **)((talk_question_lines + (i << 2)))) |= 128;
+        talk_add_line(*(int *)((talk_question_lines + (i << 2))));
     }
     talk_clear_question();
 }
@@ -860,12 +849,12 @@ void talk_log_question(void)
 void talk_add_line(iptr line)
 {
     if (D_00190D0F != 0) {
-        *(iptr *)((char *)(iptr)(talk_question_lines + (talk_question_line_count << 2))) = talk_alloc_line();
-        mc_strncpy(*(int *)((char *)(iptr)(talk_question_lines + (talk_question_line_count++ << 2))), line, 4, (iptr)D_001703F0, 1148);
+        *(iptr *)((talk_question_lines + (talk_question_line_count << 2))) = talk_alloc_line();
+        mc_strncpy((char *)*(iptr *)((talk_question_lines + (talk_question_line_count++ << 2))), (char *)line, 4, D_001703F0, 1148);
         return;
     }
-    *(iptr *)((char *)(iptr)(talk_answer_lines + (talk_answer_line_count << 2))) = talk_alloc_line();
-    mc_strncpy(*(int *)((char *)(iptr)(talk_answer_lines + (talk_answer_line_count++ << 2))), line, 4, (iptr)D_001703F0, 1153);
+    *(iptr *)((talk_answer_lines + (talk_answer_line_count << 2))) = talk_alloc_line();
+    mc_strncpy((char *)*(iptr *)((talk_answer_lines + (talk_answer_line_count++ << 2))), (char *)line, 4, D_001703F0, 1153);
 }
 
 int talk_next_word(signed char **cursor)
@@ -891,16 +880,16 @@ int talk_next_word(signed char **cursor)
 
 iptr talk_alloc_line(void)
 {
-    talk_text_pool_next += strlen(talk_text_pool_next) + 1;
+    talk_text_pool_next += strlen((char *)talk_text_pool_next) + 1;
     return talk_text_pool_next;
 }
 
 void talk_init_text(void)
 {
-    if (D_001965A0 == 0) D_001965A0 = mc_malloc(20480, (iptr)D_001703F0, 1238);
-    if (D_001965C4 == 0) D_001965C4 = mc_malloc(20480, (iptr)D_001703F0, 1241);
-    mc_memset(D_001965A0, 0, 20480, (iptr)D_001703F0, 1243, 4);
-    mc_memset(D_001965C4, 0, 20480, (iptr)D_001703F0, 1244, 4);
+    if (D_001965A0 == 0) D_001965A0 = (iptr)mc_malloc(20480, D_001703F0, 1238);
+    if (D_001965C4 == 0) D_001965C4 = (iptr)mc_malloc(20480, D_001703F0, 1241);
+    mc_memset((void *)D_001965A0, 0, 20480, D_001703F0, 1243, 4);
+    mc_memset((void *)D_001965C4, 0, 20480, D_001703F0, 1244, 4);
     talk_text_pool_next = D_001965A0;
     *(iptr *)&talk_answer_lines = D_001965C4;
     talk_answer_line_count = 0;
@@ -909,8 +898,8 @@ void talk_init_text(void)
 
 void talk_clear_question(void)
 {
-    if (D_001965AC == 0) D_001965AC = mc_malloc(20480, (iptr)D_001703F0, 1257);
-    mc_memset(D_001965AC, 0, 20480, (iptr)D_001703F0, 1259, 4);
+    if (D_001965AC == 0) D_001965AC = (iptr)mc_malloc(20480, D_001703F0, 1257);
+    mc_memset((void *)D_001965AC, 0, 20480, D_001703F0, 1259, 4);
     *(iptr *)&talk_question_lines = D_001965AC;
     talk_question_line_count = 0;
 }
@@ -942,7 +931,7 @@ void talk_draw_place_list(void)
                 name = building_name((iptr)talk_place_topics[i].building);
                 if (*(int *)talk_selected_row == talk_list_count) {
                     colour = 244;
-                    mc_strncpy(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), name, 4, (iptr)D_001703F0, 1300);
+                    mc_strncpy((char *)(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65)), (char *)name, 4, D_001703F0, 1300);
                 } else {
                     colour = 145;
                 }
@@ -1060,7 +1049,7 @@ L1776B:;
                     }
                     if (*(int *)talk_selected_row == talk_list_count) {
                         colour = 244;
-                        mc_strncpy(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), name, 4, (iptr)D_001703F0, 1448);
+                        mc_strncpy((char *)(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65)), (char *)name, 4, D_001703F0, 1448);
                     } else {
                         colour = 145;
                     }
@@ -1083,7 +1072,7 @@ L1790A:;
                     }
                     if (*(int *)talk_selected_row == talk_list_count) {
                         colour = 244;
-                        mc_strncpy(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), name, 4, (iptr)D_001703F0, 1477);
+                        mc_strncpy((char *)(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65)), (char *)name, 4, D_001703F0, 1477);
                     } else {
                         colour = 145;
                     }
@@ -1110,7 +1099,7 @@ void talk_list_draw_item(iptr text, int x, int y, int colour, int shadow)
     xn_gfx_clip_left = 6;
     *(int *)&saved_right = (int)(short)xn_gfx_clip_right;
     xn_gfx_clip_right = 100;
-    text_draw_coloured(text, (int)(short)(x + *(short *)talk_list_scroll_x), (int)(short)*(short *)&y, (int)(short)*(short *)&colour, (int)(short)*(short *)&shadow);
+    text_draw_coloured((char *)text, (int)(short)(x + *(short *)talk_list_scroll_x), (int)(short)*(short *)&y, (int)(short)*(short *)&colour, (int)(short)*(short *)&shadow);
     width = font_text_width(text);
     if (width > talk_list_max_width) talk_list_max_width = width;
     xn_gfx_clip_left = *(int *)&saved_left;
@@ -1159,11 +1148,11 @@ void talk_add_regional_item(int index)
         talk_list_count++;
         return;
     }
-    mc_set_location(1590, (iptr)D_001703F0);
-    mc_sprintf((iptr)text_buffer, (iptr)D_0017042A, talk_regional_names[index]);
+    mc_set_location(1590, D_001703F0);
+    mc_sprintf((char *)text_buffer, D_0017042A, talk_regional_names[index]);
     if (*(int *)talk_selected_row == talk_list_count) {
         colour = 244;
-        mc_strncpy(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), (iptr)text_buffer, 4, (iptr)D_001703F0, 1595);
+        mc_strncpy((char *)(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65)), (char *)text_buffer, 4, D_001703F0, 1595);
     } else {
         colour = 145;
     }
@@ -1178,7 +1167,7 @@ int talk_find_regional(int index)
 
         location_pick_random_with_service(&found, (int)(short)D_00179CC8[index], (int)(short)talk_regional_ids[index]);
         if (found.object == 0) return 0;
-        mc_strncpy((iptr)text_macro_fcn, (iptr)found.data->name, 32, (iptr)D_001703F0, 1610);
+        mc_strncpy(text_macro_fcn, found.data->name, 32, D_001703F0, 1610);
         location_free(&found);
         return 1;
     }
@@ -1201,7 +1190,7 @@ void talk_build_place_topics(void)
     talk_place_topic_count = 0;
     for (i = 0; current_location->building_count > i; i++, building++) {
         if (building->type >= 17 || building->type == 1) continue;
-        found = memchr((iptr)talk_category_building_types, building->type, 13);
+        found = (iptr)memchr(talk_category_building_types, building->type, 13);
         if (found != 0) {
             talk_place_topics[talk_place_topic_count].category = found - ((iptr)talk_category_building_types);
             talk_place_topics[talk_place_topic_count].kind = 0;
@@ -1228,9 +1217,9 @@ void talk_build_place_topics(void)
             next_distance = talk_place_topics[i + 1].distance;
             if (next_distance < distance) {
                 swapped = 1;
-                mc_memcpy((iptr)&swap, (iptr)&talk_place_topics[i], 19, (iptr)D_001703F0, 1678, 4);
-                mc_memcpy((iptr)&talk_place_topics[i], (iptr)&talk_place_topics[i + 1], 19, (iptr)D_001703F0, 1679, 4);
-                mc_memcpy((iptr)&talk_place_topics[i + 1], (iptr)&swap, 19, (iptr)D_001703F0, 1680, 4);
+                mc_memcpy(&swap, &talk_place_topics[i], 19, D_001703F0, 1678, 4);
+                mc_memcpy(&talk_place_topics[i], &talk_place_topics[i + 1], 19, D_001703F0, 1679, 4);
+                mc_memcpy(&talk_place_topics[i + 1], &swap, 19, D_001703F0, 1680, 4);
             }
         }
         last--;
@@ -1262,7 +1251,7 @@ iptr building_category(struct building *building)
     iptr found;
 
     if (building->type != 1 && building->type <= 16) {
-        found = memchr((iptr)talk_category_building_types, building->type, 13);
+        found = (iptr)memchr(talk_category_building_types, building->type, 13);
         if (found == 0) return 13;
         return found - ((iptr)talk_category_building_types);
     }
@@ -1315,7 +1304,7 @@ void talk_add_quest_info_topics(void)
             for (i = 0; quest_tick_data->section_counts[4] > i; i++, place++) {
                 if (place->messages[0] == 0 && place->messages[1] == 0) continue;
                 if (((int)(unsigned char)(place->flags & 128)) != 0) continue;
-                *(short *)((char *)(iptr)(((char *)talk_topics) + (((int)(short)D_001966A2) * 6))) = place->messages[0];
+                *(short *)((((char *)talk_topics) + (((int)(short)D_001966A2) * 6))) = place->messages[0];
                 talk_topics[((int)(short)D_001966A2) * 3 + 1] = place->messages[1];
                 talk_topics[((int)(short)D_001966A2) * 3 + 2] = quest_tick_data->id;
                 D_001966A2++;
@@ -1326,7 +1315,7 @@ void talk_add_quest_info_topics(void)
                 name = quest_symbol_text(place->symbol, 0, 0);
                 if (*(int *)talk_selected_row == talk_list_count) {
                     colour = 244;
-                    mc_strncpy(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), name, 4, (iptr)D_001703F0, 1790);
+                    mc_strncpy((char *)(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65)), (char *)name, 4, D_001703F0, 1790);
                 } else {
                     colour = 145;
                 }
@@ -1340,7 +1329,7 @@ void talk_add_quest_info_topics(void)
                 if (person->object->twin != 0 && (iptr)person->object->twin == (iptr)talk_npc_object) {
                     continue;
                 }
-                *(short *)((char *)(iptr)(((char *)talk_topics) + (((int)(short)D_001966A2) * 6))) = person->messages[0];
+                *(short *)((((char *)talk_topics) + (((int)(short)D_001966A2) * 6))) = person->messages[0];
                 talk_topics[((int)(short)D_001966A2) * 3 + 1] = person->messages[1];
                 talk_topics[((int)(short)D_001966A2) * 3 + 2] = quest_tick_data->id;
                 D_001966A2++;
@@ -1351,7 +1340,7 @@ void talk_add_quest_info_topics(void)
                 name = quest_symbol_text(person->symbol, 0, 0);
                 if (*(int *)talk_selected_row == talk_list_count) {
                     colour = 244;
-                    mc_strncpy(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), name, 4, (iptr)D_001703F0, 1821);
+                    mc_strncpy((char *)(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65)), (char *)name, 4, D_001703F0, 1821);
                 } else {
                     colour = 145;
                 }
@@ -1363,7 +1352,7 @@ void talk_add_quest_info_topics(void)
                 if (item->messages[0] == 0 && item->messages[1] == 0) continue;
                 if (((int)(unsigned char)(item->flags & 128)) != 0) continue;
                 if (item->group == 9 && item->index == 5) continue;
-                *(short *)((char *)(iptr)(((char *)talk_topics) + (((int)(short)D_001966A2) * 6))) = item->messages[0];
+                *(short *)((((char *)talk_topics) + (((int)(short)D_001966A2) * 6))) = item->messages[0];
                 talk_topics[((int)(short)D_001966A2) * 3 + 1] = item->messages[1];
                 talk_topics[((int)(short)D_001966A2) * 3 + 2] = quest_tick_data->id;
                 D_001966A2++;
@@ -1374,7 +1363,7 @@ void talk_add_quest_info_topics(void)
                 name = quest_symbol_text(item->symbol, 0, 0);
                 if (*(int *)talk_selected_row == talk_list_count) {
                     colour = 244;
-                    mc_strncpy(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65), name, 4, (iptr)D_001703F0, 1852);
+                    mc_strncpy((char *)(((iptr)talk_key_text) + (((int)(unsigned char)D_001966B8) * 65)), (char *)name, 4, D_001703F0, 1852);
                 } else {
                     colour = 145;
                 }
@@ -1602,7 +1591,7 @@ int faction_has_enemy(struct faction *faction, struct faction *other)
 
         if (other == 0) return 0;
         if (faction == 0) return 0;
-        if ((iptr)faction->enemies[0] == other || (iptr)faction->enemies[1] == other || (iptr)faction->enemies[2] == other) {
+        if (faction->enemies[0] == other || faction->enemies[1] == other || faction->enemies[2] == other) {
             result = 1;
         } else {
             result = 0;
@@ -1618,7 +1607,7 @@ int faction_has_ally(struct faction *faction, struct faction *other)
 
         if (faction == 0) return 0;
         if (other == 0) return 0;
-        if ((iptr)faction->allies[0] == other || (iptr)faction->allies[1] == other || (iptr)faction->allies[2] == other) {
+        if (faction->allies[0] == other || faction->allies[1] == other || faction->allies[2] == other) {
             result = 1;
         } else {
             result = 0;

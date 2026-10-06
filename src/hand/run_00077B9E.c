@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of click.c from 0x00077960 to 0x00077B9E, kept together for its switch table's alignment */
 #include "records.h"
+#include "clib.h"
 extern char D_001766F9[];
 extern char D_001767E4[];
 extern char D_001767EE[];
@@ -38,10 +39,7 @@ extern int climate_category(void);
 extern void music_play(char *);
 extern char *music_dungeon_song(void);
 extern int location_contains(int, int);
-extern int rand(void);
-extern void srand(int);
-extern char *memchr(char *, int, int);
-extern char *D_0018767C[];
+extern int D_0018767C[];
 extern char *D_001876AC[];
 extern char *D_001876E8[];
 extern char *D_00187734[];
@@ -58,7 +56,7 @@ extern int player_motion_flags;
 extern int frame_ticks;
 extern struct character *player_character;
 extern struct settings *game_settings;
-extern char *head_bob_offset;
+extern int head_bob_offset;
 extern char in_dungeon_water;
 extern char D_0019628E;
 extern int D_001A4FD0;

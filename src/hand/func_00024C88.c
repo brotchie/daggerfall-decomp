@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00024C88 */
 #include "records.h"
+#include "clib.h"
 
 extern char *D_00147954;
 extern char D_00170738[];        /* __FILE__ */
@@ -32,11 +33,7 @@ extern iptr disk_read_file(char *, char *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern void inv_store_item(struct record *);
 extern void inv_merge_arrows(struct record *, struct record *, int);
-extern void mc_memset(void *, int, int, char *, int, int);
-extern int atoi(unsigned char *);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
-extern int mc_sprintf(char *, char *, ...);
 
 unsigned char *career_answer_effect(unsigned char *text)
 {

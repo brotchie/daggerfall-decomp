@@ -8,9 +8,9 @@ extern int inv_left_scroll;
 extern int inv_right_scroll;
 extern short inv_right_count;
 extern short inv_left_count;
-extern int object_delete(unsigned char *);
-extern int inv_match_arrows(int);
-extern int object_find(int, int (*)(int));
+extern iptr object_delete(unsigned char *);
+extern iptr inv_match_arrows(iptr);
+extern int object_find(iptr, iptr (*)());
 extern void xn_draw_image_transparent(int, int, int, int, char *);
 void inv_draw_scroll_arrow(struct image *image, int arrow);
 

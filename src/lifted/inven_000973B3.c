@@ -7,8 +7,8 @@ extern struct record *player_entity;
 extern struct record *found_object;
 
 extern struct record *object_create_child(struct record *, struct record *, int);
-extern int object_find(struct record *, int (*)());
-extern int inv_match_arrows(struct record *);
+extern int object_find(struct record *, iptr (*)());
+extern iptr inv_match_arrows(struct record *);
 extern void item_make(int, int, struct item *);
 extern void inv_store_item(struct record *);
 

@@ -17,8 +17,8 @@ extern int spellshop_close(void);
 extern void spellshop_buy(void);
 extern void spellshop_draw_spell(struct spell *);
 extern short picklist_frame(char *);
-extern int xn_font_select();
-extern int xn_draw_image();
+extern int xn_font_select(int);
+extern void xn_draw_image(int, int, int, int, char *);
 
 void spellshop_update(void)
 {

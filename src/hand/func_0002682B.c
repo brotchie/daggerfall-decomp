@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002682B */
 #include "records.h"
+#include "clib.h"
 
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 extern char D_00170788[];
@@ -10,8 +11,6 @@ extern int ceiling_height;
 extern unsigned char player_on_ground;
 extern short collide_flags;
 extern int collide_move_object(struct record *, int, struct move_request *, int);
-extern void mc_memset(void *, int, int, char *, int, int);
-extern void mc_memcpy(char *, char *, int, char *, int, int);
 
 void place_settle_creature(struct record *creature)
 {

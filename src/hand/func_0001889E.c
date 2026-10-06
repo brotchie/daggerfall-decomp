@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0001889E */
 #include "records.h"
+#include "clib.h"
 
 extern char *D_00147954;
 extern char D_001703F0[];        /* __FILE__ */
@@ -16,7 +17,6 @@ extern unsigned char D_001966B8;
 extern void talk_list_draw_item(char *, int, int, int, int);
 extern void talk_add_quest_info_topics(void);
 extern struct faction *faction_find(short);
-extern void mc_strncpy(char *, char *, int, char *, int);
 
 void talk_draw_tell_list(void)
 {

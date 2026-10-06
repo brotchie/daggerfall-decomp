@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char disk_last_file_size[];
 extern iptr D_00147954;
@@ -17,8 +18,8 @@ extern char D_00195B84[];
 extern struct location *current_location;
 extern struct character *player_character;
 extern int game_minutes;
-extern char scratch_buffer[];
-extern char D_001966BC[];
+extern char *scratch_buffer;
+extern iptr D_001966BC[];
 extern int rumor_file;
 extern int D_00196708;
 extern int faction_count;
@@ -34,24 +35,11 @@ extern int faction_has_ally(struct faction *, struct faction *);
 extern int rumor_is_eligible(iptr, int, int, int);
 extern struct quest *quest_find_by_id(int);
 extern iptr disk_read_file(char *, iptr);
-extern int disk_write_arena2_file(char *, iptr, iptr);
+extern int disk_write_arena2_file(char *, iptr, int);
 extern int disk_open_rw(char *);
 extern int disk_create(char *);
 extern int disk_file_exists(char *);
 extern int rand_range(int, int);
-extern int rand();
-extern int close();
-extern int mc_free();
-extern int mc_memset();
-extern int lseek();
-extern int read();
-extern int write();
-extern int atoi();
-extern int strlen();
-extern int stricmp();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
 extern void faction_load_file(void);
 extern void rumor_add_faction(struct faction *, struct faction *, int, unsigned char, int);
 extern void msgbox_show_string(iptr, int);
@@ -60,7 +48,7 @@ extern void object_foreach(struct record *, void (*)());
 int faction_count_allies(struct faction *);
 int faction_count_enemies(struct faction *);
 iptr rumor_collect_local(void);
-int rumor_copy(int, struct rumor *);
+iptr rumor_copy(iptr, struct rumor *);
 void faction_link_relations(struct faction *);
 void faction_free(void);
 void faction_save_r(int, struct faction *);
@@ -90,8 +78,8 @@ void faction_link_relations(struct faction *faction)
 
 void faction_free(void)
 {
-    if (factions == 0 || (int)(iptr)factions == (-1751672937)) return;
-    mc_free((int)(iptr)factions, (iptr)D_00170464, 1082);
+    if (factions == 0 || (iptr)factions == (-1751672937)) return;
+    mc_free(factions, D_00170464, 1082);
     factions = (struct faction *)(iptr)-1751672937;
 }
 
@@ -101,27 +89,27 @@ void faction_add_record(struct faction *parsed, int depth, struct faction *added
     int parent_depth;
 
     D_00196732 = 0;
-    mc_memset(((iptr)D_001966BC) + ((depth << 2) + 4), 0, (int)(iptr)&*(signed char *)((char *)(iptr)((16 - depth) << 2) - 4), (iptr)D_00170464, 1091, 4);
+    mc_memset((void *)(((iptr)(char *)D_001966BC) + ((depth << 2) + 4)), 0, (int)(iptr)&*(signed char *)((char *)(iptr)((16 - depth) << 2) - 4), D_00170464, 1091, 4);
     seed = rand();
     seed <<= 16;
     seed |= rand();
     parsed->seed = seed;
     parsed->politics_factor = rand_range(0, 50) + 20;
-    mc_memcpy(added, parsed, 92, (iptr)D_00170464, 1097, 4);
+    mc_memcpy(added, parsed, 92, D_00170464, 1097, 4);
     if (depth == 0) {
         added->parent = 0;
     } else {
         parent_depth = depth - 1;
-        while (*(int *)(D_001966BC + (parent_depth << 2)) == 0) parent_depth--;
-        added->parent = (struct faction *)(*(iptr *)(D_001966BC + (parent_depth << 2)));
-        if (*(int *)(D_001966BC + (depth << 2)) == 0) {
-            *(iptr *)(*(char **)(D_001966BC + (parent_depth << 2)) + 84) = (iptr)added;
+        while (D_001966BC[parent_depth] == 0) parent_depth--;
+        added->parent = (struct faction *)(D_001966BC[parent_depth]);
+        if (D_001966BC[depth] == 0) {
+            *(iptr *)((char *)D_001966BC[parent_depth] + 84) = (iptr)added;
         }
     }
-    if (*(int *)(D_001966BC + (depth << 2)) != 0) {
-        *(iptr *)(*(char **)(D_001966BC + (depth << 2)) + 80) = (iptr)added;
+    if (D_001966BC[depth] != 0) {
+        *(iptr *)((char *)D_001966BC[depth] + 80) = (iptr)added;
     }
-    *(iptr *)(D_001966BC + (depth << 2)) = (iptr)added;
+    D_001966BC[depth] = (iptr)added;
 }
 
 void faction_parse_type(struct faction *faction, signed char **cursor, int *ally_count, int *enemy_count)
@@ -369,7 +357,7 @@ iptr func_0001C7D6(int kind, int index)
         if (object->type == (kind + 45)) {
             if (index < 1) {
                 character = &object->data.character;
-                mc_memcpy(character->skills, player_character->skills, 200, (iptr)D_00170464, 1352, 210);
+                mc_memcpy(character->skills, player_character->skills, 200, D_00170464, 1352, 210);
                 character->health = (character->max_health = player_character->max_health);
                 character->magicka = (character->max_magicka = player_character->max_magicka);
                 character->level = player_character->level;
@@ -405,7 +393,7 @@ void faction_save(int file)
     int unused1;
     int unused2;
 
-    write(file, (iptr)&faction_count, 4);
+    write(file, &faction_count, 4);
     faction_save_r(file, factions);
     faction_link_relations(factions);
 }
@@ -441,13 +429,13 @@ void faction_load(int file)
 
         faction_free();
         faction_load_file();
-        read(file, (iptr)&count, 4);
+        read(file, &count, 4);
         for (i = 0; i < count; i++) {
-            read(file, (iptr)&loaded, 92);
+            read(file, &loaded, 92);
             if (loaded.reputation > 100) loaded.reputation = 100;
             if (loaded.reputation < (-100)) loaded.reputation = 65436;
             faction = faction_find(loaded.id);
-            mc_memcpy(faction, (iptr)&loaded, 80, (iptr)D_00170464, 1436, 4);
+            mc_memcpy(faction, &loaded, 80, D_00170464, 1436, 4);
         }
         faction_link_relations(factions);
     }
@@ -575,8 +563,8 @@ iptr rumor_collect_local(void)
     iptr end;
 
     out = (char *)(D_00147954 + 60000);
-    mc_set_location(1642, (iptr)D_00170464);
-    mc_sprintf((iptr)out, (iptr)D_001704C5, (iptr)current_location);
+    mc_set_location(1642, D_00170464);
+    mc_sprintf(out, D_001704C5, (iptr)current_location);
     out += strlen(out);
     *out = 0;
     out[1] = 0;
@@ -587,7 +575,7 @@ iptr rumor_collect_local(void)
     rumor = (struct rumor *)D_00147954;
     while (((uptr)rumor) < end) {
         if (rumor_is_eligible((iptr)rumor, 0, 1, 0) != 0) {
-            mc_memcpy((iptr)out, (iptr)rumor + 34, rumor->text_length, (iptr)D_00170464, 1658, 4);
+            mc_memcpy(out, (void *)((iptr)rumor + 34), rumor->text_length, D_00170464, 1658, 4);
             out += rumor->text_length - 1;
             out[1] = 252;
             *out = out[1];
@@ -600,7 +588,7 @@ iptr rumor_collect_local(void)
     return D_00147954 + 60000;
 }
 
-int rumor_pick_news(short faction_id)
+iptr rumor_pick_news(short faction_id)
 {
     short rumor;
     struct {
@@ -614,15 +602,15 @@ int rumor_pick_news(short faction_id)
     state.count = 0;
     *(int *)&index = 0;
     if (disk_file_exists(D_001704BB) == 0) return 0;
-    disk_read_file(D_001704BB, *(int *)scratch_buffer);
+    disk_read_file(D_001704BB, (iptr)scratch_buffer);
     if (*(int *)disk_last_file_size == 0) return 0;
-    state.end = (iptr)(*(char **)scratch_buffer + *(int *)disk_last_file_size);
-    *(int *)&rumor = *(int *)scratch_buffer;
+    state.end = (iptr)(scratch_buffer + *(int *)disk_last_file_size);
+    *(iptr *)&rumor = (iptr)scratch_buffer;
     state.rolls[0] = rand_range(1, 100);
     state.rolls[1] = rand_range(1, 100);
     state.rolls[2] = rand_range(1, 100);
     state.rolls[3] = rand_range(1, 100);
-    state.found = (int *)(*(iptr *)scratch_buffer + 40000);
+    state.found = (int *)((iptr)scratch_buffer + 40000);
     while (((unsigned)*(int *)&rumor) < state.end) {
         if (rumor_is_eligible(*(int *)&rumor, (int)(short)faction_id, 0, state.rolls[*(int *)&index & 3]) != 0) {
             state.found[state.count++] = *(int *)&rumor;
@@ -632,24 +620,24 @@ int rumor_pick_news(short faction_id)
     }
     if (state.count == 0) return 0;
     *(int *)&rumor = state.found[rand_range(0, state.count - 1)];
-    mc_memcpy(*(int *)scratch_buffer, *(int *)&rumor + 34, (*(struct rumor **)&rumor)->text_length, (iptr)D_00170464, 1701, 4);
-    return *(int *)scratch_buffer;
+    mc_memcpy((void *)scratch_buffer, (void *)(*(iptr *)&rumor + 34), (*(struct rumor **)&rumor)->text_length, D_00170464, 1701, 4);
+    return (iptr)scratch_buffer;
 }
 
-int func_0001D46A(int target)
+iptr func_0001D46A(int target)
 {
     struct rumor *rumor;
     iptr end;
 
     if (disk_file_exists(D_001704BB) == 0) return 0;
-    disk_read_file(D_001704BB, *(int *)scratch_buffer);
+    disk_read_file(D_001704BB, (iptr)scratch_buffer);
     if (*(int *)disk_last_file_size == 0) return 0;
-    end = (iptr)(*(char **)scratch_buffer + *(int *)disk_last_file_size);
-    rumor = (struct rumor *)*(iptr *)scratch_buffer;
+    end = (iptr)(scratch_buffer + *(int *)disk_last_file_size);
+    rumor = (struct rumor *)scratch_buffer;
     while (((uptr)rumor) < end) {
         if (((int)(unsigned char)(rumor->flags & 2)) != 0 && rumor->target == target) {
-            mc_memcpy(*(int *)scratch_buffer, (iptr)rumor + 34, rumor->text_length, (iptr)D_00170464, 1720, 4);
-            return *(int *)scratch_buffer;
+            mc_memcpy((void *)scratch_buffer, (void *)((iptr)rumor + 34), rumor->text_length, D_00170464, 1720, 4);
+            return (iptr)scratch_buffer;
         }
         rumor = (struct rumor *)(((iptr)rumor + rumor->text_length) + 34);
     }
@@ -682,7 +670,7 @@ void rumor_show_local(void)
 void rumor_file_purge(void)
 {
     struct rumor *rumor;
-    int out;
+    iptr out;
     iptr end;
     struct quest *quest;
     int npc_count;
@@ -692,13 +680,13 @@ void rumor_file_purge(void)
     disk_read_file(D_001704BB, D_00147954);
     if (*(int *)disk_last_file_size == 0) return;
     rumor = (struct rumor *)D_00147954;
-    out = *(int *)scratch_buffer;
+    out = (iptr)scratch_buffer;
     end = (iptr)(*(char **)&D_00147954 + *(int *)disk_last_file_size);
     while (((uptr)rumor) < end) {
         if (((int)(unsigned char)(rumor->flags & 4)) != 0) {
             quest = quest_find_by_id((int)(short)((unsigned short)rumor->quest_id));
             if (quest == 0) goto L1D9F4;
-            if (stricmp(quest->name, (iptr)rumor + 11) != 0) goto L1D9F4;
+            if (stricmp(quest->name, (char *)((iptr)rumor + 11)) != 0) goto L1D9F4;
             out = rumor_copy(out, rumor);
         } else if (((unsigned)game_minutes) <= rumor->expires) {
             if (((int)(unsigned char)(rumor->flags & 8)) != 0) {
@@ -707,20 +695,20 @@ void rumor_file_purge(void)
                 if (((int)(unsigned char)(rumor->flags & 32)) == 0) {
                     npc_count++;
                     out = rumor_copy(out, rumor);
-                    if (npc_count > 200) func_0001DA9C((struct rumor *)*(iptr *)scratch_buffer, out);
+                    if (npc_count > 200) func_0001DA9C((struct rumor *)scratch_buffer, out);
                 }
             }
         }
 L1D9F4:;
         rumor = (struct rumor *)(((iptr)rumor + rumor->text_length) + 34);
     }
-    disk_write_arena2_file(D_001704BB, *(int *)scratch_buffer, out - *(int *)scratch_buffer);
+    disk_write_arena2_file(D_001704BB, (iptr)scratch_buffer, (int)(out - (iptr)scratch_buffer));
 }
 
-int rumor_copy(int out, struct rumor *rumor)
+iptr rumor_copy(iptr out, struct rumor *rumor)
 {
-    mc_memcpy(out, (iptr)rumor, 34, (iptr)D_00170464, 1873, 4);
-    mc_memcpy(out + 34, (iptr)rumor + 34, rumor->text_length, (iptr)D_00170464, 1874, 4);
+    mc_memcpy((void *)out, rumor, 34, D_00170464, 1873, 4);
+    mc_memcpy((void *)(out + 34), (void *)((iptr)rumor + 34), rumor->text_length, D_00170464, 1874, 4);
     return (out + 34) + rumor->text_length;
 }
 

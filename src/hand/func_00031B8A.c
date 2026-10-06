@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00031B8A */
 #include "records.h"
+#include "clib.h"
 
 #pragma pack(1)
 #pragma pack()
@@ -39,9 +40,6 @@ extern void location_pick_random_town(char *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern struct record *object_reparent(struct record *, struct record *);
 extern int object_new_id(int);
-extern int rand(void);
-extern int mc_strncpy(char *, char *, int, char *, int);
-extern int mc_memcpy(void *, void *, int, char *, int, int);
 
 int quest_init_person(struct qbn_person *qbn_person)
 {

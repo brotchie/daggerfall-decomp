@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00043F9C */
 #include "records.h"
+#include "clib.h"
 
 extern char mouse_buttons;
 extern short mouse_x;
@@ -19,7 +20,6 @@ extern void options_mouse_draw(iptr);
 extern int sound_play(int, struct record *, int);
 extern iptr disk_read_file(char *, iptr);
 extern void cursor_draw_arrow(void);
-extern void mc_free(iptr, char *, int);
 extern void xn_gfx_present_inclusive(int);
 extern void xn_mouse_get_sensitivity(unsigned char *, unsigned char *);
 extern void xn_mouse_poll_clamped(void);
@@ -53,15 +53,15 @@ int options_mouse_screen(void)
         xn_gfx_present_inclusive(0);
     }
     if (D_00195B60 != 0 && D_00195B60 != 0x97979797) {
-        mc_free(D_00195B60, D_00170EE8, 468);
+        mc_free((void *)D_00195B60, D_00170EE8, 468);
         D_00195B60 = 0x97979797;
     }
     if (D_00195B5C != 0 && D_00195B5C != 0x97979797) {
-        mc_free(D_00195B5C, D_00170EE8, 469);
+        mc_free((void *)D_00195B5C, D_00170EE8, 469);
         D_00195B5C = 0x97979797;
     }
     if (background != 0 && background != 0x97979797) {
-        mc_free(background, D_00170EE8, 470);
+        mc_free((void *)background, D_00170EE8, 470);
         background = 0x97979797;
     }
     return 0;

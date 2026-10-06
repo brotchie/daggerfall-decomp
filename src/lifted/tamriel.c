@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern struct region regions[];
 extern signed char D_0012B508;
@@ -10,9 +11,9 @@ extern char D_001711AC[];
 extern unsigned char player_environment;
 extern signed char building_open_hours[];
 extern signed char D_0017C5B9[];
-extern int month_names[];
-extern int ordinal_suffixes[];
-extern int D_001830E2;
+extern iptr month_names[];
+extern iptr ordinal_suffixes[];
+extern iptr D_001830E2;
 extern signed char D_00187CA8;
 extern int frame_checkpoint;
 extern struct record *creature_list[];
@@ -80,8 +81,6 @@ extern int location_here_contains(int, int);
 extern int spfx_disease_daily(struct disease *);
 extern int spfx_disease_recover(struct disease *);
 extern struct record *object_find_by_id(struct record *, iptr);
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
 extern void region_flag_set(int, int);
 extern void region_flag_clear(int, int);
 extern void faction_politics_update(int);
@@ -123,8 +122,8 @@ iptr calendar_format_date(int minutes, iptr buffer)
     short day;
 
     *(int *)&day = ((unsigned)(((unsigned)(((unsigned)minutes) % 518400)) / 1440)) % 30;
-    mc_set_location(79, (iptr)D_001711AC);
-    mc_sprintf(buffer, D_001830E2, ((int)(short)day) + 1, ordinal_suffixes[((((int)(short)day) > 3) ? 3 : (int)(short)day)], month_names[(((unsigned)(((unsigned)minutes) % 518400)) / 43200)]);
+    mc_set_location(79, D_001711AC);
+    mc_sprintf((char *)buffer, (char *)D_001830E2, ((int)(short)day) + 1, ordinal_suffixes[((((int)(short)day) > 3) ? 3 : (int)(short)day)], month_names[(((unsigned)(((unsigned)minutes) % 518400)) / 43200)]);
     return buffer;
 }
 
@@ -514,7 +513,7 @@ void quests_run_all(void)
         next = object->next;
         if (object->type == 14) {
             quest_tick_object = object;
-            quest_tick_data = (struct quest *)((iptr)&object->data.quest);
+            quest_tick_data = (struct quest *)(&object->data.quest);
             if (quest_debug_data == 0) quest_debug_data = (iptr)quest_tick_data;
             quest_run_opcodes(quest_tick_data);
         }
@@ -555,7 +554,7 @@ void quests_raise_event_all(int event, struct record *event_object)
     }
 }
 
-void quest_end(int unused)
+void quest_end(iptr unused)
 {
     quest_ended_id = current_quest->id;
     quest_faces_remove_quest((int)(unsigned char)(signed char)current_quest->id);

@@ -3,13 +3,10 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "structs.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern char D_00170129[];
 
-extern int open(char *, ...);
-extern int close();
-extern int mc_free();
-extern int write();
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_close;
 
@@ -21,16 +18,16 @@ int profile_close(struct profile *profile)
         handle = open(profile->path, 610, 0);
         if (handle == (-1)) {
             if (profile->buffer != 0 && (iptr)profile->buffer != (-1751672937)) {
-                mc_free((iptr)profile->buffer, (iptr)D_00170129, 171);
+                mc_free(profile->buffer, D_00170129, 171);
                 profile->buffer = (char *)(iptr)-1751672937;
             }
             return 0;
         }
-        write(handle, (iptr)profile->buffer, profile->length);
+        write(handle, profile->buffer, profile->length);
         close(handle);
     }
     if (profile->buffer != 0 && (iptr)profile->buffer != (-1751672937)) {
-        mc_free((iptr)profile->buffer, (iptr)D_00170129, 185);
+        mc_free(profile->buffer, D_00170129, 185);
         profile->buffer = (char *)(iptr)-1751672937;
     }
     return 1;

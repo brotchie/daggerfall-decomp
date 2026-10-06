@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -22,20 +23,20 @@ extern char spell_effect_costs[];
 extern char spell_effect_cost_index[];
 extern char spell_effect_cost_formula[];
 extern char spell_target_cost_factor[];
-extern int D_0017D1F6;
+extern iptr D_0017D1F6;
 extern signed char magic_school_skills[];
 extern signed char D_001940D4;
 extern signed char D_001940D5;
 extern struct record *player_entity;
 extern struct record *player_object;
 extern char cheat_flags[];
-extern char list_popup_image[];
+extern struct image *list_popup_image;
 extern struct spell *spell_records;
-extern char scratch_object[];
+extern struct record *scratch_object;
 extern iptr magic_window_image;
 extern iptr list_popup_callback;
 extern iptr window_image;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern short spell_effect_slot;
 extern short D_00195F3C;
 extern short D_00195F3E;
@@ -58,7 +59,7 @@ extern int func_00037AB7(void);
 extern int spell_effect_text_index(short);
 extern int sound_play(int, struct record *, int);
 extern iptr disk_read_file(char *, iptr);
-extern int disk_write_arena2_file(char *, iptr, iptr);
+extern int disk_write_arena2_file(char *, iptr, int);
 extern int list_popup_update(void);
 extern int gold_can_afford(int);
 extern int picklist_poll(iptr);
@@ -66,19 +67,11 @@ extern struct record *object_create_child(struct record *, struct record *, int)
 extern struct record *object_find_item(struct record *, short, short);
 extern int object_count_type(struct record *, short);
 extern int object_new_id(int);
-extern int mc_free();
-extern int mc_memset();
-extern int mc_strncpy();
-extern int strlen();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern iptr memchr();
-extern int spell_cost_formula_dispatch();
-extern int xn_mouse_poll_clamped();
-extern int xn_mouse_cursor_move();
-extern int xn_font_select();
-extern int xn_draw_image();
+extern int spell_cost_formula_dispatch(int);
+extern void xn_mouse_poll_clamped(void);
+extern void xn_mouse_cursor_move(int, int);
+extern int xn_font_select(int);
+extern void xn_draw_image(int, int, int, int, char *);
 extern void spellmaker_adjust_value(iptr, short, int, int);
 extern void skill_add_uses(int, int);
 extern void msgbox_show_string(iptr, int);
@@ -95,7 +88,7 @@ int spellmaker_allowed_targets(void);
 int spellmaker_new(void);
 int spellbook_has_spell_id(unsigned char);
 struct spell *spells_pick_list(void);
-iptr spells_std_name_list(int);
+iptr spells_std_name_list(iptr);
 void spellmaker_allowed_targets_cb(unsigned char);
 void spellmaker_pick_subtype_cb(int);
 void spell_assign_new_id(void);
@@ -119,15 +112,15 @@ int spellmaker_close(void)
     }
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_00170B13, 732);
+        mc_free((void *)window_image, D_00170B13, 732);
         window_image = -1751672937;
     }
     if (magic_window_image != 0 && magic_window_image != (-1751672937)) {
-        mc_free(magic_window_image, (iptr)D_00170B13, 733);
+        mc_free((void *)magic_window_image, D_00170B13, 733);
         magic_window_image = -1751672937;
     }
     if (spellmaker_settings_image != 0 && spellmaker_settings_image != (-1751672937)) {
-        mc_free(spellmaker_settings_image, (iptr)D_00170B13, 734);
+        mc_free((void *)spellmaker_settings_image, D_00170B13, 734);
         spellmaker_settings_image = -1751672937;
     }
     D_00196272 = 0;
@@ -138,10 +131,10 @@ void spellmaker_enter_name(void)
 {
     iptr prompt;
 
-    prompt = *(int *)scratch_buffer + 55000;
-    mc_set_location(744, (iptr)D_00170B13);
-    mc_sprintf(prompt, (iptr)D_00170B1E, D_0017D1F6);
-    *(signed char *)((char *)(strlen(prompt) + prompt) + 1) = 0;
+    prompt = (iptr)scratch_buffer + 55000;
+    mc_set_location(744, D_00170B13);
+    mc_sprintf((char *)prompt, D_00170B1E, D_0017D1F6);
+    *(signed char *)((char *)(strlen((char *)prompt) + prompt) + 1) = 0;
     inpstr_begin_text((iptr)selected_spell + 47, 24);
     msgbox_show_string(prompt, 2);
 }
@@ -317,7 +310,7 @@ int spellmaker_buy(void)
     object = object_create_child(object, 0, 89);
     object->type = 9;
     object->id = object_new_id(100);
-    mc_memcpy(&object->data.spell, (iptr)selected_spell, 89, (iptr)D_00170B13, 981, 4);
+    mc_memcpy(&object->data.spell, selected_spell, 89, D_00170B13, 981, 4);
     sound_play(206, player_object, 110);
     spellmaker_new();
     msgbox_show_rsc(1705, 1);
@@ -336,11 +329,11 @@ int spellmaker_new(void)
         return 0;
     }
     selected_spell = (struct spell *)spellmaker_spell;
-    mc_memset((iptr)selected_spell, 1, 89, (iptr)D_00170B13, 1009, 4);
-    mc_memset((iptr)selected_spell + 47, 0, 24, (iptr)D_00170B13, 1010, 25);
+    mc_memset(selected_spell, 1, 89, D_00170B13, 1009, 4);
+    mc_memset((void *)((iptr)selected_spell + 47), 0, 24, D_00170B13, 1010, 25);
     selected_spell->target = 0;
     selected_spell->element = 4;
-    mc_memset((iptr)selected_spell, 255, 6, (iptr)D_00170B13, 1015, 6);
+    mc_memset(selected_spell, 255, 6, D_00170B13, 1015, 6);
     selected_spell->effect_costs[0] = (selected_spell->effect_costs[1] = (selected_spell->effect_costs[2] = 0));
     D_0019962C = 65535;
     return 0;
@@ -351,7 +344,7 @@ void spellmaker_pick_subtype_cb(int subtype)
     short effect_type;
 
     effect_type = selected_spell->effects[(int)(short)spell_effect_slot].type;
-    mc_memcpy((iptr)spell_effect_cost_current, ((iptr)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((((int)(short)effect_type) * 12) + ((int)(short)*(short *)&subtype)))) << 3), 8, (iptr)D_00170B13, 1030, 8);
+    mc_memcpy(spell_effect_cost_current, (void *)(((iptr)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((((int)(short)effect_type) * 12) + ((int)(short)*(short *)&subtype)))) << 3)), 8, D_00170B13, 1030, 8);
     selected_spell->effects[(int)(short)spell_effect_slot].subtype = *(signed char *)&subtype;
     *(signed char *)spellmaker_settings_kind = *(signed char *)(spell_effect_settings + ((((int)(short)effect_type) * 12) + ((int)(short)*(short *)&subtype)));
     D_00199628 = 0;
@@ -453,7 +446,7 @@ int list_popup_poll(void)
 {
     short choice;
 
-    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, *(int *)list_popup_image + 12);
+    xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, (char *)((iptr)list_popup_image + 12));
     if (key_down_esc != 0) {
         if (((iptr)spellmaker_pick_subtype_cb) == list_popup_callback) {
             selected_spell->effects[(int)(short)spell_effect_slot].type = 255;
@@ -529,7 +522,7 @@ void spellbook_find_id_cb(struct record *object)
 {
     if (((int)(unsigned char)(signed char)object->type) != 9) return;
     if ((signed char)object->data.spell.id != D_00199630) return;
-    *(iptr *)scratch_object = (iptr)object;
+    *(iptr *)&scratch_object = (iptr)object;
 }
 
 int spellbook_has_spell_id(unsigned char id)
@@ -537,11 +530,11 @@ int spellbook_has_spell_id(unsigned char id)
     struct record *spellbook;
     int found;
 
-    *(int *)scratch_object = 0;
+    *(iptr *)&scratch_object = 0;
     D_00199630 = id;
     spellbook = object_find_item(player_entity->children, 27, 0);
     object_foreach(spellbook->children, spellbook_find_id_cb);
-    if (*(int *)scratch_object != 0) {
+    if ((iptr)scratch_object != 0) {
         found = 1;
     } else {
         found = 0;
@@ -561,7 +554,7 @@ struct spell *spells_pick_list(void)
     if (names == 0) return 0;
     xn_font_select(4);
     list_popup_open(names);
-    spells = *(struct spell **)scratch_buffer;
+    spells = (struct spell *)scratch_buffer;
     D_001940D4 |= 1;
     for (;;) {
         keys_world_actions();
@@ -579,32 +572,32 @@ struct spell *spells_pick_list(void)
         }
         if (((int)(short)choice) == (-2)) return 0;
         xn_mouse_cursor_move((int)(short)mouse_x, (int)(short)mouse_y);
-        mc_memcpy(655360, screen_buffer, 64000, (iptr)D_00170B13, 1560, 4);
+        mc_memcpy((void *)655360, (void *)screen_buffer, 64000, D_00170B13, 1560, 4);
     }
 }
 
-iptr spells_std_name_list(int ids)
+iptr spells_std_name_list(iptr ids)
 {
     iptr names;
     short id_count;
     struct spell *spells;
     short i;
-    int text;
+    iptr text;
     short count;
 
-    if (ids != 0) *(iptr *)&id_count = memchr(ids, 255, 1000) - ids;
-    names = *(int *)scratch_buffer + 20000;
-    text = *(int *)scratch_buffer + 21000;
-    spells = *(struct spell **)scratch_buffer;
-    disk_read_file(D_00170B69, *(int *)scratch_buffer);
+    if (ids != 0) *(iptr *)&id_count = (iptr)(memchr((char *)ids, 255, 1000) - ids);
+    names = (iptr)scratch_buffer + 20000;
+    text = (iptr)scratch_buffer + 21000;
+    spells = (struct spell *)scratch_buffer;
+    disk_read_file(D_00170B69, (iptr)scratch_buffer);
     *(int *)&i = 0;
     *(int *)&count = *(int *)&i;
     for (; ((int)(short)i) < 128; (*(int *)&i)++) {
         if (spells[(int)(short)i].name[0] == 0) continue;
-        if (ids != 0) if (memchr(ids, spells[(int)(short)i].id, (int)(short)id_count) == 0) continue;
-        mc_strncpy(text, (iptr)spells[(int)(short)i].name, 4, (iptr)D_00170B13, 1587);
-        *(int *)((char *)(iptr)((char *)names + (((int)(short)(*(int *)&count)++) << 2))) = text;
-        text += strlen(text) + 1;
+        if (ids != 0) if (memchr((char *)ids, spells[(int)(short)i].id, (int)(short)id_count) == 0) continue;
+        mc_strncpy((char *)text, spells[(int)(short)i].name, 4, D_00170B13, 1587);
+        *(iptr *)(((char *)names + (((int)(short)(*(int *)&count)++) << 2))) = text;
+        text += strlen((char *)text) + 1;
     }
     *(int *)((char *)((((int)(short)count) << 2) + names)) = 0;
     if (count == 0) return 0;
@@ -618,7 +611,7 @@ void spells_std_delete(void)
     spell = spells_pick_list();
     if (spell == 0) return;
     spell->name[0] = 0;
-    disk_write_arena2_file(D_00170B69, *(int *)scratch_buffer, 11392);
+    disk_write_arena2_file(D_00170B69, (iptr)scratch_buffer, 11392);
 }
 
 void spells_std_edit(void)
@@ -627,9 +620,9 @@ void spells_std_edit(void)
 
     spell = spells_pick_list();
     if (spell == 0) return;
-    mc_memcpy((iptr)selected_spell, spell, 89, (iptr)D_00170B13, 1654, 4);
+    mc_memcpy(selected_spell, spell, 89, D_00170B13, 1654, 4);
     spell->name[0] = 0;
-    disk_write_arena2_file(D_00170B69, *(int *)scratch_buffer, 11392);
+    disk_write_arena2_file(D_00170B69, (iptr)scratch_buffer, 11392);
 }
 
 void spells_std_append(void)
@@ -637,11 +630,11 @@ void spells_std_append(void)
     struct spell *spell;
 
     spell_assign_new_id();
-    spell = *(struct spell **)scratch_buffer;
-    disk_read_file(D_00170B69, *(int *)scratch_buffer);
+    spell = (struct spell *)scratch_buffer;
+    disk_read_file(D_00170B69, (iptr)scratch_buffer);
     while (spell->name[0] != 0) spell++;
-    mc_memcpy(spell, (iptr)selected_spell, 89, (iptr)D_00170B13, 1667, 4);
-    disk_write_arena2_file(D_00170B69, *(int *)scratch_buffer, 11392);
+    mc_memcpy(spell, selected_spell, 89, D_00170B13, 1667, 4);
+    disk_write_arena2_file(D_00170B69, (iptr)scratch_buffer, 11392);
     msgbox_show_rsc(1706, 1);
 }
 
@@ -659,9 +652,9 @@ int spell_cost(struct spell *spell, struct character *caster)
         if (spell->effects[i].type == 255) continue;
         spell_effect_slot = i;
         if (spell->effects[i].subtype != 255) {
-            mc_memcpy((iptr)spell_effect_cost_current, ((iptr)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((spell->effects[i].type * 12) + spell->effects[i].subtype))) << 3), 8, (iptr)D_00170B13, 1684, 8);
+            mc_memcpy(spell_effect_cost_current, (void *)(((iptr)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + ((spell->effects[i].type * 12) + spell->effects[i].subtype))) << 3)), 8, D_00170B13, 1684, 8);
         } else {
-            mc_memcpy((iptr)spell_effect_cost_current, ((iptr)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + (spell->effects[i].type * 12))) << 3), 8, (iptr)D_00170B13, 1686, 8);
+            mc_memcpy(spell_effect_cost_current, (void *)(((iptr)spell_effect_costs) + (((int)(unsigned char)*(signed char *)(spell_effect_cost_index + (spell->effects[i].type * 12))) << 3)), 8, D_00170B13, 1686, 8);
         }
         if (spell->effects[i].type >= 51) total++;
         effect_cost = spell_cost_formula_dispatch(((int)(unsigned char)*(signed char *)(spell_effect_cost_formula + spell->effects[i].type)) - 1);

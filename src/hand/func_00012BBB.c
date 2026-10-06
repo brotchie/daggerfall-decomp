@@ -1,15 +1,15 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00012BBB */
 #include "structs.h"
+#include "clib.h"
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
 #pragma aux (sosconv) profile_add_item_number;
 extern char D_00170129[];
 
 
-extern char *itoa(int, char *, int);
-extern int strlen(char *);
-extern int mc_memmove();
-extern int profile_find_item(struct profile *, ...);
-extern int profile_set_number(struct profile *, ...);
+extern int profile_find_item(struct profile *, char *);
+#pragma aux (sosconv) profile_find_item;
+extern int profile_set_number(struct profile *, int);
+#pragma aux (sosconv) profile_set_number;
 
 int profile_add_item_number(struct profile *s, char *key, int val, int width, int radix)
 {
@@ -32,7 +32,7 @@ int profile_add_item_number(struct profile *s, char *key, int val, int width, in
     dst = s->section;
     n = width + 4 + strlen(buf);
     if (s->length + n > s->capacity) return 0;
-    mc_memmove(dst + n, dst, s->buffer + s->length - dst, D_00170129, 1436, 4);
+    mc_memmove(dst + n, dst, (int)(s->buffer + s->length - dst), D_00170129, 1436, 4);
     while (*key != 0) {
         *dst++ = *key++;
         width--;

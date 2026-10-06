@@ -9,9 +9,8 @@ extern short inpstr_max_length;
 extern short inpstr_cursor;
 extern signed char input_digits_only;
 
-extern int mc_strncpy();
-extern int strlen();
-extern int xn_kbd_flush();
+#include "clib.h"
+extern void xn_kbd_flush(void);
 
 void inpstr_begin_text(char *text, int max_length)
 {

@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0007A983 */
 #include "records.h"
+#include "clib.h"
 
 extern int xn_cam_x;
 extern int xn_cam_y;
@@ -16,13 +17,13 @@ extern char D_00176964[];
 extern short D_001788D3[];
 extern unsigned char player_environment;
 extern unsigned short spell_last_cast_id;
-extern int D_00186503[];
+extern iptr D_00186503[];
 extern int screen_shake;
 extern signed char text_rsc_buffer[];
 extern char arena2_path[];
 extern struct record *nonworld_root;
-extern char inventory_containers[];
-extern int quest_root;
+extern struct record *inventory_containers[];
+extern iptr quest_root;
 extern struct building *current_building;
 extern struct record *player_entity;
 extern struct record *player_object;
@@ -50,7 +51,7 @@ extern char terrain_cell_dirty[];
 extern int climate_at(int, int);
 extern void automap_restore_seen(void);
 extern void func_00028F8B(struct record *);
-extern void quests_relink_all(int);
+extern void quests_relink_all(iptr);
 extern void quest_faces_after_load(void);
 extern void building_update_open_state(void);
 extern void func_0004C759(void);
@@ -82,16 +83,10 @@ extern void object_unlink(struct record *);
 extern void object_foreach(struct record *, void (*)());
 extern int object_tree_size(struct record *);
 extern void inv_reset_left_list(void);
-extern int close(int);
-extern int mc_memset(void *, int, int, char *, int, int);
-extern int read(int, void *, int);
-extern int xn_world_reload();
-extern int xn_cam_set_view_window();
-extern int xn_mouse_poll_clamped();
+extern void xn_world_reload(void);
+extern void xn_cam_set_view_window(int, int, int, int);
+extern void xn_mouse_poll_clamped(void);
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int open(char *, ...);
-extern int mc_sprintf(char *, char *, ...);
 
 int load_game(char *name)
 {
@@ -116,7 +111,7 @@ int load_game(char *name)
     location_unload(location_object->image);
     if (save_version < 293 || save_version > 294)
         fatal_error(D_0017694A);
-    mc_memset(inventory_containers, 0, 36, D_00176884, 655, 36);
+    mc_memset((char *)inventory_containers, 0, 36, D_00176884, 655, 36);
     object_unlink(player_object);
     object_free_children(player_object);
     object_free_children(location_object);

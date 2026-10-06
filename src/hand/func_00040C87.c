@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00040C87 */
 #include "records.h"
+#include "clib.h"
 
 extern int xn_timer_fps;
 extern unsigned char player_environment;
@@ -14,8 +15,7 @@ extern int is_guard_sprite(struct record *);
 extern void guard_spawn(struct record *);
 extern int ai_angle_diff(int, int, int *);
 extern int rand_range(int, int);
-extern int rand(void);
-extern int xn_math_angle_to_point();
+extern int xn_math_angle_to_point(int, int, int, int);
 
 void guards_summon(int now)
 {

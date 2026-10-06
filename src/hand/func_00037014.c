@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00037014 */
 #include "records.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -14,16 +15,16 @@ extern char spell_effect_settings[];
 extern char spell_effect_cost_formula[];
 extern char spell_target_cost_factor[];
 extern struct rect spellmaker_buttons[];
-extern char spell_effect_names[];
-extern char spell_effect_subtype_names[];
-extern char D_001845D0[];
+extern char *spell_effect_names[];
+extern char *spell_effect_subtype_names[][12];
+extern char *D_001845D0[];
 extern signed char text_buffer[];
 extern struct record *player_object;
 extern iptr magic_window_image;
 extern iptr list_popup_callback;
 extern struct character *player_character;
 extern iptr window_image;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern short spell_effect_slot;
 extern unsigned char D_00196271;
 extern signed char game_mode;
@@ -42,10 +43,6 @@ extern int sound_play(int, struct record *, int);
 extern void text_draw_coloured(char *, int, int, int, unsigned char);
 extern void buttons_draw_hover_label(short, short, int, struct rect *, char *);
 extern int gold_total_alias(void);
-extern void mc_memset(char *, int, int, char *, int, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern char *itoa(int, char *, int);
-extern void func_000A1054(char *, char *, char *, int, int);
 extern short spell_cost_formula_dispatch(int);
 extern void xn_draw_fullscreen_overlay_shaded(iptr);
 extern void xn_draw_spell_icon(int, int, int);
@@ -78,10 +75,10 @@ void spellmaker_update(void)
     for (i = 0; i < 3; i++) {
         if (selected_spell->effects[i].type == 255)
             continue;
-        mc_strncpy(((char *)text_buffer), *(char **)(spell_effect_names + selected_spell->effects[i].type * 4), 160, D_00170B13, 641);
-        if (selected_spell->effects[i].subtype != 255 && *(int *)(spell_effect_subtype_names + selected_spell->effects[i].type * 48 + selected_spell->effects[i].subtype * 4) != 0) {
+        mc_strncpy(((char *)text_buffer), spell_effect_names[selected_spell->effects[i].type], 160, D_00170B13, 641);
+        if (selected_spell->effects[i].subtype != 255 && (iptr)spell_effect_subtype_names[selected_spell->effects[i].type][selected_spell->effects[i].subtype] != 0) {
             func_000A1054(((char *)text_buffer), D_00170B1C, D_00170B13, 644, 160);
-            func_000A1054(((char *)text_buffer), *(char **)(spell_effect_subtype_names + selected_spell->effects[i].type * 48 + selected_spell->effects[i].subtype * 4), D_00170B13, 645, 160);
+            func_000A1054(((char *)text_buffer), spell_effect_subtype_names[selected_spell->effects[i].type][selected_spell->effects[i].subtype], D_00170B13, 645, 160);
         }
         text_draw_centred(((char *)text_buffer), 160, (i << 5) + 30);
     }
@@ -89,7 +86,7 @@ void spellmaker_update(void)
     if (!*spellmaker_settings_kind && !D_001940D4.f)
         spellmaker_effect_rows();
     if (D_001940D4.f && (i = list_popup_poll()) > -1)
-        (*(void (**)(int))((char *)&list_popup_callback))((*(unsigned char **)scratch_buffer)[i + 32000]);
+        (*(void (**)(int))((char *)&list_popup_callback))(((unsigned char *)scratch_buffer)[i + 32000]);
     spellmaker_settings_update();
     if (D_0019962C > -1 && *((char *)&D_00196271)) {
         if (D_00196271 == 1) {
@@ -110,7 +107,7 @@ void spellmaker_update(void)
     if (D_0019962C > -1 && (unsigned char)game_mode != 8)
         D_0019962C = -1;
     if (!*spellmaker_settings_kind && !D_001940D4.f)
-        buttons_draw_hover_label(5, 22, 18, spellmaker_buttons, D_001845D0);
+        buttons_draw_hover_label(5, 22, 18, spellmaker_buttons, (char *)D_001845D0);
     if (*((char *)&key_down_esc) && !*spellmaker_settings_kind)
         spellmaker_close();
     if (!*((char *)&mouse_buttons) || *((char *)&mouse_buttons) && *((char *)&mouse_buttons_prev))

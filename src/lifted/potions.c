@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern signed char D_0012B508;
 extern signed char key_down_esc;
@@ -48,10 +49,6 @@ extern struct record *object_delete(struct record *);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
 extern int potion_mix_unknown(iptr);
-extern int mc_free();
-extern int mc_memset();
-extern int mc_memcpy();
-extern iptr memchr();
 extern void msgbox_show_string(char *, short);
 extern void item_make(int, int, struct item *);
 extern void list_popup_open(iptr);
@@ -84,7 +81,7 @@ void potionmaker_mix(void)
             inv_store_item(potion);
             potion = object_create_child(potion, 0, 109);
             potion->type = 31;
-            mc_memcpy(&potion->data.potion_recipe, ((iptr)potion_recipes) + (i * 109), 109, (iptr)D_00176E94, 69, 4);
+            mc_memcpy(&potion->data.potion_recipe, (void *)(((iptr)potion_recipes) + (i * 109)), 109, D_00176E94, 69, 4);
             i = 0;
             msgbox_show_string(D_00176E9E, 1);
             sound_play(208, player_object, 100);
@@ -106,7 +103,7 @@ void potionmaker_mix(void)
     inv_store_item(potion);
     potion = object_create_child(potion, 0, 109);
     potion->type = 31;
-    mc_memcpy(&potion->data.potion_recipe.spell, (iptr)spellmaker_spell, 89, (iptr)D_00176E94, 94, 4);
+    mc_memcpy(&potion->data.potion_recipe.spell, spellmaker_spell, 89, D_00176E94, 94, 4);
     i = 0;
     msgbox_show_string(D_00176E9E, 1);
     sound_play(208, player_object, 100);
@@ -153,8 +150,8 @@ int potionmaker_open(int show)
         window_image = disk_read_file(D_00176EDF, 0);
         potion_cauldron_count = (*(int *)potion_ingredient_scroll = 0);
         D_00196272 = 1;
-        mc_memset((iptr)((char *)potion_cauldron), 0, 32, (iptr)D_00176E94, 156, 32);
-        mc_memset((iptr)D_001A9BB4, 254, 8, (iptr)D_00176E94, 157, 8);
+        mc_memset(((char *)potion_cauldron), 0, 32, D_00176E94, 156, 32);
+        mc_memset(D_001A9BB4, 254, 8, D_00176E94, 157, 8);
     }
     return ((((int)(unsigned char)game_mode) == 1) ? 1 : 0);
 }
@@ -219,7 +216,7 @@ int potionmaker_close(void)
     while (key_down_esc != 0);
     game_mode = 0;
     if (window_image != 0 && window_image != (-1751672937)) {
-        mc_free(window_image, (iptr)D_00176E94, 359);
+        mc_free((void *)window_image, D_00176E94, 359);
         window_image = -1751672937;
     }
     D_00196272 = 0;
@@ -253,7 +250,7 @@ int potion_match_recipe(struct potion_recipe *recipe, signed char *cauldron_ids,
     potency = i;
     for (; i < 8; i++) {
         if (((int)(unsigned char)cauldron_ids[i]) == 254) continue;
-        found = (char *)memchr((iptr)recipe_ids, (int)(unsigned char)cauldron_ids[i], 8);
+        found = (char *)memchr(recipe_ids, (int)(unsigned char)cauldron_ids[i], 8);
         if (found != 0) {
             potency += (int)(unsigned char)potencies[i];
             *found = 255;
@@ -308,7 +305,7 @@ void potion_drink(struct record *recipe)
     spell->type = 9;
     spell->flags |= 1;
     spell->id = object_new_id(801);
-    mc_memcpy(&spell->data.spell, &recipe->data.potion_recipe.spell, 89, (iptr)D_00176E94, 540, 4);
+    mc_memcpy(&spell->data.spell, &recipe->data.potion_recipe.spell, 89, D_00176E94, 540, 4);
     D_0019629A = 1;
     cast_player_spell(spell);
     D_0019629A = *(signed char *)&saved_ignore_silence;
@@ -333,7 +330,7 @@ int potion_have_recipe_ingredients(struct item *recipe_item)
     struct potion_recipe *recipe;
 
     n = 0;
-    mc_memset((iptr)((char *)potion_cauldron), 0, 32, (iptr)D_00176E94, 566, 32);
+    mc_memset(((char *)potion_cauldron), 0, 32, D_00176E94, 566, 32);
     recipe = (struct potion_recipe *)(((iptr)potion_recipes) + (recipe_item->stack_count * 109));
     potion_name = (iptr)recipe->spell.name;
     while (recipe->ingredient_indices[n] != (-2)) {

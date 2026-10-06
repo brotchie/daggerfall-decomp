@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0009C3E7 */
 #include "records.h"
+#include "clib.h"
 
 extern unsigned char mouse_buttons;
 extern iptr screen_buffer;
@@ -40,7 +41,6 @@ extern void travel_button_exit(int);
 extern void func_0009BE38(void);
 extern int travel_route(int, int, int, int, int);
 extern int travel_trip_cost(void);
-extern void mc_memset(iptr, int, int, char *, int, int);
 extern int xn_math_angle_to_point(int, int, int, int);
 
 void travel_begin_trip(void)
@@ -100,8 +100,8 @@ void travel_begin_trip(void)
         last_skill_check_minutes = game_minutes;
         raise_skills();
     }
-    mc_memset(655360, 0, 64000, D_0017743D, 782, 4);
-    mc_memset(screen_buffer, 0, 64000, D_0017743D, 783, 4);
+    mc_memset((void *)655360, 0, 64000, D_0017743D, 782, 4);
+    mc_memset((void *)screen_buffer, 0, 64000, D_0017743D, 783, 4);
     D_00196294 = 0;
     D_001962A8 = 0;
     quests_suspended = 0;

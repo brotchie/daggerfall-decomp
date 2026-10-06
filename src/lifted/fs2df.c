@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170AB4[];
 extern char D_00170AEC[];
@@ -30,7 +31,6 @@ extern int link_count;
 
 extern int spellmaker_new(void);
 extern iptr disk_read_file(char *, iptr);
-extern int mc_memset();
 short rdb_object_id_by_offset(int);
 void func_000361B7(struct rdb_model *);
 void rdb_build_action_chain(int);
@@ -141,7 +141,7 @@ void rdb_build_action_chain(int resource_type)
 void action_record_add(struct rdb_model *model, struct rdb_action *model_action, struct rdb_flat *flat, unsigned char action)
 {
     D_001995EC = (D_001995E4 = &links[link_count++]);
-    mc_memset((iptr)D_001995EC, 0, 39, (iptr)D_00170AB4, 447, 4);
+    mc_memset(D_001995EC, 0, 39, D_00170AB4, 447, 4);
     D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
         D_001995EC->trigger = model->trigger_flag_starting_lock;
@@ -166,7 +166,7 @@ void action_record_add_chained(struct rdb_model *model, struct rdb_action *model
 {
     D_001995E4->chain_count++;
     D_001995EC = &links[link_count++];
-    mc_memset((iptr)D_001995EC, 0, 39, (iptr)D_00170AB4, 490, 4);
+    mc_memset(D_001995EC, 0, 39, D_00170AB4, 490, 4);
     D_001995EC->object_id = rdb_link_object_id;
     if (model_action != 0) {
         D_001995EC->trigger = model->trigger_flag_starting_lock;

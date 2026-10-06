@@ -2,7 +2,7 @@
 #include "structs.h"
 extern short mouse_x;
 extern short mouse_y;
-extern void note_text_box(int, struct rect *);
+extern void note_text_box(iptr, struct rect *);
 
 int note_text_hit_cb(int entry)
 {

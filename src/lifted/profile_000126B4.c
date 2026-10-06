@@ -4,9 +4,11 @@
 #include "structs.h"
 
 
-extern int profile_find_item(struct profile *, ...);
-extern int profile_get_number(struct profile *, ...);
+extern int profile_find_item(struct profile *, char *);
 #pragma aux sosconv "*" parm caller [] value [eax] modify [eax ebx ecx edx];
+#pragma aux (sosconv) profile_find_item;
+extern int profile_get_number(struct profile *, int *);
+#pragma aux (sosconv) profile_get_number;
 #pragma aux (sosconv) profile_get_item_number;
 
 int profile_get_item_number(struct profile *profile, char *item, int *number)

@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0008F31F */
 #include "records.h"
 #include "bitfield.h"
+#include "clib.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -22,8 +23,8 @@ extern iptr window_image;
 extern signed char mouse_buttons_prev;
 extern char D_001A9B9C[];
 extern signed char D_001A9BB4[];
-extern char potion_cauldron[];
-extern char potion_ingredients[];
+extern struct record *potion_cauldron[];
+extern struct record *potion_ingredients[];
 extern char potion_ingredient_scroll[];
 extern int D_001AA3E0;
 extern char potion_ingredient_count[];
@@ -41,12 +42,10 @@ extern int potionmaker_in_cauldron(int, int);
 extern void potionmaker_ingredient_cb(struct record *);
 extern int potionmaker_close(void);
 extern void potion_make(struct item *);
-extern int mc_memset();
-extern int itoa();
-extern int xn_draw_fullscreen_overlay_shaded();
-extern int xn_draw_image_drop_shadow();
-extern int xn_font_select();
-extern iptr xn_tex_cache_lookup();
+extern void xn_draw_fullscreen_overlay_shaded(char *);
+extern void xn_draw_image_drop_shadow(int, int, int, int, char *);
+extern int xn_font_select(int);
+extern void *xn_tex_cache_lookup(int, int, int *);
 
 
 
@@ -63,18 +62,18 @@ void potionmaker_update(void)
     short row;
 
     if (potionmaker_open(0) == 0) return;
-    xn_draw_fullscreen_overlay_shaded(window_image);
+    xn_draw_fullscreen_overlay_shaded((char *)window_image);
     xn_font_select(4);
     text_draw_coloured(potion_name, 31, 185, 145, 156);
-    text_draw_coloured(itoa(player_character->gold, (iptr)text_buffer, 10), 235, 185, 145, 156);
+    text_draw_coloured((iptr)itoa(player_character->gold, (char *)text_buffer, 10), 235, 185, 145, 156);
     xn_font_select(3);
     *(int *)potion_ingredient_count = 0;
-    mc_memset((iptr)potion_ingredients, 0, 2048, (iptr)D_00176E94, 182, 2048);
+    mc_memset((char *)potion_ingredients, 0, 2048, D_00176E94, 182, 2048);
     object_foreach(player_entity->children, potionmaker_ingredient_cb);
     for (COUNT = i = 0; i < 8; i++) {
-        if (((int *)potion_cauldron)[i] != 0) {
-            item = &((struct record **)potion_cauldron)[i]->data.item;
-            image = *(struct texture_header **)((char *)xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, -1) + 12);
+        if ((iptr)potion_cauldron[i] != 0) {
+            item = &potion_cauldron[i]->data.item;
+            image = *(struct texture_header **)((char *)xn_tex_cache_lookup(item->inventory_image >> 7, item->inventory_image & 127, (int *)(iptr)-1) + 12);
             xn_draw_image_drop_shadow((COUNT & 1) * 56 + 233 - (image->width >> 1), (COUNT >> 1) * 38 + 42 - (image->height >> 1), image->width, image->height, (char *)image + image->data_offset);
             text_draw_centred_coloured((iptr)item->name, (short)((COUNT & 1) * 56 + 236), (short)((COUNT >> 1) * 40 + 48), 145, 156);
             ((short *)D_001A9B9C)[COUNT++] = i;
@@ -104,7 +103,7 @@ void potionmaker_update(void)
         if (row > 24) return;
         row = (MOUSE_Y - 30) / 38;
         i += row + row;
-        ((int *)potion_cauldron)[((short *)D_001A9B9C)[i]] = 0;
+        *(iptr *)&potion_cauldron[((short *)D_001A9B9C)[i]] = 0;
         ((unsigned char *)D_001A9BB4)[((short *)D_001A9B9C)[i]] = 254;
         return;
     }
@@ -116,7 +115,7 @@ void potionmaker_update(void)
     if (row > 27) return;
     row = (MOUSE_Y - 30) / 38;
     i += row * 3;
-    item = &((struct record **)potion_ingredients)[i + *(int *)potion_ingredient_scroll]->data.item;
-    if (((int *)potion_ingredients)[i + *(int *)potion_ingredient_scroll] != 0 && COUNT != 8 && potionmaker_in_cauldron(item->group, item->index) == 0)
+    item = &potion_ingredients[i + *(int *)potion_ingredient_scroll]->data.item;
+    if ((iptr)potion_ingredients[i + *(int *)potion_ingredient_scroll] != 0 && COUNT != 8 && potionmaker_in_cauldron(item->group, item->index) == 0)
         potionmaker_add_ingredient(i + *(int *)potion_ingredient_scroll);
 }

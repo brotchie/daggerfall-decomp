@@ -2,6 +2,7 @@
  * ordinary source: edit them here. Keep each function where it is: Watcom aligns switch
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
+#include "clib.h"
 
 extern int xn_anim_ticks;
 extern char D_00176C20[];
@@ -26,7 +27,7 @@ extern struct record *player_object;
 extern struct record *location_object;
 extern struct location *current_location;
 extern struct settings *game_settings;
-extern char scratch_buffer[];
+extern char *scratch_buffer;
 extern int sound_last_size;
 extern signed char current_region;
 extern signed char current_climate;
@@ -66,21 +67,13 @@ extern int flat_table_pick(iptr);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int dpmi_lock_region(iptr, int);
 extern int dpmi_unlock_region(iptr, int);
-extern int rand();
-extern int srand();
-extern int mc_free();
-extern int mc_memset();
-extern iptr mc_malloc();
-extern int mc_set_location(int, iptr);
-extern int mc_sprintf(iptr, ...);
-extern int mc_memcpy();
-extern int xn_rand_noise_2d();
-extern int xn_math_approx_dist2d();
-extern int xn_math_yaw_offset_xz();
-extern int xn_model_max_y();
-extern int xn_light_add();
-extern int xn_model_prepare();
-extern int xn_flat_add();
+extern int xn_rand_noise_2d(unsigned, unsigned);
+extern int xn_math_approx_dist2d(int, int, int, int);
+extern void xn_math_yaw_offset_xz(int, int, int *, int *);
+extern int xn_model_max_y(void *);
+extern int xn_light_add(int, int, int, int, int, int);
+extern void xn_model_prepare(void *);
+extern int xn_flat_add(int, int, int, unsigned, int, unsigned, unsigned);
 extern void arch3d_apply_climate_textures(struct arch3d_header *);
 extern void fatal_error(iptr);
 extern void mem_pool_init(iptr, int);
@@ -134,7 +127,7 @@ struct record *rmb_add_subrecord(struct record *parent)
     object->id = location_object->id + ((int)(unsigned short)(current_location->object_counter)++);
     D_001A9438 = object->id;
     block = &object->data.block;
-    mc_memcpy((iptr)block, (iptr)rmb_record_ptr, size, (iptr)D_00176C20, 803, 4);
+    mc_memcpy(block, rmb_record_ptr, size, D_00176C20, 803, 4);
     block->models = (struct block_model *)((iptr)block + 17);
     model = block->models;
     block->flats = (struct block_flat *)((iptr)model + (block->model_count * 66));
@@ -148,7 +141,7 @@ struct record *rmb_add_subrecord(struct record *parent)
         model->model = 0;
         if (model->y > 0 && model->id > 10) {
             model->model = (char *)model_get(model->id, model->variant, (((int)(unsigned char)current_climate) << 2) + ((int)(unsigned char)D_001A949C));
-            model->y = (-model->y) - (xn_model_max_y((iptr)model->model) >> 8);
+            model->y = (-model->y) - (xn_model_max_y(model->model) >> 8);
         }
         model->y += rmb_origin_y;
         model->yaw += *(int *)rmb_origin_yaw;
@@ -318,9 +311,9 @@ iptr model_load(int slot, int key)
         }
     }
     if (archive_read_record(arch3d_bsa, record, (iptr)model_cache_nodes[slot].model) == 0) {
-        mc_set_location(1104, (iptr)D_00176C20);
-        mc_sprintf(*(int *)scratch_buffer, (iptr)D_00176C4F, record);
-        fatal_error(*(int *)scratch_buffer);
+        mc_set_location(1104, D_00176C20);
+        mc_sprintf(scratch_buffer, D_00176C4F, record);
+        fatal_error((iptr)scratch_buffer);
     }
     model_heap_free -= (size + 1) & -2;
     return (iptr)model_cache_nodes[slot].model;
@@ -376,7 +369,7 @@ iptr model_cache_add(int key)
         model_cache_nodes[slot].last_frame = *(int *)frame_counter;
         model_cache_nodes[slot].left = (model_cache_nodes[slot].right = 0);
         if (model_load(slot, key) == 0) return 0;
-        xn_model_prepare((iptr)model_cache_nodes[slot].model);
+        xn_model_prepare(model_cache_nodes[slot].model);
         saved_seed = rand();
         srand(*(int *)(model_cache_nodes[slot].model + 12));
         arch3d_apply_climate_textures((struct arch3d_header *)model_cache_nodes[slot].model);
@@ -410,7 +403,7 @@ void model_cache_flush(struct model_node *root)
     }
     root->left = 0;
     root->right = root->left;
-    mc_memset((iptr)&model_cache_nodes[1], 0, 10220, (iptr)D_00176C20, 1189, 4);
+    mc_memset(&model_cache_nodes[1], 0, 10220, D_00176C20, 1189, 4);
 }
 
 void model_cache_purge_unused(struct model_node *parent, int age, struct model_node *node)
@@ -527,7 +520,7 @@ iptr sound_cache_load(int id)
     sound_cache[slot].last_frame = *(int *)frame_counter;
     sound_cache[slot].id = id;
     sound_cache[slot].size = size;
-    sound_cache[slot].data = (char *)mc_malloc(size, (iptr)D_00176C20, 1338);
+    sound_cache[slot].data = (char *)mc_malloc(size, D_00176C20, 1338);
     dpmi_lock_region((iptr)sound_cache[slot].data, size + 4096);
     archive_read_record(dagger_snd, record, (iptr)sound_cache[slot].data);
     sound_cache_bytes += size;
@@ -556,7 +549,7 @@ void sound_cache_trim(void)
         if (oldest == (-1)) return;
         dpmi_unlock_region((iptr)sound_cache[oldest].data, sound_cache[oldest].size + 4096);
         if (sound_cache[oldest].data != 0 && (iptr)sound_cache[oldest].data != (-1751672937)) {
-            mc_free((iptr)sound_cache[oldest].data, (iptr)D_00176C20, 1375);
+            mc_free(sound_cache[oldest].data, D_00176C20, 1375);
             sound_cache[oldest].data = (char *)(iptr)-1751672937;
         }
         sound_cache[oldest].data = 0;
@@ -573,7 +566,7 @@ void sound_cache_free_all(void)
         if ((iptr)sound_cache[i].data != 0) {
             dpmi_unlock_region((iptr)sound_cache[i].data, sound_cache[i].size + 1024);
             if ((iptr)sound_cache[i].data != 0 && (iptr)sound_cache[i].data != (-1751672937)) {
-                mc_free((iptr)sound_cache[i].data, (iptr)D_00176C20, 1392);
+                mc_free(sound_cache[i].data, D_00176C20, 1392);
                 sound_cache[i].data = (char *)(iptr)-1751672937;
             }
             sound_cache[i].data = (char *)0;
@@ -622,13 +615,13 @@ void model_unlink_object_cb(struct record *object)
     switch (object->type) {
     case 6:
     case 32:
-        if ((iptr)object->data.instance.model == *(int *)scratch_190de4) object->data.instance.model = 0;
+        if ((iptr)object->data.instance.model == *(iptr *)scratch_190de4) object->data.instance.model = 0;
         return;
     case 43:
         block = &object->data.block;
         model = block->models;
         for (i = 0; block->model_count > i; i++, model++) {
-            if ((iptr)model->model == *(int *)scratch_190de4) {
+            if ((iptr)model->model == *(iptr *)scratch_190de4) {
                 model->model = 0;
             }
         }
@@ -636,7 +629,7 @@ void model_unlink_object_cb(struct record *object)
     case 56:
         model = (struct block_model *)RECORD_DATA(object);
         for (i = 0; object->model_count > i; i++, model++) {
-            if ((iptr)model->model == *(int *)scratch_190de4) {
+            if ((iptr)model->model == *(iptr *)scratch_190de4) {
                 model->model = 0;
             }
         }
@@ -676,7 +669,7 @@ void player_light_draw(void)
     jitter_y >>= 3;
     jitter_z = xn_rand_noise_2d(player_object->x - player_object->z, (xn_anim_ticks / 40) << 6);
     jitter_z >>= 3;
-    xn_math_yaw_offset_xz((player_object->yaw + view_look_yaw) & 2047, 192, (iptr)&dx, (iptr)&dz);
+    xn_math_yaw_offset_xz((player_object->yaw + view_look_yaw) & 2047, 192, &dx, &dz);
     xn_light_add((player_object->x + dx) + (jitter_x - 16), (player_object->y - 50) + (jitter_y - 16), (player_object->z + dz) + (jitter_z - 16), 50, intensity, 0);
     xn_flat_add((player_object->x + dx) + (jitter_x - 16), (player_object->y - 50) + (jitter_y - 16), (player_object->z + dz) + (jitter_z - 16), 26883, -1, 1, 400);
 }

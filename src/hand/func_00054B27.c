@@ -17,7 +17,7 @@ extern void classmaker_specials_picked(void);
 extern void classmaker_set_advantage(int, int);
 extern void classmaker_set_disadvantage(int, int);
 extern void text_draw_coloured(char *, short, short, int, unsigned char);
-extern int xn_mouse_poll_clamped();
+extern void xn_mouse_poll_clamped(void);
 
 void func_00054B27(void)
 {

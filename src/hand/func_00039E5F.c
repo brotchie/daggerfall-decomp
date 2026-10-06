@@ -1,13 +1,11 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00039E5F */
 #include "records.h"
+#include "clib.h"
 
 extern char D_00170B13[];
 extern char D_00170B69[];
 extern char *scratch_buffer;
 extern iptr disk_read_file(char *, char *);
-extern void mc_strncpy(char *, char *, int, char *, int);
-extern int strlen(char *);
-extern char *memchr(char *, int, int);
 
 char **spells_std_names_for_ids(char *keys)
 {

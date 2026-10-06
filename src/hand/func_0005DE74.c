@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0005DE74 */
 #include "records.h"
+#include "clib.h"
 
 extern char D_001758B8[];
 extern char D_001758C0[];
@@ -19,14 +20,8 @@ extern void item_roll_armor_type(struct item *);
 extern void item_init_book(struct item *, int);
 extern void item_make_magic(struct item *, int);
 extern int rand_range(int, int);
-extern int rand(void);
-extern void mc_memset(void *, int, int, char *, int, int);
-extern void mc_strncpy(char *, char *, int, char *, int);
 #pragma aux mc_set_location parm routine [];
-extern void mc_set_location(int, char *);
 #pragma aux func_000A18C3 parm routine [];
-extern int func_000A18C3(char *);
-extern int mc_sprintf(char *, char *, ...);
 
 #define PFLAGS (player_character->flags)
 

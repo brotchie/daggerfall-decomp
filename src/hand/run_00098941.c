@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of inven from 0x98538 to 0x98941, kept together for its switch table's alignment */
 #include "structs.h"
+#include "clib.h"
 struct bits8 { unsigned char b0:1, b1:1, b2:1, b3:1, b4:1, b5:1, b6:1, b7:1; };
 #define FREED ((char *)0x97979797)
 extern char mouse_buttons;
@@ -34,10 +35,9 @@ extern void player_horse_sounds_stop(void);
 extern int func_00098B20(void);
 extern void func_00098A15(void);
 extern void travel_find_transport(void);
-extern int mc_free(char *, char *, int);
-extern int xn_gfx_present_inclusive();
-extern int xn_mouse_poll_clamped();
-extern int xn_draw_image();
+extern void xn_gfx_present_inclusive(int);
+extern void xn_mouse_poll_clamped(void);
+extern void xn_draw_image(int, int, int, int, char *);
 
 void trade_mark_identified(void)
 {

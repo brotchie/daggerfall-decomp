@@ -1,5 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0002ECBE */
 #include "records.h"
+#include "clib.h"
 
 extern unsigned char D_0012B508;
 extern char D_001709A1[];
@@ -34,11 +35,7 @@ extern iptr hud_message_add(char *);
 extern int rand_range(int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern void object_foreach(struct record *, void (*)());
-extern int mc_memset();
-extern int mc_memcpy();
 #pragma aux mc_set_location parm routine [];
-extern int mc_set_location(int, char *);
-extern int mc_sprintf(char *, ...);
 
 void damage_creature_death(struct record *creature)
 {

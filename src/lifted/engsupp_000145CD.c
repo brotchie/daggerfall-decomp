@@ -12,17 +12,17 @@ extern signed char scratch_190ce4[];
 extern signed char scratch_190ce5;
 extern signed char climate_weathers[];
 
-extern int xn_str_find_u16();
+extern unsigned short *xn_str_find_u16(unsigned short *, int, unsigned);
 
 short texture_archive_for_climate(int archive, int record)
 {
-    int found;
+    iptr found;
     int base;
 
     base = archive % 100;
     switch (player_environment) {
     case 1:
-        if (xn_str_find_u16((iptr)D_00179970, (int)(short)*(short *)&base, 15) != 0) {
+        if (xn_str_find_u16((unsigned short *)D_00179970, (int)(short)*(short *)&base, 15) != 0) {
             if (base == 74 && record > 2) return archive;
             archive = base + (((int)(signed char)scratch_190ce4[0]) * 100);
             if (((int)(unsigned char)climate_weathers[(int)(signed char)scratch_190ce5]) == 5 && base != 74) {
@@ -31,7 +31,7 @@ short texture_archive_for_climate(int archive, int record)
         }
         return archive;
     case 2:
-        if (xn_str_find_u16((iptr)D_0017998E, (int)(short)*(short *)&base, 15) != 0) {
+        if (xn_str_find_u16((unsigned short *)D_0017998E, (int)(short)*(short *)&base, 15) != 0) {
             if (base == 74 && record > 2) return archive;
             archive = (archive % 100) + (((int)(signed char)scratch_190ce4[0]) * 100);
         }
@@ -39,7 +39,7 @@ short texture_archive_for_climate(int archive, int record)
     case 3:
         if (base == 74 && record > 2) return archive;
         if (base == 74) return base + ((short)scratch_190ce4[0] * 100);
-        found = xn_str_find_u16((iptr)D_0017995C, (int)(short)*(short *)&archive, 5);
+        found = (iptr)xn_str_find_u16((unsigned short *)D_0017995C, (int)(short)*(short *)&archive, 5);
         if (found != 0) {
             archive = (int)(short)D_00179966[((found - ((iptr)D_0017995C)) >> 1)];
         } else if (archive == 168) {
