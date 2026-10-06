@@ -282,7 +282,7 @@ void sheet_show_misc_skills(void)
     char *text;
     int skill;
     int count;
-    short raised;
+    slot16 raised;
 
     text = scratch_buffer + 55000;
     sheet_hth_damage_line = 0;
@@ -296,7 +296,7 @@ void sheet_show_misc_skills(void)
                 if (((int)(short)*(short *)&skill) == 30) sheet_hth_damage_line = 1;
                 mc_set_location(372, D_00170C67);
                 mc_sprintf((char *)text_buffer, D_00170CEC, (iptr)skill_names[((int)(short)*(short *)&skill)], player_character->skills[(int)(short)*(short *)&skill].value, attribute_abbrevs[((int)(unsigned char)skill_governing_attributes[(int)(short)*(short *)&skill])]);
-                if (raised != 0) {
+                if ((short)raised != 0) {
                     left_colour = 96;
                 } else {
                     left_colour = 145;
@@ -307,7 +307,7 @@ void sheet_show_misc_skills(void)
                 if (((int)(short)*(short *)&skill) == 30) sheet_hth_damage_line = 1;
                 mc_set_location(379, D_00170C67);
                 mc_sprintf((char *)text_buffer, D_00170CFD, (iptr)skill_names[((int)(short)*(short *)&skill)], player_character->skills[(int)(short)*(short *)&skill].value, attribute_abbrevs[((int)(unsigned char)skill_governing_attributes[(int)(short)*(short *)&skill])]);
-                if (raised != 0) {
+                if ((short)raised != 0) {
                     right_colour = 96;
                 } else {
                     right_colour = 145;

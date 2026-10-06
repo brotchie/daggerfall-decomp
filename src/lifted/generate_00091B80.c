@@ -8,7 +8,7 @@ extern short scratch_190d6a;
 extern short chargen_selected_attribute;
 
 
-void chargen_select_attribute(short attribute)
+void chargen_select_attribute(slot16 attribute)
 {
     chargen_selected_attribute = *(int *)&attribute;
     chargen_buttons[30].y0 = (scratch_190d6a = chargen_buttons[((int)(short)attribute) + 20].y0 + 1);

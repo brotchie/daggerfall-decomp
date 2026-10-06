@@ -1,6 +1,6 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x00093A6A */
 #include "records.h"
-extern void size_fit(short *, short *, short, short);
+extern void size_fit(short *, short *, slot16, slot16);
 extern void xn_draw_image_scaled(int, int, int, int, int, int, int, char *);
 extern char *xn_tex_cache_lookup(int, int, iptr);
 extern void xn_tex_cache_flush(void);

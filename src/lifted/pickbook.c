@@ -118,8 +118,8 @@ void spellbook_frame(void)
     short *image;
     int cost;
     int unused;
-    short picked;
-    short button;
+    slot16 picked;
+    slot16 button;
 
     if (spellbook_open(0) == 0) return;
     mc_memcpy((void *)screen_buffer, (void *)spellbook_saved_screen, 64000, D_00170DE4, 123, 4);
@@ -220,7 +220,7 @@ int spellbook_close(void)
 
 void spellbook_draw_spell(struct spell *spell)
 {
-    short i;
+    slot16 i;
 
     D_0012B508 = 145;
     xn_draw_spell_icon(172, 32, spell->icon);

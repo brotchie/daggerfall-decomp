@@ -58,7 +58,7 @@ int flc_play_with_text(iptr name, struct flc_player *anim, int text_id, int ask_
     char *page;
     int i;
     int *ticks_addr;
-    short ticks_addr2;
+    pslot16 ticks_addr2;
 
     i = 0;
     mc_memset(anim, 0, sizeof(*anim), D_00175404, 127, 4);
@@ -114,7 +114,7 @@ int flc_play_with_text(iptr name, struct flc_player *anim, int text_id, int ask_
                         if (ask_yes_no == 0) goto L52084;
                     }
                 }
-                *(int *)&ticks_addr2 = 1132;
+                *(iptr *)&ticks_addr2 = (iptr)DOS_LOW(0x46C);
             } while ((*(int *)((char *)*(iptr *)&ticks_addr2) - frame_start) < anim->ticks_per_frame);
         }
         if (anim->loops == 0) break;
@@ -174,7 +174,7 @@ int flc_next_frame(struct flc_player *anim)
 void flc_read_frame(struct flc_player *anim)
 {
     unsigned short handle;
-    unsigned short i;
+    uslot16 i;
     short chunk_count;
     {
         struct {
@@ -251,7 +251,7 @@ void flc_decode_brun(signed char *chunk, struct flc_player *anim)
 {
     int y;
     signed char count;
-    short x;
+    slot16 x;
 
     for (y = 0; (short)(short)y < anim->height; y++) {
         ++chunk;

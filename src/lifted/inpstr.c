@@ -106,13 +106,13 @@ int inpstr_handle_key(unsigned char key)
 int inpstr_text_width(char *text, short length)
 {
     unsigned char saved_char;
-    short width;
+    slot16 width;
 
     saved_char = text[length];
     text[length] = 0;
     *(int *)&width = font_text_width((iptr)text);
     text[length] = saved_char;
-    return width;
+    return (short)width;
 }
 
 void picklist_save_background(struct picklist *list)

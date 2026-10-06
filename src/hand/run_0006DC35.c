@@ -82,7 +82,7 @@ extern void training_offer(iptr);
 extern void msgbox_show_string(char *, short);
 extern int quest_pick_file(unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern int itemmaker_open(int);
-extern void item_make_in_range(unsigned short, int, int, struct item *);
+extern void item_make_in_range(uslot16, int, int, struct item *);
 extern void bank_add_house_for_sale(struct record *);
 extern iptr disk_read_file(char *, iptr);
 extern void guild_buy_potions(void);

@@ -1,6 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2): a run of automap.c from 0x00027A10 to 0x0002814E, kept together for its switch table's alignment */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char mouse_buttons;
 extern short mouse_x;
@@ -211,7 +212,7 @@ void town_map_draw(void)
         map_y++;
     }
     town_map_draw_notes();
-    if ((*(struct kb *)0x46c).f == 0) return;
+    if ((*(struct kb *)DOS_LOW(0x46C)).f == 0) return;
     screen_x = (player_x - VX) * 2 + 10;
     screen_y = (player_y - VY) * 2 + 10;
     if (screen_y >= 169) return;

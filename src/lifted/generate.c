@@ -72,7 +72,7 @@ extern void object_free_children(struct record *);
 extern void chargen_draw_face(void);
 extern void chargen_draw_attributes(void);
 extern void chargen_draw_skills(void);
-extern void chargen_select_attribute(short);
+extern void chargen_select_attribute(slot16);
 extern void inv_store_item(struct record *);
 extern void inv_create_wagon(void);
 extern void inv_merge_arrows(struct record *, struct record *, int);

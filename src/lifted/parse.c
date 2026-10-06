@@ -1901,8 +1901,8 @@ iptr parse_stub_zero(int unused)
 
 int holiday_index(int minutes, int region)
 {
-    short day;
-    short holiday;
+    slot16 day;
+    slot16 holiday;
 
     *(int *)&day = (((unsigned)(((unsigned)minutes) % 518400)) / 1440) + 1;
     if (((int)(short)day) > 355) return 0;
@@ -1919,8 +1919,8 @@ int holiday_index(int minutes, int region)
 
 int holiday_today(int minutes, int region)
 {
-    short day;
-    short holiday;
+    slot16 day;
+    slot16 holiday;
 
     *(int *)&holiday = 0;
     region++;

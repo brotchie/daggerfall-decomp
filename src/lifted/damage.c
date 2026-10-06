@@ -340,7 +340,7 @@ void qaction_op35_cycle_state(struct quest *quest, struct qbn_op *op)
 {
     struct qbn_state *states[4];
     int count;
-    short i;
+    slot16 i;
 
     *(int *)&i = 0;
     count = (int)(short)i;

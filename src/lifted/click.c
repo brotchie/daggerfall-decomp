@@ -1548,7 +1548,7 @@ iptr music_dungeon_song(void)
 {
     iptr song;
     int i;
-    short location_id;
+    slot16 location_id;
 
     *(int *)&location_id = ((unsigned)location_object->id) >> 16;
     for (i = 0; i < 10; i++) {

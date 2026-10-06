@@ -204,7 +204,7 @@ iptr hud_message_add(char *text)
     char *slot_text;
     int slot;
     int free_slot;
-    short bios_ticks_addr;
+    pslot16 bios_ticks_addr;
 
     slot_text = hud_message_text;
     free_slot = -1;
@@ -217,7 +217,7 @@ iptr hud_message_add(char *text)
     }
     if (free_slot < 0) return 0;
     mc_strncpy(message_text, text, 4, D_00176A10, 117);
-    *(int *)&bios_ticks_addr = 1132;
+    *(iptr *)&bios_ticks_addr = (iptr)DOS_LOW(0x46C);
     hud_message_expiry[free_slot] = *(int *)(*(char **)&bios_ticks_addr) + 36;
     hud_message_ptrs[free_slot] = (iptr)message_text;
     return hud_message_ptrs[slot];
@@ -259,7 +259,7 @@ void info_popup_open(char *text)
 int wait_key_from_list(signed char *keys, short key_count)
 {
     unsigned char key;
-    short i;
+    slot16 i;
 
     while (mouse_buttons != 0) xn_mouse_poll_clamped();
     while (mouse_buttons == 0) {
@@ -316,15 +316,15 @@ void mode_pop(void)
     D_0019626F = 255;
 }
 
-void size_fit(short *width, short *height, short max_width, short max_height)
+void size_fit(short *width, short *height, slot16 max_width, slot16 max_height)
 {
-    short scale_w;
-    short scale_h;
+    slot16 scale_w;
+    slot16 scale_h;
 
-    if (*width <= max_width && *height <= max_height) return;
+    if (*width <= (short)max_width && *height <= (short)max_height) return;
     *(int *)&scale_w = (((int)(short)max_width) << 8) / ((int)(short)*width);
     *(int *)&scale_h = (((int)(short)max_height) << 8) / ((int)(short)*height);
-    if ((short)(short)*(int *)&scale_h < scale_w) {
+    if ((short)(short)*(int *)&scale_h < (short)scale_w) {
         *width = (((int)(short)*width) * ((int)(short)scale_h)) >> 8;
         *height = *(int *)&max_height;
         return;
@@ -364,7 +364,7 @@ void list_popup_open(char **strings)
 
 int picklist_frame(struct picklist *picklist)
 {
-    short choice;
+    slot16 choice;
 
     if (((struct bf8_0_1 *)&D_001940D4)->f != 0 && (key_down_esc != 0 || ((int)(unsigned char)(mouse_buttons & 2)) != 0)) {
         D_001940D4 &= 251;

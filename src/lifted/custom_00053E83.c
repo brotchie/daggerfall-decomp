@@ -12,7 +12,7 @@ extern short scratch_190d6a;
 extern short chargen_selected_attribute;
 
 
-void classmaker_select_attribute(short attribute)
+void classmaker_select_attribute(slot16 attribute)
 {
     chargen_selected_attribute = *(int *)&attribute;
     D_00185646 = (scratch_190d6a = classmaker_buttons[((int)(short)attribute) + 18].y0 + 1);

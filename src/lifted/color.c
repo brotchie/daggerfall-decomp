@@ -63,14 +63,14 @@ void color_init_remap_tables(void)
 
 int string_hash(char *text)
 {
-    short i;
-    short hash;
+    slot16 i;
+    slot16 hash;
 
     *(int *)&hash = 0;
     *(int *)&i = 0;
-    while (text[i] != 0) {
+    while (text[(short)i] != 0) {
         *(int *)&hash <<= 1;
-        *(int *)&hash += (unsigned char)text[i];
+        *(int *)&hash += (unsigned char)text[(short)i];
         (*(int *)&i)++;
     }
     return *(int *)&hash;
@@ -128,14 +128,14 @@ int door_blocked_by_player(struct record *door)
 
 struct building *object_find_building(struct record *object)
 {
-    short i;
+    slot16 i;
 
     object = object->parent;
     while (object != 0 && object != location_object) {
         *(int *)&i = 0;
-        for (; i < current_location->building_count; (*(int *)&i)++) {
-            if (current_location->buildings[i].id == object->id) {
-                return &current_location->buildings[i];
+        for (; (short)i < current_location->building_count; (*(int *)&i)++) {
+            if (current_location->buildings[(short)i].id == object->id) {
+                return &current_location->buildings[(short)i];
             }
         }
     }

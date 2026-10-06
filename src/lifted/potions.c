@@ -181,7 +181,7 @@ void potionmaker_add_ingredient(int index)
 
 int potionmaker_in_cauldron(int group, int index)
 {
-    short i;
+    slot16 i;
     struct item *item;
 
     *(int *)&i = 0;

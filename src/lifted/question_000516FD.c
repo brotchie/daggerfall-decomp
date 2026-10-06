@@ -9,7 +9,7 @@ extern char *scratch_buffer;
 extern void xn_mouse_cursor_erase(void);
 extern void xn_mouse_cursor_draw(void);
 extern void xn_draw_image_transparent(int, int, int, int, char *);
-extern void class_question_scroll_step(iptr *, short);
+extern void class_question_scroll_step(iptr *, slot16);
 
 void class_question_scroll(int *scroll_cels, short delta)
 {

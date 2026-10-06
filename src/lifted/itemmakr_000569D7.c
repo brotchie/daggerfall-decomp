@@ -20,7 +20,7 @@ extern void itemmaker_show_param_list(iptr, short);
 
 void itemmaker_add_power_cb(int power)
 {
-    short slot;
+    slot16 slot;
 
     *(short *)scratch_190d66 = power;
     *(int *)&slot = itemmaker_free_slot();

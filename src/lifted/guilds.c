@@ -238,7 +238,7 @@ void spellshop_buy(void)
 void spellshop_draw_spell(struct spell *spell)
 {
     int price;
-    short i;
+    slot16 i;
 
     D_0012B508 = 145;
     xn_draw_spell_icon(172, 32, spell->icon);

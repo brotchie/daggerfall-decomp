@@ -118,7 +118,7 @@ void hud_button_inventory(void)
 
 void hud_toggle_weapon(void)
 {
-    short item_data;
+    pslot16 item_data;
 
     D_001940D6 ^= 64;
     if (((struct bf8_6_1 *)&D_001940D6)->f == 0) return;
@@ -219,7 +219,7 @@ void magic_items_open(void)
 
 void magic_items_frame(void)
 {
-    short picked;
+    slot16 picked;
 
     if (((struct bf8_5_1 *)&D_001940D4)->f == 0) return;
     mc_memcpy((void *)screen_buffer, (void *)magic_items_saved_screen, 64000, D_00175898, 368, 4);

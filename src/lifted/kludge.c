@@ -90,7 +90,7 @@ extern void pickpocket_attempt(struct record *);
 extern void rumor_show_local(void);
 extern void player_refresh_paperdoll(void);
 extern void text_draw(iptr, int, int);
-extern void item_make_in_range(unsigned short, int, int, struct item *);
+extern void item_make_in_range(uslot16, int, int, struct item *);
 extern void item_make(int, int, struct item *);
 extern void item_make_artifact(struct item *, int);
 extern void guild_join_dark_brotherhood(void);
@@ -188,7 +188,7 @@ void kludge_make_test_character_with_spells(int full)
     int unused1;
     struct record *object;
     int unused2;
-    short i;
+    slot16 i;
 
     kludge_make_test_character(full);
     *(int *)&i = 0;
@@ -476,14 +476,14 @@ void kludge_show_memory(void)
 
 iptr location_find_door(int id)
 {
-    short door;
+    pslot16 door;
     int i;
-    short id_low;
+    slot16 id_low;
 
     *(int *)&id_low = id;
     *(iptr *)&door = (iptr)loaded_location.doors;
-    for (i = 0; i < loaded_location.door_count; i++, (*(char (**)[6])&(*(int *)&door))++) {
-        if ((short)*(int *)&id_low == *(short *)(*(char **)&door + 4)) return *(int *)&door;
+    for (i = 0; i < loaded_location.door_count; i++, (*(char (**)[6])&(*(iptr *)&door))++) {
+        if ((short)*(int *)&id_low == *(short *)(*(char **)&door + 4)) return *(iptr *)&door;
     }
     return 0;
 }

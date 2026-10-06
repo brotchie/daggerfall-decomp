@@ -1,4 +1,5 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0003DCF4 */
+#include "ptrint.h"
 struct flags5 { unsigned char pad:7; unsigned char b7:1; };
 struct flags6 { unsigned char pad:5; unsigned char b5:1; };
 extern char text_shadow_colour;
@@ -22,7 +23,7 @@ extern short msgbox_h;
 extern void msgbox_draw_buttons(short);
 extern int font_char_width(unsigned char);
 extern int font_text_width(char *);
-extern void text_draw_shadow(char *, short, short);
+extern void text_draw_shadow(char *, slot16, slot16);
 extern void text_draw_centred_shadow(char *, int, int);
 extern void painting_draw(void);
 #include "clib.h"

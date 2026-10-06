@@ -6,7 +6,7 @@
 extern signed char quest_global_states[];
 
 
-void quest_set_state(struct quest *quest, struct qbn_op *op, short value)
+void quest_set_state(struct quest *quest, struct qbn_op *op, slot16 value)
 {
     struct qbn_state *state;
 

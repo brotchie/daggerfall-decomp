@@ -47,7 +47,7 @@ extern void chargen_free_images(void);
 extern int chargen_screen_loop(int, int);
 extern void chargen_select_skill(int);
 extern void chargen_roll_attributes(void);
-extern void chargen_select_attribute(short);
+extern void chargen_select_attribute(slot16);
 #pragma aux mc_set_location parm routine [];
 
 int chargen_name_character(void)

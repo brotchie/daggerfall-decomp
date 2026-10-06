@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "records.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern char D_00177358[];
 extern char D_00177364[];
@@ -314,7 +315,7 @@ iptr location_cell_at(int x, int z)
 
 int travel_map_open(int mode)
 {
-    short ticks_addr;
+    pslot16 ticks_addr;
 
     if (((int)D_0019626F) == 19 && ((int)(unsigned char)game_mode) == 8) {
         return 1;
@@ -353,7 +354,7 @@ int travel_map_open(int mode)
         *(iptr *)&D_00195B5C = disk_read_file(D_00177423, 0);
         disk_read_file(D_00177430, (iptr)scratch_buffer);
         xn_pal_set_all_8bit((char *)((iptr)scratch_buffer + 8));
-        *(int *)&ticks_addr = 1132;
+        *(iptr *)&ticks_addr = (iptr)DOS_LOW(0x46C);
         scratch_190cac = *(int *)(*(char **)&ticks_addr);
         D_001AA6A4 = (D_001AA6A5 = 0);
         scratch_190ce5 = (scratch_190ce4[0] = 0);

@@ -193,7 +193,7 @@ void court_reputation_restore(void)
 
 void court_close(void)
 {
-    short fatigue;
+    slot16 fatigue;
 
     *(int *)&fatigue = player_character->fatigue;
     time_pass(240);

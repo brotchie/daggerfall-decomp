@@ -110,13 +110,13 @@ int disk_create(char *name)
 
 int disk_file_exists(char *name)
 {
-    short handle;
+    slot16 handle;
     char path[92];
 
     mc_set_location(159, D_00175D00);
     mc_sprintf(path, D_00175D60, (iptr)arena2_path, name);
     *(int *)&handle = open(path, 512);
-    if (handle < 0) return 0;
+    if ((short)handle < 0) return 0;
     close((int)(short)handle);
     return 1;
 }

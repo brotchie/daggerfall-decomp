@@ -155,7 +155,7 @@ void player_horse_sounds(int);
 
 void intrface_init(void)
 {
-    short i;
+    slot16 i;
 
     cursor_region_images = disk_read_file(D_00176A68, 0);
     cursor_arrow_image = disk_read_file(D_00176A72, 0);
@@ -224,7 +224,7 @@ void func_0008066F(int distance)
 
 void func_000806DD(int distance, int yaw_offset)
 {
-    short saved_yaw;
+    slot16 saved_yaw;
 
     saved_yaw = player_object->yaw;
     player_object->yaw += yaw_offset;

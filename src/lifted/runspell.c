@@ -100,7 +100,7 @@ int spell_resist_check(struct record *, struct record **);
 struct spell *spell_find_active_effect(struct record *, int, int *, int *);
 int spell_apply_effect(struct record *, int, struct record *);
 void spellbook_find_last_cast_cb(struct record *);
-void spell_compute_values(struct spell *, unsigned short, int);
+void spell_compute_values(struct spell *, uslot16, int);
 void func_0005C856(struct record *, struct record *);
 void cast_anim_start(int);
 void func_0005CA28(struct record *);
@@ -351,7 +351,7 @@ int spell_apply_effect(struct record *spell, int slot, struct record *target)
     return spell_effect_dispatch(spell_data->effects[slot].type, spell, slot, target);
 }
 
-void spell_compute_values(struct spell *spell, unsigned short level, int percent)
+void spell_compute_values(struct spell *spell, uslot16 level, int percent)
 {
     int slot;
 

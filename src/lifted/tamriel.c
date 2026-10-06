@@ -111,7 +111,7 @@ void quests_run_all(void);
 
 iptr calendar_format_date(int minutes, iptr buffer)
 {
-    short day;
+    slot16 day;
 
     *(int *)&day = ((unsigned)(((unsigned)(((unsigned)minutes) % 518400)) / 1440)) % 30;
     mc_set_location(79, D_001711AC);

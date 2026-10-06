@@ -1092,8 +1092,8 @@ L17A4C:;
 void talk_list_draw_item(iptr text, int x, int y, int colour, int shadow)
 {
     int width;
-    short saved_left;
-    short saved_right;
+    slot16 saved_left;
+    slot16 saved_right;
 
     *(int *)&saved_left = (int)(short)xn_gfx_clip_left;
     xn_gfx_clip_left = 6;
@@ -1379,7 +1379,7 @@ int talk_faction_greeting(short faction_id)
 {
     int relation;
     int roll;
-    short faction;
+    pslot16 faction;
 
     *(iptr *)&faction = (iptr)faction_find((int)(short)faction_id);
     if (((int)(unsigned char)*(signed char *)(*(char **)&faction)) == 15 || ((int)(unsigned char)*(signed char *)(*(char **)&faction)) == 14) {
@@ -1478,13 +1478,13 @@ struct faction *faction_find_type_in_region_r(struct faction *faction, short reg
 
 struct faction *faction_find_r(struct faction *faction, short id)
 {
-    short found;
+    pslot16 found;
 
     while (faction != 0) {
         if (faction->id == (short)id) return faction;
         if (faction->child != 0) {
             *(iptr *)&found = (iptr)faction_find_r(faction->child, (int)(short)id);
-            if (*(int *)&found != 0) return (struct faction *)*(iptr *)&found;
+            if (*(iptr *)&found != 0) return (struct faction *)*(iptr *)&found;
         }
         faction = faction->next;
     }
@@ -1531,13 +1531,13 @@ struct faction *faction_nth_r(struct faction *faction)
 
 struct faction *faction_nth_of_type_r(struct faction *faction, unsigned char type)
 {
-    short found;
+    pslot16 found;
 
     while (faction != 0) {
         if (*(int *)D_00195B84 == 0 && faction->type == type) return faction;
         if (faction->child != 0) {
             *(iptr *)&found = (iptr)faction_nth_of_type_r(faction->child, (int)(unsigned char)type);
-            if (*(int *)&found != 0) return (struct faction *)*(iptr *)&found;
+            if (*(iptr *)&found != 0) return (struct faction *)*(iptr *)&found;
         }
         if (faction->type == type) (*(int *)D_00195B84)--;
         faction = faction->next;

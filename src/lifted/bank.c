@@ -511,7 +511,7 @@ void bank_draw_house_list(void)
 void bank_draw_ship_list(void)
 {
     int row;
-    short colour;
+    slot16 colour;
 
     for (row = 0; ((int)(unsigned char)bank_ship_count) > row; row++) {
         if (((int)(unsigned char)bank_selected) == row) {

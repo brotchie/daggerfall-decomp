@@ -103,7 +103,7 @@ void book_open(short book_id)
 
 void book_update(void)
 {
-    short i;
+    slot16 i;
 
     if (((int)(short)book_file) < 1) return;
     D_001940D8 |= 16;
@@ -190,7 +190,7 @@ void func_0005A230(void)
 void func_0005A2BE(void)
 {
     struct image *image;
-    short i;
+    slot16 i;
 
     *(int *)&i = 0;
     for (; (short)(short)*(int *)&i < D_00199D5E; (*(int *)&i)++) {
@@ -230,7 +230,7 @@ void book_goto_page_prompt(void)
 int font_char_width(unsigned char ch)
 {
     char *glyph;
-    short glyph_index;
+    slot16 glyph_index;
 
     if (((int)(unsigned char)ch) == 32) return (int)(short)font_space_width;
     *(int *)&glyph_index = ((int)(unsigned char)ch) - 33;
@@ -238,7 +238,7 @@ int font_char_width(unsigned char ch)
     return ((int)(short)*(short *)glyph) + ((int)(short)font_char_spacing);
 }
 
-void text_draw_shadow(char *text, short x, short y)
+void text_draw_shadow(char *text, slot16 x, slot16 y)
 {
     unsigned char saved_colour;
 

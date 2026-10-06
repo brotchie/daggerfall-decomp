@@ -65,21 +65,21 @@ int engine_pick_object(int x, int y, struct pick_result *result)
     return pick_result->flags & 1;
 }
 
-int arch3d_plane_point_at(struct arch3d_plane *plane, short i)
+iptr arch3d_plane_point_at(struct arch3d_plane *plane, short i)
 {
-    short point;
+    pslot16 point;
 
     *(iptr *)&point = (iptr)plane->points;
     if ((short)plane->point_count <= i) return 0;
-    *(int *)&point += ((int)(short)i) << 3;
-    return *(int *)&point;
+    *(iptr *)&point += ((int)(short)i) << 3;
+    return *(iptr *)&point;
 }
 
 struct arch3d_plane *arch3d_plane_at(iptr model, short plane_index)
 {
     struct arch3d_header *arch3d;
     struct arch3d_plane *plane;
-    short i;
+    slot16 i;
 
     arch3d = *(struct arch3d_header **)model;
     *(int *)&i = 0;
@@ -225,7 +225,7 @@ void world_for_each_object(iptr callback)
     struct record *object;
     struct record *next;
     struct record *children;
-    unsigned short flags;
+    uslot16 flags;
 
     grid_visit_func = (iptr)object_find;
     if (((int)player_environment) < 3) {

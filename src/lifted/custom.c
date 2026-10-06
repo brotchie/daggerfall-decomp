@@ -143,7 +143,7 @@ extern void msgbox_show_rsc(int, int);
 extern void keys_world_actions(void);
 extern void classmaker_draw_reputations(void);
 extern void classmaker_input_text(iptr, int, iptr);
-extern void classmaker_select_attribute(short);
+extern void classmaker_select_attribute(slot16);
 extern void classmaker_specials_screen(void);
 extern void itemmaker_reset(void);
 extern void itemmaker_select_tab(int);
@@ -164,8 +164,8 @@ void classmaker_run(void)
     int *bios_ticks;
     int *bios_ticks_now;
     int *bios_ticks_set;
-    short button_count;
-    short button;
+    slot16 button_count;
+    slot16 button;
 
     mc_memset((void *)((iptr)player_class + 16), -1, 12, D_00175420, 88, 12);
     player_class->hp_per_level = 8;
@@ -233,7 +233,7 @@ void classmaker_run(void)
         if (((int)(unsigned char)game_mode) != 8) {
             if (*(short *)classmaker_screen == 0 && mouse_buttons != 0 && mouse_buttons != mouse_buttons_prev) {
                 *(int *)&button = 0;
-                for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
+                for (; (short)(short)*(int *)&button < (short)button_count; (*(int *)&button)++) {
                     if (mouse_x > classmaker_current_buttons[(short)button].x0 && mouse_x < classmaker_current_buttons[(short)button].x1 && mouse_y > classmaker_current_buttons[(short)button].y0 && mouse_y < classmaker_current_buttons[(short)button].y1) {
                         sound_play(203, player_object, 100);
                         classmaker_current_buttons[(short)button].handler();
@@ -242,7 +242,7 @@ void classmaker_run(void)
                 }
             } else if (((int)(unsigned char)(mouse_buttons & 1)) != 0) {
                 *(int *)&button = 0;
-                for (; (short)(short)*(int *)&button < button_count; (*(int *)&button)++) {
+                for (; (short)(short)*(int *)&button < (short)button_count; (*(int *)&button)++) {
                     if (mouse_x > classmaker_current_buttons[(short)button].x0 && mouse_x < classmaker_current_buttons[(short)button].x1 && mouse_y > classmaker_current_buttons[(short)button].y0 && mouse_y < classmaker_current_buttons[(short)button].y1) {
                         sound_play(203, player_object, 100);
                         classmaker_current_buttons[(short)button].handler();
@@ -462,8 +462,8 @@ void classmaker_attribute_down(void)
 
 int classmaker_pick_from_list(iptr names, iptr background)
 {
-    short i;
-    short count;
+    slot16 i;
+    slot16 count;
 
     if (((iptr)(char *)skill_names) == names) {
         *(int *)&i = 0;
@@ -631,22 +631,22 @@ int classmaker_update_advancement(void)
     int disadvantage_cost;
     int multiplier;
     int advantage_cost;
-    short i;
-    short hp_cost;
+    slot16 i;
+    pslot16 hp_cost;
 
     multiplier = 65536;
     advantage_cost = 0;
     *(int *)&i = 0;
-    for (; (short)(short)((int)(unsigned char)classmaker_special_counts[0]) > i; (*(int *)&i)++) {
+    for (; (short)(short)((int)(unsigned char)classmaker_special_counts[0]) > (short)i; (*(int *)&i)++) {
         advantage_cost += *(int *)((classmaker_advantage_costs[((int)(unsigned char)classmaker_specials[((int)(short)i) * 2])] + (((int)(unsigned char)D_00199821[((int)(short)i) * 2]) << 2)));
     }
     disadvantage_cost = 0;
     *(int *)&i = 0;
-    for (; (short)(short)((int)(unsigned char)D_00190D7F) > i; (*(int *)&i)++) {
+    for (; (short)(short)((int)(unsigned char)D_00190D7F) > (short)i; (*(int *)&i)++) {
         disadvantage_cost += *(int *)((classmaker_disadvantage_costs[((int)(unsigned char)D_0019982E[((int)(short)i) * 2])] + (((int)(unsigned char)D_0019982F[((int)(short)i) * 2]) << 2)));
     }
-    *(int *)&hp_cost = (player_class->hp_per_level - 8) * 3277;
-    if (player_class->hp_per_level < 8) *(int *)&hp_cost <<= 1;
+    *(iptr *)&hp_cost = (player_class->hp_per_level - 8) * 3277;
+    if (player_class->hp_per_level < 8) *(iptr *)&hp_cost <<= 1;
     multiplier = (int)(iptr)(*(char **)&hp_cost + ((advantage_cost + 65536) - disadvantage_cost));
     if (multiplier < 6554) multiplier = 6554;
     player_class->advancement_multiplier = multiplier;
@@ -677,7 +677,7 @@ void classmaker_hp_down(void)
 
 int classmaker_skill_taken(short skill)
 {
-    short i;
+    slot16 i;
 
     *(int *)&i = 0;
     for (; ((int)(short)i) < 12; (*(int *)&i)++) {

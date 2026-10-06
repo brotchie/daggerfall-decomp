@@ -42,7 +42,7 @@ extern void xn_str_append_char(char *, int);
 extern void fatal_error(char *);
 extern void class_question_scroll(int *, short);
 extern void text_draw(iptr, int, int);
-int class_question_answer_span(short, short, short *, short *);
+int class_question_answer_span(slot16, slot16, short *, short *);
 
 void class_question_show(int *scroll_cels)
 {
@@ -96,11 +96,11 @@ void class_question_show(int *scroll_cels)
     rsc_text = (char *)(iptr)-1751672937;
 }
 
-void class_question_scroll_step(iptr *scroll_cels, short delta)
+void class_question_scroll_step(iptr *scroll_cels, slot16 delta)
 {
-    if (delta < 0 && *(short *)scratch_190d64 != 0) {
+    if ((short)delta < 0 && *(short *)scratch_190d64 != 0) {
         *(short *)scratch_190d64 += *(int *)&delta;
-    } else if (delta > 0 && *(short *)scratch_190d64 < *(short *)scratch_190d66) {
+    } else if ((short)delta > 0 && *(short *)scratch_190d64 < *(short *)scratch_190d66) {
         *(short *)scratch_190d64 += *(int *)&delta;
     }
     *(int *)frame_counter = (int)(short)(*(short *)scratch_190d64 & 7);
@@ -141,7 +141,7 @@ int class_question_get_answer(void)
     return 0;
 }
 
-int class_question_answer_span(short first_row, short end_row, short *top, short *bottom)
+int class_question_answer_span(slot16 first_row, slot16 end_row, short *top, short *bottom)
 {
     first_row = *(int *)&first_row * font_height;
     end_row = *(int *)&end_row * font_height;
@@ -163,9 +163,9 @@ int class_question_answer_span(short first_row, short end_row, short *top, short
 
 int class_question_pick_class(void)
 {
-    short entry;
+    pslot16 entry;
     int answers;
-    short i;
+    slot16 i;
 
     disk_read_file(D_001753DB, (iptr)scratch_buffer);
     *(iptr *)&entry = (iptr)scratch_buffer + 18;
@@ -173,12 +173,12 @@ int class_question_pick_class(void)
     *(int *)&i = 0;
     for (; ((int)(short)i) < 48; (*(int *)&i)++) {
         if ((*(int *)(*(char **)&entry) & 16777215) == answers) return ((int)(short)i) >> 2;
-        *(int *)&entry += 3;
+        *(iptr *)&entry += 3;
     }
     *(int *)&i = 0;
     for (; ((int)(short)i) < 18; (*(int *)&i)++) {
         if ((*(int *)(*(char **)&entry) & 16777215) == answers) return (((int)(short)i) >> 2) + 12;
-        *(int *)&entry += 3;
+        *(iptr *)&entry += 3;
     }
     fatal_error(D_001753E7);
     return 0;

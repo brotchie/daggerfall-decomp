@@ -33,10 +33,10 @@ int lockpick_door(struct record *);
 
 int archive_open(char *name, iptr directory, int writable)
 {
-    short record_count;
-    short handle;
-    short dir_size;
-    short type;
+    slot16 record_count;
+    slot16 handle;
+    slot16 dir_size;
+    slot16 type;
 
     if (writable != 0) {
         do {

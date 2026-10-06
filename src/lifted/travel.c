@@ -374,7 +374,7 @@ void travel_draw_locations(void)
     int i;
     int x;
     int y;
-    short saved_clip_bottom;
+    slot16 saved_clip_bottom;
 
     location = region_locations;
     *(int *)&saved_clip_bottom = (int)(short)xn_gfx_clip_bottom;

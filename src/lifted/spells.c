@@ -353,7 +353,7 @@ void spellmaker_pick_subtype_cb(int subtype)
 
 int spellmaker_find_effect(short effect_type)
 {
-    short i;
+    slot16 i;
 
     *(int *)&i = 0;
     for (; ((int)(short)i) < 3; (*(int *)&i)++) {
@@ -427,7 +427,7 @@ void spellmaker_settings_close(void)
 
 void spellmaker_effect_rows(void)
 {
-    short row;
+    slot16 row;
 
     *(int *)&row = 0;
     for (; ((int)(short)row) < 3; (*(int *)&row)++) {
@@ -445,7 +445,7 @@ void spellmaker_effect_rows(void)
 
 int list_popup_poll(void)
 {
-    short choice;
+    slot16 choice;
 
     xn_draw_image((int)(short)D_00195F40, (int)(short)D_00195F3E, (int)(short)D_00195F42, (int)(short)D_00195F3C, (char *)((iptr)list_popup_image + 12));
     if (key_down_esc != 0) {
@@ -468,7 +468,7 @@ int list_popup_poll(void)
 
 int spell_icon_cycle(void)
 {
-    short step;
+    slot16 step;
 
     if (((int)(unsigned char)(mouse_buttons & 2)) != 0) {
         *(int *)&step = -1;
@@ -496,12 +496,12 @@ void spell_assign_new_id(void)
     struct spell *spells;
     int i;
     unsigned char id;
-    short is_free;
+    slot16 is_free;
 
     *(int *)&is_free = 0;
     id = 0;
     spells = spell_records;
-    while (is_free == 0) {
+    while ((short)is_free == 0) {
         *(int *)&is_free = 1;
         for (i = 0; ((int)(short)*(short *)&i) < 128; i++) {
             if (spells[*(short *)&i].name[0] == 0) continue;
@@ -511,7 +511,7 @@ void spell_assign_new_id(void)
                 break;
             }
         }
-        if (is_free != 0 && spellbook_has_spell_id((int)(unsigned char)id) != 0) {
+        if ((short)is_free != 0 && spellbook_has_spell_id((int)(unsigned char)id) != 0) {
             id++;
             *(int *)&is_free = 0;
         }
@@ -545,9 +545,9 @@ int spellbook_has_spell_id(unsigned char id)
 
 struct spell *spells_pick_list(void)
 {
-    short choice;
+    slot16 choice;
     struct spell *spells;
-    short i;
+    slot16 i;
     iptr names;
     short unused;
 
@@ -564,7 +564,7 @@ struct spell *spells_pick_list(void)
         if (((int)(short)choice) > (-1)) {
             *(int *)&i = 0;
             while (spells[(int)(short)i].name[0] == 0) (*(int *)&i)++;
-            while (choice != 0) {
+            while ((short)choice != 0) {
                 (*(int *)&i)++;
                 while (spells[(int)(short)i].name[0] == 0) (*(int *)&i)++;
                 (*(int *)&choice)--;
@@ -580,11 +580,11 @@ struct spell *spells_pick_list(void)
 iptr spells_std_name_list(iptr ids)
 {
     iptr names;
-    short id_count;
+    pslot16 id_count;
     struct spell *spells;
-    short i;
+    slot16 i;
     iptr text;
-    short count;
+    slot16 count;
 
     if (ids != 0) *(iptr *)&id_count = (iptr)(memchr((char *)ids, 255, 1000) - ids);
     names = (iptr)scratch_buffer + 20000;
@@ -601,7 +601,7 @@ iptr spells_std_name_list(iptr ids)
         text += strlen((char *)text) + 1;
     }
     *(int *)((char *)((((int)(short)count) << 2) + names)) = 0;
-    if (count == 0) return 0;
+    if ((short)count == 0) return 0;
     return names;
 }
 

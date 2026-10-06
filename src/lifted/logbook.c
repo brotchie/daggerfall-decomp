@@ -109,7 +109,7 @@ void logbook_draw_entry(char *text)
 {
     int unused2;
     int unused1;
-    short line_height;
+    slot16 line_height;
 
     D_0012B508 = 146;
     line_height = font_height;

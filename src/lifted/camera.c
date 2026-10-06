@@ -3,6 +3,7 @@
  * tables from the start of the file, so moving functions can change the code. */
 #include "ptrint.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern signed char key_down_backslash;
 extern char D_00170194[];
@@ -31,8 +32,8 @@ void screenshot_poll(void)
 void screenshot_save_bmp(char *filename)
 {
     iptr buffer;
-    short i;
-    short fd;
+    slot16 i;
+    slot16 fd;
 
     buffer = (iptr)mc_malloc(768, D_00170194, 67);
     xn_pal_read_dac((char *)buffer);
@@ -51,7 +52,7 @@ void screenshot_save_bmp(char *filename)
             mc_free((void *)buffer, D_00170194, 82);
             buffer = -1751672937;
         }
-        buffer = 655360;
+        buffer = (iptr)DOS_LOW(0xA0000);
         buffer += 63680;
         *(int *)&i = 0;
         for (; ((int)(short)i) < 200; (*(int *)&i)++) {

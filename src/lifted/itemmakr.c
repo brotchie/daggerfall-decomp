@@ -189,10 +189,10 @@ void itemmaker_side_effects_click(void)
     itemmaker_remove_slot((int)(short)itemmaker_row_slot(1));
 }
 
-void itemmaker_set_side_effect_param_cb(short param)
+void itemmaker_set_side_effect_param_cb(slot16 param)
 {
-    short exclusion_row;
-    short choice;
+    slot16 exclusion_row;
+    slot16 choice;
 
     *(int *)&choice = *(int *)&param;
     if (itemmaker_slots[(int)(short)*(short *)scratch_190d64].type == 0) {
@@ -202,7 +202,7 @@ void itemmaker_set_side_effect_param_cb(short param)
     }
     itemmaker_slots[(int)(short)*(short *)scratch_190d64].param = *(int *)&param;
     *(int *)&exclusion_row = (int)(unsigned char)*(signed char *)(D_0018597F + ((int)(short)*(short *)scratch_190d66));
-    if (exclusion_row == 0) {
+    if ((short)exclusion_row == 0) {
         func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)(*(short *)scratch_190d66 + 15), (int)(short)choice, -1, -1, -1, -1);
         return;
     }

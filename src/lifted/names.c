@@ -73,7 +73,7 @@ iptr name_generate(unsigned char bank, unsigned char female)
 
 iptr name_generate_first(unsigned char bank, unsigned char female)
 {
-    short part;
+    slot16 part;
 
     {
         int default_part;

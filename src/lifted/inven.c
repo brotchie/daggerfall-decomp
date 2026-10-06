@@ -217,7 +217,7 @@ extern void poison_apply(struct record *, int, int);
 extern void weapon_reload_hand_sprites(void);
 extern void book_read_header(iptr, unsigned short);
 extern void text_draw_coloured(iptr, int, int, int, unsigned char);
-extern void size_fit(short *, short *, short, short);
+extern void size_fit(short *, short *, slot16, slot16);
 extern void object_free_pending(void);
 extern void msgbox_yes_no_rsc(int);
 extern void gold_add(int);
@@ -544,11 +544,11 @@ void inv_draw_container_icon(int button, int icon)
 void func_00093BD9(iptr unused, struct rect *buttons, int button)
 {
     struct image *image;
-    short centre_x;
-    short centre_y;
+    slot16 centre_x;
+    slot16 centre_y;
     short width;
     short height;
-    short i;
+    slot16 i;
 
     *(int *)&centre_x = (buttons[button].x0 + buttons[button].x1) >> 1;
     *(int *)&centre_y = (buttons[button].y0 + buttons[button].y1) >> 1;
@@ -780,7 +780,7 @@ void inv_use_item(void)
     struct record *monster;
     int i;
     int used;
-    short saved_spell;
+    slot16 saved_spell;
 
     used = 0;
     object = inv_selected_item;
@@ -1345,7 +1345,7 @@ int trade_base_price(int price)
 
 void shop_quality_message(struct building *building)
 {
-    short text_id;
+    slot16 text_id;
 
     D_0012B508 = 146;
     if (building->quality <= 3) {

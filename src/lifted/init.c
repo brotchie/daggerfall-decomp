@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern char disk_last_file_size[];
 extern int xn_cam_x;
@@ -234,7 +235,7 @@ void debug_show_mem_used(void)
 {
     struct bf8_0_5 *ticks_addr;
 
-    ticks_addr = (struct bf8_0_5 *)1132;
+    ticks_addr = (struct bf8_0_5 *)DOS_LOW(0x46C);
     if (ticks_addr->f == 0) {
         dpmi_get_free_memory((iptr)D_001A3F60);
         D_001A3F9C = D_001A3F90 - (D_001A3F7C << 2);

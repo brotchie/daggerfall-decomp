@@ -21,7 +21,7 @@ extern void func_0005A1C8(char *);
 
 void book_draw_page(int page)
 {
-    short line_height;
+    slot16 line_height;
     {
         char *text;
 

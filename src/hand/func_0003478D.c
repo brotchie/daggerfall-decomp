@@ -77,7 +77,7 @@ void sky_update(void)
     int unused5;
     unsigned char sun_placed;
 
-    *(struct vec3 *)&point_x = *(struct vec3 *)D_000346B8;
+    VEC3_LOCALS_SET(point_x, point_y, point_z, D_000346B8);
     sun_placed = 0;
     if (D_00187CA8 == 0) return;
     if (((int)player_environment) == 3) {
@@ -181,7 +181,7 @@ void sky_update(void)
         return;
     }
     moons_visible = 0;
-    mc_memcpy(&moon_x, moon0_direction, 12, D_00170A86, 271, 4);
+    VEC3_LOCALS_MEMCPY(moon_x, moon_y, moon_z, moon0_direction, D_00170A86, 271);
     xn_mat_transform_ptr(&moon_x, &moon_y, &moon_z, xn_cam_rotation);
     if (moon_z > 100) {
         xn_cam_project_ptr(moon_x, moon_y, moon_z, &screen_x, &screen_y);
@@ -189,7 +189,7 @@ void sky_update(void)
         moon0_image->y = (((int)(short)xn_cam_centre_y) + screen_y) - (moon0_image->height >> 1);
         moons_visible |= 1;
     }
-    mc_memcpy(&moon_x, moon1_direction, 12, D_00170A86, 281, 4);
+    VEC3_LOCALS_MEMCPY(moon_x, moon_y, moon_z, moon1_direction, D_00170A86, 281);
     xn_mat_transform_ptr(&moon_x, &moon_y, &moon_z, xn_cam_rotation);
     if (moon_z > 100) {
         xn_cam_project_ptr(moon_x, moon_y, moon_z, &screen_x, &screen_y);

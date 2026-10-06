@@ -7,7 +7,7 @@
 extern int rand_range(int, int);
 extern struct record *object_create_child(struct record *, struct record *, int);
 extern int object_new_id(int);
-extern void item_make_in_range(unsigned short, int, int, struct item *);
+extern void item_make_in_range(uslot16, int, int, struct item *);
 
 struct record *monster_make_item(struct record *monster, int group, int index_lo, int index_hi, int excluded_index, int chance)
 {

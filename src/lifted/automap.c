@@ -124,7 +124,7 @@ extern void automap_add_note(struct record *, char *);
 extern void town_map_open(void);
 extern void town_map_scroll(int);
 extern void town_note_add(char *);
-extern void quest_set_state(struct quest *, struct qbn_op *, short);
+extern void quest_set_state(struct quest *, struct qbn_op *, slot16);
 extern void quest_set_arg_state(struct quest *, struct qbn_op *, int, int);
 extern void qaction_place_foe(struct qbn_op *, struct qbn_place *);
 extern void text_draw(char *, int, int);

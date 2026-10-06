@@ -4,6 +4,7 @@
 #include "records.h"
 #include "bitfield.h"
 #include "clib.h"
+#include "doslow.h"
 
 extern int D_000C5404;
 extern int xn_sin_table[];
@@ -245,7 +246,7 @@ void world_draw_objects(void)
     struct record *next;
     struct record *block;
     struct record *children;
-    unsigned short flags;
+    uslot16 flags;
 
     D_001A949C = climate_weathers[climate_category()];
     model_cache_flush_count = 0;
@@ -329,7 +330,7 @@ int automap_draw_object_cb(struct record *object)
     int i;
     int unused3;
     int unused4;
-    short ticks_addr;
+    pslot16 ticks_addr;
 
     if (model_cache_flush_count != 0) return 1;
     if ((object->flags & 512) != 0) return 0;
@@ -339,7 +340,7 @@ int automap_draw_object_cb(struct record *object)
         } else {
             if ((object->flags & 128) == 0 && ((struct bf8_4_1 *)&cheat_flags)->f == 0) return 0;
             if (object->type != 6 && object->type != 32) return 0;
-            *(int *)&ticks_addr = 1132;
+            *(iptr *)&ticks_addr = (iptr)DOS_LOW(0x46C);
             if ((iptr)D_00196DB0 == (iptr)object && ((struct bf8_3_1 *)(*(char **)&ticks_addr))->f == 0) {
                 return 0;
             }

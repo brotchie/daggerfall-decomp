@@ -16,11 +16,11 @@ extern void func_00057147(short, short, short, short, short, short, short);
 
 void itemmaker_set_power_param_cb(int param)
 {
-    short exclusion_row;
+    slot16 exclusion_row;
 
     itemmaker_slots[(int)(short)*(short *)scratch_190d64].param = param;
     *(int *)&exclusion_row = (int)(unsigned char)*(signed char *)(D_00185766 + ((int)(short)*(short *)scratch_190d66));
-    if (exclusion_row == 0) {
+    if ((short)exclusion_row == 0) {
         func_00057147((int)(short)*(short *)scratch_190d64, (int)(short)*(short *)scratch_190d66, (int)(short)*(short *)&param, -1, -1, -1, -1);
         return;
     }

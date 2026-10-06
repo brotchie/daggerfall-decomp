@@ -308,7 +308,7 @@ void note_prev_page(void)
 
 void note_next_page(void)
 {
-    short page_count;
+    slot16 page_count;
 
     *(int *)&page_count = ((unsigned)lseek((int)(short)note_file, 0, 2)) / 3640;
     note_save_page();
@@ -375,8 +375,8 @@ int note_find_match_cb(struct note_text *entry)
 void note_find(void)
 {
     int unused;
-    short page_count;
-    short start_page;
+    slot16 page_count;
+    slot16 start_page;
 
     if (((int)(unsigned char)game_mode) != 9 || ((int)(short)(*(short *)note_text_flags & 128)) == 0 || *(signed char *)(((char *)note_search_text)) == 0) {
         return;
@@ -390,7 +390,7 @@ void note_find(void)
     } else {
         note_selected = note_page;
     }
-    while (note_page_index < page_count) {
+    while (note_page_index < (short)page_count) {
         note_load_page();
         if (note_page_walk((iptr)note_selected, (iptr)note_find_match_cb, 0) != 0) goto L4E6F9;
         note_page_index++;
