@@ -352,9 +352,23 @@ volatile unsigned long vpc_frame_yields;
 void xn_int2f(struct vpc_regs *r)
 {
     if (AX(r) == 0x1680) {      /* release the time slice: the game's loop does once a frame */
+        /* at most one frame a VGA refresh (70 Hz): what a frame was waiting for on a PC is
+           done in a fraction of that here, and the rest would only spin (PORT_FRAME_CAP=0
+           turns it off) */
+        static Uint64 last;
+        static int cap = -1;
+        Uint64 now = SDL_GetTicksNS(), period = 14285714ull;
+        if (cap < 0) {
+            const char *e = getenv("PORT_FRAME_CAP");
+            cap = !(e != NULL && strcmp(e, "0") == 0);
+        }
         vpc_frame_yields++;
         vpc_poll();
-        SDL_DelayNS(100000);
+        if (cap && last != 0 && now - last < period)
+            SDL_DelayNS(period - (now - last));
+        else
+            SDL_DelayNS(100000);
+        last = SDL_GetTicksNS();
         SET8L(r->eax, 0);
         return;
     }

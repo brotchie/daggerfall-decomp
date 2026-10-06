@@ -385,6 +385,15 @@ static void mouse_service(struct vpc_regs *r);
 
 void vpc_mouse_service(struct vpc_regs *r)
 {
+    /* a menu waits for a click by polling the driver as fast as it can: about once a
+       millisecond is plenty, and spares a core */
+    if ((r->eax & 0xFFFF) == 0x0003) {
+        static Uint64 last;
+        Uint64 now = SDL_GetTicksNS();
+        if (now - last < 1000000)
+            SDL_DelayNS(1000000 - (now - last));
+        last = SDL_GetTicksNS();
+    }
     SDL_LockMutex(mouse_lock);
     mouse_service(r);
     SDL_UnlockMutex(mouse_lock);

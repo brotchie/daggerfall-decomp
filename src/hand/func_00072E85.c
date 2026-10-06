@@ -64,7 +64,8 @@ void weapon_player_update(void)
         return;
     }
     if (D_001A4A30[((int)(unsigned char)weapon_active_hand)] != 0) {
-        color_remap = (iptr)((char *)color_remap_tables + (((int)(unsigned char)*(signed char *)((char *)D_001A4A30[((int)(unsigned char)weapon_active_hand)] + 127)) << 8));
+        /* the item's colour: its data's +56 (the record's header first) */
+        color_remap = (iptr)((char *)color_remap_tables + (((int)(unsigned char)*(signed char *)((char *)D_001A4A30[((int)(unsigned char)weapon_active_hand)] + RECORD_HEADER_SIZE + 56)) << 8));
     }
     if (((struct bf8_6_1 *)&D_001940D6)->f != 0 && D_001A4A70[((int)(unsigned char)weapon_active_hand)] == 0) {
         cif = weapon_hand_cif[((int)(unsigned char)weapon_active_hand)];
