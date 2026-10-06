@@ -42,7 +42,7 @@ void func_000A117E(void *block);
 /* (p + align - 1) rounded down to a multiple of align (a power of 2). init_game_data and
    color_init_remap_tables align their 256-byte tables (water.tbl, haze.000/001): p is an
    address (uptr). */
-uptr xn_mem_align_up(uptr p, uptr align);
+uptr xn_mem_align_up(uptr p, u32 align);
 
 /* init_video: the work buffer (size + 32 bytes, at least 64K: its start aligned to 32 bytes;
    without the memory: the keyboard, joystick and video put back, 'SYSTEM: Unable to

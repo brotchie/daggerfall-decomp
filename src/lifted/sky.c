@@ -109,7 +109,22 @@ void sky_apply_sunlight(void)
     x = player_object->x + sun_direction;
     y = player_object->y + D_001985CC;
     z = player_object->z + D_001985D0;
+#ifdef DAGGER_PORT
+    {
+        /* the engine normalises the vector at its argument: x, y and z were consecutive locals
+           under Watcom; natively they are a vector here */
+        int v[3];
+        v[0] = x;
+        v[1] = y;
+        v[2] = z;
+        xn_vec_normalize_ptr(v, 0, 0);
+        x = v[0];
+        y = v[1];
+        z = v[2];
+    }
+#else
     xn_vec_normalize_ptr(&x, (iptr)&y, (iptr)&z);
+#endif
     xn_light_add(-x, y, -z, sun_light, 0, 8);
 }
 

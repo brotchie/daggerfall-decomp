@@ -10,9 +10,9 @@
 #define WORK_MIN        0x10000         /* the work buffer's least size */
 #define WORK_ALIGN      0x20
 
-uptr xn_mem_align_up(uptr p, uptr align)
+uptr xn_mem_align_up(uptr p, u32 align)
 {
-    return (p + align - 1) & ~(align - 1);
+    return (p + align - 1) & ~(uptr)(align - 1);
 }
 
 /* The 'SYSTEM:' fatal error: msg ('$'-terminated) printed and the program ended */
