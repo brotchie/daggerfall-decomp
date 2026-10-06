@@ -165,7 +165,7 @@ int quest_init_resources(struct quest *quest)
     int i;
     int pass_count;
     int record_index;
-    short arg_index;
+    slot16 arg_index;
     int section;
     short unused;
 
@@ -293,7 +293,7 @@ int func_000337AD(struct location_door *door, struct qbn_place *place, struct bu
 int quest_place_object(struct record *object, struct qbn_place *place)
 {
     struct record *site;
-    short saved_faction_id;
+    slot16 saved_faction_id;
 
     if (place == 0) {
         if (spawn_find_point(object, 512, 1024) != 0) {

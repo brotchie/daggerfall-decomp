@@ -6,7 +6,7 @@ extern struct flat_cfg flats_cfg[];
 extern iptr scratch_buffer;
 extern int flats_cfg_count;
 extern void cfg_read_line(int *, char *);
-extern int cfg_read_number(int *);
+extern int cfg_read_number(iptr *);
 extern iptr disk_read_file(char *, iptr);
 
 void flats_cfg_load(void)

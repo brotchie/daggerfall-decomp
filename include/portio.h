@@ -114,11 +114,6 @@ int persist_block_disk_size(const void *record);
 int persist_qbn_file_size(void *file, int n);
 void persist_qbn_file_copy(void *dst, void *file, int n);
 
-/* pointer-sized table slots */
-#define PTR_SIZE 8
-#define PTR_SHIFT 3
-/* a short local that the code uses as a 4-byte slot for an address (*(iptr *)&local) */
-#define SHORT_SLOT iptr
 
 #else /* Watcom: the original expressions */
 
@@ -154,9 +149,6 @@ void persist_qbn_file_copy(void *dst, void *file, int n);
 #define PORT_QBN_SIZE(file, n) n
 #define PORT_QBN_COPY(dst, file, n, srcfile, line) mc_memcpy(dst, (void *)file, n, srcfile, line, 4)
 
-#define PTR_SIZE 4
-#define PTR_SHIFT 2
-#define SHORT_SLOT short
 
 #endif
 

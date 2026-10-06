@@ -591,14 +591,14 @@ iptr rumor_collect_local(void)
 
 iptr rumor_pick_news(short faction_id)
 {
-    SHORT_SLOT rumor;
+    pslot16 rumor;
     struct {
         int rolls[4];               /* +0x00: rumor_is_eligible's roll, by index & 3 */
         int count;                  /* +0x10 */
         iptr *found;                /* +0x14: the eligible rumors */
         iptr end;                    /* +0x18 */
     } state;
-    SHORT_SLOT index;
+    pslot16 index;
 
     state.count = 0;
     *(int *)&index = 0;

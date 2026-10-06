@@ -1497,10 +1497,10 @@ void func_000193DD(struct faction *faction)
     int i;
 
     while (faction != 0) {
-        if ((iptr)faction == *(int *)scratch_190be4) *(signed char *)D_00195B84 |= 1;
+        if ((iptr)faction == *(iptr *)scratch_190be4) *(signed char *)D_00195B84 |= 1;
         for (i = 0; i < 3; i++) {
-            if ((iptr)faction->allies[i] == *(int *)scratch_190be4) *(signed char *)D_00195B84 |= 1;
-            if ((iptr)faction->enemies[i] == *(int *)scratch_190be4) *(signed char *)D_00195B84 |= 2;
+            if ((iptr)faction->allies[i] == *(iptr *)scratch_190be4) *(signed char *)D_00195B84 |= 1;
+            if ((iptr)faction->enemies[i] == *(iptr *)scratch_190be4) *(signed char *)D_00195B84 |= 2;
         }
         if (faction->child != 0) func_000193DD(faction->child);
         faction = faction->next;

@@ -79,6 +79,11 @@ TYPES = {
     # (scratch_190de8 ..., D_00190E18 ...) inside it, all zero in FALL.EXE: natively 512 bytes,
     # the slots at twice their offsets
     "scratch_190de4": "iptr __v[64]",
+    # the next 256 bytes: a table of 64 pointers too (spell and item-maker lists)
+    "scratch_190ee4": "iptr __v[64]",
+    # an int slot that also keeps a pointer (talk.c's faction target; potions' item list
+    # starts here and runs over the slots after it, as in DOS)
+    "scratch_190be4": "iptr __v",
 }
 
 DECL = re.compile(r"^extern\s+((?:const\s+|volatile\s+|signed\s+|unsigned\s+|struct\s+|union\s+)*"

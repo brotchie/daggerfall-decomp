@@ -276,7 +276,7 @@ void classmaker_run(void)
     mc_free((void *)scratch_190df8, D_00175420, 222);
     mc_free((void *)scratch_190dfc, D_00175420, 223);
     mc_free((void *)D_00190E00, D_00175420, 224);
-    mc_memset(scratch_190de4, 0, 512, D_00175420, 226, 512);
+    mc_memset(scratch_190de4, 0, 128 * PTR_SIZE, D_00175420, 226, 512);
 }
 
 void classmaker_exit_button(void)

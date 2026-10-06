@@ -597,10 +597,10 @@ iptr spells_std_name_list(iptr ids)
         if (spells[(int)(short)i].name[0] == 0) continue;
         if (ids != 0) if (memchr((char *)ids, spells[(int)(short)i].id, (int)(short)id_count) == 0) continue;
         mc_strncpy((char *)text, spells[(int)(short)i].name, 4, D_00170B13, 1587);
-        *(iptr *)(((char *)names + (((int)(short)(*(int *)&count)++) << 2))) = text;
+        *(iptr *)(((char *)names + (((int)(short)(*(int *)&count)++) << PTR_SHIFT))) = text;
         text += strlen((char *)text) + 1;
     }
-    *(int *)((char *)((((int)(short)count) << 2) + names)) = 0;
+    *(iptr *)((char *)((((int)(short)count) << PTR_SHIFT) + names)) = 0;
     if ((short)count == 0) return 0;
     return names;
 }

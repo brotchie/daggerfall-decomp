@@ -177,7 +177,7 @@ void qaction_op37_repute_exceeds(struct quest *quest, struct qbn_op *op)
     struct faction *faction;
     struct qbn_state *state;
     int exceeds;
-    short person_faction;
+    slot16 person_faction;
 
     if (op->args[1].value == (-1)) return;
     person = op->args[2].object;

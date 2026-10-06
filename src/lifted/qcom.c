@@ -78,7 +78,7 @@ extern void qaction_op12_start_stop_timer(struct quest *, struct qbn_op *, short
 extern void qaction_op35_cycle_state(struct quest *, struct qbn_op *);
 extern void qaction_op34_pick_one_state(struct quest *, struct qbn_op *);
 extern void qaction_op29_prompt(struct quest *, struct qbn_op *);
-extern void quest_set_state(struct quest *, struct qbn_op *, short);
+extern void quest_set_state(struct quest *, struct qbn_op *, slot16);
 extern void quest_set_arg_state(struct quest *, struct qbn_op *, int, int);
 extern void qaction_op04_give_reward(struct quest *, struct qbn_op *);
 extern void qaction_op19_reveal_location(struct quest *, struct qbn_op *, int);

@@ -11,7 +11,7 @@ extern void xn_mouse_cursor_draw(void);
 extern void xn_draw_image_transparent(int, int, int, int, char *);
 extern void class_question_scroll_step(iptr *, slot16);
 
-void class_question_scroll(int *scroll_cels, short delta)
+void class_question_scroll(iptr *scroll_cels, short delta)
 {
     xn_mouse_cursor_erase();
     class_question_scroll_step(scroll_cels, delta);

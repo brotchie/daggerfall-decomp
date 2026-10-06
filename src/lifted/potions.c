@@ -120,8 +120,8 @@ void potion_recipe_list_cb(struct record *object)
     if (object->type != 2) return;
     item = &object->data.item;
     if (item->group != 27 || item->index != 4) return;
-    *(iptr *)(scratch_190be4 + (*(int *)D_00195B84 << 2)) = (iptr)item;
-    *(iptr *)(scratch_190de4 + ((*(int *)D_00195B84)++ << 2)) = (((iptr)potion_recipes) + (item->stack_count * 109)) + 67;
+    *(iptr *)(scratch_190be4 + (*(int *)D_00195B84 << PTR_SHIFT)) = (iptr)item;
+    *(iptr *)(scratch_190de4 + ((*(int *)D_00195B84)++ << PTR_SHIFT)) = (((iptr)potion_recipes) + (item->stack_count * 109)) + 67;
 }
 
 void potionmaker_recipes(void)
@@ -136,7 +136,7 @@ void potionmaker_recipes(void)
         potion_make(*(struct item **)scratch_190be4);
         return;
     }
-    *(int *)(scratch_190de4 + (*(int *)D_00195B84 << 2)) = 0;
+    *(iptr *)(scratch_190de4 + (*(int *)D_00195B84 << PTR_SHIFT)) = 0;
     list_popup_open((iptr)scratch_190de4);
     sound_play(205, player_object, 100);
 }

@@ -109,7 +109,7 @@ void itemmaker_reset(void);
 void itemmaker_store_item(void);
 void itemmaker_remove_slot(short);
 void itemmaker_soul_list_cb(struct record *);
-void itemmaker_show_list(int *, int);
+void itemmaker_show_list(iptr *, int);
 void itemmaker_consume_soul(void);
 void itemmaker_write_item_file(void);
 void itemmaker_clear_soul_slots(void);
@@ -181,7 +181,7 @@ void itemmaker_add_powers(void)
         return;
     }
     list_popup_callback = (iptr)itemmaker_add_power_cb;
-    itemmaker_show_list((int *)(char *)enchant_power_names, 0);
+    itemmaker_show_list((iptr *)(char *)enchant_power_names, 0);
 }
 
 void itemmaker_side_effects_click(void)
@@ -219,7 +219,7 @@ void itemmaker_add_side_effects(void)
         return;
     }
     list_popup_callback = (iptr)itemmaker_add_side_effect_cb;
-    itemmaker_show_list((int *)(char *)enchant_side_effect_names, 15);
+    itemmaker_show_list((iptr *)(char *)enchant_side_effect_names, 15);
 }
 
 void itemmaker_return_item(void)
@@ -304,7 +304,7 @@ void itemmaker_soul_list_cb(struct record *soul)
     if (soul->type != 20 || *(int *)D_00195B84 > 62) return;
     if (D_00190D63 == soul->soul_creature) scratch_object = soul;
     text_rsc_buffer[*(int *)D_00195B84] = (signed char)soul->soul_creature;
-    *(iptr *)(scratch_190ee4 + ((*(int *)D_00195B84)++ << 2)) = D_00190EDC;
+    *(iptr *)(scratch_190ee4 + ((*(int *)D_00195B84)++ << PTR_SHIFT)) = D_00190EDC;
     mc_strncpy((char *)D_00190EDC, monster_names[soul->soul_creature], 4, D_001756A3, 526);
     next_name = D_00190EDC;
     next_name += strlen(monster_names[soul->soul_creature]) + 1;
@@ -328,7 +328,7 @@ int itemmaker_pick_param_list(iptr list_kind)
             msgbox_show_string(D_001756EC, 1);
             return 0;
         }
-        *(int *)(scratch_190ee4 + (*(int *)D_00195B84 << 2)) = 0;
+        *(iptr *)(scratch_190ee4 + (*(int *)D_00195B84 << PTR_SHIFT)) = 0;
         itemmaker_show_param_list((iptr)scratch_190ee4, 1000);
     }
     return 1;
@@ -359,7 +359,7 @@ int itemmaker_free_slot_count(void)
     return count;
 }
 
-void itemmaker_show_list(int *names, int type)
+void itemmaker_show_list(iptr *names, int type)
 {
     int slot;
     int index;
@@ -380,7 +380,7 @@ void itemmaker_show_list(int *names, int type)
                 } else if (((int)(short)*(short *)&type) == 21 && itemmaker_has_health_leech() != 0) {
                 } else {
                     *(signed char *)((char *)(((int)(short)*(short *)&count) + scratch_buffer) + 64000) = *(signed char *)&index;
-                    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&count) << 2)) = *names;
+                    *(iptr *)(scratch_190ee4 + (((int)(short)*(short *)&count) << PTR_SHIFT)) = *names;
                     count++;
                 }
             }
@@ -390,7 +390,7 @@ L576C2:;
         (*(short *)&index)++;
         type++;
     }
-    *(int *)(scratch_190ee4 + (((int)(short)*(short *)&count) << 2)) = 0;
+    *(iptr *)(scratch_190ee4 + (((int)(short)*(short *)&count) << PTR_SHIFT)) = 0;
     list_popup_open((iptr)scratch_190ee4);
 }
 

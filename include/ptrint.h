@@ -44,4 +44,14 @@ typedef unsigned short upslot16;
 #define VEC3_LOCALS_SET(x, y, z, src) (*(struct vec3 *)&(x) = *(struct vec3 *)(src))
 #define VEC3_LOCALS_MEMCPY(x, y, z, src, file, line) mc_memcpy(&(x), (src), 12, (file), (line), 4)
 #endif
+/* the size of a pointer, and its shift: the stride of a table of addresses the code indexes
+   by hand (`table + (i << PTR_SHIFT)`) */
+#ifdef DAGGER_PORT
+#define PTR_SIZE 8
+#define PTR_SHIFT 3
+#else
+#define PTR_SIZE 4
+#define PTR_SHIFT 2
+#endif
+
 #endif

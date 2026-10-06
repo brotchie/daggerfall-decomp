@@ -224,6 +224,31 @@ each with a Python reference model.
   BIOS tick, VGA memory) go through `DOS_LOW()` (include/doslow.h), with FALL.EXE
   byte-identical.
 
+**2026-10-05, saves and sizes (step 1 of the plan after phase 3): done.**
+- **Save and data files** (f71d9cc): every struct the game reads or writes in its 32-bit
+  layout goes through a converter natively (port/include/disk.h, port/shim/persist.c), hooked
+  by macros that are the original code under Watcom (include/portio.h). The DOS formats are
+  kept bit for bit: classic saves load, and the game's own saves stay DOS Daggerfall's.
+  `port/test/savetest` runs 868,399 checks:
+  - 16,465 records of the 18 classic saves round-trip, and their SAVETREE.DAT and SAVEVARS.DAT
+    come back identical through the game's hooks;
+  - MAPS.BSA, BLOCKS.BSA's RMB blocks and the QBN files convert, with fields checked.
+- **Sizes** (c92e896): about 180 struct sizes, strides and offsets written as numbers are now
+  `REC_SIZEOF`/`REC_OFFSETOF`/fields (records.h). `tools/port_sizes.py check` confirms each is
+  the old number under i386.
+- **Narrow frame slots** (911d2cd and the cleanup after it): locals the code reaches through
+  a wider type (`short x; *(int *)&x = v;`) use include/ptrint.h's `slot16`/`pslot16`, the
+  declared type under Watcom and room enough natively. More hidden BIOS-tick and VGA addresses
+  now go through `DOS_LOW`. `tools/port_slots.py` finds none left.
+- **Pointer tables at a 4-byte stride** use `PTR_SHIFT`/`PTR_SIZE` (ptrint.h): the list
+  popups' scratch tables (scratch_190be4/de4/ee4, typed for the data generator), the talk
+  lines, the spell and item-maker lists.
+- **Left:**
+  - 510 relocated pointers in 18 globals whose neighbours have no symbols, and 70
+    declaration disagreements: lists in `build/port/agents/x64/`;
+  - natively written saves have not been loaded by DOS or Daggerfall Unity yet;
+  - none of this has run in the game yet. The engine is the remaining blocker.
+
 The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a pointer:
 
 | Kind | Count | Files |

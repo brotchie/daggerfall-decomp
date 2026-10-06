@@ -40,7 +40,7 @@ extern void xn_draw_cel_frame(void *, int, int);
 extern void xn_str_copy_until(char *, char *, int);
 extern void xn_str_append_char(char *, int);
 extern void fatal_error(char *);
-extern void class_question_scroll(int *, short);
+extern void class_question_scroll(iptr *, short);
 extern void text_draw(iptr, int, int);
 int class_question_answer_span(slot16, slot16, short *, short *);
 

@@ -784,7 +784,7 @@ void spfx_dispel_magic_cb(int row)
     int chance;
     struct record *spell;
 
-    spell = *(struct record **)(scratch_190ee4 + (row << 2));
+    spell = *(struct record **)(scratch_190ee4 + (row << PTR_SHIFT));
     if (spell->caster != player_entity) {
         level_bonus = (player_character->level - spell->caster->data.character.level) * 5;
         chance = level_bonus + selected_spell->cast_chances[D_001A99F4];

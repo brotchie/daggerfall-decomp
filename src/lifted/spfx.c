@@ -111,13 +111,13 @@ void spfx_dispel(struct record *spell, int slot, struct record *target)
             if (active->type == 9) {
                 active_data = &active->data.spell;
                 mc_strncpy((char *)text, active_data->name, 4, D_00176D55, 284);
-                *(iptr *)(scratch_190ee4 + (count << 2)) = (iptr)active;
-                *(iptr *)(scratch_190de4 + (count++ << 2)) = text;
+                *(iptr *)(scratch_190ee4 + (count << PTR_SHIFT)) = (iptr)active;
+                *(iptr *)(scratch_190de4 + (count++ << PTR_SHIFT)) = text;
                 text += strlen(active_data->name) + 1;
             }
             active = active->next;
         }
-        *(int *)(scratch_190de4 + (count << 2)) = 0;
+        *(iptr *)(scratch_190de4 + (count << PTR_SHIFT)) = 0;
         spfx_show_choice_list((iptr)scratch_190de4, (iptr)spfx_dispel_magic_cb);
         selected_spell = spell_data;
         D_001A99F4 = slot;

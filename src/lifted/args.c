@@ -199,7 +199,7 @@ void config_read(char *path)
                 } else if (stricmp(key, D_00176B33) == 0) {
                     cfg_stereo = atoi(value);
                 } else if (stricmp(key, D_00176B3A) == 0) {
-                    object_heap_size = atoi(value) << 10;
+                    object_heap_size = NATIVE_HEAP_BYTES(atoi(value) << 10);
                 } else if (stricmp(key, D_00176B45) == 0) {
                     cfg_texture_memory = atoi(value);
                 } else if (stricmp(key, D_00176B53) == 0) {

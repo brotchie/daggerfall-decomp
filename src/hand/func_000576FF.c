@@ -1,14 +1,14 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x000576FF */
 #include "records.h"
 extern short scratch_190d64;
-extern int scratch_190ee4[];
+extern iptr scratch_190ee4[];
 extern char *scratch_buffer;
 extern struct magic_enchantment D_00199868[][5];   /* itemmaker_slot_exclusions */
 extern struct enchantment itemmaker_slots[];
 extern int itemmaker_param_excluded(int, int);
-extern void list_popup_open(int *);
+extern void list_popup_open(iptr *);
 
-void itemmaker_show_param_list(int *names, short type)
+void itemmaker_show_param_list(iptr *names, short type)
 {
     short i;
     unsigned short index;
