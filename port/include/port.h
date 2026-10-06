@@ -27,7 +27,10 @@
 #define filelength(...) port_filelength(__VA_ARGS__)
 #define fopen(...) port_fopen(__VA_ARGS__)
 #define fclose(...) port_fclose(__VA_ARGS__)
-#define fprintf(...) port_fprintf(__VA_ARGS__)
+/* FALL.EXE's 0xA16F8, named fprintf in config/names.csv, is sscanf (the sscanf module:
+   cget_string 0xA16A4, vsscanf 0xA16D1; fprintf, fscanf and sscanf are the same bytes once
+   relocations are masked). The game's one call, in kludge.c, is sscanf(version, "%d", &build). */
+#define fprintf(...) port_sscanf(__VA_ARGS__)
 #define rand(...) port_rand(__VA_ARGS__)
 #define srand(...) port_srand(__VA_ARGS__)
 #define exit(...) port_exit(__VA_ARGS__)

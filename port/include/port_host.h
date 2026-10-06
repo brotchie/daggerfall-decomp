@@ -20,4 +20,11 @@ void host_shutdown(void);
 /* a symbol the native build does not provide yet: logs its name and stops (port/gen stubs) */
 void port_unimplemented(const char *name) __attribute__((noreturn));
 
+/* stops with a message and the call chain (port/host/main.c) */
+void port_fatal(const char *fmt, ...) __attribute__((noreturn, format(printf, 1, 2)));
+
+/* stops when p is a pointer that lost its top half on the way (an int in the game's C:
+   docs/port.md, phase 3): nothing the host maps lies below 4 GB */
+void port_check_ptr(const void *p, const char *what);
+
 #endif

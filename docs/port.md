@@ -23,14 +23,17 @@ work on `main`.
 |---|---|
 | `port/CMakeLists.txt` | the native build: the game's C as an object library, the shims, the generated definitions, SDL3 |
 | `port/include/port.h` | included ahead of every game file: Watcom's far-pointer keywords become nothing, and the C library calls whose DOS behaviour differs go to `port/shim` (function-like macros, so a parameter named `close` stays) |
-| `port/include/dos.h`, `i86.h` | Watcom's `REGS`, `SREGS` and `find_t` with Watcom's layouts; no segments (`FP_SEG` is 0) |
-| `port/shim/libc.c` | Watcom's `rand` (so a native run can follow an emulated one), `itoa`, `utoa`, `stricmp`, `strnicmp`, `exit` |
-| `port/shim/memcheck.c` | MemCheck's `mc_*` replacements, passed to the C library |
-| `port/shim/dosfile.c` | DOS files: `C:\` and relative paths are the install folder, names match without regard to case, writes go to an overlay folder (read first), Watcom's `open` flags |
-| `port/shim/dos.c` | `int386`/`int386x`: the DOS, DPMI and mouse services, each added as the port reaches it |
-| `port/host/main.c` | `main`: SDL, the folders, then the game's main (0x10010) with `Z.CFG`, as `FALL.EXE Z.CFG` ran |
+| `port/include/dos.h`, `i86.h` | Watcom's `REGS`, `SREGS` and the packed 43-byte `find_t`. Far pointers: a selector stands for a pointer's top 32 bits, so `MK_FP(FP_SEG(p), FP_OFF(p)) == p` for 64-bit pointers; selector 0 and the flat selector `segread` gives are the program's own 4 GB window |
+| `port/shim/libc.c`, `watcom.c` | Watcom's `rand` (so a native run can follow an emulated one), `itoa`, `utoa`, `stricmp`, `strnicmp`, `exit`, `pow` (Watcom's square-and-multiply for integral exponents, which libm differs from in the last bits), `fscanf`/`sscanf`, `_msize`, `_nheapwalk` |
+| `port/shim/memcheck.c`, `mcheck2.c` | MemCheck's `mc_*` replacements, passed to the C library. MemCheck is never started in FALL.EXE, so its checks return 0 and its debug output goes nowhere, natively as in the original |
+| `port/shim/sos.c` | HMI SOS (timer, digital, MIDI, songs) as the game calls it. The timer events really fire, on SDL's timer thread: the 140 Hz event is the game's frame clock. There is no audio yet; samples "end" after their length's time |
+| `port/shim/except.c`, `xgfx.c` | MemCheck's exception hooks (no-ops); two pixel routines in the library region (`gfx_put_pixel`, `gfx_get_pixel`) |
+| `port/shim/dosfile.c` | DOS files: `C:\` and relative paths are the install folder, names match without regard to case, writes go to an overlay folder (read first), Watcom's `open` flags; `_dos_findfirst`/`_dos_findnext` as DOS matches (`*.*` matches every name, 8.3 upper case, directories only with `_A_SUBDIR`) |
+| `port/shim/dos.c` | `int386`/`int386x`: DPMI 0500h (free memory, the emulator's figures), 0600h-0603h, 0100h/0101h/0006h (DOS memory as host blocks), CauseWay FF30h; anything else logs and sets carry |
+| `port/host/main.c` | `main`: SDL, the folders, then the game's main (0x10010) with `Z.CFG`, as `FALL.EXE Z.CFG` ran; a backtrace for a stub or a fault; `port_check_ptr` stops on a pointer that lost its top half |
 | `tools/port_build.py` | configure, build and generate; `run` prepares a game folder as `tools/fallemu.py` does and starts the build; `missing` lists the stubs |
 | `tools/port_census.py` | the 64-bit worklist: clang's diagnostics on the game's C, by kind and by file |
+| `tools/port_data.py` | the game's data (phase 2): object 3 in address order, globals whose types hold pointers in native layouts with 8-byte relocations from FALL.EXE's fixups; `report` lists declarations still too narrow |
 
 ## Building and running
 
@@ -84,6 +87,24 @@ So every value that holds an address must have a type as wide as a pointer.
 - A run reaches the game's main. It asks DPMI for free memory (int 31h 0500h, not done yet)
   and stops at `func_0009DB3F`, MemCheck's handler registration.
 
+**2026-10-05, the library.** All 45 unnamed library functions the game calls have native
+implementations.
+- Each has a name in `config/names.csv`:
+  - HMI SOS: timer, digital, MIDI and songs;
+  - MemCheck's API, found through its own table of names at 0x188F01;
+  - Watcom's `pow`, `_msize`, `fscanf`, `_dos_findfirst`/`_dos_findnext`.
+- Three of the existing names were wrong:
+  - 0xA0AD9 is MemCheck's `strcpy`, not `strncpy`;
+  - 0xA16F8 "fprintf" is `sscanf`;
+  - 0xA31A6 "fprintf_2" is `fscanf`.
+- The only stubs left are the 175 engine functions. A run gets through the DPMI and MemCheck
+  setup and stops at the first engine call, `xn_sys_install_crit_error_handler`.
+- The data generator is wired in. Of 2,346 globals, 391 have native layouts.
+- Next in `main`:
+  - `srand(*(int *)0x46c)` reads the BIOS tick at a fixed address, which the SDL layer has to
+    provide;
+  - `config_read` opens Z.CFG through a declaration that returns an int.
+
 The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a pointer:
 
 | Kind | Count | Files |
@@ -108,7 +129,26 @@ The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a po
    - real pointer types where Watcom's bytes allow.
 
    It is driven by clang's diagnostics and its AST, with the matching build as the check.
-   The growing structs that are saved or read from files keep their 32-bit layout on disk.
+
+   **Saves and data files keep their 32-bit formats.** The save-data audit is in
+   `build/port/agents/persist/report.md`, regenerable from its `sites.csv` patterns.
+   - What is on disk:
+     - SAVETREE.DAT writes records byte for byte: the 71-byte header, then the character,
+       monster and QBN quest data, model instances and links.
+     - SAVEVARS.DAT holds the quest faces, a copy of the player's header, and the factions.
+     - MAPS, the RMB blocks and the QBN files are read raw into growing structs.
+   - Pointer fields on disk are ids (an unlink pass before saving, a relink after loading)
+     or garbage the loader ignores.
+   - Classic saves and Daggerfall Unity both use these formats, so the native build keeps
+     them bit for bit:
+     - packed `*_disk` structs with 32-bit slots;
+     - a converter at each function that touches the disk;
+     - under Watcom the original call.
+   - Everywhere else, about 75 header literals (`+71`, `55`, `0x47`) and the struct sizes
+     and strides become `sizeof`/`offsetof`, the same constants under Watcom.
+   - `model_instance` and `block_model` hide the engine model handle's `lights` and
+     `matrix` pointers in padding. They must be declared as pointers, or the game and the
+     engine disagree about where the model's angles and position are.
 4. **The engine as plain C.** That is the XnGine work on `main` (the canonical C).
 5. **SDL3 platform layer:**
    - video: an 8-bit framebuffer and palette;

@@ -5435,8 +5435,12 @@ func,0x0009D764,travel_draw_buttons,strong,draws FIND/I'M AT (region vs world) a
 func,0x0009D8BD,travel_button_filter,strong,"handler of (50,175)-(228,196) = DUNGEONS/HOMES/TEMPLES/TOWNS (screenshot): toggles travel_filter bit 0/1/2/3 by quadrant, redraws the region"
 func,0x0009D960,travel_stub,candidate,returns 0; no reference anywhere
 func,0x0009D986,travel_show_days_left,strong,"'Days left: %ld' (minutes/1440) at (240,2) over the saved map picture; called from tamriel.c 4AC01 while a trip's time passes"
+func,0x0009DA1C,mc_set_location_api,strong,"(line, file), parm routine []: MemCheck's public mc_set_location: calls the internal setter 0xA0ED9 between API entry 0xA34B8 with index 11 (""mc_set_location"" in MemCheck's name table at 0x188F01) and API exit 0xA351E; the game calls it before printf. port/shim/mcheck2.c"
 func,0x0009DAEE,printf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:printf
 func,0x0009DB11,exit,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:exit
+func,0x0009DB3F,mc_set_exception_handler,candidate,"(handler) -> previous: stores 0x18929C (default 0xA2D9E, XXDEF.C's report), which the DPMI exception handler 0xBAE85 calls; hooks/unhooks DPMI exceptions (0xBAF6D/0xBAE22, int 31h 0202h/0203h) only while MemCheck is active (0x188A44 bit 0). main passes crash_screen. MemCheck's own name unknown. port/shim/except.c"
+func,0x0009DBF9,mc_erf_none,candidate,"empty function (push ebp; mov ebp,esp; pop ebp; ret) in MemCheck's API block; main passes it to mc_set_erf (0x9DBFE) to silence MemCheck. port/shim/mcheck2.c"
+func,0x0009DBFE,mc_set_erf,candidate,"(erf) -> previous: sets 0x189330 (default 0xADE60, which writes the message) unless NULL; 0xA3722 calls [0x189330](msg) for every MemCheck message. port/shim/mcheck2.c"
 func,0x0009DC25,rand,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:rand
 func,0x0009DC49,srand,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:rand
 func,0x0009DC59,open,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:open
@@ -5447,13 +5451,28 @@ func,0x0009DEAC,abs,confirmed,"Watcom C32 10.0a CLIB3R.LIB module abs (abs_): 85
 func,0x0009DEB4,_cstart,strong,Watcom's startup _cstart_: 99% of the bytes equal (relocations masked) to CLIB3R.LIB cstrt386. audit: it is the LE header's entry point (le.py entry_va 0x9DEB4) and starts with a jmp over the banner 'WATCOM C/C++32 Run-Time system. (c) Copyright ...'
 func,0x0009E145,__do_exit_with_msg__,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cstrt386
 func,0x0009E180,__GETDS,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cstrt386 DOS/CSTRTX3R.OBJ:CSTRTX3R.OBJ
+func,0x0009E1A1,sosTIMERInitSystem,strong,"HMI SOS (rate, debug) -> 0: rate 0xFF00 = _TIMER_DOS_RATE keeps the PIT at 65536 (0x9E7E2 programs it with 0x1234DC/rate), debug bit 0 skips hooking int 8 (ISR 0x9E818 via 0xA3C99); sos_init calls (0xFF00, 0). port/shim/sos.c"
+func,0x0009E281,sosTIMERUnInitSystem,strong,HMI SOS (arg) -> 0: unhooks the timer interrupt if hooked (0x18B5B4 bit 0); sos_shutdown calls (0). port/shim/sos.c
+func,0x0009E2BB,sosTIMERRegisterEvent,strong,"HMI SOS (rate, callback, &handle) -> 0 or 0x0B: 16 slots (callbacks 0x18B5BC, rates 0x18B5FC), reprograms the PIT for the fastest rate, writes the slot to *handle; sound_timer_add (140 Hz xn_timer_tick_callback), sos_init (90 Hz mixer), sosMIDIStartSong. port/shim/sos.c"
+func,0x0009E61A,sosTIMERRemoveEvent,strong,"HMI SOS (handle) -> 0: clears callback slot 0x18B5BC[handle], reprograms the PIT for the remaining fastest rate; sound_timer_remove, sos_shutdown, sosMIDIStopSong. port/shim/sos.c"
+func,0x0009E8FF,sosDIGIInitSystem,strong,"HMI SOS (driver path, debug) -> 0: copies the path to 0x18B42C (strcpy 0xA4590) and sets 0x18B428 bit 0; sos_init calls (0, 0). port/shim/sos.c"
+func,0x0009E95B,sosDIGIUnInitSystem,strong,HMI SOS () -> 0: clears 0x18B428 bit 0 set by sosDIGIInitSystem. port/shim/sos.c
+func,0x0009E9C2,sosMIDIInitSystem,strong,"HMI SOS (driver path, debug) -> 0 or 0x18 (already, 0x18B991 bit 0x10): clears the 32 song slots 0x18BAA0 and 8 driver slots (0x13E bytes at 0x18C034), master volume 0x18BB24 = 0x7F. port/shim/sos.c"
+func,0x0009EC0A,sosMIDIUnInitSystem,strong,HMI SOS () -> 0 or 0x19 (not initialised): clears 0x18B991 bit 0x10 set by sosMIDIInitSystem. port/shim/sos.c
+func,0x0009EC82,sosMIDIInitDriver,strong,"HMI SOS (hardware block, &handle) -> 0/0x0B: takes one of 8 driver slots (0x18C038 + 0x13E*i = device id from the block's first dword: 0xA005, 0xA007, 0xA00A ...); sos_init with the MIDI device (0x18DD64 -> 0x18DD58). port/shim/sos.c"
+func,0x0009F253,sosMIDIUnInitDriver,strong,"HMI SOS (handle, release) -> 0/0x0A/0x19: handle < 8, driver ready bit 0x10 at 0x18C035; calls the driver's uninit through its table; sos_shutdown (0x18DD58, 1). port/shim/sos.c"
+func,0x0009F4DE,sosDIGIInitDriver,strong,"HMI SOS (driver block, &handle) -> 0/0x0B/0x05: takes one of 5 slots 0x18B52C, allocates the 0x1E00-byte sample table (32 x 0xF0) at block+0x58 and the DMA buffer; sos_init with 0x18DC38 (268 bytes) -> 0x18DD60. port/shim/sos.c"
+func,0x0009F9A7,sosDIGIUnInitDriver,strong,"HMI SOS (handle, shutdown, free) -> 0/0x0A/1: driver from 0x18B52C[handle], 1 if never started (flag 2); sos_init/sos_shutdown (0x18DD60, 1, 1). port/shim/sos.c"
+func,0x0009FEE5,sosMIDISetInsData,strong,"HMI SOS (handle, far bank, size) -> the driver's result: calls the driver's function at 0x18C05E + 0x13E*handle; sos_init passes MELODIC.BNK and DRUM.BNK for OPL devices 0xA002/0xA009. port/shim/sos.c"
 func,0x000A0024,mc_free,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (ptr, __FILE__, __LINE__); 236 calls"
 func,0x000A0040,mc_memset,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (dst, value, n, __FILE__, __LINE__, 4), e.g. (655360, 0, 64000, ...) clears the screen; 187 calls"
 func,0x000A006E,lseek,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:lseek
 func,0x000A00AF,mc_malloc,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (size, __FILE__, __LINE__) returns a pointer; 35 calls"
 func,0x000A00CB,read,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:read
 func,0x000A01DE,strncmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strncmp
-func,0x000A0AD9,mc_strncpy,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (dst, src, n, __FILE__, __LINE__); 137 calls"
+func,0x000A021C,sosMIDIInitSong,strong,"HMI SOS (song block, &handle) -> 0/0x0E/0x0B/0x1A: strcmp(song data, ""HMI-MIDISONG061595"") (0x177540), takes one of 32 slots 0x18BAA0, relocates the song's offsets, 0x1A when no track has a driver (slot kept); sos_load_song. port/shim/sos.c"
+func,0x000A0517,sosMIDIUnInitSong,strong,HMI SOS (handle) -> 0/0x0A: frees song slot 0x18BAA0[handle] and its track buffers; music_stop. port/shim/sos.c
+func,0x000A0AD9,mc_strcpy,strong,"API entry index 23 (""strcpy"" in MemCheck's name table 0x188F01) and the copy is 0xA8CFD, a strcpy (dst, src); the third argument is the destination size (e.g. 40 for namegen_name), not a count. file_index_scan (hand/func_0006D6A4.c) copies a whole directory name with it given 4. Frees the name for 0xA14E8. (port library audit, 2026-10-05)"
 func,0x000A0B42,write,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:write
 func,0x000A0D13,atoi,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:atoi DOS/CLIB3R.LIB:atol; also atol
 func,0x000A0D8F,utoa,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:itoa
@@ -5467,28 +5486,50 @@ func,0x000A0ED9,mc_set_location,strong,"(line, file), parm routine []: called be
 func,0x000A0F5C,mc_sprintf,strong,"(buffer, format, ...): sprintf (identified while matching, docs/progress.md), not byte-identical to Watcom's sprintf (libmatch): MemCheck's checked version; 128 calls"
 func,0x000A1004,unlink,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:unlnk
 func,0x000A1023,mc_memcpy,strong,"MemCheck's checked replacement: not byte-identical to Watcom's (libmatch), called with the caller's source file and line (MemCheck's convention); (dst, src, n, __FILE__, __LINE__, 4) at every call site, e.g. disease.c line 83"
+func,0x000A1054,mc_strcat,strong,"(dst, src, file, line, dst size): MemCheck location+size 0xA0F39, then 0xA9554 (API index 22 ""strcat"", strlen(dst)+strlen(src)+1); names.c appends surname. port/shim/mcheck2.c"
 func,0x000A1079,memchr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memchr
 func,0x000A1097,tolower,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:tolower
 func,0x000A1235,filelength,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:filelen
 func,0x000A1272,_dos_getvect,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:d_getvec
 func,0x000A12D1,getenv,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:getenv
 func,0x000A132C,memcmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:memcmp
+func,0x000A134C,gfx_put_pixel,strong,"x EAX, y EDX, colour BL: if inside xn_gfx_clip_left/top/right/bottom (right, bottom exclusive) sets pen_x/pen_y (0x142928/C) and screen_buffer[xn_gfx_row_offset[y] + x]; travel map dots, people.c. port/shim/xgfx.c"
+func,0x000A138E,gfx_get_pixel,strong,"x EAX, y EDX: screen_buffer[xn_gfx_row_offset[y] + x] inside the clip window, else EAX (x) unchanged; note.c's colour pick. port/shim/xgfx.c"
 func,0x000A13DA,_dos_findfirst,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:find386
 func,0x000A13F7,_dos_findnext,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:find386
+func,0x000A148C,mc_debugf,strong,"(fmt, ...): API index 10 (""mc_debug""); while MemCheck is active (0x188ACB or 0x188AC2) vsprintf into 200 bytes and 0xA375B outputs it; the string-only form is 0xA145C; XXDEF.C and mem_check_heap use it. port/shim/mcheck2.c"
+func,0x000A14E8,mc_strncpy,strong,"(dst, src, n, file, line, dst size): location+size 0xA0F39, then 0xA988B (API index 25 ""strncpy"") -> Watcom strncpy 0xB37B7; rdb_model_id_from_name, quests. Needs 0xA0AD9 renamed first (renames.csv). port/shim/mcheck2.c"
+func,0x000A166C,pow,strong,"(double x, double y), parm routine [] value [8087]: fld both, 0xA1516: x87 square-and-multiply (0xA1649) for integral 1 <= |y| < 65536, else fyl2x/exp (0xA19A8), errors via __pow87_err 0xA98D6; pow(1.04, level) in skill_ready_to_advance. port/shim/watcom.c"
 func,0x000A167C,__CHP,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:fchop
 func,0x000A16A4,cget_string,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:sscanf
-func,0x000A16D1,vfscanf,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also vsscanf
-func,0x000A16F8,fprintf,confirmed,"byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fprintf DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also fscanf, sscanf"
+func,0x000A16D1,vsscanf,strong,"the sscanf module: between cget_string 0xA16A4 and sscanf 0xA16F8 (libmatch could not tell vfscanf/vsscanf apart) (port library audit, 2026-10-05)"
+func,0x000A16F8,sscanf,strong,"the sscanf module (cget_string 0xA16A4, vsscanf 0xA16D1); the game's one call is kludge.c's sscanf(version D_001903BA, ""%d"", &build). Native build: port.h maps the game's fprintf to port_sscanf meanwhile; after the rename add sscanf to HOST_LIBC or keep a shim. (port library audit, 2026-10-05)"
 func,0x000A1720,strcmp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:cmp386
 func,0x000A17C1,strchr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strchr
 func,0x000A17DC,strstr,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:strstr
+func,0x000A18C3,mc_stack_trace,strong,"(heading) -> depth: API index 12 (""mc_stack_trace""); while active prints "">>>>>>> Run MCMAP <exename> to map stack traces!"" and the trace (0xBB0BF); else 0. port/shim/mcheck2.c"
+func,0x000A1944,mc_memset_noloc,strong,"(dst, c, n): MemCheck's memset interception without a location: API index 19 (""memset""), then Watcom's memset 0xAB6C0; question.c, sosMIDIInitSong, sosDIGIInitDriver. port/shim/mcheck2.c"
 func,0x000A199E,___DEXP1,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
 func,0x000A19A6,IF_EXP,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
 func,0x000A19A8,___DEXP,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
 func,0x000A1A0A,exp,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a MATH387R.LIB:exp387
+func,0x000A1D3C,sosMIDISetMasterVolume,strong,"HMI SOS (volume) -> 0: stores 0x18BB24 (MIDIInitSystem's 0x7F) and re-applies each song's volume (+0x106) via 0xA1A2B over the 32 slots; sound_init_music (127), sound_set_volume. port/shim/sos.c"
+func,0x000A1ED5,sosDIGISetSampleVolume,strong,"HMI SOS (driver, sample, left<<16|right) -> previous volume or 0x0A: slot = driver+0x58 + 0xF0*sample, playing bit 0x80 at +0x21, volume at +0x2C; sound_update_channels. port/shim/sos.c"
+func,0x000A20BF,sosDIGISetPanLocation,strong,"HMI SOS (driver, sample, pan) -> previous pan or 0x0A: as sosDIGISetSampleVolume with the pan at +0x44; sound_update_channels. port/shim/sos.c"
+func,0x000A2460,sosDIGISampleDone,strong,"HMI SOS (driver, sample) -> 1 done, 0 playing (+0x21 bit 0x80), 0x0A bad driver; the game's channel bookkeeping. port/shim/sos.c"
+func,0x000A2504,sosDIGIStartSample,strong,"HMI SOS (driver, start block) -> slot, -1 none free, 0x0A bad driver: copies the 0xF0-byte block into the first idle slot of driver+0x58, sets playing, links it into the mix list; sound_play_sample*. port/shim/sos.c"
+func,0x000A2687,sosDIGIStopSample,strong,"HMI SOS (driver, sample) -> 0/0x0A: sets the stop request bit 0x40 at +0x21 of a playing slot; sound_stop_channel. port/shim/sos.c"
+func,0x000A277F,_msize,strong,"(p): push ebp/mov ebp,esp/call 0xAB753 (MemCheck's _nmsize, API index 78) -> Watcom _nmsize 0xB7273, Watcom's 32-bit _msize; music_play/music_stop lock length. port/shim/watcom.c"
+func,0x000A27A0,sosMIDIStartSong,strong,"HMI SOS (handle) -> 0/0x0A/0x19: needs the song's driver-ready bit 0x10 (+0x21), registers the sequencer 0xA07F7 as a timer event at the song's rate (+0xD4), sets playing (+0x21 bit 0x80); music_play/music_update. port/shim/sos.c"
+func,0x000A2857,sosMIDIStopSong,strong,"HMI SOS (handle) -> 0/0x0A/0x19: removes the song's timer event (+0xC6), clears playing, silences its channels (0xAC0ED, 0xA067D); music_stop. port/shim/sos.c"
+func,0x000A2941,sosMIDISongDone,strong,"HMI SOS (handle) -> 0 playing (+0x20 bit 0x8000), 1 stopped, 0x0A bad handle; music_update restarts a finished song. port/shim/sos.c"
+func,0x000A29BA,mc_check,strong,"(p) -> 0 ok: API index 3 (""mc_check""); checks one buffer only while MemCheck is active (0x188ACB); mem_check_heap(screen_buffer). port/shim/mcheck2.c"
+func,0x000A2A2B,mc_check_buffers,strong,"() -> 0 ok: API index 2 (""mc_check_buffers""), 0xAC347(2) only while active; mem_check_crt_heap. port/shim/mcheck2.c"
 func,0x000A2A76,_nheapwalk,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:nheapwal
 func,0x000A2A84,__NHeapWalk,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:nheapwal
+func,0x000A2D9E,mc_exception_report,strong,"XXDEF.C (0x177606): MemCheck's default exception handler (0x18929C's initial value): ""MemCheck detected an EXCEPTION at %04X:%08X. Error code: %04Xh"", CS:IP, stack trace, then printf(""%s\n"", ""\nChaining to default exception handler... \n""); crash_screen calls it last. port/shim/except.c"
 func,0x000A2EAC,int386x,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:intx386
+func,0x000A2EC5,mc__fmemcpy,strong,"(far dst EAX:DX, far src EBX:CX, n, file, line, kind): location+kind 0xA0F39, then 0xA6CBC (API index 53 ""_fmemcpy""); func_0007EF86 copies 14 bytes back from DOS memory. port/shim/mcheck2.c"
 func,0x000A2EFC,__open_flags,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
 func,0x000A2FB0,__doopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
 func,0x000A3078,_fsopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
@@ -5496,8 +5537,8 @@ func,0x000A3093,fopen,confirmed,byte-identical (relocations masked) to Watcom C3
 func,0x000A309D,close_file,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
 func,0x000A3105,freopen,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fopen
 func,0x000A3129,cget_file,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fscanf
-func,0x000A317F,vfscanf_2,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also vsscanf
-func,0x000A31A6,fprintf_2,confirmed,"byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fprintf DOS/CLIB3R.LIB:fscanf DOS/CLIB3R.LIB:sscanf; also fscanf, sscanf"
+func,0x000A317F,vfscanf,strong,"the fscanf module: cget_file 0xA3129, vfscanf, fscanf 0xA31A6 (do after 0xA16D1's rename) (port library audit, 2026-10-05)"
+func,0x000A31A6,fscanf,confirmed,"the fscanf module; args.c: fscanf(file, ""%s %s"", key, value) != EOF over the config file (port library audit, 2026-10-05)"
 func,0x000A31C7,fclose,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose
 func,0x000A31F6,__shutdown_stream,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose
 func,0x000A320B,__hex,confirmed,byte-identical (relocations masked) to Watcom C32 10.0a DOS/CLIB3R.LIB:fclose

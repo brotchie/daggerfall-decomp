@@ -307,8 +307,9 @@ class Plan:
         self.functions = set()  # code symbols the data points at
 
 
-def plan_data(need, table, image=None, report_only=False):
-    """need: {name: addr} of the data symbols the game names. Returns (asm text, Plan)."""
+def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
+    """need: {name: addr} of the data symbols the game names; defined: names something else
+    defines (their bytes keep their place, without the label). Returns (C text, Plan)."""
     image = image or le.LE(EXE)
     objs = image.load(relocate=True)
     fix = {}
@@ -510,8 +511,9 @@ def plan_data(need, table, image=None, report_only=False):
         a2, e2, count, s32, s64, l32, l64 = layout_of[name]
         if is_typed:
             asm.append(".p2align 3")
-        asm.append(".globl _%s" % name)
-        asm.append("_%s:" % name)
+        if name not in defined:
+            asm.append(".globl _%s" % name)
+            asm.append("_%s:" % name)
         if not is_typed:
             # relocations inside an untyped global: the declaration is too narrow
             for a in range(addr, end):
@@ -554,8 +556,9 @@ def plan_data(need, table, image=None, report_only=False):
             emit_bytes(buf[pos:off])
             pos = max(pos, off)
             if kind == 0:
-                asm.append(".globl _%s" % val)
-                asm.append("_%s:" % val)
+                if val not in defined:
+                    asm.append(".globl _%s" % val)
+                    asm.append("_%s:" % val)
             else:
                 sym, add = val
                 asm.append(".quad _%s%s" % (sym, ("+%d" % add) if add else ""))

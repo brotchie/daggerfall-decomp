@@ -18,6 +18,9 @@ target_include_directories(game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${RO
 target_compile_options(game PRIVATE
     -std=gnu89 -include ${CMAKE_CURRENT_SOURCE_DIR}/include/port.h
     -funsigned-char -fwrapv -fno-strict-aliasing
+    # FALL.EXE's x87 runs at 53-bit precision (control word 0x127F) and never fuses a
+    # multiply and an add: each double operation rounds on its own, as here without FMA
+    -ffp-contract=off
     # the build reports errors only; tools/port_census.py counts the warnings (the
     # worklist of docs/port.md). These would be errors in clang 16+ and stay warnings until
     # the declarations agree:
@@ -33,5 +36,5 @@ file(GLOB GEN_SRC CONFIGURE_DEPENDS ${CMAKE_BINARY_DIR}/gen/*.c)
 
 add_executable(fall ${PORT_SRC} ${GEN_SRC} $<TARGET_OBJECTS:game>)
 target_include_directories(fall PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_compile_options(fall PRIVATE -std=gnu11 -Wall -Wno-unused-function)
+target_compile_options(fall PRIVATE -std=gnu11 -Wall -Wno-unused-function -ffp-contract=off)
 target_link_libraries(fall PRIVATE SDL3::SDL3)

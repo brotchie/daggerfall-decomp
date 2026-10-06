@@ -6,9 +6,14 @@
      --game DIR     the installed game (only read): ARENA2, the .BNK and .CFG files
      --overlay DIR  where the game's writes go (saves, its config), read before DIR
      CONFIG         the config file, Z.CFG by default (written to the overlay when missing) */
+#include <execinfo.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <SDL3/SDL.h>
 
@@ -21,6 +26,7 @@ static const char z_cfg[] = "type 4\r\npath C:\\ARENA2\\\r\npathcd C:\\ARENA2\\\
                             "maps mapsave.sav\r\nmapfile maps.bsa\r\ncontrols 1\r\n";
 
 static int sdl_started;
+static SDL_ThreadID main_thread;
 
 void host_shutdown(void)
 {
@@ -30,11 +36,60 @@ void host_shutdown(void)
     }
 }
 
+/* before stopping on a fatal error: SDL_Quit only from the main thread (on SDL's timer
+   thread, where the SOS timer events run the game's callbacks, it would wait for itself) */
+static void shutdown_for_abort(void)
+{
+    if (SDL_GetCurrentThreadID() == main_thread)
+        host_shutdown();
+}
+
+/* the call chain on stderr, for a stub that stops the run or a fault */
+static void backtrace_stderr(void)
+{
+    void *frames[48];
+    int n = backtrace(frames, 48);
+
+    backtrace_symbols_fd(frames, n, 2);
+}
+
 void port_unimplemented(const char *name)
 {
     fprintf(stderr, "port: %s is not in the native build yet\n", name);
-    host_shutdown();
+    backtrace_stderr();
+    shutdown_for_abort();
     abort();
+}
+
+void port_fatal(const char *fmt, ...)
+{
+    va_list ap;
+
+    fprintf(stderr, "port: ");
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    fprintf(stderr, "\n");
+    backtrace_stderr();
+    shutdown_for_abort();
+    abort();
+}
+
+void port_check_ptr(const void *p, const char *what)
+{
+    if (p != NULL && ((uintptr_t)p >> 32) == 0)
+        port_fatal("%s: %p is a pointer cut to 32 bits", what, p);
+}
+
+/* a fault (often a pointer cut to 32 bits, docs/port.md): name it, show where, and end */
+static void on_fault(int sig)
+{
+    static const char msg[] = "port: fatal signal, backtrace:\n";
+
+    write(2, msg, sizeof msg - 1);
+    backtrace_stderr();
+    signal(sig, SIG_DFL);
+    raise(sig);
 }
 
 int main(int argc, char **argv)
@@ -54,6 +109,11 @@ int main(int argc, char **argv)
         else
             config = argv[i];
     }
+    main_thread = SDL_GetCurrentThreadID();
+    signal(SIGSEGV, on_fault);
+    signal(SIGBUS, on_fault);
+    signal(SIGILL, on_fault);
+    signal(SIGFPE, on_fault);
     if (game == NULL) {
         fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [CONFIG]\n");
         return 2;

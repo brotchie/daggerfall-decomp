@@ -81,7 +81,8 @@ def check(rows):
     errs, seen = [], {}
     for r in rows:
         if not re.fullmatch(r"[a-z_][a-z0-9_]*", r["name"]) and not (
-                "Watcom" in r["evidence"] and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", r["name"])):
+                ("Watcom" in r["evidence"] or "HMI" in r["evidence"])
+                and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", r["name"])):
             errs.append("%s: not a lower_case identifier (library names keep their case)" % r["name"])
         if r["confidence"] not in RANK:
             errs.append("%s: confidence %r" % (r["name"], r["confidence"]))
