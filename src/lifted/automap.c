@@ -881,7 +881,7 @@ void func_00028ED1(struct record *object)
     char *seen_bits;
 
     if (object->type != 6 && object->type != 34) return;
-    seen_bits = RECORD_DATA(D_00196DA0);
+    seen_bits = RECORD_DATA(DOS_NULL(D_00196DA0));     /* no automap yet: the zero page */
     seen_bits += 2048;
     if ((((int)(unsigned char)*(signed char *)((((unsigned)(object->id & 65535)) >> 3) + seen_bits)) & (1 << ((object->id & 65535) & 7))) == 0) return;
     object->flags |= 128;

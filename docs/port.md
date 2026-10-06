@@ -140,6 +140,17 @@ What it took, beyond the engine:
   and plays on any data it gives (the movies stream their sound this way).
 - **The installer's files.** ARCH3D.BSA and DAGGER.SND are unpacked from PACKED.DAT
   (`port/host/packed.c`, PKWARE DCL) into the overlay on the first run.
+- **The data in place.** port_data keeps FALL.EXE's data byte for byte where it was, so every
+  global keeps its distance from every other: the code reaches tables through shifted bases
+  (climate's categories from 223 bytes before them). The globals holding pointers are laid
+  out natively out of line.
+- **Against the original.** `tools/port_compare.py` renders each classic save in the emulator
+  (FALL.EXE itself) and natively, and compares the frames pixel by pixel. All 18 saves score
+  0.84-1.00; the rest is random (rain, torch flicker, clouds, walking people).
+  - The comparison found two bugs: the sun's direction (three locals the asm took as a vector)
+    and the weapon's colours (an offset counted from the 71-byte header).
+- **Frame rate.** The world runs at the VGA's 70 Hz at most, about a quarter of a core, while
+  the yield of the game's loop sleeps out each frame.
 - **Checks without a person.**
   - `PORT_SCRIPT` (keys, clicks and screenshots on a timeline), `PORT_SHOT_EVERY`,
     `PORT_EXIT_AFTER`;

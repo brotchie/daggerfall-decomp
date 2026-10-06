@@ -15,12 +15,11 @@ extern char D_00175734[];
 extern char D_00175738[];
 extern iptr D_0017D1EA;
 extern char *enchant_power_names[];
-extern char *D_00180ACE[];
 extern char *enchant_side_effect_names[];
 extern char *monster_names[];
 extern iptr enchant_power_params[];
 extern iptr enchant_power_costs[];
-extern iptr D_0018586F[];
+extern iptr enchant_side_effect_params[];
 extern int D_00185871[];
 extern char *enchant_spell_lists[];
 extern iptr D_001858DB[];
@@ -431,7 +430,7 @@ int itemmaker_points_used(void)
 {
     int slot;
     int points;
-    int cost_code;
+    iptr cost_code;              /* a cost code, or a pointer to costs by parameter */
     iptr cost_table;
 
     slot = 0;
@@ -444,12 +443,12 @@ int itemmaker_points_used(void)
         } else {
             cost_table = (iptr)(char *)D_001858DB;
         }
-        cost_code = *(int *)((char *)(((itemmaker_slots[slot].type) << 2) + cost_table));
+        cost_code = *(iptr *)((char *)(((itemmaker_slots[slot].type) << PTR_SHIFT) + cost_table));
         if (cost_code == 0) continue;
-        if (((unsigned)cost_code) < 100) {
+        if (((uptr)cost_code) < 100) {
             points += enchant_slot_cost(cost_code, (int)(unsigned char)(signed char)itemmaker_slots[slot].param, 1, itemmaker_slots[slot].type);
         } else {
-            points += (int)(short)*(short *)((*(char **)((char *)(((itemmaker_slots[slot].type) << 2) + cost_table)) + ((itemmaker_slots[slot].param) * 2)));
+            points += (int)(short)*(short *)((*(char **)((char *)(((itemmaker_slots[slot].type) << PTR_SHIFT) + cost_table)) + ((itemmaker_slots[slot].param) * 2)));
         }
     }
     return points;
@@ -467,7 +466,7 @@ int itemmaker_gold_cost(void)
         if (scratch_190ce4[slot] != 0) continue;
         cost_code = (iptr)enchant_power_costs[(itemmaker_slots[slot].type)];
         if (cost_code == 0) continue;
-        if (((unsigned)cost_code) < 100) {
+        if (((uptr)cost_code) < 100) {
             cost += enchant_slot_cost(cost_code, (int)(unsigned char)(signed char)itemmaker_slots[slot].param, 0, itemmaker_slots[slot].type);
         } else {
             cost += (int)(short)*(short *)(((char *)enchant_power_costs[(itemmaker_slots[slot].type)] + ((itemmaker_slots[slot].param) * 2)));
@@ -702,12 +701,12 @@ iptr enchant_powers_text(struct item *item)
             }
         } else {
             mc_set_location(1139, D_001756A3);
-            mc_sprintf((char *)text_buffer, D_00175734, (iptr)D_00180ACE[item->enchantments[i].type]);
+            mc_sprintf((char *)text_buffer, D_00175734, (iptr)enchant_side_effect_names[item->enchantments[i].type - 15]);
             if (item->enchantments[i].param != (-1)) {
                 if (item->enchantments[i].type == 15) {
                     func_000A1054((char *)text_buffer, monster_names[item->enchantments[i].param], D_001756A3, 1143, 160);
                 } else {
-                    func_000A1054((char *)text_buffer, (char *)*(iptr *)((char *)(iptr)(*(char **)&D_0018586F[item->enchantments[i].type] + (item->enchantments[i].param << 2))), D_001756A3, 1145, 160);
+                    func_000A1054((char *)text_buffer, (char *)*(iptr *)((char *)(iptr)(*(char **)&enchant_side_effect_params[item->enchantments[i].type - 15] + (item->enchantments[i].param << PTR_SHIFT))), D_001756A3, 1145, 160);
                 }
             }
         }

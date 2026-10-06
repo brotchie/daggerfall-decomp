@@ -212,7 +212,7 @@ void sheet_affiliation_line(struct record *object)
     membership = &object->data.membership;
     faction = faction_find(membership->faction);
     mc_set_location(255, D_00170C67);
-    mc_sprintf((char *)text_buffer, D_00170CA7, faction->name, *(int *)((faction_rank_names[((int)(unsigned char)(membership->kind & 31))] + (membership->rank << 2))));
+    mc_sprintf((char *)text_buffer, D_00170CA7, faction->name, *(iptr *)((faction_rank_names[((int)(unsigned char)(membership->kind & 31))] + (membership->rank << PTR_SHIFT))));
     func_000A1054((char *)D_0019963C, (char *)text_buffer, D_00170C67, 256, 4);
     text_cursor_x++;
 }

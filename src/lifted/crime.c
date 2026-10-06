@@ -8,7 +8,7 @@ extern struct region regions[];
 extern char region_legal_reputation[];  /* court_frame: regions[].legal_reputation evaluates in another order */
 extern iptr screen_buffer;
 extern char D_001706E1[];
-extern iptr D_00179EA8[];
+extern int crime_reputation_loss[];
 extern signed char D_00187CA8;
 extern struct record *creature_list[];
 extern int scratch_190cac;
@@ -175,9 +175,10 @@ void crime_reputation_penalty(void)
 {
     iptr faction;
 
-    regions[(unsigned char)current_region].legal_reputation -= *(short *)&D_00179EA8[((int)(unsigned char)crime_current)];
+    /* the loss of crimes 1-13 (D_00179EA8 + 4 * crime under Watcom: the table after it) */
+    regions[(unsigned char)current_region].legal_reputation -= *(short *)&crime_reputation_loss[((int)(unsigned char)crime_current) - 1];
     faction = faction_find_type_in_region((int)(short)((int)(unsigned char)current_region), 15);
-    faction_change_reputation(faction, (int)(-(D_00179EA8[((int)(unsigned char)crime_current)] >> 1)));
+    faction_change_reputation(faction, (int)(-(crime_reputation_loss[((int)(unsigned char)crime_current) - 1] >> 1)));
 }
 
 void court_reputation_restore(void)

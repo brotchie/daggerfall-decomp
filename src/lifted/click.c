@@ -1257,7 +1257,7 @@ void footstep_sounds(void)
         sound_index = 2;
         break;
     case 3:
-        sound_index = collide_floor_plane->floor_sound;
+        sound_index = DOS_NULL(collide_floor_plane)->floor_sound;   /* no floor: the zero page */
         if (sound_index > 4 || sound_index < 0) sound_index = 0;
         sound_index <<= 1;
         if (dungeon_water_level != 10000 && player_object->y > dungeon_water_level && in_dungeon_water == 0) {

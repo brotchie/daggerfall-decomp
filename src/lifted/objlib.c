@@ -479,7 +479,7 @@ void marker_make_clutter(struct record *marker, struct building *building)
     srand(marker->id & 65535);
     floor_y = collide_floor_height(marker);
     if (floor_y != 100000) marker->y = floor_y;
-    marker->image = flat_random_clutter((int)player_environment, current_building->type);
+    marker->image = flat_random_clutter((int)player_environment, DOS_NULL(current_building)->type);
     srand(saved_seed);
 }
 
