@@ -11,21 +11,34 @@ to the asm at the engine's **boundary** with the game.
 This guide is for the agents converting the engine group by group, and for readers. The
 pilot (vec, mat and math: 62 functions) is done and is the worked example throughout.
 
-**Status (2026-10-05): part 1 done.** The boundary, the yardsticks and the test mechanism
-are in place, and the pilot is canonical:
+**Status (2026-10-06): the whole engine is canonical.**
+- Part 1 built the yardsticks and made the pilot canonical.
+- Five groups converted the rest, and the merged tree is verified as a whole: 648 functions in C,
+  all canonical. That is 639 through test shims, 4 direct dispatchers and 5 interrupt handlers.
+- No interface pragmas, `_r` adapters, asm-entry calls, patch fields, planted-ret counting or
+  generated code remain.
+- Register files remain only at the DOS/BIOS boundary (`dos.c`, `pc.c`, `gfx.c`'s int 10h) and in
+  8 catalogued game-facing adapters (`NAME_b`).
+- Every engine declaration agrees with its definition, and every function and module is
+  documented. docs/engine/architecture.md is the overview.
 
 | | |
 |---|---|
-| The boundary (`config/xngine_boundary.csv`) | 181 entries (174 called by the game, 3 held as pointers, 3 called through pointers, 5 vectors), 15 game functions and 40 service and 13 port forms as exits; memory classified from 36 surveyed scenarios (1,605 frames) and the corpus's writes |
-| Lockstep scenarios (`xn_rc.py scenarios`) | 36 scenarios, **1,605 / 1,605 frames identical** at the boundary, continuous (the C machine keeps its own state; 67 s with four workers) and resynced each frame (`--resync`). A deliberate one-unit error in `xn_math_approx_dist2d` and one in `xn_mat_from_angles` fail every frame of three scenarios and the records |
-| The game's calls (`xn_rc.py test --boundary`) | all 176 converted entries with records: **2,501 / 2,501** game-called records; the pilot's 15 game-called entries 288 / 288 |
-| Records through shims (`xn_rc.py test vec mat math`) | 62 / 62 functions, **803 / 803** records, alone and all at once; the whole corpus with everything routed: 8,204 / 8,204 |
-| Pure helpers (`xn_equiv.py`) | 33 specs, **90.1 million samples** (54.6 million exhaustive), no difference |
-| Coverage of the asm (`xn_cover.py`) | **4,495 / 6,550 basic blocks (68.6%)** executed, 74.6% of instructions; 90.8% executed or justified (dead code, unrolled copies of executed blocks, absent hardware, VESA, fatal paths); 605 blocks in 149 live functions not reached yet |
+| Records through shims (`xn_rc.py test --corpus`) | **8,794 / 8,794** records of 642 functions, everything routed at once; 676 of them crafted for coverage (`tools/xn_mkrec.py`) |
+| The game's calls (`xn_rc.py test --boundary`) | all **178** entries, **2,814 / 2,814** game-called records |
+| Lockstep scenarios (`xn_rc.py scenarios`) | 39 scenarios, **1,675 / 1,675 frames identical** at the boundary (screen and palette, game-visible memory, port and DOS I/O in order) |
+| Pure helpers (`xn_equiv.py`) | 140 specs, **217 million samples** (89 million exhaustive), no difference |
+| Coverage of the asm (`xn_cover.py`) | 81.1% of all 6,550 basic blocks executed (84.3% of instructions); of the reachable blocks, **98.1%** exercised; **100%** executed or justified, 0 not reached |
+| Quirks (docs/engine/quirks.md) | 148 entries, kept or dropped, and one deviation (D-VID-01) |
 
-The phase's coverage target (95% of reachable blocks executed, the rest justified) is the
-conversion groups' to reach: each group adds the records and scenarios its functions need
-(workflow step 8). `build/xn_canon/coverage/report.md` lists the gaps by function.
+**How the coverage figure is counted.**
+- Reachable blocks leave out dead functions (no caller in the game or the engine: 414 blocks) and
+  blocks that analysis shows cannot run (20).
+- Unrolled copies of executed code count as exercised (701), since each is the same instruction
+  pattern as one that ran.
+- The 102 reachable blocks left are hardware that is absent in the harness (the head trackers, the
+  serial port, VESA) or fatal paths. Each is justified in `tools/xn_cover.py`'s JUSTIFIED table,
+  where every entry carries its reason.
 
 ### The boundary in numbers
 
