@@ -48,6 +48,9 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import le  # noqa: E402
 
 EXE = os.path.join(ROOT, "orig", "1.07.213", "FALL.EXE")
+# real-mode memory the game points at (VGA 0xA0000, the BIOS data area 0x400...): natively the
+# virtual PC's port_low_memory_block
+LOWMEM_FIRST, LOWMEM_END = 0x400, 0x110000
 CFLAGS = ["-std=gnu89", "-include", os.path.join(ROOT, "port", "include", "port.h"),
           "-funsigned-char", "-I" + os.path.join(ROOT, "port", "include"),
           "-I" + os.path.join(ROOT, "include"), "-fsyntax-only", "-w", "-ferror-limit=0",
@@ -539,6 +542,16 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
                         events.append((dst, 1, (sym, add)))
                     continue
                 (val,) = struct.unpack("<I", v) if len(v) == 4 else (0,)
+                # a pointer anywhere in low memory; an iptr only as a lone variable where
+                # real-mode data lives (an iptr table can hold plain numbers too:
+                # D_00178848's powers of 16 run up to 0x10000000)
+                if (("*" in t) and LOWMEM_FIRST <= val < LOWMEM_END) or \
+                        (t in ("iptr", "uptr") and count == 1 and "[" not in p and
+                         (0x400 <= val < 0x500 or 0xA0000 <= val < LOWMEM_END)):
+                    # a real-mode address (VGA's 0xA0000, the BIOS data area): the native
+                    # build's low memory block (port/host/vpc.c)
+                    events.append((dst, 1, ("port_low_memory_block", val)))
+                    continue
                 if val and ("*" in t):
                     plan.problems["raw-pointer"].append("%s%s = 0x%08X" % (name, p, val))
                 if t in ("long", "iptr") and val & 0x80000000:

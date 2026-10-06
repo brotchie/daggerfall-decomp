@@ -34,6 +34,9 @@ static uintptr_t flat_base(void)
     return (uintptr_t)&anchor & ~(uintptr_t)0xFFFFFFFFu;
 }
 
+uintptr_t port_sel_base(unsigned short sel);
+unsigned short port_sel_new(uintptr_t base);
+
 static uintptr_t base_of(unsigned short sel)
 {
     unsigned i = sel >> 3;
@@ -75,6 +78,17 @@ unsigned short port_fp_seg(const volatile void *p)
 void *port_mk_fp(unsigned short sel, unsigned int off)
 {
     return (void *)(base_of(sel) + off);
+}
+
+/* for the engine's DPMI calls (port/host/vpc.c): a selector's base, a new selector */
+uintptr_t port_sel_base(unsigned short sel)
+{
+    return base_of(sel);
+}
+
+unsigned short port_sel_new(uintptr_t base)
+{
+    return new_sel(base);
 }
 
 /* int.c's own FP_SEG (it undefines <i86.h>'s) */

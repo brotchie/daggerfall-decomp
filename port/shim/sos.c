@@ -3,9 +3,9 @@
    driver (music). FALL.EXE links the library in at 0x9E18C-0xA0AD9 and 0xA1A16-0xA2A2B;
    docs/state.md, "The library region".
 
-   There is no audio yet (docs/port.md, phase 5): each call answers as FALL.EXE's would and
-   keeps the state the game looks at (handles, which samples and songs are playing), so the
-   game's logic goes on. The timer services are real: SOS's events are the game's clocks
+   Each call answers as FALL.EXE's would and keeps the state the game looks at (handles,
+   which samples and songs are playing). Samples play on the virtual PC's sound card
+   (port/host/vpc_audio.c); music has no synthesiser yet (docs/port.md). The timer services are real: SOS's events are the game's clocks
    (xn_timer_tick_callback at 140 Hz counts frame time; the video player's 60 Hz callback),
    and they run on SDL's timer thread, as they ran from the timer interrupt.
 
@@ -20,6 +20,7 @@
 #include <SDL3/SDL.h>
 
 #include "port_host.h"
+#include "port_vpc.h"
 
 typedef unsigned int W32;
 
@@ -83,8 +84,11 @@ static Uint64 SDLCALL timer_fire(void *userdata, SDL_TimerID id, Uint64 interval
     /* as many calls as the rate owes, a few at most when the thread was held up */
     while (e->used && now >= e->next_ns && n++ < 8) {
         void (*fn)(void) = e->fn;
+        /* under the virtual PC's interrupt lock, as its own interrupts run (port_vpc.h) */
+        vpc_irq_lock();
         if (fn != NULL)
             fn();
+        vpc_irq_unlock();
         e->next_ns += e->period_ns;
     }
     if (!e->used)
@@ -181,7 +185,6 @@ static struct digi_driver {
     struct digi_sample {
         int playing;
         struct sos_sample s;            /* SOS copies the start block into the slot */
-        Uint64 end_ns;                  /* without a mixer: when it would have ended */
     } samples[DIGI_SAMPLES];
 } digi[DIGI_DRIVERS];
 
@@ -203,7 +206,8 @@ W32 func_0009E95B(void)
    HMIDRV.386 (device id at +0x104, port, DMA and IRQ at +0x5C/+0x60/+0x64, rate at +0x04,
    DMA buffer size at +0x44), allocates the sample table and fills in the mixer callback at
    +0x108, which the game then registers as a 90 Hz timer event. Here the block stays as the
-   game filled it (the callback 0: the event runs nothing). phase 5: SDL audio */
+   game filled it (the callback 0: the event runs nothing); the virtual PC's sound card mixes
+   on its own (port/host/vpc_audio.c), a voice for each of the driver's sample slots. */
 W32 func_0009F4DE(void *driver, W32 *handle)
 {
     int i;
@@ -227,8 +231,23 @@ W32 func_0009F9A7(W32 h, W32 shutdown, W32 release)
     (void)release;
     if (h >= DIGI_DRIVERS || digi[h].driver == NULL)
         return SOS_ERR_INVALID_HANDLE;
+    {
+        int i;
+        for (i = 0; i < DIGI_SAMPLES; i++)
+            vpc_audio_stop((int)h * DIGI_SAMPLES + i);
+    }
     memset(&digi[h], 0, sizeof digi[h]);
     return SOS_OK;
+}
+
+/* the sound card's voice for a driver's sample slot */
+static int digi_voice(const struct digi_sample *s)
+{
+    int d = 0;
+
+    while (d < DIGI_DRIVERS - 1 && !(s >= digi[d].samples && s < digi[d].samples + DIGI_SAMPLES))
+        d++;
+    return d * DIGI_SAMPLES + (int)(s - digi[d].samples);
 }
 
 static struct digi_sample *digi_sample(W32 h, W32 hs)
@@ -240,7 +259,7 @@ static struct digi_sample *digi_sample(W32 h, W32 hs)
 
 static int digi_playing(struct digi_sample *s)
 {
-    if (s->playing && s->end_ns != 0 && SDL_GetTicksNS() >= s->end_ns)
+    if (s->playing && !vpc_audio_playing(digi_voice(s)))
         s->playing = 0;
     return s->playing;
 }
@@ -248,7 +267,7 @@ static int digi_playing(struct digi_sample *s)
 /* sosDIGIStartSample(driver, start block) (0xA2504) -> the sample's handle (its slot), -1
    when every slot plays, or 0x0A for a bad driver (FALL.EXE returns the error code as the
    handle). The block (struct sos_sample): data, length, volume (left << 16 | right), loop
-   (-1), rate, bits, channels, format, pan. phase 5: SDL audio */
+   (-1), rate, bits, channels, format, pan. It plays on the sound card's voice for the slot. */
 W32 func_000A2504(W32 h, const struct sos_sample *start)
 {
     int i;
@@ -262,18 +281,12 @@ W32 func_000A2504(W32 h, const struct sos_sample *start)
         return 0xFFFFFFFFu;
     {
         struct digi_sample *s = &digi[h].samples[i];
-        Uint64 bytes_per_second = (Uint64)(start->rate > 0 ? start->rate : 0) *
-                                  (start->channels > 0 ? start->channels : 1) *
-                                  (start->bits > 8 ? 2 : 1);
         s->s = *start;
         s->playing = 1;
-        if (start->loop != 0)
-            s->end_ns = 0;          /* a loop plays until it is stopped */
-        else if (bytes_per_second == 0 || start->length <= 0)
-            s->end_ns = SDL_GetTicksNS();
-        else
-            s->end_ns = SDL_GetTicksNS() +
-                        (Uint64)start->length * 1000000000ull / bytes_per_second;
+        port_check_ptr(start->data, "sosDIGIStartSample's data");
+        vpc_audio_play(digi_voice(s), start->data, start->length, start->rate,
+                       start->bits > 8 ? 16 : 8, start->channels, start->loop != 0,
+                       (unsigned int)start->volume, (unsigned int)start->pan);
     }
     return (W32)i;
 }
@@ -296,7 +309,8 @@ W32 func_000A2687(W32 h, W32 hs)
 
     if (s == NULL)
         return SOS_ERR_INVALID_HANDLE;
-    s->playing = 0;                 /* phase 5: SDL audio */
+    s->playing = 0;
+    vpc_audio_stop(digi_voice(s));
     return SOS_OK;
 }
 
@@ -310,7 +324,8 @@ W32 func_000A1ED5(W32 h, W32 hs, W32 volume)
     if (s == NULL || !digi_playing(s))
         return SOS_ERR_INVALID_HANDLE;
     old = (W32)s->s.volume;
-    s->s.volume = (int)volume;      /* phase 5: SDL audio */
+    s->s.volume = (int)volume;
+    vpc_audio_set_volume(digi_voice(s), volume);
     return old;
 }
 
@@ -324,7 +339,8 @@ W32 func_000A20BF(W32 h, W32 hs, W32 pan)
     if (s == NULL || !digi_playing(s))
         return SOS_ERR_INVALID_HANDLE;
     old = (W32)s->s.pan;
-    s->s.pan = (int)pan;            /* phase 5: SDL audio */
+    s->s.pan = (int)pan;
+    vpc_audio_set_pan(digi_voice(s), pan);
     return old;
 }
 

@@ -14,8 +14,14 @@ void dos_set_dirs(const char *game, const char *overlay);
    `writing` is 0 */
 int dos_host_path(const char *dos, int writing, char *out, size_t n);
 
-/* stop the host layer (SDL) before the process ends */
+/* stop the host layer (SDL, the virtual PC) before the process ends */
 void host_shutdown(void);
+
+/* SDL has started on this thread (the main thread: SDL_Quit only from here) */
+void host_started(void);
+
+/* a fault prints the call chain before the process ends */
+void host_install_fault_handlers(void);
 
 /* a symbol the native build does not provide yet: logs its name and stops (port/gen stubs) */
 void port_unimplemented(const char *name) __attribute__((noreturn));
@@ -26,5 +32,17 @@ void port_fatal(const char *fmt, ...) __attribute__((noreturn, format(printf, 1,
 /* stops when p is a pointer that lost its top half on the way (an int in the game's C:
    docs/port.md, phase 3): nothing the host maps lies below 4 GB */
 void port_check_ptr(const void *p, const char *what);
+
+/* selectors (port/shim/dos.c): what a selector stands for, a new one for a base */
+unsigned long port_sel_base(unsigned short sel);
+unsigned short port_sel_new(unsigned long base);
+
+/* the DOS file layer (port/shim/dosfile.c), with Watcom's open flags */
+int port_open(const char *dos, int wflags, ...);
+int port_read(int fd, void *buf, unsigned int n);
+int port_write(int fd, const void *buf, unsigned int n);
+int port_lseek(int fd, int offset, int whence);
+int port_close(int fd);
+void port_exit(int status) __attribute__((noreturn));
 
 #endif

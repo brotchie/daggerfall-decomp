@@ -154,7 +154,7 @@ def build():
     # compile everything; the link may fail until the generated definitions are current
     r = run(["ninja", "-C", BUILD, "fall"], capture_output=True)
     game_objs = objects("game.dir")
-    port_objs = [o for o in objects("fall.dir") if "/gen/" not in o]
+    port_objs = [o for o in objects("fall.dir") + objects("porthost.dir") if "/gen/" not in o]
     errors = [l for l in (r.stdout + r.stderr).splitlines() if re.search(r"\.[ch]:\d+:\d+: error:", l)]
     if errors or not game_objs:
         print("\n".join(errors[:50]) or r.stdout[-4000:])
@@ -169,7 +169,7 @@ def build():
           "(%d with native layouts), problems: %s (gen/data_problems.txt)"
           % (len(game_objs), len(funcs), len(unknown), len(plan.items), typed,
              ", ".join("%s %d" % (k, len(v)) for k, v in sorted(plan.problems.items()))))
-    r = run(["ninja", "-C", BUILD, "fall"])
+    r = run(["ninja", "-C", BUILD, "fall", "vpcdemo"])
     if r.returncode:
         sys.exit("port: link failed")
     print("port: built", os.path.relpath(os.path.join(BUILD, "fall"), ROOT))

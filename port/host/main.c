@@ -2,14 +2,13 @@
    the game's folders and calls the game's main (FALL.EXE 0x10010) with its one argument, the
    config file, as the DOS game was started (`FALL.EXE Z.CFG`).
 
-   usage: fall [--game DIR] [--overlay DIR] [CONFIG]
+   usage: fall [--game DIR] [--overlay DIR] [--nosound] [CONFIG]
      --game DIR     the installed game (only read): ARENA2, the .BNK and .CFG files
      --overlay DIR  where the game's writes go (saves, its config), read before DIR
+     --nosound      keep the install's HMISET.CFG ("No Digital Device"), as the emulator runs;
+                    otherwise the overlay gets one with a Sound Blaster 16 for the game's sound
+                    effects (music needs a synthesiser the port does not have yet)
      CONFIG         the config file, Z.CFG by default (written to the overlay when missing) */
-#include <execinfo.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +17,7 @@
 #include <SDL3/SDL.h>
 
 #include "port_host.h"
+#include "port_vpc.h"
 
 extern int func_00010010(short argc, char **argv);     /* the game's main */
 
@@ -25,78 +25,19 @@ extern int func_00010010(short argc, char **argv);     /* the game's main */
 static const char z_cfg[] = "type 4\r\npath C:\\ARENA2\\\r\npathcd C:\\ARENA2\\\r\n"
                             "maps mapsave.sav\r\nmapfile maps.bsa\r\ncontrols 1\r\n";
 
-static int sdl_started;
-static SDL_ThreadID main_thread;
-
-void host_shutdown(void)
-{
-    if (sdl_started) {
-        SDL_Quit();
-        sdl_started = 0;
-    }
-}
-
-/* before stopping on a fatal error: SDL_Quit only from the main thread (on SDL's timer
-   thread, where the SOS timer events run the game's callbacks, it would wait for itself) */
-static void shutdown_for_abort(void)
-{
-    if (SDL_GetCurrentThreadID() == main_thread)
-        host_shutdown();
-}
-
-/* the call chain on stderr, for a stub that stops the run or a fault */
-static void backtrace_stderr(void)
-{
-    void *frames[48];
-    int n = backtrace(frames, 48);
-
-    backtrace_symbols_fd(frames, n, 2);
-}
-
-void port_unimplemented(const char *name)
-{
-    fprintf(stderr, "port: %s is not in the native build yet\n", name);
-    backtrace_stderr();
-    shutdown_for_abort();
-    abort();
-}
-
-void port_fatal(const char *fmt, ...)
-{
-    va_list ap;
-
-    fprintf(stderr, "port: ");
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    fprintf(stderr, "\n");
-    backtrace_stderr();
-    shutdown_for_abort();
-    abort();
-}
-
-void port_check_ptr(const void *p, const char *what)
-{
-    if (p != NULL && ((uintptr_t)p >> 32) == 0)
-        port_fatal("%s: %p is a pointer cut to 32 bits", what, p);
-}
-
-/* a fault (often a pointer cut to 32 bits, docs/port.md): name it, show where, and end */
-static void on_fault(int sig)
-{
-    static const char msg[] = "port: fatal signal, backtrace:\n";
-
-    write(2, msg, sizeof msg - 1);
-    backtrace_stderr();
-    signal(sig, SIG_DFL);
-    raise(sig);
-}
+/* HMI's sound setup with a Sound Blaster 16 (SETUP.INI's device 003) and no MIDI device */
+static const char hmiset_sb16[] =
+    "[DIGITAL]\r\nDeviceName  = Sound Blaster 16/AWE32    \r\nDeviceIRQ   = 5\r\n"
+    "DeviceDMA   = 1\r\nDevicePort  = 0x220\r\nDeviceID    = 0xe015\r\n\r\n"
+    "[MIDI]\r\nDeviceName  = No MIDI Device            \r\nDevicePort  = 0xffffffff\r\n"
+    "DeviceID    = 0xffffffff\r\n";
 
 int main(int argc, char **argv)
 {
     const char *game = getenv("DAGGER_GAME");
     const char *overlay = getenv("DAGGER_OVERLAY");
     const char *config = "Z.CFG";
+    int nosound = 0;
     char path[1024];
     char *game_argv[3];
     int i;
@@ -106,14 +47,12 @@ int main(int argc, char **argv)
             game = argv[++i];
         else if (strcmp(argv[i], "--overlay") == 0 && i + 1 < argc)
             overlay = argv[++i];
+        else if (strcmp(argv[i], "--nosound") == 0)
+            nosound = 1;
         else
             config = argv[i];
     }
-    main_thread = SDL_GetCurrentThreadID();
-    signal(SIGSEGV, on_fault);
-    signal(SIGBUS, on_fault);
-    signal(SIGILL, on_fault);
-    signal(SIGFPE, on_fault);
+    host_install_fault_handlers();
     if (game == NULL) {
         fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [CONFIG]\n");
         return 2;
@@ -131,11 +70,25 @@ int main(int argc, char **argv)
         fclose(f);
     }
 
+    if (!nosound) {
+        char hmi[1024];
+        FILE *f;
+        snprintf(hmi, sizeof hmi, "%s/HMISET.CFG", overlay ? overlay : "overlay");
+        if (access(hmi, F_OK) != 0 && (f = fopen(hmi, "wb")) != NULL) {
+            fwrite(hmiset_sb16, 1, sizeof hmiset_sb16 - 1, f);
+            fclose(f);
+        }
+    }
+
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS)) {
         fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
         return 1;
     }
-    sdl_started = 1;
+    host_started();
+    if (vpc_init("Daggerfall") != 0) {
+        fprintf(stderr, "port: no memory for the virtual PC\n");
+        return 1;
+    }
 
     game_argv[0] = "FALL.EXE";
     game_argv[1] = (char *)config;

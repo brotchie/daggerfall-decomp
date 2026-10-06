@@ -30,16 +30,23 @@ work on `main`.
 | `port/shim/except.c`, `xgfx.c` | MemCheck's exception hooks (no-ops); two pixel routines in the library region (`gfx_put_pixel`, `gfx_get_pixel`) |
 | `port/shim/dosfile.c` | DOS files: `C:\` and relative paths are the install folder, names match without regard to case, writes go to an overlay folder (read first), Watcom's `open` flags; `_dos_findfirst`/`_dos_findnext` as DOS matches (`*.*` matches every name, 8.3 upper case, directories only with `_A_SUBDIR`) |
 | `port/shim/dos.c` | `int386`/`int386x`: DPMI 0500h (free memory, the emulator's figures), 0600h-0603h, 0100h/0101h/0006h (DOS memory as host blocks), CauseWay FF30h; anything else logs and sets carry |
+| `port/include/port_vpc.h`, `port/host/vpc*.c` | the virtual PC on SDL3 (phase 5, below): low memory, VGA mode 13h and its DAC, the 70 Hz retrace, the keyboard (scan codes, int 9, the BIOS buffer), the mouse driver (int 33h), the PIT and BIOS tick, the vector table, DOS/BIOS/DPMI services with a register file, the sound card |
+| `port/test/vpcdemo.c` | the virtual PC on its own, through XnGine's entry points, with the game's image, palette and sounds; `--selftest` checks it end to end |
+| `port/host/host.c` | stopping SDL and the virtual PC, stopping on a stub or fault with the call chain, `port_check_ptr` |
 | `port/host/main.c` | `main`: SDL, the folders, then the game's main (0x10010) with `Z.CFG`, as `FALL.EXE Z.CFG` ran; a backtrace for a stub or a fault; `port_check_ptr` stops on a pointer that lost its top half |
 | `tools/port_build.py` | configure, build and generate; `run` prepares a game folder as `tools/fallemu.py` does and starts the build; `missing` lists the stubs |
 | `tools/port_census.py` | the 64-bit worklist: clang's diagnostics on the game's C, by kind and by file |
+| `tools/port_lowmem.py` | the game's reads of real-mode memory by address (68 of the BIOS tick at 0x46C, 44 of VGA memory at 0xA0000) as `DOS_LOW(addr)` (include/doslow.h): the same constant under Watcom, the virtual PC's low memory natively; lists the sites, `--apply` rewrites them |
 | `tools/port_data.py` | the game's data (phase 2): object 3 in address order, globals whose types hold pointers in native layouts with 8-byte relocations from FALL.EXE's fixups; `report` lists declarations still too narrow |
 
 ## Building and running
 
 ```sh
 .venv/bin/python tools/port_build.py                 # build/port/fall
-DAGGER_GAME=~/dagger_comp/build/game .venv/bin/python tools/port_build.py run
+DAGGER_GAME=~/dagger_comp/build/game .venv/bin/python tools/port_build.py run [--nosound]
+build/port/vpcdemo --game ~/dagger_comp/build/game        # the virtual PC on its own
+SDL_VIDEO_DRIVER=offscreen SDL_AUDIO_DRIVER=dummy DAGGER_OVERLAY=build/port/run \
+    build/port/vpcdemo --game ~/dagger_comp/build/game --selftest
 .venv/bin/python tools/port_build.py missing         # what the stubs stand in for
 .venv/bin/python tools/port_census.py                # the 64-bit worklist
 ```
@@ -105,6 +112,56 @@ implementations.
     provide;
   - `config_read` opens Z.CFG through a declaration that returns an int.
 
+**2026-10-05, the virtual PC (phase 5, platform side).** XnGine reaches the hardware through
+a few helpers, which the canonical engine keeps (docs/xngine_canonical.md on main):
+- port I/O: `xn_inb`, `xn_outb`, `xn_inw`, `xn_outw`;
+- services with a register file: `xn_int10`, `xn_int15`, `xn_int16`, `xn_int21`,
+  `xn_int2f`, `xn_int31`, `xn_int33`;
+- `_dos_getvect`/`_dos_setvect` for its five handlers;
+- VGA memory and the BIOS data area by address.
+
+`port/host/vpc*.c` gives the native build those same helpers on SDL3:
+- **Video:** mode 13h at 0xA0000 of a 1 MB + 64 KB low-memory block, through the 256-colour
+  DAC (3C7h-3C9h), shown at 4:3 in a resizable window. Alt+Enter toggles full screen; F12
+  saves a screenshot.
+- **Retrace:** 3DAh gives a 70 Hz vertical retrace. The screen is shown when the engine
+  sees a retrace start, otherwise every 14 ms.
+- **Interrupts:** they run on SDL's timer thread one at a time, under a lock that
+  `port_cli`/`port_sti` hold off, as one CPU takes them:
+  - the PIT's 18.2 Hz tick (int 8, the BIOS's: 0x46C and int 1Ch);
+  - the keyboard (int 9 for each scan code byte at port 60h);
+  - HMI SOS's timer events.
+- **Keyboard:** SDL keys become scan code set 1. The default int 9 is the BIOS's: shift
+  flags at 0x417, a keyboard buffer for int 16h.
+- **Mouse:** int 33h with mickeys, ranges and press counts. A click captures the mouse;
+  Ctrl+G releases it.
+- **DOS and DPMI:** the int 21h file calls go to the DOS file layer; DPMI covers
+  selectors, DOS memory and exception vectors. There is no VESA, so XnGine stays in
+  mode 13h.
+- **Sound:** SOS's samples play on a mixer of 160 voices into one SDL3 stream, with SOS's
+  volume and pan. The overlay gets an HMISET.CFG with a Sound Blaster 16, so the game
+  turns its sound effects on (`--nosound` keeps the install's). Music has no synthesiser
+  yet: HMI songs on an OPL3 with the game's MELODIC.BNK and DRUM.BNK are to come.
+- **Data:** `screen_buffer`, whose initial value in FALL.EXE is 0xA0000, now points into the
+  native low memory (tools/port_data.py).
+
+`vpcdemo --selftest` checks it end to end, and every check passes:
+- mode 13h and the DAC read-back;
+- an ARENA2 image read through the DOS layer;
+- scan codes 1E 9E 2A 1E 9E AA E0 48 through an installed int 9 at port 60h, and the BIOS
+  buffer's a, A, Up when the handler chains;
+- int 33h motion;
+- frames paced at 70 Hz;
+- the BIOS tick at 18.2 Hz;
+- a DAGGER.SND sample that plays and finishes.
+
+With a window the demo shows CHGN00I0.IMG with its palette and a mouse cursor, and clicks
+play sounds.
+
+`tools/port_lowmem.py` finds the game's own reads of real-mode memory by address: 68 of the
+tick at 0x46C, 44 of VGA memory. It rewrites them as `DOS_LOW()`. A trial on three files kept
+all 49 functions byte-identical. It is applied once the 64-bit pass has finished with `src/`.
+
 The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a pointer:
 
 | Kind | Count | Files |
@@ -113,6 +170,27 @@ The 64-bit worklist (`port_census.py`) has 7,243 diagnostics that lose half a po
 | calls through a declaration without parameters | 2,128 | 173 |
 | int-to-pointer casts | 448 | 96 |
 | other narrowing (shorten, int-conversion, compares) | 29 | 15 |
+
+## Linking the engine
+
+When XnGine's canonical C lands on `main`, the native build compiles `src/engine/` in place of
+the 175 stubs. What the engine needs under `DAGGER_PORT`:
+- `xn_inb`/`xn_outb`/`xn_inw`/`xn_outw` as plain function declarations, without the inline
+  `in`/`out` pragmas: the virtual PC defines them.
+- `xn_regs`'s registers pointer-wide (`unsigned long`, the layout of `struct vpc_regs` in
+  port_vpc.h): a DOS read passes its buffer's address in EDX. Code that puts an address in a
+  register uses `uptr`, not `u32`.
+- `VGA_MEMORY` and every other real-mode address through the virtual PC's low memory:
+  `(port_low_memory + 0xA0000)`, or `DOS_LOW()` from include/doslow.h.
+- Interrupt handlers as plain C functions installed with `_dos_setvect`. They run on the
+  interrupt thread under its lock and send EOI as before (`xn_outb(0x20, 0x20)`). Globals
+  that a handler changes and a loop waits on must be `volatile`.
+- `cli`/`sti` sections as `port_cli()`/`port_sti()`.
+- No hardware exceptions (an arm64 divide does not trap; the canonical C's `arith.c`
+  checks).
+- The structs the game and the engine share (the model handle in `model_instance` and
+  `block_model`, `monster_anim`, the texture cache entries) declared with the same
+  pointer fields on both sides.
 
 ## Phases
 

@@ -531,3 +531,15 @@ unsigned func_000A13F7(struct find_t *ff)
     find_fill(ff, &searches[slot].e[searches[slot].pos]);
     return 0;
 }
+
+/* int 21h 4Eh/4Fh for XnGine (port/host/vpc.c): the DTA has struct find_t's layout (21
+   reserved bytes, attribute, time, date, size, name), so a find fills it directly; a failed
+   find leaves the name empty */
+void port_dos_find(int first, const char *pattern, unsigned int attr, unsigned char *dta)
+{
+    struct find_t *ff = (struct find_t *)dta;
+    unsigned err = first ? func_000A13DA(pattern, attr, ff) : func_000A13F7(ff);
+
+    if (err != 0)
+        ff->name[0] = '\0';
+}
