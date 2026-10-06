@@ -731,14 +731,28 @@ class RImage:
         asm_address, size, reason). A machine made from asm state (a record's, a snapshot's)
         has run the asm's initialisation, not the C's: the C's own storage starts as built,
         so state an earlier call set (the 1/z table, the view) is taken from where the asm
-        keeps it. A test-harness migration, never part of the engine."""
+        keeps it. A row's `kind` is `copy` (the default: the bytes as they are) or `codeptr`
+        (a dword holding an asm entry's address becomes that function's C address). A
+        test-harness migration, never part of the engine."""
         for r in adopt_rows():
             name = r["c_symbol"].strip()
             a = next((self.syms[n] for n in ("_" + name, name, name + "_") if n in self.syms), None)
             if a is None:
                 continue                # not in this image (another group's, not built)
             n = int(r["size"], 0)
-            emu.uc.mem_write(a, bytes(emu.uc.mem_read(LOAD + int(r["asm_address"], 16), n)))
+            data = bytes(emu.uc.mem_read(LOAD + int(r["asm_address"], 16), n))
+            if (r.get("kind") or "copy").strip() == "codeptr":
+                # a dword holding an asm entry's address (0: none) becomes the C address of
+                # that entry's function
+                v = struct.unpack("<I", data[:4])[0]
+                if v:
+                    rt = self.routes.get(v - LOAD)
+                    if rt is None or rt.get("c") is None:
+                        raise SystemExit("adopt %s: %08X is no converted function's entry" %
+                                         (name, v))
+                    v = rt["c"]
+                data = struct.pack("<I", v)
+            emu.uc.mem_write(a, data)
 
     def game_routes(self):
         """The functions routed when the game runs (route_game)."""
