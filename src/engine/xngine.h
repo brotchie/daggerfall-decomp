@@ -23,7 +23,14 @@
    config/names.csv, and the linker resolves them to their addresses in the loaded game (an
    unnamed address is xn_data_XXXXXX). A function the C calls that is still asm is declared with
    the pragma of its interface and resolves to its asm entry; `asm_NAME` is always the asm
-   entry, even once NAME is C. 8.3 file names: the compiler runs under DOSBox-X. */
+   entry, even once NAME is C. 8.3 file names: the compiler runs under DOSBox-X.
+
+   Canonical modules (docs/xngine_canonical.md; vec, mat and math so far) have none of that:
+   plain prototypes with Watcom's own convention, no pragma, no NAME_r in src/engine. Their
+   asm interfaces live in test shims (src/engine_test/<subsys>_t.c), which only the tools
+   build in; the game reaches them through boundary routes the build generates
+   (config/xngine_boundary.csv). The inline helpers below are compiler support (Watcom
+   C32 10.0a has no 64-bit integers), not interfaces. */
 #ifndef XNGINE_H
 #define XNGINE_H
 
@@ -172,6 +179,15 @@ u32 xn_u64_div(const xn_s64 *r, u32 d);
    emulator logs the exception: the C divides where the asm did, with these helpers (a
    register operand: the handler steps over its 2 bytes), never with C's `/` where a divide
    can fail. */
+
+/* Canonical C does not raise the exception (src/engine/arith.c): the same results, the
+   quotient and the remainder 0 when the asm's divide would fault (docs/engine/quirks.md
+   Q-SYS-01). */
+int xn_s64_div_fits(const xn_s64 *n, s32 d);            /* 1 when idiv would not fault */
+s32 xn_s64_div_or0(const xn_s64 *n, s32 d);             /* n / d, truncated, or 0 */
+s32 xn_s64_divrem_or0(const xn_s64 *n, s32 d, s32 *rem);
+u32 xn_u64_div_or0(const xn_s64 *n, u32 d);             /* unsigned n / d, or 0 */
+u32 xn_u64_divrem_or0(const xn_s64 *n, u32 d, u32 *rem);
 
 /* ---- bits ------------------------------------------------------------------------------- */
 /* The index of the highest (bsr) or lowest (bsf) set bit of v; for v = 0, `old` (the CPU

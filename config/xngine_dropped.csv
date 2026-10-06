@@ -1,0 +1,11 @@
+function,kind,start,end,name,reason
+*,exceptions,,,00 FD,"canonical C checks a divide instead of letting it fault: the asm's divide errors (and the return from XnGine's handler) are gone; the results are the handler's (Q-SYS-01, src/engine/arith.c)"
+xn_vec_unit_to_angles_regs,memory,0C1F00,0C1F0C,xn_vec_angles_in,"scratch: the asm kept its input (x, y, z) here and read y back; nothing else reads it (config/xngine_boundary.csv: private)"
+xn_mat_scaled_axes,memory,136E84,136E90,xn_mat_scaled_axes_in,"scratch: the asm kept its scales a, b, c here; nothing reads them"
+xn_mat_from_angles,memory,13719F,1371AB,xn_mat_from_angles_tmp,"scratch in code bytes: three products of sines and cosines the asm kept between its steps"
+xn_math_triangle_y_at,memory,14BB00,14BB24,xn_math_tri_edges,"scratch: the edges e1, e2 and the query offset (xn_math_triangle_y_at, xn_vec_triangle_normal)"
+xn_math_triangle_y_at,memory,14BB30,14BB3C,xn_math_tri_edges+30,"scratch: the normal's y and the height's two terms"
+xn_vec_blend,memory,14BB60,14BB68,xn_vec_blend_weights,"scratch: the weights << 10"
+xn_mat_mul_int,memory,15D165,15D16D,xn_mat_int_strides,"scratch in code bytes: the row strides the product passed to its dot product (now parameters)"
+xn_mat_mul_fixed,memory,15D1E9,15D1F5,xn_mat_fixed_strides,"scratch in code bytes: the row strides and the shift (xn_mat_fixed_shift) passed to the dot product"
+xn_mat_mul_fixed64,memory,15D27C,15D286,xn_mat_fixed64_strides,"scratch in code bytes: the row strides and the shift (xn_mat_fixed64_shift) passed to the dot product"

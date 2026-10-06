@@ -649,16 +649,12 @@ void xn_collide_sphere_sphere_r(xn_regs *r)
 
 s32 xn_collide_sphere_sphere_approx(s32 cx, s32 cy, s32 cz, s32 r1, const xn_vec3 *c2, s32 r2)
 {
-    xn_vec3 terms;
-
-    return r1 + r2 - xn_vec_length_approx(cx - c2->x, cy - c2->y, cz - c2->z, &terms);
+    return r1 + r2 - xn_vec_length_approx(cx - c2->x, cy - c2->y, cz - c2->z);
 }
 
 s32 xn_collide_point_in_sphere_approx(const xn_vec3 *c, s32 r, const xn_vec3 *p)
 {
-    xn_vec3 terms;
-
-    return r - xn_vec_length_approx(c->x - p->x, c->y - p->y, c->z - p->z, &terms);
+    return r - xn_vec_length_approx(c->x - p->x, c->y - p->y, c->z - p->z);
 }
 
 /* the asm interface: EDX and EBX are the approximate length's y and z terms */
@@ -668,7 +664,8 @@ void xn_collide_point_in_sphere_approx_r(xn_regs *r)
     const xn_vec3 *p = (const xn_vec3 *)r->esi;
 
     regs_vec(&c, r->eax, r->edx, r->ebx);
-    r->eax = r->ecx - xn_vec_length_approx(c.x - p->x, c.y - p->y, c.z - p->z, &terms);
+    xn_vec_length_approx_terms(c.x - p->x, c.y - p->y, c.z - p->z, &terms);
+    r->eax = r->ecx - (terms.x + terms.y + terms.z);
     r->edx = terms.y;
     r->ebx = terms.z;
 }

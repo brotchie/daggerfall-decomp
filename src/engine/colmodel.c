@@ -264,8 +264,8 @@ static s32 model_model_detail(void)
         return -1;
     /* the pairs that meet, B's spheres in A's space */
     xn_mat_from_angles(b->angle_x, b->yaw, b->angle_z, &w->probe_matrix);
-    xn_mat_mul_fixed(3, 3, &w->rel_matrix.m[0][0], 3, &w->model_matrix_inv.m[0][0],
-                     &w->probe_matrix.m[0][0], 0x1C);
+    xn_mat_mul_fixed(&w->rel_matrix.m[0][0], &w->model_matrix_inv.m[0][0],
+                     &w->probe_matrix.m[0][0], 3, 3, 3, 0x1C);
     d->pair_count = 0;
     d->pairs = d->pairs_next = (struct xn_model_sphere **)(big_buffer + 0x2000);
     pa = d->a_list;
@@ -391,8 +391,8 @@ s32 xn_collide_spheres_model(struct xn_model_handle *h, struct xn_collide_probe 
     w->local_end.z = (p->position.z - h->z) << 8;
     xn_mat_transform(&w->local_end, &w->model_matrix_inv);
     xn_mat_from_angles(p->angle_x, p->yaw, p->angle_z, &w->probe_matrix);
-    xn_mat_mul_fixed(3, 3, &w->rel_matrix.m[0][0], 3, &w->model_matrix_inv.m[0][0],
-                     &w->probe_matrix.m[0][0], 0x1C);
+    xn_mat_mul_fixed(&w->rel_matrix.m[0][0], &w->model_matrix_inv.m[0][0],
+                     &w->probe_matrix.m[0][0], 3, 3, 3, 0x1C);
     met = (struct xn_collide_probe_sphere **)(big_buffer + 0x1000);
     for (k = 0; k < count; k++) {       /* (the asm: a count down from probe_count) */
         ps = met[k];
@@ -532,8 +532,8 @@ s32 xn_collide_spheres_spheres(struct xn_collide_probe *a, struct xn_collide_pro
     w->local_end.z = (b->position.z - a->position.z) << 8;
     xn_mat_transform(&w->local_end, &w->model_matrix_inv);
     xn_mat_from_angles(b->angle_x, b->yaw, b->angle_z, &w->probe_matrix);
-    xn_mat_mul_fixed(3, 3, &w->rel_matrix.m[0][0], 3, &w->model_matrix_inv.m[0][0],
-                     &w->probe_matrix.m[0][0], 0x1C);
+    xn_mat_mul_fixed(&w->rel_matrix.m[0][0], &w->model_matrix_inv.m[0][0],
+                     &w->probe_matrix.m[0][0], 3, 3, 3, 0x1C);
     xn_collide_ss_hits = HIT_LIST;
     xn_collide_ss_hits->count = 0;
     xn_collide_ss_hit_next = xn_collide_ss_hits->hits;
@@ -586,7 +586,7 @@ s32 xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_v
     struct xn_collide_hits *hits = HIT_LIST;
     struct xn_collide_hit *hit = hits->hits;
     const u8 *img;
-    xn_vec3 c, terms, d, p;
+    xn_vec3 c, d, p;
     s32 half_diag, radius, t;
 
     w->model = (struct xn_model_handle *)pos;
@@ -597,8 +597,7 @@ s32 xn_collide_segment_flat(const xn_vec3 *pos, const xn_vec3 *start, const xn_v
     img = xn_tex_cache_lookup_image(image >> 7, image & 0x7F, 0);
     xn_collide_flat_height = (*(const u16 *)(img + 6) * scale) >> 8;
     xn_collide_flat_width = (*(const u16 *)(img + 4) * scale) >> 8;
-    half_diag = xn_vec_length_approx(xn_collide_flat_height >> 1, xn_collide_flat_width >> 1, 0,
-                                     &terms);
+    half_diag = xn_vec_length_approx(xn_collide_flat_height >> 1, xn_collide_flat_width >> 1, 0);
     radius = half_diag + (half_diag >> 3);
     w->local_pos.x = 0;
     w->local_pos.y = (xn_collide_flat_height >> xn_collide_flat_anchor_shift[((flags >> 1) & 0xF) * 2])

@@ -1,22 +1,7 @@
-/* vec.c: XnGine's vector functions as readable C (xvec.h; see xngine.h and
-   docs/xngine_readable.md). */
+/* vec.c: XnGine's vectors (canonical C; the interface and the module's documentation are in
+   xvec.h). */
 #include "xvec.h"
 #include "xmath.h"
-
-/* a vector from the registers of an asm caller, and back */
-static void regs_to_vec(const xn_regs *r, xn_vec3 *v)
-{
-    v->x = r->eax;
-    v->y = r->edx;
-    v->z = r->ebx;
-}
-
-static void vec_to_regs(const xn_vec3 *v, xn_regs *r)
-{
-    r->eax = v->x;
-    r->edx = v->y;
-    r->ebx = v->z;
-}
 
 xn_vec3 *xn_vec_unit_direction(const xn_vec3 *from, const xn_vec3 *to, xn_vec3 *out)
 {
@@ -66,14 +51,6 @@ s32 xn_vec_dir_to_angles_regs(s32 x, s32 y, s32 z, s32 *yaw)
     return xn_vec_unit_to_angles_regs(v.x << 12, v.y << 12, v.z << 12, yaw);
 }
 
-void xn_vec_dir_to_angles_regs_r(xn_regs *r)
-{
-    s32 yaw;
-
-    r->eax = xn_vec_dir_to_angles_regs(r->eax, r->edx, r->ebx, &yaw);
-    r->edx = yaw;
-}
-
 s32 xn_vec_unit_to_angles(xn_vec3 *v)
 {
     s32 yaw, pitch;
@@ -96,9 +73,6 @@ s32 xn_vec_unit_to_angles_regs(s32 x, s32 y, s32 z, s32 *yaw)
     s32 a, c, pitch;
     xn_s64 sy;
 
-    xn_vec_angles_in.x = x;
-    xn_vec_angles_in.y = y;
-    xn_vec_angles_in.z = z;
     a = xn_math_asin(-x);
     if (z < 0) {                        /* facing back: the other side of the circle */
         a = 0x400 - a;
@@ -112,18 +86,10 @@ s32 xn_vec_unit_to_angles_regs(s32 x, s32 y, s32 z, s32 *yaw)
     xn_s64_set(&sy, -y);
     xn_s64_shl(&sy, 28);
     if (c != 0 && magnitude(-y) <= magnitude(c))
-        pitch = xn_s64_div(&sy, c);
+        pitch = xn_s64_div_or0(&sy, c);
     else
         pitch = xn_mulhi(-y >> 4, c) < 0 ? -XN_ONE28 : XN_ONE28;
     return xn_math_asin(pitch);
-}
-
-void xn_vec_unit_to_angles_regs_r(xn_regs *r)
-{
-    s32 yaw;
-
-    r->eax = xn_vec_unit_to_angles_regs(r->eax, r->edx, r->ebx, &yaw);
-    r->edx = yaw;
 }
 
 int xn_vec_scale_unit14(xn_vec3 *v, s32 dist)
@@ -134,17 +100,6 @@ int xn_vec_scale_unit14(xn_vec3 *v, s32 dist)
     v->y = (v->y * dist + 0x2000) >> 14;
     v->z = (v->z * dist + 0x2000) >> 14;
     return 1;
-}
-
-void xn_vec_scale_unit14_r(xn_regs *r)
-{
-    xn_vec3 v;
-    int ok;
-
-    regs_to_vec(r, &v);
-    ok = xn_vec_scale_unit14(&v, r->ecx);
-    vec_to_regs(&v, r);
-    XN_SETFLAG(r, XN_CF, !ok);
 }
 
 /* (a*wa + b*wb + 2^19) >> 20 with a 64-bit sum */
@@ -160,21 +115,14 @@ static s32 blend1(s32 a, s32 wa, s32 b, s32 wb)
 
 void xn_vec_blend(s32 wa, const xn_vec3 *a, s32 wb, const xn_vec3 *b, xn_vec3 *out)
 {
-    xn_tri_work *w = &xn_math_tri_edges;
+    xn_vec3 r;
 
-    w->w_a = wa << 10;
-    w->w_b = wb << 10;
-    out->x = blend1(a->x, w->w_a, b->x, w->w_b);
-    out->y = blend1(a->y, w->w_a, b->y, w->w_b);
-    out->z = blend1(a->z, w->w_a, b->z, w->w_b);
-}
-
-void xn_vec_blend_r(xn_regs *r)
-{
-    xn_vec3 v;
-
-    xn_vec_blend(r->eax, (const xn_vec3 *)r->edx, r->ebx, (const xn_vec3 *)r->ecx, &v);
-    vec_to_regs(&v, r);
+    wa <<= 10;
+    wb <<= 10;
+    r.x = blend1(a->x, wa, b->x, wb);
+    r.y = blend1(a->y, wa, b->y, wb);
+    r.z = blend1(a->z, wa, b->z, wb);
+    *out = r;
 }
 
 /* (a*b - c*d) >> 8 with a 64-bit difference; rounded adds 0x80 first */
@@ -199,14 +147,6 @@ void xn_vec_cross(const xn_vec3 *a, const xn_vec3 *b, xn_vec3 *out)
     *out = c;
 }
 
-void xn_vec_cross_r(xn_regs *r)
-{
-    xn_vec3 c;
-
-    xn_vec_cross((const xn_vec3 *)r->eax, (const xn_vec3 *)r->edx, &c);
-    vec_to_regs(&c, r);
-}
-
 /* x^2 + y^2 + z^2 in 64 bits */
 static void sum_squares(xn_s64 *s, s32 x, s32 y, s32 z)
 {
@@ -223,11 +163,12 @@ s32 xn_vec_length(s32 x, s32 y, s32 z)
     return xn_math_isqrt64(s.lo, s.hi);
 }
 
-s32 xn_vec_length_approx(s32 x, s32 y, s32 z, xn_vec3 *terms)
+void xn_vec_length_approx_terms(s32 x, s32 y, s32 z, xn_vec3 *terms)
 {
     u32 ax = magnitude(x), ay = magnitude(y), az = magnitude(z);
 
-    /* the largest stays, the other two count a quarter (signed comparisons, as the asm) */
+    /* the largest stays, the other two count a quarter (signed comparisons, as the asm: an
+       axis whose magnitude stayed negative never counts as the largest) */
     if ((s32)ax < (s32)ay) {
         if ((s32)az < (s32)ay) {
             ax >>= 2;
@@ -246,16 +187,14 @@ s32 xn_vec_length_approx(s32 x, s32 y, s32 z, xn_vec3 *terms)
     terms->x = ax;
     terms->y = ay;
     terms->z = az;
-    return ax + ay + az;
 }
 
-void xn_vec_length_approx_r(xn_regs *r)
+s32 xn_vec_length_approx(s32 x, s32 y, s32 z)
 {
     xn_vec3 t;
 
-    r->eax = xn_vec_length_approx(r->eax, r->edx, r->ebx, &t);
-    r->edx = t.y;
-    r->ebx = t.z;
+    xn_vec_length_approx_terms(x, y, z, &t);
+    return t.x + t.y + t.z;
 }
 
 void xn_vec_normalize_ptr(xn_vec3 *v)
@@ -275,13 +214,13 @@ static void normalize(xn_vec3 *v, u32 shift)
         return;
     xn_s64_set(&s, v->z);
     xn_s64_shl(&s, shift);
-    v->z = xn_s64_div(&s, len);
+    v->z = xn_s64_div_or0(&s, len);
     xn_s64_set(&s, v->y);
     xn_s64_shl(&s, shift);
-    v->y = xn_s64_div(&s, len);
+    v->y = xn_s64_div_or0(&s, len);
     xn_s64_set(&s, v->x);
     xn_s64_shl(&s, shift);
-    v->x = xn_s64_div(&s, len);
+    v->x = xn_s64_div_or0(&s, len);
 }
 
 void xn_vec_normalize(xn_vec3 *v)
@@ -289,27 +228,9 @@ void xn_vec_normalize(xn_vec3 *v)
     normalize(v, 16);
 }
 
-void xn_vec_normalize_r(xn_regs *r)
-{
-    xn_vec3 v;
-
-    regs_to_vec(r, &v);
-    xn_vec_normalize(&v);
-    vec_to_regs(&v, r);
-}
-
 void xn_vec_normalize_q28(xn_vec3 *v)
 {
     normalize(v, 28);
-}
-
-void xn_vec_normalize_q28_r(xn_regs *r)
-{
-    xn_vec3 v;
-
-    regs_to_vec(r, &v);
-    xn_vec_normalize_q28(&v);
-    vec_to_regs(&v, r);
 }
 
 void xn_vec_normalize_shift(xn_vec3 *v, u32 shift)
@@ -321,42 +242,24 @@ void xn_vec_normalize_shift(xn_vec3 *v, u32 shift)
     len = xn_math_isqrt64(s.lo, s.hi);
     s.lo = 0;
     s.hi = 1 << (shift & 31);
-    recip = xn_u64_div(&s, len);        /* 2^(32+shift) / |v| */
+    recip = xn_u64_div_or0(&s, len);    /* 2^(32+shift) / |v| */
     v->z = xn_mulhi(v->z, recip);
     v->y = xn_mulhi(v->y, recip);
     v->x = xn_mulhi(v->x, recip);
 }
 
-void xn_vec_normalize_shift_r(xn_regs *r)
-{
-    xn_vec3 v;
-
-    regs_to_vec(r, &v);
-    xn_vec_normalize_shift(&v, r->ecx & 0xFF);
-    vec_to_regs(&v, r);
-}
-
 void xn_vec_triangle_normal(const xn_vec3 *tri, xn_vec3 *out)
 {
-    xn_tri_work *w = &xn_math_tri_edges;
-    xn_vec3 n;
+    xn_vec3 e1, e2, n;
 
-    w->e1.x = tri[1].x - tri[0].x;
-    w->e1.y = tri[1].y - tri[0].y;
-    w->e1.z = tri[1].z - tri[0].z;
-    w->e2.x = tri[2].x - tri[1].x;
-    w->e2.y = tri[2].y - tri[1].y;
-    w->e2.z = tri[2].z - tri[1].z;
-    n.z = cross8(w->e1.x, w->e2.y, w->e1.y, w->e2.x, 0);
-    n.y = cross8(w->e1.z, w->e2.x, w->e1.x, w->e2.z, 0);
-    n.x = cross8(w->e1.y, w->e2.z, w->e1.z, w->e2.y, 0);
+    e1.x = tri[1].x - tri[0].x;
+    e1.y = tri[1].y - tri[0].y;
+    e1.z = tri[1].z - tri[0].z;
+    e2.x = tri[2].x - tri[1].x;
+    e2.y = tri[2].y - tri[1].y;
+    e2.z = tri[2].z - tri[1].z;
+    n.z = cross8(e1.x, e2.y, e1.y, e2.x, 0);
+    n.y = cross8(e1.z, e2.x, e1.x, e2.z, 0);
+    n.x = cross8(e1.y, e2.z, e1.z, e2.y, 0);
     *out = n;
-}
-
-void xn_vec_triangle_normal_r(xn_regs *r)
-{
-    xn_vec3 n;
-
-    xn_vec_triangle_normal((const xn_vec3 *)r->eax, &n);
-    vec_to_regs(&n, r);
 }

@@ -1,130 +1,117 @@
-/* xmat.h: XnGine's matrix functions (src/engine/mat.c; see xngine.h): 3x3 rotations in 2.28
-   fixed point from and to angles, matrix times vector, matrix products, and the general
-   n x m products the collision code uses.
+/* xmat.h: XnGine's matrices (src/engine/mat.c). Canonical C: plain prototypes, Watcom's own
+   calling convention; docs/xngine_canonical.md.
 
-   Each declaration keeps the function's asm interface (config/xngine_abi.csv): no pragma is
-   Watcom's own convention; a pragma names the registers; NAME_r is the glue for a function
-   whose asm callers read several registers or flags. */
+   What it does
+     3x3 rotations from and to (pitch, yaw, roll), a rotation times a vector (and its
+     transpose: the inverse rotation), rotation products, the view-space steps of the terrain's
+     axes, and the general n x m products and identities the collision code uses.
+
+   Fixed point and units
+     xn_mat3      m[row][column], 2.28 fixed point (1.0 = 0x10000000); a rotation's rows are
+                  the axes of the space it maps to
+     angles       2048 steps to a turn; xn_mat_from_angles composes roll, pitch and yaw as the
+                  game's objects and camera use them
+     transforms   xn_mat_transform takes each product as the high dword of (v << 4) times the
+                  2.28 entry (v must fit in 28 bits); xn_mat_transform_wide keeps the 64-bit
+                  product >> 28 (any v)
+     general      the n x m products take row-major arrays of s32 (or of 8-byte entries, whose
+                  low dwords are multiplied, for the 64-bit ones); a stride is in entries;
+                  rows, inner and cols must be at least 1 (the asm's loops counted down from
+                  them)
+
+   Tables (object 2, read only): xn_sin_table and xn_cos_table (xngine.h).
+   The quirks callers can see are kept; docs/engine/quirks.md has each one (Q-MAT-nn). */
 #ifndef XMAT_H
 #define XMAT_H
 
 #include "xngine.h"
 
-extern s32 xn_cam_scale_x;              /* the view matrix's row scales (xn_cam_scale_matrix) */
+extern s32 xn_cam_scale_x;              /* the view's x and y scales (xcam.h) */
 extern s32 xn_cam_scale_y;
-extern xn_vec3 xn_terrain_step_x;       /* xn_mat_scaled_axes' results */
+extern xn_vec3 xn_terrain_step_x;       /* xn_mat_scaled_axes' results (the terrain reads them) */
 extern xn_vec3 xn_terrain_step_y;
 extern xn_vec3 xn_terrain_step_z;
-extern xn_vec3 xn_mat_scaled_axes_in;   /* and its input */
 
-/* xn_mat_from_angles' products of sines and cosines (in code bytes, 0x13719F) */
-typedef struct xn_mat_angles_tmp {
-    s32 sr_sy;              /* sin roll * sin yaw */
-    s32 sy_cr;              /* sin yaw * cos roll */
-    s32 sp_cy;              /* sin pitch * cos yaw */
-} xn_mat_angles_tmp;
-extern xn_mat_angles_tmp xn_mat_from_angles_tmp;
+/* ---- rotations ------------------------------------------------------------------------------ */
 
-/* The general products' row strides and shifts (in code bytes next to them) */
-extern s32 xn_mat_int_strides[2];       /* A's row, B's row, in bytes */
-extern s32 xn_mat_fixed_strides[2];
-extern s32 xn_mat_fixed_shift;
-extern s32 xn_mat_fixed64_strides[2];
-extern u16 xn_mat_fixed64_shift;
-
-/* The angles of a rotation: pitch the arc sine of m[2][1], yaw that of m[2][0] / cos(pitch)
-   (mirrored by m[2][2]'s sign), roll that of -m[0][1] / cos(pitch) (mirrored by m[1][1]'s).
-   Returns 0 (all angles 0) when cos(pitch) is 0 or a ratio is out of range; the asm's CF. */
-int xn_mat_to_angles(const xn_mat3 *m, s32 *pitch, s32 *yaw, s32 *roll);
-void xn_mat_to_angles_r(xn_regs *r);
-
-/* The rotation of pitch, yaw and roll (2048ths of a turn) into m, 2.28 rounded. */
+/* The rotation of pitch, yaw and roll (2048ths of a turn) into m, each entry a 2.28 product
+   rounded. 12 game sites (objects, the camera). */
 void xn_mat_from_angles(s32 pitch, s32 yaw, s32 roll, xn_mat3 *m);
 
-/* Dead: m = the 3x3 identity with 1.0 = 2^28. (These three keep every register: the route's
-   stub keeps EAX, which Watcom's code never keeps.) */
+/* The angles of the rotation m: pitch the arc sine of m[2][1]; yaw that of m[2][0] / cos(pitch)
+   (mirrored when m[2][2] < 0); roll that of -m[0][1] / cos(pitch) (mirrored when
+   m[1][1] < 0). Returns 1, or 0 with all three angles 0 when cos(pitch) is 0 or a ratio is
+   above 1. */
+int xn_mat_to_angles(const xn_mat3 *m, s32 *pitch, s32 *yaw, s32 *roll);
+
+/* out = a b (each entry the 64-bit sum of three products >> 28). */
+void xn_mat_multiply(const xn_mat3 *a, const xn_mat3 *b, xn_mat3 *out);
+
+/* dst = src transposed (the inverse of a rotation). */
+void xn_mat_transpose_copy3(const xn_mat3 *src, xn_mat3 *dst);
+
+/* Dead: m = the identity (1.0 = 2^28). */
 void xn_mat_identity_q28(xn_mat3 *m);
-#pragma aux xn_mat_identity_q28 parm [eax] modify exact [eax];
 
-/* Dead: xn_mat_set_scale. */
-void xn_mat_set_scale_thunk(xn_mat3 *m);
-#pragma aux xn_mat_set_scale_thunk parm [eax] modify exact [eax];
-
-/* Dead: m = the identity scaled by the view scales; the asm stores the matrix's address where
-   the y scale belongs (a bug, kept). */
+/* Dead: m = the identity scaled by the view's scales. Q-MAT-01: the asm stores the matrix's
+   own address where the y scale belongs (m[1][1]), and m[2][2] stays 1.0. */
 void xn_mat_set_scale(xn_mat3 *m);
-#pragma aux xn_mat_set_scale parm [eax] modify exact [eax];
+void xn_mat_set_scale_thunk(xn_mat3 *m);    /* (the same, through one more call) */
 
-/* *x, *y, *z = m times (*x, *y, *z) (xn_mat_transform) */
-void xn_mat_transform_ptr(s32 *x, s32 *y, s32 *z, const xn_mat3 *m);
+/* ---- vectors ------------------------------------------------------------------------------- */
 
 /* In place: v = m v, each product the high dword of (v << 4) times the 2.28 entry. */
 void xn_mat_transform(xn_vec3 *v, const xn_mat3 *m);
-void xn_mat_transform_r(xn_regs *r);
 
-/* *x, *y, *z = m^T times (*x, *y, *z) */
-void xn_mat_transform_transposed_ptr(s32 *x, s32 *y, s32 *z, const xn_mat3 *m);
+/* The same on three separate values: (*x, *y, *z) = m (*x, *y, *z). Eight game sites. */
+void xn_mat_transform_ptr(s32 *x, s32 *y, s32 *z, const xn_mat3 *m);
 
 /* In place: v = m^T v, the inverse rotation. */
 void xn_mat_transform_transposed(xn_vec3 *v, const xn_mat3 *m);
-void xn_mat_transform_transposed_r(xn_regs *r);
 
-/* Dead: a copy of xn_mat_transform_ptr. */
-void xn_mat_transform_ptr_v2(s32 *x, s32 *y, s32 *z, const xn_mat3 *m);
+/* The same on three separate values. One game site. */
+void xn_mat_transform_transposed_ptr(s32 *x, s32 *y, s32 *z, const xn_mat3 *m);
 
 /* In place: v = m v with the full 64-bit products >> 28 (no << 4 first: large v do not
    overflow). */
 void xn_mat_transform_wide(xn_vec3 *v, const xn_mat3 *m);
-void xn_mat_transform_wide_r(xn_regs *r);
 
-/* Dead: a copy of xn_mat_transform_transposed. */
+/* Dead: copies of xn_mat_transform_ptr and xn_mat_transform_transposed. */
+void xn_mat_transform_ptr_v2(s32 *x, s32 *y, s32 *z, const xn_mat3 *m);
 void xn_mat_transform_transposed_v2(xn_vec3 *v, const xn_mat3 *m);
-void xn_mat_transform_transposed_v2_r(xn_regs *r);
 
 /* The view-space steps of the axes scaled by a, b and c: m (a, 0, 0), m (0, b, 0) and
-   m (0, 0, c) into xn_terrain_step_x, _y and _z. */
+   m (0, 0, c) (xn_mat_transform_wide) into xn_terrain_step_x, _y and _z. */
 void xn_mat_scaled_axes(s32 a, s32 b, s32 c, const xn_mat3 *m);
 
-/* out = a b (2.28; each entry a 64-bit sum >> 28) */
-void xn_mat_multiply(const xn_mat3 *a, const xn_mat3 *b, xn_mat3 *out);
+/* ---- general products (collision) ------------------------------------------------------------ */
 
-/* Dead: C (rows x bcols) = A (rows x inner) B (inner x bcols), 32-bit integer products. */
-void xn_mat_mul_int(s32 bcols, s32 rows, s32 *c, s32 inner, const s32 *a, const s32 *b);
-#pragma aux xn_mat_mul_int parm [eax] [edx] [ebx] [ecx] [esi] [edi] \
-    modify exact [eax edx ebx esi];
+/* The dot product of n consecutive entries of a with a column of b, whose entries are
+   b_stride apart: 32-bit products and sum. */
+s32 xn_mat_dot_int(s32 n, const s32 *a, const s32 *b, s32 b_stride);
 
-/* *out = the dot product of n consecutive entries of a with a column of b
-   (xn_mat_int_strides[1] bytes apart). */
-void xn_mat_dot_int(s32 n, s32 *out, const s32 *a, const s32 *b);
-#pragma aux xn_mat_dot_int parm [ecx] [ebx] [esi] [edi] modify exact [eax];
+/* Dead: c (rows x cols) = a (rows x inner) b (inner x cols), 32-bit products. */
+void xn_mat_mul_int(s32 *c, const s32 *a, const s32 *b, s32 rows, s32 inner, s32 cols);
 
-/* C = A B with 64-bit sums >> shift (fixed point). The shift arrives in EBP: glue. */
-void xn_mat_mul_fixed(s32 bcols, s32 rows, s32 *c, s32 inner, const s32 *a, const s32 *b,
-                      s32 shift);
-void xn_mat_mul_fixed_r(xn_regs *r);
+/* The same dot product with a 64-bit sum, >> shift (0..31). */
+s32 xn_mat_dot_fixed(s32 n, const s32 *a, const s32 *b, s32 b_stride, u32 shift);
 
-/* *out = (a row . b column) >> xn_mat_fixed_shift, with a 64-bit sum */
-void xn_mat_dot_fixed(s32 n, s32 *out, const s32 *a, const s32 *b);
-#pragma aux xn_mat_dot_fixed parm [ecx] [ebx] [esi] [edi] modify exact [eax];
+/* c = a b with 64-bit sums >> shift: fixed-point matrices (collision: 3x3, shift 28). */
+void xn_mat_mul_fixed(s32 *c, const s32 *a, const s32 *b, s32 rows, s32 inner, s32 cols,
+                      u32 shift);
 
-/* Dead: C = A B over 8-byte entries (the low dwords multiplied), 64-bit results >> shift.
-   The shift arrives in BP: glue. */
-void xn_mat_mul_fixed64(s32 bcols, s32 rows, s32 *c, s32 inner, const s32 *a, const s32 *b,
-                        u16 shift);
-void xn_mat_mul_fixed64_r(xn_regs *r);
+/* The dot product over 8-byte entries (their low dwords; b's entries are b_stride dwords
+   apart): the 64-bit sum >> shift into out[0] (low) and out[1] (high, arithmetic shift). */
+void xn_mat_dot_fixed64(s32 n, const s32 *a, const s32 *b, s32 b_stride, u32 shift, s32 out[2]);
 
-/* the 8-byte entries' dot product: a 64-bit result >> xn_mat_fixed64_shift into out[0..1] */
-void xn_mat_dot_fixed64(s32 n, s32 *out, const s32 *a, const s32 *b);
-#pragma aux xn_mat_dot_fixed64 parm [ecx] [ebx] [esi] [edi] modify exact [eax];
+/* Dead: c = a b over 8-byte entries, 64-bit results >> shift. */
+void xn_mat_mul_fixed64(s32 *c, const s32 *a, const s32 *b, s32 rows, s32 inner, s32 cols,
+                        u32 shift);
 
-/* m = the n x n identity with 1 << shift on the diagonal */
+/* m = the n x n identity with 1 << shift on the diagonal (n at least 1). */
 void xn_mat_identity(s32 *m, s32 shift, s32 n);
 
 /* Dead: the same over 8-byte entries. */
 void xn_mat_identity64(s32 *m, s32 shift, s32 n);
-#pragma aux xn_mat_identity64 parm [eax] [edx] [ebx] modify exact [eax edx];
-
-/* dst = src transposed (a copy, then swapped in place) */
-void xn_mat_transpose_copy3(const xn_mat3 *src, xn_mat3 *dst);
 
 #endif
