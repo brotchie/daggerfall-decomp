@@ -157,6 +157,37 @@ int dos_host_path(const char *dos, int writing, char *out, size_t size)
 #define W_TRUNC 0x0040
 #define W_EXCL 0x0400
 
+/* DOS's handles: the lowest free one from 5 (0-4 are the standard devices), at most 255, each
+   standing for a host file descriptor. The game keeps tables by handle (the archives' names,
+   directories and types: 20 handles, DOS's default), which a host's descriptor numbers (SDL,
+   the audio and the GPU hold many) would run past. */
+#define DOS_HANDLES 256
+static int host_fds[DOS_HANDLES];       /* host fd + 1; 0 when free */
+
+static int dos_handle(int fd)
+{
+    int h;
+
+    if (fd < 0)
+        return fd;
+    for (h = 5; h < DOS_HANDLES; h++) {
+        if (host_fds[h] == 0) {
+            host_fds[h] = fd + 1;
+            return h;
+        }
+    }
+    close(fd);
+    errno = EMFILE;
+    return -1;
+}
+
+static int host_fd(int h)
+{
+    if (h < 0 || h >= DOS_HANDLES || host_fds[h] == 0)
+        return h;           /* the standard devices, or a host descriptor (port/test/savetest) */
+    return host_fds[h] - 1;
+}
+
 int port_open(const char *dos, int wflags, ...)
 {
     char path[1024], orig[1024];
@@ -187,34 +218,38 @@ int port_open(const char *dos, int wflags, ...)
         if (resolve(game_dir, comp, n, orig, sizeof orig))
             copy_file(orig, path);
     }
-    return open(path, flags, mode);
+    return dos_handle(open(path, flags, mode));
 }
 
 int port_read(int fd, void *buf, unsigned int n)
 {
-    return (int)read(fd, buf, n);
+    return (int)read(host_fd(fd), buf, n);
 }
 
 int port_write(int fd, const void *buf, unsigned int n)
 {
-    return (int)write(fd, buf, n);
+    return (int)write(host_fd(fd), buf, n);
 }
 
 int port_lseek(int fd, int offset, int whence)
 {
-    return (int)lseek(fd, offset, whence);
+    return (int)lseek(host_fd(fd), offset, whence);
 }
 
 int port_close(int fd)
 {
-    return close(fd);
+    int h = host_fd(fd);
+
+    if (fd >= 5 && fd < DOS_HANDLES)
+        host_fds[fd] = 0;
+    return h < 0 ? -1 : close(h);
 }
 
 int port_filelength(int fd)
 {
     struct stat st;
 
-    if (fstat(fd, &st) != 0)
+    if (fstat(host_fd(fd), &st) != 0)
         return -1;
     return (int)st.st_size;
 }

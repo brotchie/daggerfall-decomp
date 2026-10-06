@@ -10,7 +10,7 @@ extern short mouse_y;
 extern struct spell *selected_spell;
 extern unsigned char spell_effect_school[];
 extern unsigned char spell_effect_cost_formula[];
-extern struct rect spellmaker_setting_buttons[];
+extern struct rect spellmaker_setting_buttons[34];
 extern unsigned char magic_school_skills[];
 extern signed char text_buffer[];
 extern unsigned char D_001940D5;

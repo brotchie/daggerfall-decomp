@@ -1,7 +1,7 @@
 /* matched by the real Watcom C32 10.0a (-d2), lifted from 0x0004A0C0 */
 #include "records.h"
 
-extern int text_blank;
+extern iptr text_blank;
 extern struct location *current_location;
 extern int rand_range(int, int);
 extern iptr building_name(struct building *);

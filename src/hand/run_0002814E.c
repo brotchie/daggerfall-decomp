@@ -17,8 +17,8 @@ extern char D_001707AE[];
 extern char D_001707B8[];
 extern char D_001707C3[];
 extern unsigned char player_environment;
-extern struct rect town_map_buttons[];
-extern char D_0017A103[];
+extern struct rect town_map_buttons[6];
+extern char D_0017A104[];            /* the town map's colour per map pixel 1..: indexed from pixel - 1 */
 extern iptr D_0018507F;
 extern signed char text_buffer[];
 extern signed char scratch_190ce5;
@@ -200,7 +200,7 @@ void town_map_draw(void)
             while (screen_x < 310 && map_x < map_width) {
                 pixel = MAP[map_width * map_y + map_x];
                 if (!(pixel == 0 || pixel == 251 || pixel == 250)) {
-                    colour = D_0017A103[MAP[map_width * map_y + map_x]];
+                    colour = D_0017A104[MAP[map_width * map_y + map_x] - 1];
                     SCR[screen_y * 320 + screen_x] = colour;
                     SCR[screen_y * 320 + screen_x + 1] = colour;
                 }

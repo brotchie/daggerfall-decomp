@@ -570,7 +570,7 @@ int pedestrian_walk(struct record *pedestrian, int player_distance)
         facing >>= 8;
         if (facing > 4) {
             pedestrian->flags |= 0x4000;
-            facing = (int)(unsigned char)anim_mirror_facing[facing];
+            facing = (int)(unsigned char)anim_mirror_facing[facing - 5];
         } else {
             pedestrian->flags &= ~0x4000;
         }

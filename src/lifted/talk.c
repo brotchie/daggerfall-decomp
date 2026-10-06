@@ -36,7 +36,7 @@ extern char talk_where_answers[];
 extern char talk_tell_answers[];
 extern char talk_creature_language[];
 extern char D_00179ACE[];
-extern struct rect talk_buttons[];
+extern struct rect talk_buttons[19];
 extern char talk_greeting_texts[];
 extern short talk_ack_texts[];
 extern short talk_regional_ids[];

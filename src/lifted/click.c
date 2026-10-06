@@ -29,7 +29,7 @@ extern char D_00176322[];
 extern unsigned char player_environment;
 extern signed char building_open_hours[];
 extern signed char D_0017C5B9[];
-extern int D_0017CA14;
+extern iptr D_0017CA14;
 extern char *monster_names[];
 extern iptr D_00183248;
 extern iptr D_0018324C;

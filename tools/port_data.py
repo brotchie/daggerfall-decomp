@@ -92,7 +92,37 @@ TYPES = {
     # the per-object light lists: 400 declared, but the pool runs to xn_render_light_list_pool_start
     # (1,600 entries of 24 bytes) and a frame may use them all: every entry at native size
     "xn_render_light_list_pool": ("struct xn_light_ref __v[1]", "all", "src/engine/xpipe.h"),
+    # pointers no code reads, so no source declares them (config/names.csv says what each
+    # is): they lie beside data the game reads, and are pointers natively like their
+    # neighbours. XnGine's span pool bounds (after xn_render_poly_pool's 1000 polygons):
+    "xn_render_span_pool_start": "void *__v",
+    "xn_render_span_pool_end": "void *__v",
+    # the C runtime's math error messages, by error type (after _IsTable, D_00178630)
+    "clib_matherr_messages": "char *__v[7]",
+    "region_event_names": "char *__v[26]",
+    "talk_place_names": "char *__v[8]",
+    "intro_keys_na": "char *__v",
+    "font_names": "char *__v[5]",
+    "gender_names": "char *__v[3]",
+    "prompt_how_many": "char *__v",
+    "sheet_labels": "char *__v[2]",
+    "lock_text_unlocked": "char *__v",
+    "poison_text_no_weapon": "char *__v",
+    "poison_text_already": "char *__v",
+    "travel_text_no_fast_travel": "char *__v",
+    "travel_text_no_destination": "char *__v",
+    "identify_text_done": "char *__v",
+    "identify_text_cost": "char *__v",
+    "region_event_phrases": "char *__v[26]",
+    "world_cell_header_ptr": "void *__v",
+    # read only through enchant_power_params[15] (itemmaker_show_param_list walks it to the 0)
+    "enchant_artifact_names": "char *__v[11]",
 }
+
+# FALL.EXE's library data (MemCheck's and the Watcom runtime's tables and messages, from 0x1889E0):
+# only library code reads it, and the native build replaces that code with the host's, so its
+# pointers stay as FALL.EXE's 32-bit values ("library" rows, for information)
+LIBRARY_ONLY = {"library_data"}
 
 DECL = re.compile(r"^extern\s+((?:const\s+|volatile\s+|signed\s+|unsigned\s+|struct\s+|union\s+)*"
                   r"[A-Za-z_]\w*(?:\s*\*)*)\s*(\**)\s*([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)\s*;")
@@ -643,7 +673,8 @@ def plan_data(need, table, image=None, report_only=False, defined=frozenset()):
             # relocations inside an untyped global: the declaration is too narrow
             for a in range(addr, end):
                 if a in fix:
-                    plan.problems["narrow" if o.index == 3 else "narrow-engine"].append("%s+0x%X (0x%08X) -> 0x%08X" % (name, a - addr, a, fix[a]))
+                    kind = "library" if name in LIBRARY_ONLY else "narrow" if o.index == 3 else "narrow-engine"
+                    plan.problems[kind].append("%s+0x%X (0x%08X) -> 0x%08X" % (name, a - addr, a, fix[a]))
             emit_bytes(raw)
             continue
         buf = bytearray(count * s64)

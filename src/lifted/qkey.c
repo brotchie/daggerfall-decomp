@@ -19,14 +19,14 @@ extern char D_00170968[];
 extern signed char weapon_skills[];
 extern signed char D_0017A144[];
 extern signed char struck_body_part_table[];
-extern char D_0017CAFA[];
+extern char *D_0017CCFA[];   /* class names, by mobile id - 128 */
 extern char material_to_hit[];
 extern char weapon_damage_min[];
 extern char weapon_damage_max[];
 extern char *monster_names[];
 extern char *region_names[];
 extern signed char D_001841E3[];
-extern int text_blank;
+extern iptr text_blank;
 extern char monster_category[];
 extern iptr D_0018506F;
 extern signed char body_part_armor_slots[];
@@ -224,7 +224,7 @@ L2D3DB:;
                             return name_generate_seeded((int)(unsigned char)D_0017A144[current_quest->id % 3], 0, object->name_seed);
                         }
                         if (creature->mobile_id >= 128) {
-                            return *(int *)(D_0017CAFA + (creature->mobile_id << 2));
+                            return (iptr)D_0017CCFA[creature->mobile_id - 128];
                         }
                         return (iptr)monster_names[creature->race];
                     }

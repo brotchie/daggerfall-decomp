@@ -20,7 +20,7 @@ extern char D_00170BF3[];
 extern char D_00170C00[];
 extern char D_00170C0E[];
 extern iptr D_0017B4B0;              /* the title menu's keys ("LSE"): a pointer */
-extern signed char D_0017B4B7[];
+extern signed char D_0017B4B8[];      /* a byte per race: its message is 2000 + it; picks count from 1 */
 extern char *D_0017CCFA[];
 extern signed char text_buffer[];
 extern signed char scratch_190d16;
@@ -174,7 +174,7 @@ L3A496:;
                     while (mouse_buttons != 0) xn_mouse_poll_clamped();
                     sound_play_ui(((int)(signed char)pick) + 208);
                     D_001940D5 |= 128;
-                    msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)D_0017B4B7[(int)(signed char)pick]) + 2000), 5);
+                    msgbox_show_rsc((int)(short)(((unsigned short)(unsigned char)D_0017B4B8[(int)(signed char)pick - 1]) + 2000), 5);
                 }
             }
             player_character->race = pick - 1;

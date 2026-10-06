@@ -135,6 +135,8 @@ void vpc_audio_shutdown(void);
 int vpc_audio_play(int voice, const void *data, int bytes, int rate, int bits, int channels,
                    int loop, unsigned int volume, unsigned int pan);
 void vpc_audio_stop(int voice);
+void vpc_audio_on_end(int voice, void (*fn)(int voice, void *arg), void *arg);
+void vpc_audio_continue(int voice, const void *data, int bytes);
 int vpc_audio_playing(int voice);
 void vpc_audio_set_volume(int voice, unsigned int volume);
 void vpc_audio_set_pan(int voice, unsigned int pan);

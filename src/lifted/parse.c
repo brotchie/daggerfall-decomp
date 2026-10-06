@@ -32,7 +32,7 @@ extern char D_0017C912[];
 extern short holiday_days[];
 extern signed char holiday_regions[];
 extern iptr holiday_names[];
-extern char D_0017CB8E[];
+extern char *D_0017CCFA[];   /* class names, then guilds, gods (temple kind 128|k: [kind - 91]) ... */
 extern iptr month_names[];
 extern iptr day_names[];
 extern iptr ordinal_suffixes[];
@@ -70,7 +70,7 @@ extern iptr codeword_second_words[];
 extern char monster_weights[];
 extern iptr imperial_names[];
 extern char *location_type_names[];
-extern int text_blank;
+extern iptr text_blank;
 extern iptr honorifics;
 extern iptr D_0018508F;
 extern iptr legal_reputation_names[];
@@ -685,9 +685,9 @@ iptr macro_gtp_fine(void)
     return (iptr)itoa(scratch_190cac, (char *)text_rsc_buffer, 10);
 }
 
-int macro_gdd_temple_god(void)
+iptr macro_gdd_temple_god(void)
 {
-    if ((iptr)guild_membership != 0) return *(int *)(D_0017CB8E + (guild_membership->kind << 2));
+    if ((iptr)guild_membership != 0) return (iptr)D_0017CCFA[guild_membership->kind - 91];
     return text_blank;
 }
 

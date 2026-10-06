@@ -697,7 +697,7 @@ iptr enchant_powers_text(struct item *item)
                 if (item->enchantments[i].type < 3) {
                     func_000A1054((char *)text_buffer, (char *)spell_name_by_id(item->enchantments[i].param), D_001756A3, 1132, 160);
                 } else {
-                    func_000A1054((char *)text_buffer, (char *)*(iptr *)((char *)(iptr)(*(char **)&enchant_power_params[item->enchantments[i].type] + (item->enchantments[i].param << 2))), D_001756A3, 1134, 160);
+                    func_000A1054((char *)text_buffer, (char *)*(iptr *)((char *)(iptr)(*(char **)&enchant_power_params[item->enchantments[i].type] + (item->enchantments[i].param << PTR_SHIFT))), D_001756A3, 1134, 160);
                 }
             }
         } else {

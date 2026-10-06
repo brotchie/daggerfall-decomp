@@ -30,7 +30,7 @@ extern char D_00170F54[];
 extern char D_00170F61[];
 extern char D_00170F6E[];
 extern iptr controls_file;
-extern int binding_names_base[];
+extern char *binding_names[21];      /* the names of bindings 200..220 (JOY 1 ... 3D CTRL) */
 extern struct rect options_buttons[];
 extern struct rect controls_buttons[];
 extern struct rect options_joystick_buttons[];
@@ -298,7 +298,7 @@ void options_controls_draw(int editing, iptr background)
         if (((int)(unsigned char)*(signed char *)(key_map + action)) < 200) {
             text_draw_centred(key_names[((int)(unsigned char)*(signed char *)(key_map + action))], (controls_buttons[action].x1 + controls_buttons[action].x0) / 2, (int)(iptr)&*(signed char *)((char *)(iptr)(controls_buttons[action].y0) + 2));
         } else {
-            text_draw_centred(binding_names_base[((int)(unsigned char)*(signed char *)(key_map + action))], (controls_buttons[action].x1 + controls_buttons[action].x0) / 2, (int)(iptr)&*(signed char *)((char *)(iptr)(controls_buttons[action].y0) + 2));
+            text_draw_centred((iptr)binding_names[((int)(unsigned char)*(signed char *)(key_map + action)) - 200], (controls_buttons[action].x1 + controls_buttons[action].x0) / 2, (int)(iptr)&*(signed char *)((char *)(iptr)(controls_buttons[action].y0) + 2));
         }
     }
 }

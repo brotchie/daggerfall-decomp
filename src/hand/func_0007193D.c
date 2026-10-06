@@ -16,7 +16,7 @@ extern char D_001760EA[];
 extern char D_0017610F[];
 extern char D_0017611C[];
 extern iptr D_0017D1FA;
-extern int D_0017D1FE;
+extern iptr D_0017D1FE;
 extern signed char text_buffer[];
 extern int D_00190CBC;
 extern signed char D_00190D1A;

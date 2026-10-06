@@ -16,7 +16,7 @@ extern char D_00170DEF[];
 extern char D_00170E11[];
 extern char D_00170E17[];
 extern struct spell *selected_spell;
-extern struct rect spellbook_buttons[];
+extern struct rect spellbook_buttons[9];
 extern char *spell_effect_names[];
 extern char *spell_effect_subtype_names[][12];
 extern char D_0018320A[];

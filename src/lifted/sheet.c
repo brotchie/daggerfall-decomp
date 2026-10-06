@@ -27,7 +27,7 @@ extern char D_00170D0F[];
 extern char D_00170D4C[];
 extern short msgbox_wrap_width;
 extern short skill_advance_multipliers[];
-extern struct rect sheet_buttons[];
+extern struct rect sheet_buttons[23];
 extern char *skill_names[];
 extern signed char skill_governing_attributes[];
 extern iptr attribute_abbrevs[];

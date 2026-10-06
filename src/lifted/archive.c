@@ -10,7 +10,7 @@ extern char D_00170150[];
 extern char D_0017015A[];
 extern char D_00170172[];
 extern iptr lock_text_fail;
-extern int lock_text_open;
+extern iptr lock_text_open;
 extern struct record *player_object;
 extern struct character *player_character;
 extern char *scratch_buffer;

@@ -11,7 +11,7 @@ extern iptr D_00183258;
 extern iptr D_0018325C;
 extern iptr D_00183260;
 extern iptr D_00183264[];
-extern int D_0018328C;
+extern iptr D_0018328C;
 extern iptr D_0018333C;
 extern iptr D_00183340;
 extern signed char text_buffer[];

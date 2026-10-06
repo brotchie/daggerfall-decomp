@@ -7,7 +7,7 @@
 #include "ptrint.h"
 
 /* data */
-extern int text_blank;
+extern iptr text_blank;
 extern int scratch_190be4;
 extern int scratch_190be8;
 extern unsigned char D_00190C78;

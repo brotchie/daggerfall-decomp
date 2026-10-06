@@ -207,7 +207,7 @@ int monster_set_action(struct record *monster, int angle, int action)
     facing = (view_yaw - player_angle) & 2047;
     facing >>= 8;
     if (facing > 4) {
-        facing = (int)(unsigned char)anim_mirror_facing[facing];
+        facing = (int)(unsigned char)anim_mirror_facing[facing - 5];
         anim->anim_flags |= 128;
     } else {
         anim->anim_flags &= 127;
@@ -246,7 +246,7 @@ int monster_set_action_seducer(struct record *monster, int angle, int action)
     }
     facing >>= 8;
     if (facing > 4) {
-        facing = (int)(unsigned char)anim_mirror_facing[facing];
+        facing = (int)(unsigned char)anim_mirror_facing[facing - 5];
         anim->anim_flags |= 128;
     } else {
         anim->anim_flags &= 127;

@@ -189,6 +189,7 @@ static struct digi_driver {
     struct digi_sample {
         int playing;
         struct sos_sample s;            /* SOS copies the start block into the slot */
+        struct sos_sample *start;       /* the game's block: its done callback gets it */
     } samples[DIGI_SAMPLES];
 } digi[DIGI_DRIVERS];
 
@@ -268,6 +269,41 @@ static int digi_playing(struct digi_sample *s)
     return s->playing;
 }
 
+/* The start block's done callback (+0x5C, natively after the 8-byte data pointer: the video
+   player's xn_vid_audio_done_cb): SOS calls it with the block when the sample has played, and
+   the callback may put the next buffer in the block (data, length), which plays on at once:
+   that is how the movies stream their sound. Without new data the sample has ended. */
+struct sos_sample_cb {
+    char *data;
+    char pad04[8];
+    int length;
+    int length2;
+    char pad14[24];
+    int volume, loop, rate, bits, channels, format, pan;
+    char pad48[20];
+    void (*done)(struct sos_sample *);
+};
+
+static void digi_sample_end(int voice, void *arg)
+{
+    struct digi_sample *s = arg;
+    struct sos_sample_cb *b = (struct sos_sample_cb *)s->start;
+    char *old = b->data;
+    int old_length = b->length;
+
+    if (b->done == NULL) {
+        s->playing = 0;
+        return;
+    }
+    b->done(s->start);
+    if (b->data != NULL && b->length > 0 && (b->data != old || b->length != old_length)) {
+        vpc_audio_continue(voice, b->data, b->length);
+        vpc_audio_on_end(voice, digi_sample_end, s);
+    } else {
+        s->playing = 0;
+    }
+}
+
 /* sosDIGIStartSample(driver, start block) (0xA2504) -> the sample's handle (its slot), -1
    when every slot plays, or 0x0A for a bad driver (FALL.EXE returns the error code as the
    handle). The block (struct sos_sample): data, length, volume (left << 16 | right), loop
@@ -288,9 +324,12 @@ W32 func_000A2504(W32 h, const struct sos_sample *start)
         s->s = *start;
         s->playing = 1;
         port_check_ptr(start->data, "sosDIGIStartSample's data");
+        s->start = (struct sos_sample *)start;
         vpc_audio_play(digi_voice(s), start->data, start->length, start->rate,
                        start->bits > 8 ? 16 : 8, start->channels, start->loop != 0,
                        (unsigned int)start->volume, (unsigned int)start->pan);
+        if (((const struct sos_sample_cb *)start)->done != NULL)
+            vpc_audio_on_end(digi_voice(s), digi_sample_end, s);
     }
     return (W32)i;
 }

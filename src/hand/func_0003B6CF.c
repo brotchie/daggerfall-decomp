@@ -3,7 +3,7 @@
 #include "bitfield.h"
 #include "clib.h"
 
-extern struct rect sheet_buttons[];
+extern struct rect sheet_buttons[23];
 extern short font_height;
 extern char D_00170C67[];
 extern char D_00170C6F[];

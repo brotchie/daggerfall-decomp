@@ -10,6 +10,7 @@
    its length's time has passed. */
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <SDL3/SDL.h>
@@ -29,6 +30,8 @@ static struct voice {
     float gain_l, gain_r;
     unsigned int volume, pan;
     Uint64 end_ns;              /* without a device: when it ends */
+    void (*end_cb)(int voice, void *arg);   /* at its end, as SOS's DMA interrupt calls the */
+    void *end_arg;                          /* sample's callback: it may give more data */
 } voices[VOICES];
 
 static SDL_AudioStream *out;
@@ -83,6 +86,21 @@ static void mix(float *buf, int frames)
             if (v->pos >= v->frames) {
                 if (v->loop) {
                     v->pos -= v->frames;
+                } else if (v->end_cb != NULL) {
+                    /* the callback runs as an interrupt (under the interrupt lock), without
+                       the voices' lock, so it can play or continue a voice */
+                    void (*cb)(int, void *) = v->end_cb;
+                    void *arg = v->end_arg;
+                    v->pos -= v->frames;
+                    v->active = 0;
+                    v->end_cb = NULL;
+                    SDL_UnlockMutex(mix_mutex);
+                    vpc_irq_lock();
+                    cb(i, arg);
+                    vpc_irq_unlock();
+                    SDL_LockMutex(mix_mutex);
+                    if (!v->active)
+                        break;
                 } else {
                     v->active = 0;
                     break;
@@ -118,6 +136,18 @@ static void SDLCALL feed(void *userdata, SDL_AudioStream *stream, int additional
 
 static SDL_AudioDeviceID device;
 
+/* PORT_AUDIO_RAW=FILE: the device's final mix (sounds and music) as it plays, raw float32
+   samples (the device's channels and rate, printed at start), for checks without a person */
+static FILE *capture;
+
+static void SDLCALL postmix(void *userdata, const SDL_AudioSpec *spec, float *buffer, int buflen)
+{
+    (void)userdata;
+    (void)spec;
+    if (capture != NULL)
+        fwrite(buffer, 1, (size_t)buflen, capture);
+}
+
 int vpc_audio_init(void)
 {
     SDL_AudioSpec spec = {SDL_AUDIO_F32, 2, OUT_RATE}, dst;
@@ -134,6 +164,11 @@ int vpc_audio_init(void)
         !SDL_BindAudioStream(device, out)) {
         fprintf(stderr, "port: sound stream: %s\n", SDL_GetError());
         return -1;
+    }
+    if (getenv("PORT_AUDIO_RAW") != NULL && (capture = fopen(getenv("PORT_AUDIO_RAW"), "wb")) != NULL) {
+        fprintf(stderr, "port: capturing the mix: float32, %d channels, %d Hz\n", dst.channels,
+                dst.freq);
+        SDL_SetAudioPostmixCallback(device, postmix, NULL);
     }
     SDL_ResumeAudioDevice(device);
     return 0;
@@ -184,6 +219,34 @@ int vpc_audio_play(int voice, const void *data, int bytes, int rate, int bits, i
     v->end_ns = loop ? 0 : SDL_GetTicksNS() + (Uint64)v->frames * 1000000000ull / (Uint64)rate;
     SDL_UnlockMutex(mix_mutex);
     return 0;
+}
+
+/* fn(voice, arg) when the voice reaches its end (set after vpc_audio_play) */
+void vpc_audio_on_end(int voice, void (*fn)(int voice, void *arg), void *arg)
+{
+    if (voice < 0 || voice >= VOICES)
+        return;
+    SDL_LockMutex(mix_mutex);
+    voices[voice].end_cb = fn;
+    voices[voice].end_arg = arg;
+    SDL_UnlockMutex(mix_mutex);
+}
+
+/* from an end callback: the voice goes on with more data, in the same format, without a gap */
+void vpc_audio_continue(int voice, const void *data, int bytes)
+{
+    struct voice *v;
+
+    if (voice < 0 || voice >= VOICES || data == NULL)
+        return;
+    SDL_LockMutex(mix_mutex);
+    v = &voices[voice];
+    v->data = data;
+    v->frames = bytes / (v->bits / 8 * v->channels);
+    if (v->pos >= v->frames)
+        v->pos = 0;
+    v->active = v->frames > 0;
+    SDL_UnlockMutex(mix_mutex);
 }
 
 void vpc_audio_stop(int voice)
