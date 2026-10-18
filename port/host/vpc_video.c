@@ -10,7 +10,7 @@
 
    PORT_GL=1 (fall --gl) shows the screen through OpenGL instead of SDL's renderer, with the 3D
    view drawn by OpenGL (port/host/vpc_gl.c); F11 switches the 3D view between OpenGL and the
-   software renderer. */
+   software renderer, F10 OpenGL's textures between texels and smooth. */
 #include <stdio.h>
 #include <string.h>
 
@@ -343,6 +343,10 @@ int vpc_video_handle_event(const void *ev)
             vpc_gl_toggle();
             return 1;
         }
+        if (e->key.scancode == SDL_SCANCODE_F10 && use_gl) {
+            vpc_gl_toggle_smooth();
+            return 1;
+        }
         if (e->key.scancode == SDL_SCANCODE_F12) {
             char name[32];
             snprintf(name, sizeof name, "dagger_%03d.bmp", screenshot_count++);
@@ -353,6 +357,7 @@ int vpc_video_handle_event(const void *ev)
     }
     if (e->type == SDL_EVENT_KEY_UP &&
         (e->key.scancode == SDL_SCANCODE_F12 || e->key.scancode == SDL_SCANCODE_F11 ||
+         (e->key.scancode == SDL_SCANCODE_F10 && use_gl) ||
          (e->key.scancode == SDL_SCANCODE_RETURN && (e->key.mod & SDL_KMOD_ALT))))
         return 1;
     return 0;

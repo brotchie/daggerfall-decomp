@@ -95,8 +95,15 @@ linker prefers.
 ## OpenGL
 
 `fall --gl` (or `PORT_GL=1`) draws the 3D view with OpenGL 4.1 and shaders, at the window's
-resolution (1920x1440 in the default window on a Retina display), instead of 320x200. F11
-switches the 3D view between OpenGL and the software renderer while the game runs.
+resolution (1920x1440 in the default window on a Retina display), instead of 320x200, with
+4x multisampled edges. While the game runs:
+- F11 switches the 3D view between OpenGL and the software renderer;
+- F10 switches OpenGL's textures between texels (the engine's look, the default) and smooth:
+  each pixel blends its four nearest texels, each through the shade and haze rows and the
+  palette first, and the sky backdrop behind the scene is filtered the same way.
+
+`PORT_GL_MSAA=N` sets the samples (1: none), `PORT_GL_SMOOTH=1` starts smooth,
+`PORT_GL_SOFTWARE=1` starts with the software 3D view.
 
 ```sh
 DEVELOPER_DIR=/Library/Developer/CommandLineTools .venv/bin/python tools/port_build.py
@@ -132,19 +139,22 @@ How it works:
     stride: a face's wrap size, a flat's size, the ground's 64x64) and uploaded as 8-bit
     indices.
   - The shade table and the haze table are copied with each frame.
-- **The renderer** (`port/host/vpc_gl.c`, on the main thread) draws into a palette-index
-  framebuffer (RG8: the index and a coverage flag) with a float depth linear in camera z:
+- **The renderer** (`port/host/vpc_gl.c`, on the main thread) draws into a multisampled
+  colour framebuffer with a float depth linear in camera z, resolved so that the scene's
+  alpha is its coverage:
   - the fragment shader takes the texel (wrapped for faces and the ground; clamped, with
     texel 0 transparent, for flats), then the shade row, a flat's second row, and the
     distance fog's haze row where the span hook would apply it (`xn_shade_fog_span`: z >> 8
-    past the fog's start, `fog_step` table bytes a unit);
+    past the fog's start, `fog_step` table bytes a unit), then the palette: the colour index
+    is the one the span routines would write;
   - the world writes depth; the flats test it without writing, back to front, as the engine
     draws them; translucent flats (ghosts) are dithered;
   - the composite then picks, per window pixel: the software screen (VGA memory) outside the
     3D window or where the game drew after the 3D pass (the screen differs from the copy taken
-    after it: the HUD, the weapon, rain and snow, the dungeon water); else the OpenGL pixel;
-    else what was on the screen before the 3D pass (the sky backdrop), or indoors the
-    background colour. Then the palette, so fades and the palette's effects apply as before.
+    after it: the HUD, the weapon, rain and snow, the dungeon water); else the OpenGL pixel
+    over what was on the screen before the 3D pass (the sky backdrop), or indoors the
+    background colour, by its coverage. The scene is drawn again at every present with the
+    palette of the moment, so fades and the palette's effects apply as before.
   - The 3D window is the rows the frame loop draws (the clip top to as far below the view
     centre as it is above it, Q-RENDER-05), not the whole clip window: the HUD's rows stay on
     the screen from frame to frame inside it.
@@ -171,8 +181,9 @@ Checks:
   vertices and draws.
 
 Not yet:
-- The sky backdrop and the dungeon water stay the software renderer's pixels (320x200): the
-  sky is a 2D image the game copies in, the water a post-pass over the S-buffer.
+- The sky backdrop and the dungeon water stay the software renderer's pixels (320x200; the sky
+  filtered in smooth mode): the sky is a 2D image the game copies in, the water a post-pass
+  over the S-buffer.
 - Light shaders are sampled per vertex, not per pixel.
 - Translucent flats are a dither, not the blend table.
 - macOS only (`<OpenGL/gl3.h>`); another platform needs a GL loader.

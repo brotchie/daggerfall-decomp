@@ -117,5 +117,7 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb);
 int vpc_gl_screenshot(const char *path);
 /* F11: the 3D view through OpenGL or the software renderer */
 void vpc_gl_toggle(void);
+/* F10: OpenGL's textures as texels or smooth (bilinear, through the palette) */
+void vpc_gl_toggle_smooth(void);
 
 #endif

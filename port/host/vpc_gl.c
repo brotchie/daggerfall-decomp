@@ -1,17 +1,19 @@
 /* vpc_gl.c: the OpenGL renderer (port/include/port_gl.h), on the main thread. Each present:
 
    1. the textures the capture registered since the last frame are uploaded (8-bit indices);
-   2. the latest 3D scene is drawn into the scene framebuffer, at the window's resolution:
-      a palette index and a coverage flag per pixel, and a depth linear in camera z. The
-      fragment shader finds each pixel's texel (the engine's texel coordinates, interpolated
-      perspective-correctly), takes it through the polygon's shade row, a flat's second row
-      and the distance fog's haze row as the span routines do, so the colours are the
-      engine's own. The world's polygons write depth; the flats test it and are drawn back to
-      front, as the engine draws them;
+   2. the latest 3D scene is drawn into the scene framebuffer, at the window's resolution
+      (4x multisampled unless PORT_GL_MSAA says otherwise), with a depth linear in camera z.
+      The fragment shader finds each pixel's texel (the engine's texel coordinates,
+      interpolated perspective-correctly), takes it through the polygon's shade row, a flat's
+      second row and the distance fog's haze row as the span routines do, so the colours are
+      the engine's own, then through the palette. F10 blends the four nearest texels, each
+      through the tables and the palette (smooth textures). The world's polygons write
+      depth; the flats test it and are drawn back to front, as the engine draws them. The
+      scene's alpha is its coverage (fractional on the edges once resolved);
    3. the composite: per pixel of the window, the software screen's pixel (VGA memory) where
       the game drew after the 3D pass (the screen differs from the copy taken after it) or
-      outside the 3D window; else the scene's pixel where it covers, else what was there
-      before the 3D pass (the sky) or the background colour indoors. Then the palette.
+      outside the 3D window; else the scene over what was there before the 3D pass (the sky)
+      or the background colour indoors.
    The picture is 320x200 at 4:3, letterboxed in the window, as the software path shows it. */
 #define GL_SILENCE_DEPRECATION
 #include <stddef.h>
@@ -26,12 +28,13 @@
 
 static SDL_Window *window;
 static SDL_GLContext context;
-static int ready, gl_on = 1;
+static int ready, gl_on = 1, smooth, msaa = 4;
 
 static GLuint scene_prog, comp_prog;
 static GLuint vao, vbo, empty_vao;
 static GLuint tex_vga, tex_pre, tex_post, tex_tables, tex_pal;
-static GLuint scene_fbo, scene_colour, scene_depth;
+static GLuint scene_fbo, scene_colour, scene_depth;     /* (resolved) colour, and its FBO */
+static GLuint ms_fbo, ms_colour, ms_depth;              /* the multisampled target */
 static GLuint out_fbo, out_colour;
 static int fbo_w, fbo_h;
 static GLuint *textures;
@@ -40,9 +43,9 @@ static int *tsize;                      /* w, h per texture id */
 
 /* scene uniforms */
 static GLint u_view, u_mode, u_colour, u_row2, u_fog, u_tsize, u_fogp, u_depth, u_tex,
-    u_tables;
+    u_tables, u_pal, u_smooth;
 /* composite uniforms */
-static GLint c_vga, c_pre, c_post, c_scene, c_pal, c_valid, c_clip, c_bg;
+static GLint c_vga, c_pre, c_post, c_scene, c_pal, c_valid, c_clip, c_bg, c_smooth;
 
 static const char *scene_vs =
     "#version 410 core\n"
@@ -72,29 +75,15 @@ static const char *scene_fs =
     "in float v_z;\n"
     "uniform usampler2D u_tex;\n"
     "uniform usampler2D u_tables;\n"        /* 256 x 128: the shade rows, then the haze rows */
-    "uniform int u_mode, u_colour, u_row2, u_fog;\n"
+    "uniform sampler2D u_pal;\n"
+    "uniform int u_mode, u_colour, u_row2, u_fog, u_smooth;\n"
     "uniform ivec2 u_tsize;\n"
     "uniform vec3 u_fogp;\n"                /* start, step, far (camera z >> 8) */
     "uniform float u_depth;\n"
-    "layout(location = 0) out vec2 o;\n"
+    "layout(location = 0) out vec4 o;\n"
     "uint tab(int row, uint c) { return texelFetch(u_tables, ivec2(int(c), row), 0).r; }\n"
-    "void main() {\n"
-    "    uint c;\n"
-    "    if (u_mode == 1) {\n"
-    "        c = uint(u_colour);\n"
-    "    } else {\n"
-    "        ivec2 t;\n"
-    "        if (u_mode == 0)\n"
-    "            t = ivec2(mod(floor(v_uv), vec2(u_tsize)));\n"
-    "        else\n"
-    "            t = clamp(ivec2(floor(v_uv)), ivec2(0), u_tsize - 1);\n"
-    "        c = texelFetch(u_tex, t, 0).r;\n"
-    "        if (u_mode >= 2) {\n"
-    "            if (c == 0u) discard;\n"
-    "            if (u_mode == 3 && ((int(gl_FragCoord.x) + int(gl_FragCoord.y)) & 1) == 1)\n"
-    "                discard;\n"
-    "        }\n"
-    "    }\n"
+    /* a texel through the polygon's rows and the fog, as the span routines map it */
+    "uint lit(uint c) {\n"
     "    if (v_shade >= 0.0)\n"
     "        c = tab(clamp(int(floor(v_shade)), 0, 127), c);\n"
     "    if (u_row2 >= 0)\n"
@@ -106,7 +95,47 @@ static const char *scene_fs =
     "            c = tab(64 + clamp(int(floor(b / 256.0)), 0, 63), c);\n"
     "        }\n"
     "    }\n"
-    "    o = vec2(float(c) / 255.0, 1.0);\n"
+    "    return c;\n"
+    "}\n"
+    "vec3 rgb(uint c) { return texelFetch(u_pal, ivec2(int(c), 0), 0).rgb; }\n"
+    "uint texel(ivec2 t) {\n"
+    "    if (u_mode == 0)\n"
+    "        t = ivec2(mod(vec2(t), vec2(u_tsize)));\n"
+    "    else\n"
+    "        t = clamp(t, ivec2(0), u_tsize - 1);\n"
+    "    return texelFetch(u_tex, t, 0).r;\n"
+    "}\n"
+    "void main() {\n"
+    "    vec3 c;\n"
+    "    if (u_mode == 1) {\n"
+    "        c = rgb(lit(uint(u_colour)));\n"
+    "    } else if (u_smooth == 0) {\n"
+    "        uint t = texel(ivec2(floor(v_uv)));\n"
+    "        if (u_mode >= 2 && t == 0u)\n"
+    "            discard;\n"
+    "        c = rgb(lit(t));\n"
+    "    } else {\n"
+    /* the four texels around the point, each lit and through the palette, blended; a
+       flat's transparent texels weigh nothing */
+    "        vec2 p = v_uv - 0.5;\n"
+    "        vec2 f = fract(p);\n"
+    "        ivec2 b = ivec2(floor(p));\n"
+    "        vec4 sum = vec4(0.0);\n"
+    "        for (int k = 0; k < 4; k++) {\n"
+    "            ivec2 d = ivec2(k & 1, k >> 1);\n"
+    "            float w = (d.x == 1 ? f.x : 1.0 - f.x) * (d.y == 1 ? f.y : 1.0 - f.y);\n"
+    "            uint t = texel(b + d);\n"
+    "            if (u_mode >= 2 && t == 0u)\n"
+    "                continue;\n"
+    "            sum += vec4(rgb(lit(t)) * w, w);\n"
+    "        }\n"
+    "        if (sum.a < 0.5)\n"
+    "            discard;\n"
+    "        c = sum.rgb / sum.a;\n"
+    "    }\n"
+    "    if (u_mode == 3 && ((int(gl_FragCoord.x) + int(gl_FragCoord.y)) & 1) == 1)\n"
+    "        discard;\n"
+    "    o = vec4(c, 1.0);\n"
     "    gl_FragDepth = clamp(v_z * u_depth, 0.0, 1.0);\n"
     "}\n";
 
@@ -128,17 +157,33 @@ static const char *comp_fs =
     "uniform int u_valid;\n"
     "uniform ivec4 u_clip;\n"               /* left, top, right, bottom */
     "uniform ivec2 u_bg;\n"                 /* fill?, colour */
+    "uniform int u_smooth;\n"
     "layout(location = 0) out vec4 o;\n"
+    "vec3 pal(uint c) { return texelFetch(u_pal, ivec2(int(c), 0), 0).rgb; }\n"
+    /* the picture before the 3D pass at q (320x200 pixels), filtered through the palette */
+    "vec3 pre_smooth(vec2 q) {\n"
+    "    vec2 p = q - 0.5;\n"
+    "    vec2 f = fract(p);\n"
+    "    ivec2 b = ivec2(floor(p));\n"
+    "    vec3 s = vec3(0.0);\n"
+    "    for (int k = 0; k < 4; k++) {\n"
+    "        ivec2 d = ivec2(k & 1, k >> 1);\n"
+    "        float w = (d.x == 1 ? f.x : 1.0 - f.x) * (d.y == 1 ? f.y : 1.0 - f.y);\n"
+    "        s += pal(texelFetch(u_pre, clamp(b + d, ivec2(0), ivec2(319, 199)), 0).r) * w;\n"
+    "    }\n"
+    "    return s;\n"
+    "}\n"
     "void main() {\n"
     "    ivec2 p = clamp(ivec2(floor(v_pos * vec2(320.0, 200.0))), ivec2(0), ivec2(319, 199));\n"
     "    uint c = texelFetch(u_vga, p, 0).r;\n"
     "    if (u_valid != 0 && p.x >= u_clip.x && p.x < u_clip.z && p.y >= u_clip.y &&\n"
     "        p.y < u_clip.w && c == texelFetch(u_post, p, 0).r) {\n"
-    "        vec2 s = texelFetch(u_scene, ivec2(gl_FragCoord.xy), 0).rg;\n"
-    "        if (s.g > 0.5)\n"
-    "            c = uint(s.r * 255.0 + 0.5);\n"
-    "        else\n"
-    "            c = u_bg.x != 0 ? uint(u_bg.y) : texelFetch(u_pre, p, 0).r;\n"
+    /* the scene (its colour premultiplied by its coverage) over what is behind it */
+    "        vec4 s = texelFetch(u_scene, ivec2(gl_FragCoord.xy), 0);\n"
+    "        vec3 u = u_bg.x != 0 ? pal(uint(u_bg.y)) : u_smooth != 0 ?\n"
+    "                 pre_smooth(v_pos * vec2(320.0, 200.0)) : pal(texelFetch(u_pre, p, 0).r);\n"
+    "        o = vec4(s.rgb + u * (1.0 - s.a), 1.0);\n"
+    "        return;\n"
     "    }\n"
     "    o = texelFetch(u_pal, ivec2(int(c), 0), 0);\n"
     "}\n";
@@ -229,6 +274,8 @@ int vpc_gl_init(void *sdl_window)
     u_depth = glGetUniformLocation(scene_prog, "u_depth");
     u_tex = glGetUniformLocation(scene_prog, "u_tex");
     u_tables = glGetUniformLocation(scene_prog, "u_tables");
+    u_pal = glGetUniformLocation(scene_prog, "u_pal");
+    u_smooth = glGetUniformLocation(scene_prog, "u_smooth");
     c_vga = glGetUniformLocation(comp_prog, "u_vga");
     c_pre = glGetUniformLocation(comp_prog, "u_pre");
     c_post = glGetUniformLocation(comp_prog, "u_post");
@@ -237,6 +284,7 @@ int vpc_gl_init(void *sdl_window)
     c_valid = glGetUniformLocation(comp_prog, "u_valid");
     c_clip = glGetUniformLocation(comp_prog, "u_clip");
     c_bg = glGetUniformLocation(comp_prog, "u_bg");
+    c_smooth = glGetUniformLocation(comp_prog, "u_smooth");
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -267,6 +315,20 @@ int vpc_gl_init(void *sdl_window)
 
     if (env && *env == '1')
         gl_on = 0;
+    env = SDL_getenv("PORT_GL_MSAA");
+    if (env)
+        msaa = atoi(env);
+    {
+        GLint max = 1;
+
+        glGetIntegerv(GL_MAX_SAMPLES, &max);
+        if (msaa > max)
+            msaa = max;
+        if (msaa < 1)
+            msaa = 1;
+    }
+    env = SDL_getenv("PORT_GL_SMOOTH");
+    smooth = env && *env == '1';
     ready = 1;
     pgl_enabled = 1;
     return 1;
@@ -285,6 +347,12 @@ void vpc_gl_toggle(void)
 {
     gl_on = !gl_on;
     fprintf(stderr, "port: 3D view by %s\n", gl_on ? "OpenGL" : "the software renderer");
+}
+
+void vpc_gl_toggle_smooth(void)
+{
+    smooth = !smooth;
+    fprintf(stderr, "port: OpenGL textures %s\n", smooth ? "smooth" : "as texels");
 }
 
 /* ---- textures ------------------------------------------------------------------------------ */
@@ -332,6 +400,12 @@ static void make_fbos(int w, int h)
         glDeleteRenderbuffers(1, &scene_depth);
         glDeleteFramebuffers(1, &out_fbo);
         glDeleteTextures(1, &out_colour);
+        if (ms_fbo) {
+            glDeleteFramebuffers(1, &ms_fbo);
+            glDeleteRenderbuffers(1, &ms_colour);
+            glDeleteRenderbuffers(1, &ms_depth);
+            ms_fbo = 0;
+        }
     }
     fbo_w = w;
     fbo_h = h;
@@ -340,7 +414,7 @@ static void make_fbos(int w, int h)
     glBindTexture(GL_TEXTURE_2D, scene_colour);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, w, h, 0, GL_RG, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glGenRenderbuffers(1, &scene_depth);
     glBindRenderbuffer(GL_RENDERBUFFER, scene_depth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, w, h);
@@ -350,6 +424,24 @@ static void make_fbos(int w, int h)
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, scene_depth);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         fprintf(stderr, "port: GL scene framebuffer incomplete\n");
+
+    if (msaa > 1) {
+        glGenRenderbuffers(1, &ms_colour);
+        glBindRenderbuffer(GL_RENDERBUFFER, ms_colour);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_RGBA8, w, h);
+        glGenRenderbuffers(1, &ms_depth);
+        glBindRenderbuffer(GL_RENDERBUFFER, ms_depth);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_DEPTH_COMPONENT32F, w, h);
+        glGenFramebuffers(1, &ms_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, ms_fbo);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ms_colour);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ms_depth);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            fprintf(stderr, "port: GL multisampled framebuffer incomplete: no MSAA\n");
+            glDeleteFramebuffers(1, &ms_fbo);
+            ms_fbo = 0;
+        }
+    }
 
     glGenTextures(1, &out_colour);
     glBindTexture(GL_TEXTURE_2D, out_colour);
@@ -447,7 +539,7 @@ static void draw_scene(const pgl_scene *s)
     int x0, y0, x1, y1;
     float depth_far = s->far_z > 0 ? s->far_z * 2.0f : 1e9f;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, scene_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, ms_fbo ? ms_fbo : scene_fbo);
     glViewport(0, 0, fbo_w, fbo_h);
     glDisable(GL_SCISSOR_TEST);
     glClearColor(0, 0, 0, 0);
@@ -469,6 +561,10 @@ static void draw_scene(const pgl_scene *s)
     glUniform1f(u_depth, 1.0f / depth_far);
     glUniform1i(u_tex, 0);
     glUniform1i(u_tables, 1);
+    glUniform1i(u_pal, 2);
+    glUniform1i(u_smooth, smooth);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, tex_pal);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex_tables);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 128, GL_RED_INTEGER, GL_UNSIGNED_BYTE,
@@ -503,6 +599,12 @@ static void draw_scene(const pgl_scene *s)
     glDepthMask(GL_TRUE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_SCISSOR_TEST);
+    if (ms_fbo) {               /* resolve: the edges' coverage becomes their alpha */
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, scene_fbo);
+        glBlitFramebuffer(0, 0, fbo_w, fbo_h, 0, 0, fbo_w, fbo_h, GL_COLOR_BUFFER_BIT,
+                          GL_NEAREST);
+    }
 }
 
 /* the share of the 3D window's pixels the game changed after the 3D pass: a scene the game
@@ -622,6 +724,7 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb)
     glUniform1i(c_scene, 3);
     glUniform1i(c_pal, 4);
     glUniform1i(c_valid, valid);
+    glUniform1i(c_smooth, smooth);
     if (s) {
         glUniform4i(c_clip, s->clip_l, s->clip_t, s->clip_r, s->clip_b);
         glUniform2i(c_bg, s->bg_fill, s->bg_colour);
