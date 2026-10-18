@@ -32,7 +32,7 @@ static int ready, gl_on = 1, smooth, msaa = 4;
 
 static GLuint scene_prog, comp_prog;
 static GLuint vao, vbo, empty_vao;
-static GLuint tex_vga, tex_pre, tex_post, tex_tables, tex_pal;
+static GLuint tex_vga, tex_pre, tex_post, tex_tables, tex_pal, tex_falloff;
 static GLuint scene_fbo, scene_colour, scene_depth;     /* (resolved) colour, and its FBO */
 static GLuint ms_fbo, ms_colour, ms_depth;              /* the multisampled target */
 static GLuint out_fbo, out_colour;
@@ -43,7 +43,7 @@ static int *tsize;                      /* w, h per texture id */
 
 /* scene uniforms */
 static GLint u_view, u_mode, u_colour, u_row2, u_fog, u_tsize, u_fogp, u_depth, u_tex,
-    u_tables, u_pal, u_smooth;
+    u_tables, u_pal, u_smooth, u_focal, u_nl, u_lbase, u_lights, u_falloff;
 /* composite uniforms */
 static GLint c_vga, c_pre, c_post, c_scene, c_pal, c_valid, c_clip, c_bg, c_smooth;
 
@@ -56,6 +56,7 @@ static const char *scene_vs =
     "out vec2 v_uv;\n"
     "out float v_shade;\n"
     "out float v_z;\n"
+    "out vec3 v_cam;\n"
     "void main() {\n"
     "    float z = a_cam.z;\n"
     /* screen x = cx + x * hw / z on 320 columns, y = cy + y * hh / z on 200 rows, as clip
@@ -66,6 +67,7 @@ static const char *scene_vs =
     "    v_uv = a_uv;\n"
     "    v_shade = a_shade;\n"
     "    v_z = z;\n"
+    "    v_cam = a_cam;\n"
     "}\n";
 
 static const char *scene_fs =
@@ -73,6 +75,13 @@ static const char *scene_fs =
     "in vec2 v_uv;\n"
     "in float v_shade;\n"
     "in float v_z;\n"
+    "in vec3 v_cam;\n"
+    "uniform vec4 u_view;\n"
+    "uniform vec2 u_focal;\n"
+    "uniform int u_nl;\n"                    /* a light shader: its lights (0: none) */
+    "uniform float u_lbase;\n"
+    "uniform float u_lights[15];\n"
+    "uniform usampler2D u_falloff;\n"        /* LIGHT.DAT, 256 x 128 */
     "uniform usampler2D u_tex;\n"
     "uniform usampler2D u_tables;\n"        /* 256 x 128: the shade rows, then the haze rows */
     "uniform sampler2D u_pal;\n"
@@ -83,8 +92,31 @@ static const char *scene_fs =
     "layout(location = 0) out vec4 o;\n"
     "uint tab(int row, uint c) { return texelFetch(u_tables, ivec2(int(c), row), 0).r; }\n"
     /* a texel through the polygon's rows and the fog, as the span routines map it */
+    /* xn_light_shade at this pixel: its point in view space >> 8, each light's squared
+       distance (the squares table's k * k << 8) times its falloff's high dword, LIGHT.DAT
+       there times the intensity >> 12 on the base shade, to the last row */
+    "float light_shade() {\n"
+    "    vec3 p = vec3(v_cam.x * u_view.z / u_focal.x, v_cam.y * u_view.w / u_focal.y,\n"
+    "                  v_cam.z) / 256.0;\n"
+    "    float s = u_lbase;\n"
+    "    for (int i = 0; i < 3; i++) {\n"
+    "        if (i >= u_nl)\n"
+    "            break;\n"
+    "        vec3 k = floor(vec3(u_lights[i * 5], u_lights[i * 5 + 1], u_lights[i * 5 + 2]) +\n"
+    "                       p);\n"
+    "        float h = floor(256.0 * dot(k, k) * u_lights[i * 5 + 4] / 4294967296.0);\n"
+    "        if (h < 32768.0) {\n"
+    "            int hi = int(h);\n"
+    "            float f = float(texelFetch(u_falloff, ivec2(hi & 255, hi >> 8), 0).r);\n"
+    "            s += floor(f * u_lights[i * 5 + 3] / 4096.0);\n"
+    "        }\n"
+    "    }\n"
+    "    return min(s, 63.0 * 256.0) / 256.0;\n"
+    "}\n"
     "uint lit(uint c) {\n"
-    "    if (v_shade >= 0.0)\n"
+    "    if (u_nl > 0)\n"
+    "        c = tab(clamp(int(floor(light_shade())), 0, 63), c);\n"
+    "    else if (v_shade >= 0.0)\n"
     "        c = tab(clamp(int(floor(v_shade)), 0, 127), c);\n"
     "    if (u_row2 >= 0)\n"
     "        c = tab(u_row2, c);\n"
@@ -276,6 +308,11 @@ int vpc_gl_init(void *sdl_window)
     u_tables = glGetUniformLocation(scene_prog, "u_tables");
     u_pal = glGetUniformLocation(scene_prog, "u_pal");
     u_smooth = glGetUniformLocation(scene_prog, "u_smooth");
+    u_focal = glGetUniformLocation(scene_prog, "u_focal");
+    u_nl = glGetUniformLocation(scene_prog, "u_nl");
+    u_lbase = glGetUniformLocation(scene_prog, "u_lbase");
+    u_lights = glGetUniformLocation(scene_prog, "u_lights");
+    u_falloff = glGetUniformLocation(scene_prog, "u_falloff");
     c_vga = glGetUniformLocation(comp_prog, "u_vga");
     c_pre = glGetUniformLocation(comp_prog, "u_pre");
     c_post = glGetUniformLocation(comp_prog, "u_post");
@@ -307,6 +344,12 @@ int vpc_gl_init(void *sdl_window)
     tex_pre = index_texture(PGL_W, PGL_H);
     tex_post = index_texture(PGL_W, PGL_H);
     tex_tables = index_texture(256, 128);
+    glGenTextures(1, &tex_falloff);
+    glBindTexture(GL_TEXTURE_2D, tex_falloff);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, 256, 128, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT,
+                 NULL);
     glGenTextures(1, &tex_pal);
     glBindTexture(GL_TEXTURE_2D, tex_pal);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -479,7 +522,8 @@ static int by_state(const void *a, const void *b)
 static int same_state(const pgl_draw *p, const pgl_draw *q)
 {
     return p->mode == q->mode && p->tex == q->tex && p->colour == q->colour &&
-           p->row2 == q->row2 && p->fog == q->fog && p->layer == q->layer;
+           p->row2 == q->row2 && p->fog == q->fog && p->layer == q->layer &&
+           p->nlights == 0 && q->nlights == 0;
 }
 
 static void set_draw_state(const pgl_draw *d)
@@ -488,6 +532,11 @@ static void set_draw_state(const pgl_draw *d)
     glUniform1i(u_colour, d->colour);
     glUniform1i(u_row2, d->row2);
     glUniform1i(u_fog, d->fog);
+    glUniform1i(u_nl, d->nlights);
+    if (d->nlights) {
+        glUniform1f(u_lbase, d->lbase);
+        glUniform1fv(u_lights, 15, &d->lights[0][0]);
+    }
     if (d->tex >= 0 && d->tex < ntextures && textures[d->tex]) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textures[d->tex]);
@@ -517,7 +566,9 @@ static void draw_runs(const pgl_scene *s, const int *order, int n)
             continue;
         }
         set_draw_state(d);
-        while (j < n && same_state(&s->draws[order[j]], d)) {
+        /* the run: this draw, and those after it with the same state (a lit draw has
+           its own light uniforms, so its run is itself) */
+        while (j < n && (j == i || same_state(&s->draws[order[j]], d))) {
             if (s->draws[order[j]].count > 0) {
                 firsts[k] = s->draws[order[j]].first;
                 counts[k] = s->draws[order[j]].count;
@@ -565,6 +616,12 @@ static void draw_scene(const pgl_scene *s)
     glUniform1i(u_smooth, smooth);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tex_pal);
+    glUniform1i(u_falloff, 3);
+    glUniform2f(u_focal, s->focal_x, s->focal_y);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, tex_falloff);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 128, GL_RED_INTEGER, GL_UNSIGNED_SHORT,
+                    s->falloff);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex_tables);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 128, GL_RED_INTEGER, GL_UNSIGNED_BYTE,

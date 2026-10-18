@@ -49,6 +49,7 @@ static s32 cam[MAX_CAM][3];
 static int ncam;
 static unsigned int gen = 1;
 static int scene_done;
+static int vertex_light = -1;           /* PORT_GL_VERTEX_LIGHT=1: light shaders per vertex */
 static unsigned long serial;
 
 static int on(void)
@@ -201,6 +202,7 @@ static pgl_draw *new_draw(int mode, int tex, int layer)
     d->row2 = -1;
     d->fog = 0;
     d->layer = layer;
+    d->nlights = 0;
     return d;
 }
 
@@ -424,6 +426,21 @@ static void world_poly(int index, int fog)
     d = new_draw(mode, tex, 0);
     d->colour = (u8)p->colour4;
     d->fog = fog;
+    if (h.lit && !vertex_light) {
+        /* the shader goes to the fragment shader whole: no per-vertex samples */
+        const struct xn_light_shader *sh = p->shader;
+
+        d->nlights = sh->nlights < 3 ? sh->nlights : 3;
+        d->lbase = (float)(sh->row - xn_shade_table);
+        for (k = 0; k < d->nlights; k++) {
+            d->lights[k][0] = (float)sh->light[k].x;
+            d->lights[k][1] = (float)sh->light[k].y;
+            d->lights[k][2] = (float)sh->light[k].z;
+            d->lights[k][3] = (float)(u32)sh->light[k].intensity;
+            d->lights[k][4] = (float)(u32)sh->light[k].falloff;
+        }
+        h.lit = 0;
+    }
     n = c->n < 64 ? c->n : 64;
     for (k = 0; k < n; k++)
         vertex(&h, cam[c->first + k][0], cam[c->first + k][1], cam[c->first + k][2], &v[k]);
@@ -491,6 +508,8 @@ void xn_glcap_end_frame(void)
 
     if (!on())
         return;
+    if (vertex_light < 0)
+        vertex_light = pgl_vertex_light();
     S = pgl_building();
     S->nverts = 0;
     S->ndraws = 0;
@@ -502,6 +521,8 @@ void xn_glcap_end_frame(void)
     S->hh = (float)xn_cam_half_height;
     S->near_z = (float)xn_cam_near_z;
     S->far_z = (float)xn_cam_far_z;
+    S->focal_x = (float)xn_cam_focal_x;
+    S->focal_y = (float)xn_cam_focal_y;
     /* the 3D window: the rows the frame loop draws (from the clip top to as far below the
        view centre as that is above it, Q-RENDER-05) within the clip window, and the columns
        of the view within it. Rows below are not the 3D pass's even inside the clip window
@@ -530,6 +551,8 @@ void xn_glcap_end_frame(void)
     memcpy(S->tables, xn_shade_table, 64 * 256);
     haze = haze_base();
     memcpy(S->tables + 64 * 256, haze ? haze : xn_shade_table, 64 * 256);
+    if (xn_light_falloff)
+        memcpy(S->falloff, xn_light_falloff, sizeof S->falloff);
 
     for (i = 1; i < (int)(xn_render_poly_next - xn_render_poly_pool) && i < POOL; i++)
         if (caps[i].gen == gen && caps[i].kind == CAP_WORLD)

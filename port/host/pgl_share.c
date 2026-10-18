@@ -15,6 +15,13 @@ void *pgl_realloc(void *p, size_t n)
     return realloc(p, n);
 }
 
+int pgl_vertex_light(void)
+{
+    const char *e = SDL_getenv("PORT_GL_VERTEX_LIGHT");
+
+    return e && *e == '1';
+}
+
 static pgl_scene scenes[3];
 static pgl_scene *building = &scenes[0], *latest = &scenes[1], *showing = &scenes[2];
 static int latest_new;

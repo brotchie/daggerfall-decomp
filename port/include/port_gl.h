@@ -51,6 +51,12 @@ typedef struct pgl_draw {
     int row2;               /* a second row every texel goes through (a flat's fog), or -1 */
     int fog;                /* the frame's distance fog applies */
     int layer;              /* 0 the world (depth written), 1 flats (tested, not written) */
+    /* a light shader (xlight.h), evaluated per pixel: 1-3 point lights, else 0. Its base
+       shade (table bytes from the shade table's start) and per light the foot point on the
+       face's plane (view space >> 8), the intensity and the falloff */
+    int nlights;
+    float lbase;
+    float lights[3][5];
 } pgl_draw;
 
 #define PGL_W 320
@@ -66,6 +72,7 @@ typedef struct pgl_scene {
     unsigned long serial;   /* counts the frames drawn */
     /* the view: the centre and half size on the screen, the near and far planes (camera z) */
     float cx, cy, hw, hh, near_z, far_z;
+    float focal_x, focal_y;                 /* pixels (the light shaders' rays) */
     int clip_l, clip_t, clip_r, clip_b;     /* the 3D window on the 320x200 screen */
     int bg_fill, bg_colour;                 /* indoors: what no polygon covers */
     /* the distance fog: camera z >> 8 beyond start goes step table bytes a unit toward
@@ -73,6 +80,7 @@ typedef struct pgl_scene {
     int fog_on;
     float fog_start, fog_step, fog_far;
     unsigned char tables[128 * 256];        /* the shade table, then the haze table */
+    unsigned short falloff[32768];          /* LIGHT.DAT: a light's falloff by distance */
     unsigned char pre[PGL_W * PGL_H];       /* the screen before the 3D pass (the sky) */
     unsigned char post[PGL_W * PGL_H];      /* and after it (before the HUD) */
 } pgl_scene;
@@ -86,6 +94,8 @@ extern volatile int pgl_enabled;
 /* the host's realloc (the engine's objects name only what the native build defines: a C
    library name there would be taken for a game symbol, tools/port_build.py) */
 void *pgl_realloc(void *p, size_t n);
+/* PORT_GL_VERTEX_LIGHT=1: light shaders sampled per vertex, not per pixel */
+int pgl_vertex_light(void);
 
 /* ---- the hand-over: a frame drawn on the game's thread, shown on the main thread ---------- */
 

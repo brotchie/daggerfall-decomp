@@ -132,9 +132,13 @@ How it works:
     perspective-correct interpolation is linear in u/z and 1/z across the screen, as the
     gradients are, so the texels land where the engine puts them, without the 8- and 16-pixel
     linear steps.
-  - The shade: the polygon's one shade row, or for a light shader (kind 8) `xn_light_shade`
-    itself at each vertex, the triangles split until their sides are under 12 pixels (the
-    span routines sample every 16).
+  - The shade: the polygon's one shade row; a light shader (kind 8: torches, spells) goes to
+    the fragment shader whole (its base shade, and per light the foot point, intensity and
+    falloff), which evaluates `xn_light_shade` at every pixel with LIGHT.DAT as a texture: the
+    pixel's view-space point from its camera-space position, the squared distances as the
+    squares table has them, the falloff's high dword, the intensity >> 12.
+    `PORT_GL_VERTEX_LIGHT=1` samples `xn_light_shade` itself at the vertices instead, the
+    triangles split until their sides are under 12 pixels (the span routines sample every 16).
   - Textures are registered once by a hash of their pixels (an image's pixels at the 256-byte
     stride: a face's wrap size, a flat's size, the ground's 64x64) and uploaded as 8-bit
     indices.
@@ -184,7 +188,6 @@ Not yet:
 - The sky backdrop and the dungeon water stay the software renderer's pixels (320x200; the sky
   filtered in smooth mode): the sky is a 2D image the game copies in, the water a post-pass
   over the S-buffer.
-- Light shaders are sampled per vertex, not per pixel.
 - Translucent flats are a dither, not the blend table.
 - macOS only (`<OpenGL/gl3.h>`); another platform needs a GL loader.
 
