@@ -46,6 +46,8 @@ work on `main`.
 | `tools/port_build.py` | configure, build and generate; `run` prepares a game folder as `tools/fallemu.py` does and starts the build; `missing` lists the stubs |
 | `tools/port_census.py` | the 64-bit worklist: clang's diagnostics on the game's C, by kind and by file |
 | `tools/port_lowmem.py` | the game's reads of real-mode memory by address (68 of the BIOS tick at 0x46C, 44 of VGA memory at 0xA0000) as `DOS_LOW(addr)` (include/doslow.h): the same constant under Watcom, the virtual PC's low memory natively; lists the sites, `--apply` rewrites them |
+| `port/include/port_gl.h`, `port/engine_gl/glcap.c`, `port/host/vpc_gl.c`, `port/host/pgl_share.c` | the OpenGL renderer for the 3D view (`--gl`, "OpenGL" below): the capture on the game's thread, the renderer on the main thread, the hand-over between them |
+| `tools/port_gl_shots.py` | every classic save through the software and the OpenGL renderer, with a same-frame score |
 | `tools/port_data.py` | the game's data (phase 2): object 3 in address order, globals whose types hold pointers in native layouts with 8-byte relocations from FALL.EXE's fixups; `report` lists declarations still too narrow |
 
 ## Building and running
@@ -90,6 +92,91 @@ takes from the host (`HOST_LIBC`). Everything else gets a generated definition i
 A game global that shares a name with the host's C library gets its own definition, which the
 linker prefers.
 
+## OpenGL
+
+`fall --gl` (or `PORT_GL=1`) draws the 3D view with OpenGL 4.1 and shaders, at the window's
+resolution (1920x1440 in the default window on a Retina display), instead of 320x200. F11
+switches the 3D view between OpenGL and the software renderer while the game runs.
+
+```sh
+DEVELOPER_DIR=/Library/Developer/CommandLineTools .venv/bin/python tools/port_build.py
+build/port/fall --game build/game --gl
+.venv/bin/python tools/port_gl_shots.py [--jobs 6] [NAME ...]  # both renderers, every save
+```
+
+How it works:
+- **The software renderer still runs.** The game sees the frame it always saw: the pick reads
+  the S-buffer, and the HUD and the weapon are drawn over `screen_buffer`. OpenGL draws the
+  same frame again, so the two can be compared frame by frame, and the software picture is
+  there wherever OpenGL has nothing to add.
+- **The capture** (`port/engine_gl/glcap.c`, on the game's thread, built with the engine)
+  takes the frame as the engine builds it, through hooks in the renderer: `XN_GLCAP(...)` in
+  poly.c (a model face's or a clipped polygon's camera-space vertices; a textured face's
+  image), terrain.c (a ground cell's corners), flat.c (a flat's quad), render.c and rframe.c
+  (the frame's start, the screen before the 3D pass, the frame's end) and gfx.c (the present).
+  Outside the native build `XN_GLCAP` is nothing; the hooks are under `DAGGER_PORT`.
+  - At the frame's end, every pool record whose span routine is no longer its first-span setup
+    (the S-buffer showed it somewhere) becomes triangles; every flat whose light setup ran
+    (Q-FLAT-01: the others were never drawn) becomes a quad.
+  - Each vertex carries the texel the span routines would give at that point: the polygon's
+    u/z and v/z gradients at the vertex's screen position, times z, as `tex_span`
+    (u/z * z << 6 >> 32, 8.8 texels) and `tex64_span` (the ground's: * z >> 3, low dwords)
+    compute them, plus the texture origin (swapped for the lit routine). GL's
+    perspective-correct interpolation is linear in u/z and 1/z across the screen, as the
+    gradients are, so the texels land where the engine puts them, without the 8- and 16-pixel
+    linear steps.
+  - The shade: the polygon's one shade row, or for a light shader (kind 8) `xn_light_shade`
+    itself at each vertex, the triangles split until their sides are under 12 pixels (the
+    span routines sample every 16).
+  - Textures are registered once by a hash of their pixels (an image's pixels at the 256-byte
+    stride: a face's wrap size, a flat's size, the ground's 64x64) and uploaded as 8-bit
+    indices.
+  - The shade table and the haze table are copied with each frame.
+- **The renderer** (`port/host/vpc_gl.c`, on the main thread) draws into a palette-index
+  framebuffer (RG8: the index and a coverage flag) with a float depth linear in camera z:
+  - the fragment shader takes the texel (wrapped for faces and the ground; clamped, with
+    texel 0 transparent, for flats), then the shade row, a flat's second row, and the
+    distance fog's haze row where the span hook would apply it (`xn_shade_fog_span`: z >> 8
+    past the fog's start, `fog_step` table bytes a unit);
+  - the world writes depth; the flats test it without writing, back to front, as the engine
+    draws them; translucent flats (ghosts) are dithered;
+  - the composite then picks, per window pixel: the software screen (VGA memory) outside the
+    3D window or where the game drew after the 3D pass (the screen differs from the copy taken
+    after it: the HUD, the weapon, rain and snow, the dungeon water); else the OpenGL pixel;
+    else what was on the screen before the 3D pass (the sky backdrop), or indoors the
+    background colour. Then the palette, so fades and the palette's effects apply as before.
+  - The 3D window is the rows the frame loop draws (the clip top to as far below the view
+    centre as it is above it, Q-RENDER-05), not the whole clip window: the HUD's rows stay on
+    the screen from frame to frame inside it.
+  - A frame the game has drawn over (more than 60% of the 3D window changed since the 3D
+    pass: the inventory, the map) is not shown; a menu over the frozen view keeps the frame.
+- **The hand-over** (`port/host/pgl_share.c`): three scenes (filled by the game's thread,
+  latest, shown) and a queue of new textures. The scene structs in `port_gl.h` are packed to 8
+  bytes explicitly: the engine's objects are compiled with `-fpack-struct=1`.
+
+Checks:
+- `tools/port_gl_shots.py` loads every classic save in both renderers and saves the same
+  moments; with `PORT_GL_SW_SHOTS=1` an OpenGL run saves the software screen of the same frame
+  next to each shot, and the tool scores the OpenGL picture sampled at the 320x200 pixels'
+  centres against it. Close views score 0.83-0.94 (the rest is a texel boundary or a light
+  band moved by a pixel: exact perspective against the engine's linear steps); distant ground
+  scores lower, since a minified texture's texel under a pixel centre depends on the exact
+  sample point.
+- 2026-10-18: all 18 classic saves render, and the screens around the world (the map, the
+  options, the info and character screens) composite as they should. Two and a half minutes
+  of random keys and clicks on six saves under AddressSanitizer (`PORT_SANITIZE=address`,
+  OpenGL on) report only the original's stat-bar over-read. The game's loop runs at the same
+  ~54 Hz in both renderers.
+- `PORT_GL_DEBUG=1` prints, every 2 s, how many presents showed the 3D scene, and the scene's
+  vertices and draws.
+
+Not yet:
+- The sky backdrop and the dungeon water stay the software renderer's pixels (320x200): the
+  sky is a 2D image the game copies in, the water a post-pass over the S-buffer.
+- Light shaders are sampled per vertex, not per pixel.
+- Translucent flats are a dither, not the blend table.
+- macOS only (`<OpenGL/gl3.h>`); another platform needs a GL loader.
+
 ## Why the 64-bit work cannot be skipped
 
 The game keeps pointers in `int`s everywhere: casts, globals typed `int`, functions declared
@@ -103,6 +190,9 @@ half. A 32-bit address space would hide that, but arm64 macOS has none:
 So every value that holds an address must have a type as wide as a pointer.
 
 ## Status
+
+**2026-10-18, OpenGL.** `fall --gl` draws the 3D view with OpenGL at the window's resolution
+(see "OpenGL"); F11 switches between it and the software renderer.
 
 **2026-10-06, the game runs natively.** With XnGine linked (see "Linking the engine"), `fall`:
 - plays the intro movie with its sound;

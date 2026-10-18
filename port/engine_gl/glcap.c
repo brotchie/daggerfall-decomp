@@ -48,7 +48,7 @@ static struct cap {
 static s32 cam[MAX_CAM][3];
 static int ncam;
 static unsigned int gen = 1;
-static int scene_done, presents_without;
+static int scene_done;
 static unsigned long serial;
 
 static int on(void)
@@ -541,6 +541,10 @@ void xn_glcap_end_frame(void)
     scene_done = 1;
 }
 
+/* A frame drawn since the last present is handed over. When the game shows pictures without
+   drawing the world (a menu over the frozen view), the last frame stays: the renderer shows
+   it only where the screen still has the 3D pass's pixels, and not at all once most of them
+   are gone (vpc_gl.c). */
 void xn_glcap_present(void)
 {
     if (!pgl_enabled)
@@ -548,12 +552,5 @@ void xn_glcap_present(void)
     if (scene_done) {
         pgl_publish();
         scene_done = 0;
-        presents_without = 0;
-    } else if (++presents_without == 4) {
-        /* the game shows pictures without drawing the world: no 3D view */
-        S = pgl_building();
-        S->valid = 0;
-        S->serial = ++serial;
-        pgl_publish();
     }
 }
