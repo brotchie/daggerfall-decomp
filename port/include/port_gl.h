@@ -121,8 +121,9 @@ int pgl_texture_next(int *id, int *w, int *h, unsigned char **pixels);
 int vpc_gl_init(void *sdl_window);
 void vpc_gl_shutdown(void);
 /* shows the screen: the 320x200 picture vga (the VGA's memory) through the palette (256 RGB
-   bytes, 8 bits each), with the latest 3D scene composited in */
-void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb);
+   bytes, 8 bits each), with the latest 3D scene composited in; cross: where a crosshair goes
+   (320x200 pixels), or NULL */
+void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const int *cross);
 /* the last frame shown, as a .bmp at the window's resolution; 0 on success */
 int vpc_gl_screenshot(const char *path);
 /* F11: the 3D view through OpenGL or the software renderer */

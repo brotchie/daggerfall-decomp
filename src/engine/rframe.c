@@ -49,6 +49,7 @@ s32 xn_render_frame(s32 flags)
     {
         s32 r = xn_render_draw_flats();
 
+        port_render_frames++;
         XN_GLCAP(xn_glcap_end_frame());
         return r;
     }

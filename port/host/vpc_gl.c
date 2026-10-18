@@ -45,7 +45,7 @@ static int *tsize;                      /* w, h per texture id */
 static GLint u_view, u_mode, u_colour, u_row2, u_fog, u_tsize, u_fogp, u_depth, u_tex,
     u_tables, u_pal, u_smooth, u_focal, u_nl, u_lbase, u_lights, u_falloff;
 /* composite uniforms */
-static GLint c_vga, c_pre, c_post, c_scene, c_pal, c_valid, c_clip, c_bg, c_smooth;
+static GLint c_vga, c_pre, c_post, c_scene, c_pal, c_valid, c_clip, c_bg, c_smooth, c_cross;
 
 static const char *scene_vs =
     "#version 410 core\n"
@@ -190,6 +190,7 @@ static const char *comp_fs =
     "uniform ivec4 u_clip;\n"               /* left, top, right, bottom */
     "uniform ivec2 u_bg;\n"                 /* fill?, colour */
     "uniform int u_smooth;\n"
+    "uniform vec3 u_cross;\n"              /* the crosshair: x, y (320x200 pixels), on */
     "layout(location = 0) out vec4 o;\n"
     "vec3 pal(uint c) { return texelFetch(u_pal, ivec2(int(c), 0), 0).rgb; }\n"
     /* the picture before the 3D pass at q (320x200 pixels), filtered through the palette */
@@ -205,7 +206,20 @@ static const char *comp_fs =
     "    }\n"
     "    return s;\n"
     "}\n"
+    /* the crosshair at the window's resolution: a white plus, its arms 1.2 to 4.2 pixels from
+       the centre and 0.6 of a pixel thick (a pixel is 1.2 times as tall as wide), in a dark
+       outline */
+    "float cross_at(vec2 q, float grow) {\n"
+    "    vec2 d = abs(q - u_cross.xy) * vec2(1.0, 1.2);\n"
+    "    float t = 0.3 + grow, a = 1.2 - grow, b = 4.2 + grow;\n"
+    "    return (d.x < t && d.y > a && d.y < b) || (d.y < t && d.x > a && d.x < b) ? 1.0 : 0.0;\n"
+    "}\n"
     "void main() {\n"
+    "    if (u_cross.z > 0.5) {\n"
+    "        vec2 q = v_pos * vec2(320.0, 200.0);\n"
+    "        if (cross_at(q, 0.0) > 0.5) { o = vec4(1.0); return; }\n"
+    "        if (cross_at(q, 0.25) > 0.5) { o = vec4(0.0, 0.0, 0.0, 1.0); return; }\n"
+    "    }\n"
     "    ivec2 p = clamp(ivec2(floor(v_pos * vec2(320.0, 200.0))), ivec2(0), ivec2(319, 199));\n"
     "    uint c = texelFetch(u_vga, p, 0).r;\n"
     "    if (u_valid != 0 && p.x >= u_clip.x && p.x < u_clip.z && p.y >= u_clip.y &&\n"
@@ -322,6 +336,7 @@ int vpc_gl_init(void *sdl_window)
     c_clip = glGetUniformLocation(comp_prog, "u_clip");
     c_bg = glGetUniformLocation(comp_prog, "u_bg");
     c_smooth = glGetUniformLocation(comp_prog, "u_smooth");
+    c_cross = glGetUniformLocation(comp_prog, "u_cross");
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -699,7 +714,7 @@ static void letterbox(int *x, int *y, int *w, int *h)
 static int debug = -1, presents, st_shown, st_stale, st_invalid, st_none;
 static Uint64 last_report;
 
-void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb)
+void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const int *cross)
 {
     unsigned char pal[256 * 4];
     const pgl_scene *s;
@@ -782,6 +797,10 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb)
     glUniform1i(c_pal, 4);
     glUniform1i(c_valid, valid);
     glUniform1i(c_smooth, smooth);
+    if (cross)
+        glUniform3f(c_cross, cross[0] + 0.5f, cross[1] + 0.5f, 1.0f);
+    else
+        glUniform3f(c_cross, 0.0f, 0.0f, 0.0f);
     if (s) {
         glUniform4i(c_clip, s->clip_l, s->clip_t, s->clip_r, s->clip_b);
         glUniform2i(c_bg, s->bg_fill, s->bg_colour);

@@ -9,6 +9,7 @@
 #include "port_gl.h"
 
 volatile int pgl_enabled;
+volatile unsigned long port_render_frames;
 
 void *pgl_realloc(void *p, size_t n)
 {

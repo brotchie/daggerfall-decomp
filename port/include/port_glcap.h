@@ -10,6 +10,9 @@ struct xn_tex_image;
 struct xn_flat;
 
 extern volatile int pgl_enabled;
+/* the 3D frames drawn (rframe.c), whatever renders them: the world is on the screen while it
+   moves (port/host/main.c's crosshair) */
+extern volatile unsigned long port_render_frames;
 
 /* the polygon pool starts again (xn_render_begin_frame) */
 void xn_glcap_begin_frame(void);

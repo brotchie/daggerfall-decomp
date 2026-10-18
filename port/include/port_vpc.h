@@ -65,7 +65,8 @@ int vpc_screenshot(const char *path);
 /* The scripted driver (vpc_script.c), for runs without a person: PORT_SCRIPT is a timeline,
    "SECONDS COMMAND [ARGS]" steps separated by ';' (seconds since start-up):
      shot FILE.bmp | key NAME (SDL's key names: Return, Escape, Up, A ...) | down NAME |
-     up NAME | type TEXT | click X Y (mode 13h pixels) | rclick X Y | move X Y | quit
+     up NAME | type TEXT | click X Y (mode 13h pixels) | rclick X Y | move X Y | mdown B |
+     mup B (mouse button B held, let go: 0 left, 1 right, 2 middle) | quit
    PORT_SHOT_EVERY=SECONDS with PORT_SHOT_DIR=DIR saves the screen that often (shot_NNNN.bmp);
    PORT_EXIT_AFTER=SECONDS quits. The main thread's poll runs it. */
 void vpc_script_init(void);
@@ -153,6 +154,9 @@ void vpc_music_render(short *out, int frames);
 
 /* ---- the parts' own entry points (port/host/vpc_*.c) -------------------------------------- */
 
+/* the game's side (port/host/main.c) says when the mouse looks around the world, and where
+   the view's centre is: the screen then shows a crosshair there */
+void vpc_set_view_probe(int (*probe)(int *cx, int *cy));
 void vpc_video_init(const char *title);
 void vpc_video_shutdown(void);
 unsigned char vpc_video_inb(unsigned int port);

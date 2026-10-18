@@ -112,6 +112,11 @@ static void run(const struct step *st)
             vpc_input_mouse_button(release_button, 1);
             release_at = now_s() + 0.1;
         }
+    } else if (!strcmp(st->cmd, "mdown") || !strcmp(st->cmd, "mup")) {
+        /* a mouse button held or let go: 0 left, 1 right, 2 middle */
+        int b = atoi(st->arg);
+        if (b >= 0 && b <= 2)
+            vpc_input_mouse_button(b, st->cmd[1] == 'd');
     } else if (!strcmp(st->cmd, "quit")) {
         vpc_quit_requested = 1;
     } else {

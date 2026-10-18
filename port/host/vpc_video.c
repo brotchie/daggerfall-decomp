@@ -37,6 +37,19 @@ static unsigned int mode = 3;
 static Uint64 last_present, last_period;
 static int screenshot_count;
 static int use_gl;
+static int (*view_probe)(int *cx, int *cy);
+
+void vpc_set_view_probe(int (*probe)(int *cx, int *cy))
+{
+    view_probe = probe;
+}
+
+/* where the crosshair goes (1), or none (0): while the mouse looks around the world */
+static int crosshair(int *cx, int *cy)
+{
+    return view_probe != NULL && mode == 0x13 && view_probe(cx, cy) && *cx > 4 &&
+           *cx < VGA_W - 4 && *cy > 4 && *cy < VGA_H - 4;
+}
 
 void vpc_video_init(const char *title)
 {
@@ -119,6 +132,20 @@ static void render_pixels(void)
         pal[i] = colour((unsigned int)i);
     for (i = 0; i < VGA_W * VGA_H; i++)
         pixels[i] = pal[vga[i]];
+    {
+        /* the crosshair: a white plus in a dark outline, three pixels each way */
+        int cx, cy, d;
+
+        if (crosshair(&cx, &cy)) {
+            for (d = -4; d <= 4; d++) {
+                pixels[(cy - 1) * VGA_W + cx + d] = pixels[(cy + 1) * VGA_W + cx + d] = 0xFF000000u;
+                pixels[(cy + d) * VGA_W + cx - 1] = pixels[(cy + d) * VGA_W + cx + 1] = 0xFF000000u;
+            }
+            for (d = -3; d <= 3; d++)
+                if (d < -1 || d > 1)
+                    pixels[cy * VGA_W + cx + d] = pixels[(cy + d) * VGA_W + cx] = 0xFFFFFFFFu;
+        }
+    }
 }
 
 /* the window is the main thread's: the game's thread (a retrace it saw, a mode set) asks for
@@ -176,7 +203,12 @@ static void present_now(void)
             rgb[i * 3 + 1] = (unsigned char)(c >> 8);
             rgb[i * 3 + 2] = (unsigned char)c;
         }
-        vpc_gl_present(mode == 0x13 ? port_low_memory + 0xA0000 : black, rgb);
+        {
+            int cross[2];
+
+            vpc_gl_present(mode == 0x13 ? port_low_memory + 0xA0000 : black, rgb,
+                           crosshair(&cross[0], &cross[1]) ? cross : NULL);
+        }
         return;
     }
     if (renderer == NULL || texture == NULL)

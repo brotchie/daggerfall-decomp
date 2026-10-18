@@ -98,6 +98,10 @@ extern unsigned char mouse_sensitivity_y;
 extern char joystick_setting;
 extern char D_00195E82[];
 extern char key_map[];
+#ifdef DAGGER_PORT
+/* the native build's control presets, once the controls are loaded (port/host/main.c) */
+extern void port_controls_loaded(void);
+#endif
 extern int maps_bsa;
 extern char *D_001997F0;
 extern char *D_00199804;
@@ -241,6 +245,9 @@ void init_game_data(void)
         mouse_sensitivity_x /= 6;
         mouse_sensitivity_y /= 6;
     }
+#ifdef DAGGER_PORT
+    port_controls_loaded();
+#endif
     init_world_objects();
     region_load_tables();
     sky_init();

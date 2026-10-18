@@ -191,6 +191,41 @@ Not yet:
 - Translucent flats are a dither, not the blend table.
 - macOS only (`<OpenGL/gl3.h>`); another platform needs a GL loader.
 
+## Modern controls
+
+`fall --modern` (or `PORT_CONTROLS=modern`) plays with mouse look and WASD. It is the game's
+own controls, set up differently; nothing in the game's logic changes:
+- **VIEW mode.** The CONTROLS screen's mouse setting VIEW (`mouse_control_mode` 1) is the
+  original's mouse look: `player_mouse_look` adds the mouse's motion to the player's yaw and
+  pitch (pitch +-256, a quarter turn). The window captures the mouse at the first click
+  (Ctrl+G lets it go), so the motion never stops at the window's edge.
+- **The keys** are `key_map` bindings (the 38 actions of the CONTROLS screen):
+
+  | action | key | was |
+  |---|---|---|
+  | FORWARD, REVERSE, SLIDE LEFT, SLIDE RIGHT | W, S, A, D | Up, Down, Left Shift, Right Shift |
+  | RUN (held) | Left Shift | P |
+  | JUMP, CROUCH | Space, C | J, D |
+  | ACTIVATE CENTER OBJECT (what the crosshair is on) | E | Space |
+  | ACTIVATE CURSOR (a cursor for the HUD, and back) | Tab | Enter |
+  | SWING WEAPON (held while the mouse moves) | left mouse button | right mouse button |
+  | READY WEAPON, SWITCH HAND | F, H | A, S |
+  | INVENTORY, STATUS, TRAVEL MAP, ABORT SPELL | I, J, V, G | F6, I, W, E |
+
+  TURN LEFT and RIGHT stay on the arrows, and the rest keep their keys (R rest, T transport,
+  M automap, L logbook, Q recast, Backspace cast, F1-F4 interaction modes, F5 the sheet).
+- **When it applies.** `init_game_data` calls `port_controls_loaded` (port/host/main.c, under
+  `DAGGER_PORT`) once the controls file is read. The preset replaces controls that are still
+  the classic defaults (no controls file, or one saved unchanged). Controls changed on the
+  CONTROLS screen are the player's, and they stay.
+- **The crosshair** at the view's centre (both renderers; at the window's resolution with
+  OpenGL) shows while the mouse looks around: VIEW mode, no cursor, no screen over the world,
+  and a 3D frame drawn in the last 200 ms (`port_render_frames`, counted in rframe.c).
+- **Sensitivity.** The mouse driver scales its motion counts by int 33h fn 1Ah's sensitivity,
+  as a DOS driver does, so the HORIZONTAL and VERTICAL settings of the game's mouse options set
+  the speed of the look (the default 8 is the speed before).
+- `PORT_SCRIPT` has `mdown B` and `mup B` (a mouse button held and let go) for scripted swings.
+
 ## Why the 64-bit work cannot be skipped
 
 The game keeps pointers in `int`s everywhere: casts, globals typed `int`, functions declared
@@ -204,6 +239,9 @@ half. A 32-bit address space would hide that, but arm64 macOS has none:
 So every value that holds an address must have a type as wide as a pointer.
 
 ## Status
+
+**2026-10-18, modern controls.** `fall --modern`: mouse look, WASD, Shift to run, E to use,
+a crosshair (see "Modern controls").
 
 **2026-10-18, OpenGL.** `fall --gl` draws the 3D view with OpenGL at the window's resolution
 (see "OpenGL"); F11 switches between it and the software renderer.

@@ -337,9 +337,10 @@ static int handle_event(const void *ev)
         picture_scale(w, &sx, &sy);
         gx = e->motion.xrel * sx;               /* game pixels */
         gy = e->motion.yrel * sy;
-        /* the driver's units (units_x); mickeys at the drivers' ratio */
-        mouse.mx += gx * units_x() * mouse.ratio_x / 8.0;
-        mouse.my += gy * mouse.ratio_y / 8.0;
+        /* the driver's units (units_x); mickeys at the drivers' ratio, scaled by the
+           sensitivity (function 1Ah, 50 = 1.0: the game's mouse settings send 6 to 90) */
+        mouse.mx += gx * units_x() * mouse.ratio_x / 8.0 * mouse.sens_x / 50.0;
+        mouse.my += gy * mouse.ratio_y / 8.0 * mouse.sens_y / 50.0;
         mouse.x = clampd(mouse.x + gx * units_x(), mouse.minx, mouse.maxx);
         mouse.y = clampd(mouse.y + gy, mouse.miny, mouse.maxy);
         return 1;
@@ -467,9 +468,9 @@ static void mouse_service(struct vpc_regs *r)
         if (DXr(r) > 0)
             mouse.ratio_y = DXr(r);
         break;
-    case 0x001A:                /* sensitivity: BX, CX, DX (kept and given back) */
-        mouse.sens_x = (int)BXr(r);
-        mouse.sens_y = CXr(r);
+    case 0x001A:                /* sensitivity: BX, CX, DX (they scale the mickeys) */
+        mouse.sens_x = BXr(r) > 0 ? (int)BXr(r) : 50;
+        mouse.sens_y = CXr(r) > 0 ? CXr(r) : 50;
         mouse.threshold = DXr(r);
         break;
     case 0x001B:
