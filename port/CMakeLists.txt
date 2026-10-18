@@ -34,7 +34,10 @@ target_compile_options(game PRIVATE
 # docs/engine/architecture.md): the game's dialect, with PORT_ENGINE (port.h leaves the
 # engine's file calls alone: its own go through int 21h). glue.asm is the matching build's;
 # here the virtual PC is the glue (port/include/port_vpc.h).
-file(GLOB ENGINE_SRC CONFIGURE_DEPENDS ${ROOT}/src/engine/*.c)
+# port/engine_gl: the OpenGL renderer's capture (port/include/port_gl.h), built with the engine
+# (its headers, its dialect) since it reads the engine's frame as the engine left it.
+file(GLOB ENGINE_SRC CONFIGURE_DEPENDS ${ROOT}/src/engine/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine_gl/*.c)
 add_library(engine OBJECT ${ENGINE_SRC})
 target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${ROOT}/include
     ${ROOT}/src/engine)
@@ -59,6 +62,9 @@ add_library(porthost STATIC ${PORT_SRC})
 target_include_directories(porthost PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_options(porthost PRIVATE -std=gnu11 -Wall -Wno-unused-function -ffp-contract=off)
 target_link_libraries(porthost PUBLIC SDL3::SDL3)
+if(APPLE)
+    target_link_libraries(porthost PUBLIC "-framework OpenGL")
+endif()
 
 file(GLOB GEN_SRC CONFIGURE_DEPENDS ${CMAKE_BINARY_DIR}/gen/*.c)
 

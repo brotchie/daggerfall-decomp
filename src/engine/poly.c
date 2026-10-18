@@ -368,6 +368,7 @@ int xn_poly_project_face(const struct xn_model_face *face, u32 codes)
     int n, top;
 
     if ((codes & 0xFF00) == 0) {
+        XN_GLCAP(xn_glcap_face(xn_render_poly_next, face));
         walk_projected(face);
         return (uptr)spans < (uptr)xn_render_span_next;
     }
@@ -389,6 +390,8 @@ int xn_poly_project_face(const struct xn_model_face *face, u32 codes)
     xn_poly_clip_src_end = v;
     if (!xn_poly_clip_frustum())
         return 0;
+    XN_GLCAP(xn_glcap_poly(xn_render_poly_next, xn_poly_clip_src,
+                           (int)(xn_poly_clip_src_end - xn_poly_clip_src)));
     n = project_clipped(0x7FFFFFFF, 0, &top_y, &top);
     if ((u8)n >= 0x1C)                  /* Quirk Q-POLY-03 */
         return 0;
@@ -406,6 +409,8 @@ void xn_poly_project_terrain(int n)
     xn_poly_clip_src_end = xn_poly_vertex_buf_a + n;
     if (!xn_poly_clip_frustum())
         return;
+    XN_GLCAP(xn_glcap_poly(xn_render_poly_next, xn_poly_clip_src,
+                           (int)(xn_poly_clip_src_end - xn_poly_clip_src)));
     n = project_clipped(0x7FFFFFFF, 0, &top_y, &top);
     xn_poly_rasterize(top_y, ring_at(n, top), n);
 }
@@ -449,6 +454,7 @@ void xn_poly_setup_textured(struct xn_poly *poly, const struct xn_span *span, s3
 
     poly->wrap_mask = image->wrap_mask;
     poly->texels = (u8 *)image + image->data_offset;
+    XN_GLCAP(xn_glcap_tex(poly, image));
     kind = xn_light_setup_poly(poly);
     /* the 16-pixel routines when 1/z changes slowly across the screen (abs as `neg`: the
        least s32 stays itself; the shift unsigned) */

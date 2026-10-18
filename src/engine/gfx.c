@@ -110,6 +110,7 @@ void xn_gfx_drv0_present(s32 keep)
     s32 top, offset;
     u32 n;
 
+    XN_GLCAP(xn_glcap_present());
     if ((s8)xn_gfx_present_mode <= 0)
         return;
     if (xn_gfx_present_mode == 3) {

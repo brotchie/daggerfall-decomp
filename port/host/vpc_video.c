@@ -6,12 +6,17 @@
 
    The window shows the 320x200 screen at 4:3, as a monitor did (each pixel 1.2 times as tall
    as it is wide), as large as the window allows. Alt+Enter toggles full screen; F12 saves the
-   screen as dagger_NNN.bmp. */
+   screen as dagger_NNN.bmp.
+
+   PORT_GL=1 (fall --gl) shows the screen through OpenGL instead of SDL's renderer, with the 3D
+   view drawn by OpenGL (port/host/vpc_gl.c); F11 switches the 3D view between OpenGL and the
+   software renderer. */
 #include <stdio.h>
 #include <string.h>
 
 #include <SDL3/SDL.h>
 
+#include "port_gl.h"
 #include "port_vpc.h"
 
 #define VGA_W 320
@@ -31,9 +36,30 @@ static unsigned char pel_mask = 0xFF;
 static unsigned int mode = 3;
 static Uint64 last_present, last_period;
 static int screenshot_count;
+static int use_gl;
 
 void vpc_video_init(const char *title)
 {
+    const char *gl = SDL_getenv("PORT_GL");
+
+    if (gl && *gl && *gl != '0') {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
+        window = SDL_CreateWindow(title, 960, 720, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL |
+                                                       SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        if (window && vpc_gl_init(window)) {
+            use_gl = 1;
+            return;
+        }
+        fprintf(stderr, "port: no OpenGL; the software renderer shows the screen\n");
+        vpc_gl_shutdown();
+        if (window)
+            SDL_DestroyWindow(window);
+    }
     window = SDL_CreateWindow(title, 960, 720, SDL_WINDOW_RESIZABLE);
     if (window == NULL) {
         fprintf(stderr, "port: SDL_CreateWindow: %s\n", SDL_GetError());
@@ -55,6 +81,8 @@ void vpc_video_init(const char *title)
 
 void vpc_video_shutdown(void)
 {
+    if (use_gl)
+        vpc_gl_shutdown();
     if (texture)
         SDL_DestroyTexture(texture);
     if (renderer)
@@ -136,6 +164,21 @@ static void present_now(void)
 
     count_frames();
     last_present = SDL_GetTicksNS();
+    if (use_gl) {
+        static const unsigned char black[VGA_W * VGA_H];
+        unsigned char rgb[256 * 3];
+        int i;
+
+        for (i = 0; i < 256; i++) {
+            Uint32 c = colour((unsigned int)i);
+
+            rgb[i * 3] = (unsigned char)(c >> 16);
+            rgb[i * 3 + 1] = (unsigned char)(c >> 8);
+            rgb[i * 3 + 2] = (unsigned char)c;
+        }
+        vpc_gl_present(mode == 0x13 ? port_low_memory + 0xA0000 : black, rgb);
+        return;
+    }
     if (renderer == NULL || texture == NULL)
         return;
     render_pixels();
@@ -167,6 +210,29 @@ int vpc_screenshot(const char *path)
     SDL_Surface *s;
     int ok;
 
+    if (use_gl) {
+        /* PORT_GL_SW_SHOTS=1: the software screen of the same frame too (NAME_sw.bmp) */
+        const char *both = SDL_getenv("PORT_GL_SW_SHOTS");
+
+        present_now();
+
+        if (both && *both == '1') {
+            char sw[1024];
+            size_t n = strlen(path);
+
+            if (n > 4 && n < sizeof sw - 4 && strcmp(path + n - 4, ".bmp") == 0) {
+                snprintf(sw, sizeof sw, "%.*s_sw.bmp", (int)(n - 4), path);
+                render_pixels();
+                s = SDL_CreateSurfaceFrom(VGA_W, VGA_H, SDL_PIXELFORMAT_XRGB8888, pixels,
+                                          VGA_W * 4);
+                if (s) {
+                    SDL_SaveBMP(s, sw);
+                    SDL_DestroySurface(s);
+                }
+            }
+        }
+        return vpc_gl_screenshot(path);
+    }
     render_pixels();
     s = SDL_CreateSurfaceFrom(VGA_W, VGA_H, SDL_PIXELFORMAT_XRGB8888, pixels, VGA_W * 4);
     if (s == NULL)
@@ -273,6 +339,10 @@ int vpc_video_handle_event(const void *ev)
             SDL_SetWindowFullscreen(window, !(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN));
             return 1;
         }
+        if (e->key.scancode == SDL_SCANCODE_F11 && use_gl) {
+            vpc_gl_toggle();
+            return 1;
+        }
         if (e->key.scancode == SDL_SCANCODE_F12) {
             char name[32];
             snprintf(name, sizeof name, "dagger_%03d.bmp", screenshot_count++);
@@ -282,7 +352,7 @@ int vpc_video_handle_event(const void *ev)
         }
     }
     if (e->type == SDL_EVENT_KEY_UP &&
-        (e->key.scancode == SDL_SCANCODE_F12 ||
+        (e->key.scancode == SDL_SCANCODE_F12 || e->key.scancode == SDL_SCANCODE_F11 ||
          (e->key.scancode == SDL_SCANCODE_RETURN && (e->key.mod & SDL_KMOD_ALT))))
         return 1;
     return 0;

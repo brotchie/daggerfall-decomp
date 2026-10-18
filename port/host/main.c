@@ -2,7 +2,7 @@
    the game's folders and calls the game's main (FALL.EXE 0x10010) with its one argument, the
    config file, as the DOS game was started (`FALL.EXE Z.CFG`).
 
-   usage: fall [--game DIR] [--overlay DIR] [--nosound] [CONFIG]
+   usage: fall [--game DIR] [--overlay DIR] [--nosound] [--gl] [CONFIG]
      --game DIR     the installed game (only read): ARENA2, the .BNK and .CFG files; else
                     $DAGGER_GAME, the one remembered, or a folder dialog (launch.c)
      --overlay DIR  where the game's writes go (saves, its config), read before DIR; else
@@ -10,6 +10,7 @@
      --nosound      keep the install's HMISET.CFG ("No Digital Device"), as the emulator runs;
                     otherwise the overlay gets one with a Sound Blaster 16: its sound effects,
                     and its OPL3 for the music
+     --gl           draw the 3D view with OpenGL (as PORT_GL=1; port/include/port_gl.h)
      CONFIG         the config file, Z.CFG by default (written to the overlay when missing) */
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,6 +61,8 @@ int main(int argc, char **argv)
             overlay = argv[++i];
         else if (strcmp(argv[i], "--nosound") == 0)
             nosound = 1;
+        else if (strcmp(argv[i], "--gl") == 0)
+            setenv("PORT_GL", "1", 1);
         else if (strncmp(argv[i], "-psn_", 5) == 0)
             ;                           /* what Finder passed to apps on older macOS */
         else
@@ -69,7 +72,7 @@ int main(int argc, char **argv)
     overlay = launch_overlay_dir(overlay);
     game = launch_game_dir(game);
     if (game == NULL) {
-        fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [--nosound] [CONFIG]\n");
+        fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [--nosound] [--gl] [CONFIG]\n");
         return 2;
     }
     dos_set_dirs(game, overlay);

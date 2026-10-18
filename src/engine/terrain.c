@@ -341,6 +341,7 @@ static void draw_projected(u32 v, const u32 *corner, int n)
     s32 top_y = 0;
     int k, top = 0;
 
+    XN_GLCAP(xn_glcap_terrain(xn_render_poly_next, v, corner, n));
     for (k = 0; k < n; k++) {
         s = &xn_vert_screen[v + corner[k]];
         xn_poly_vertex_buf_a[k].x = s->sx;

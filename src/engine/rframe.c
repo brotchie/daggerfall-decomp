@@ -15,7 +15,10 @@ s32 xn_render_frame(s32 flags)
     s32 end_row;
 
     xn_render_frame_flags = flags;
-    if (xn_tex_cache_full || xn_render_draw_models())
+    if (xn_tex_cache_full)
+        return 1;
+    XN_GLCAP(xn_glcap_pre());
+    if (xn_render_draw_models())
         return 1;
     mem_check_heap(0x206);
     xn_render_fill_background();
@@ -42,5 +45,14 @@ s32 xn_render_frame(s32 flags)
         head++;
     } while (++xn_render_row_y != end_row);
     mem_check_heap(0x208);
+#ifdef DAGGER_PORT
+    {
+        s32 r = xn_render_draw_flats();
+
+        XN_GLCAP(xn_glcap_end_frame());
+        return r;
+    }
+#else
     return xn_render_draw_flats();
+#endif
 }

@@ -215,6 +215,7 @@ int xn_flat_draw(struct xn_flat *flat)
     flat->span = xn_flat_span_light_setup;
     w.flat = flat;
     w.tex_w = image->width;
+    XN_GLCAP(xn_glcap_flat(flat, image, xn_poly_vertex_buf_a));
     xn_poly_project_flat(&w, xn_poly_vertex_buf_a);
     return 0;
 }

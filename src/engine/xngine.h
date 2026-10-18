@@ -345,4 +345,13 @@ void xn_int33(xn_regs *r);
 #pragma aux xn_int31 parm [edx] modify [eax edx];
 #pragma aux xn_int33 parm [edx] modify [eax edx];
 
+/* The native build's OpenGL renderer captures the frame through hooks in the renderer
+   (port/include/port_glcap.h); in every other build XN_GLCAP(...) is nothing. */
+#ifdef DAGGER_PORT
+#include "port_glcap.h"
+#else
+#define XN_GLCAP(call) ((void)0)
 #endif
+
+#endif
+

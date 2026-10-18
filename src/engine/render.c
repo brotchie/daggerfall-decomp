@@ -155,6 +155,7 @@ void xn_render_begin_frame(void)
     else if (ambient > 0x3F00)
         ambient = 0x3F00;
     xn_light_ambient_row = xn_shade_table + ambient;
+    XN_GLCAP(xn_glcap_begin_frame());
 }
 
 void *xn_render_pick(s32 x, s32 y)
