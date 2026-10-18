@@ -15,7 +15,10 @@
    3. the composite: per pixel of the window, the software screen's pixel (VGA memory) where
       the game drew after the 3D pass (the screen differs from the copy taken after it) or
       outside the 3D window; else the scene over what was there before the 3D pass (the sky)
-      or the background colour indoors.
+      or the background colour indoors. Where the world lies beyond the dungeon water's
+      plane, the water as xn_water_draw makes it, from the scene's colour indices (a second
+      colour attachment, with the coverage and that test): each pixel the tint of a
+      neighbour's on its row, by the row's ripple in the frame's columns.
 
    The view (docs/port.md, "Widescreen"): with aspect=fill the view fills the window. The
    engine draws a frame as much wider than 320 columns as the window is wider than 4:3 (the
@@ -71,9 +74,11 @@ static int overscan = 24;               /* columns past each side */
 
 static GLuint scene_prog, comp_prog;
 static GLuint vao, vbo, empty_vao;
-static GLuint tex_vga, tex_pre, tex_post, tex_side, tex_tables, tex_pal, tex_falloff;
+static GLuint tex_vga, tex_pre, tex_post, tex_side, tex_tables, tex_pal, tex_falloff, tex_jit,
+    tex_tint;
 static GLuint scene_fbo, scene_colour, scene_depth;     /* (resolved) colour, and its FBO */
-static GLuint ms_fbo, ms_colour, ms_depth;              /* the multisampled target */
+static GLuint scene_index;                              /* (resolved) index, covered, water */
+static GLuint ms_fbo, ms_colour, ms_depth, ms_index;    /* the multisampled target */
 static GLuint out_fbo, out_colour;
 static int fbo_w, fbo_h;
 static GLuint *textures;
@@ -83,10 +88,14 @@ static int *tsize;                      /* w, h per texture id */
 /* scene uniforms */
 static GLint u_view, u_frame, u_mode, u_colour, u_row2, u_fog, u_tsize, u_fogp, u_depth, u_tex,
     u_tables, u_pal, u_smooth, u_focal, u_nl, u_lbase, u_lights, u_falloff, u_move, u_shift,
-    u_zoom;
+    u_zoom, u_wplane;
 /* composite uniforms */
 static GLint c_vga, c_pre, c_post, c_side, c_scene, c_pal, c_valid, c_gl, c_sides, c_clip, c_bg,
-    c_smooth, c_cross, c_map, c_sharp, c_scale, c_presh;
+    c_smooth, c_cross, c_map, c_sharp, c_scale, c_presh, c_index, c_jit, c_tint, c_water,
+    c_wrows, c_wscale;
+/* the scene's second attachment as it is cleared: no colour, not covered, beyond the water
+   (where no world polygon is, xn_water_draw draws the water between the S-buffer's spans) */
+static const GLuint index_clear[4] = { 0, 0, 1, 0 };
 
 static const char *scene_vs =
     "#version 410 core\n"
@@ -141,7 +150,11 @@ static const char *scene_fs =
     "uniform ivec2 u_tsize;\n"
     "uniform vec3 u_fogp;\n"                /* start, step, far (camera z >> 8) */
     "uniform float u_depth;\n"
+    "uniform vec3 u_wplane;\n"              /* the water: p beyond its plane where u_wplane.p > 1 */
     "layout(location = 0) out vec4 o;\n"
+    /* the colour index (the nearest texel's), covered, beyond the water's plane (the world's:
+       the flats do not write it, as the S-buffer has no flats) */
+    "layout(location = 1) out uvec4 o_index;\n"
     "uint tab(int row, uint c) { return texelFetch(u_tables, ivec2(int(c), row), 0).r; }\n"
     /* a texel through the polygon's rows and the fog, as the span routines map it */
     /* xn_light_shade at this pixel: its point in view space >> 8, each light's squared
@@ -191,13 +204,16 @@ static const char *scene_fs =
     "}\n"
     "void main() {\n"
     "    vec3 c;\n"
+    "    uint ci;\n"
     "    if (u_mode == 1) {\n"
-    "        c = rgb(lit(uint(u_colour)));\n"
+    "        ci = lit(uint(u_colour));\n"
+    "        c = rgb(ci);\n"
     "    } else if (u_smooth == 0) {\n"
     "        uint t = texel(ivec2(floor(v_uv)));\n"
     "        if (u_mode >= 2 && t == 0u)\n"
     "            discard;\n"
-    "        c = rgb(lit(t));\n"
+    "        ci = lit(t);\n"
+    "        c = rgb(ci);\n"
     "    } else {\n"
     /* the four texels around the point, each lit and through the palette, blended; a
        flat's transparent texels weigh nothing */
@@ -216,10 +232,12 @@ static const char *scene_fs =
     "        if (sum.a < 0.5)\n"
     "            discard;\n"
     "        c = sum.rgb / sum.a;\n"
+    "        ci = lit(texel(ivec2(floor(v_uv))));\n"
     "    }\n"
     "    if (u_mode == 3 && ((int(gl_FragCoord.x) + int(gl_FragCoord.y)) & 1) == 1)\n"
     "        discard;\n"
     "    o = vec4(c, 1.0);\n"
+    "    o_index = uvec4(ci, 1u, dot(u_wplane, v_cam) > 1.0 ? 1u : 0u, 0u);\n"
     "    gl_FragDepth = clamp(v_zd * u_depth, 0.0, 1.0);\n"
     "}\n";
 
@@ -257,9 +275,38 @@ static const char *comp_fs =
     "uniform vec2 u_presh;\n"              /* the sky backdrop's move with the scene's (frame
                                               pixels): the panorama a column a step of yaw,
                                               the horizon with the pitch */
+    "uniform usampler2D u_index;\n"        /* the scene's colour index, covered, beyond the water */
+    "uniform usampler2D u_jit;\n"          /* the frame's pixels' ripple, jitter + 1 */
+    "uniform usampler2D u_tint;\n"         /* 256 x 16: row n the tint n + 1 times over */
+    "uniform int u_water;\n"
+    "uniform ivec2 u_wrows;\n"             /* the water's rows, top and bottom */
+    "uniform float u_wscale;\n"            /* window pixels a frame column */
     "layout(location = 0) out vec4 o;\n"
     "vec3 pal(uint c) { return texelFetch(u_pal, ivec2(int(c), 0), 0).rgb; }\n"
     "int frame_w() { return int(u_map.w); }\n"
+    "int jit(ivec2 p) { return int(texelFetch(u_jit, p, 0).r) - 1; }\n"
+    "bool beyond(int x, int y) { return texelFetch(u_index, ivec2(x, y), 0).b != 0u; }\n"
+    /* xn_water_span at the window's resolution: the water pixel in column p.x of a row
+       becomes the tint of the pixel jitter columns along. The columns go left to right, so a
+       jitter of -1 takes the pixel to the left as already redrawn when it is water too: the
+       tint of its tint, as far as a run of -1 jitters goes */
+    "vec3 water(ivec2 p) {\n"
+    "    int y = int(gl_FragCoord.y);\n"
+    "    int w = textureSize(u_index, 0).x;\n"
+    "    int k = 0;\n"
+    "    int j = jit(p);\n"
+    "    while (j < 0 && k < 15 && p.x - k - 1 >= u_clip.x &&\n"
+    "           beyond(int(floor(gl_FragCoord.x - float(k + 1) * u_wscale)), y)) {\n"
+    "        k++;\n"
+    "        j = jit(ivec2(p.x - k, p.y));\n"
+    "    }\n"
+    "    int sx = clamp(int(floor(gl_FragCoord.x + float(j - k) * u_wscale)), 0, w - 1);\n"
+    "    uvec4 s = texelFetch(u_index, ivec2(sx, y), 0);\n"
+    "    uint c = s.g != 0u ? s.r : u_bg.x != 0 ? uint(u_bg.y) :\n"
+    "             texelFetch(u_pre, clamp(ivec2(p.x + j - k, p.y), ivec2(0),\n"
+    "                                     ivec2(frame_w() - 1, 199)), 0).r;\n"
+    "    return pal(texelFetch(u_tint, ivec2(int(c), k), 0).r);\n"
+    "}\n"
     /* the picture before the 3D pass at q (frame pixels), filtered through the palette */
     "vec3 pre_smooth(vec2 q) {\n"
     "    vec2 p = q - 0.5;\n"
@@ -291,6 +338,13 @@ static const char *comp_fs =
     "    vec3 u = u_smooth != 0 ? pre_smooth(k) : pal(texelFetch(u_pre, kp, 0).r);\n"
     "    return s.rgb + u * (1.0 - s.a);\n"
     "}\n"
+    /* the 3D pass's pixel: the water where the world lies beyond its plane, else the scene */
+    "vec3 scene_or_water(vec2 q, ivec2 p) {\n"
+    "    if (u_water != 0 && p.y >= u_wrows.x && p.y < u_wrows.y &&\n"
+    "        beyond(int(gl_FragCoord.x), int(gl_FragCoord.y)))\n"
+    "        return water(p);\n"
+    "    return scene_at(q, p);\n"
+    "}\n"
     /* the frame's pixel p (q: this fragment's point in the frame) */
     "vec3 frame_px(ivec2 p, vec2 q) {\n"
     "    int dx = int(u_map.z);\n"
@@ -300,7 +354,7 @@ static const char *comp_fs =
     "    if (p.x >= dx && p.x < dx + 320) {\n"
     "        uint c = texelFetch(u_vga, ivec2(p.x - dx, p.y), 0).r;\n"
     "        if (in3d && u_gl != 0 && c == texelFetch(u_post, p, 0).r)\n"
-    "            return scene_at(q, p);\n"
+    "            return scene_or_water(q, p);\n"
     "        return pal(c);\n"
     "    }\n"
     /* a side: the wide frame's, within its 3D window's rows (below them it is not drawn) */
@@ -308,7 +362,7 @@ static const char *comp_fs =
     "        return vec3(0.0);\n"
     "    uint c = texelFetch(u_side, p, 0).r;\n"
     "    if (in3d && u_gl != 0 && c == texelFetch(u_post, p, 0).r)\n"
-    "        return scene_at(q, p);\n"
+    "        return scene_or_water(q, p);\n"
     "    return pal(c);\n"
     "}\n"
     "void main() {\n"
@@ -478,6 +532,7 @@ int vpc_gl_init(void *sdl_window)
     u_move = glGetUniformLocation(scene_prog, "u_move");
     u_shift = glGetUniformLocation(scene_prog, "u_shift");
     u_zoom = glGetUniformLocation(scene_prog, "u_zoom");
+    u_wplane = glGetUniformLocation(scene_prog, "u_wplane");
     u_nl = glGetUniformLocation(scene_prog, "u_nl");
     u_lbase = glGetUniformLocation(scene_prog, "u_lbase");
     u_lights = glGetUniformLocation(scene_prog, "u_lights");
@@ -499,6 +554,12 @@ int vpc_gl_init(void *sdl_window)
     c_sharp = glGetUniformLocation(comp_prog, "u_sharp");
     c_scale = glGetUniformLocation(comp_prog, "u_scale");
     c_presh = glGetUniformLocation(comp_prog, "u_presh");
+    c_index = glGetUniformLocation(comp_prog, "u_index");
+    c_jit = glGetUniformLocation(comp_prog, "u_jit");
+    c_tint = glGetUniformLocation(comp_prog, "u_tint");
+    c_water = glGetUniformLocation(comp_prog, "u_water");
+    c_wrows = glGetUniformLocation(comp_prog, "u_wrows");
+    c_wscale = glGetUniformLocation(comp_prog, "u_wscale");
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -522,6 +583,8 @@ int vpc_gl_init(void *sdl_window)
     tex_post = index_texture(PGL_MAX_W, PGL_H);
     tex_side = index_texture(PGL_MAX_W, PGL_H);
     tex_tables = index_texture(256, 128);
+    tex_jit = index_texture(PGL_MAX_W, PGL_H);
+    tex_tint = index_texture(256, 16);
     glGenTextures(1, &tex_falloff);
     glBindTexture(GL_TEXTURE_2D, tex_falloff);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -540,9 +603,12 @@ int vpc_gl_init(void *sdl_window)
     if (env)
         msaa = atoi(env);
     {
-        GLint max = 1;
+        GLint max = 1, max_int = 1;
 
         glGetIntegerv(GL_MAX_SAMPLES, &max);
+        glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_int);     /* the index attachment's */
+        if (max_int < max)
+            max = max_int;
         if (msaa > max)
             msaa = max;
         if (msaa < 1)
@@ -646,12 +712,14 @@ static void make_fbos(int w, int h)
     if (scene_fbo) {
         glDeleteFramebuffers(1, &scene_fbo);
         glDeleteTextures(1, &scene_colour);
+        glDeleteTextures(1, &scene_index);
         glDeleteRenderbuffers(1, &scene_depth);
         glDeleteFramebuffers(1, &out_fbo);
         glDeleteTextures(1, &out_colour);
         if (ms_fbo) {
             glDeleteFramebuffers(1, &ms_fbo);
             glDeleteRenderbuffers(1, &ms_colour);
+            glDeleteRenderbuffers(1, &ms_index);
             glDeleteRenderbuffers(1, &ms_depth);
             ms_fbo = 0;
         }
@@ -664,12 +732,18 @@ static void make_fbos(int w, int h)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glGenTextures(1, &scene_index);
+    glBindTexture(GL_TEXTURE_2D, scene_index);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI, w, h, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, NULL);
     glGenRenderbuffers(1, &scene_depth);
     glBindRenderbuffer(GL_RENDERBUFFER, scene_depth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, w, h);
     glGenFramebuffers(1, &scene_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, scene_fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, scene_colour, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, scene_index, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, scene_depth);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         fprintf(stderr, "port: GL scene framebuffer incomplete\n");
@@ -678,12 +752,16 @@ static void make_fbos(int w, int h)
         glGenRenderbuffers(1, &ms_colour);
         glBindRenderbuffer(GL_RENDERBUFFER, ms_colour);
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_RGBA8, w, h);
+        glGenRenderbuffers(1, &ms_index);
+        glBindRenderbuffer(GL_RENDERBUFFER, ms_index);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_RGBA8UI, w, h);
         glGenRenderbuffers(1, &ms_depth);
         glBindRenderbuffer(GL_RENDERBUFFER, ms_depth);
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_DEPTH_COMPONENT32F, w, h);
         glGenFramebuffers(1, &ms_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, ms_fbo);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ms_colour);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_RENDERBUFFER, ms_index);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ms_depth);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             fprintf(stderr, "port: GL multisampled framebuffer incomplete: no MSAA\n");
@@ -1068,14 +1146,20 @@ static void draw_scene(const pgl_scene *s, const view *v)
     int i, nworld = 0, nflat = 0;
     int x0, y0, x1, y1;
     float depth_far = s->far_z > 0 ? s->far_z * 2.0f : 1e9f;
+    static const GLfloat clear[4] = { 0, 0, 0, 0 };
+    static const GLenum both[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
     glBindFramebuffer(GL_FRAMEBUFFER, ms_fbo ? ms_fbo : scene_fbo);
+    /* the colour indices only for the water */
+    glDrawBuffers(s->water_on ? 2 : 1, both);
     glViewport(0, 0, fbo_w, fbo_h);
     glDisable(GL_SCISSOR_TEST);
-    glClearColor(0, 0, 0, 0);
     glClearDepth(1.0);
     glDepthMask(GL_TRUE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearBufferfv(GL_COLOR, 0, clear);
+    if (s->water_on)
+        glClearBufferuiv(GL_COLOR, 1, index_clear);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     /* the 3D window, in the window's pixels */
     x0 = (int)floor((s->clip_l - v->c0) * fbo_w / v->cols);
@@ -1109,6 +1193,7 @@ static void draw_scene(const pgl_scene *s, const view *v)
     glBindTexture(GL_TEXTURE_2D, tex_pal);
     glUniform1i(u_falloff, 3);
     glUniform2f(u_focal, s->focal_x, s->focal_y);
+    glUniform3fv(u_wplane, 1, s->water_plane);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, tex_falloff);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 128, GL_RED_INTEGER, GL_UNSIGNED_SHORT,
@@ -1140,19 +1225,51 @@ static void draw_scene(const pgl_scene *s, const view *v)
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
     draw_runs(s, order, nworld);
-    /* the flats: back to front, tested against the world, not each other */
+    /* the flats: back to front, tested against the world, not each other; the water's test
+       stays the world's */
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_FALSE, GL_FALSE);
     draw_runs(s, order + nworld, nflat);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_TRUE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_SCISSOR_TEST);
     if (ms_fbo) {               /* resolve: the edges' coverage becomes their alpha */
         glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, scene_fbo);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        glDrawBuffers(1, both);
         glBlitFramebuffer(0, 0, fbo_w, fbo_h, 0, 0, fbo_w, fbo_h, GL_COLOR_BUFFER_BIT,
                           GL_NEAREST);
+        if (s->water_on) {      /* the indices: one sample each */
+            static const GLenum second[2] = { GL_NONE, GL_COLOR_ATTACHMENT1 };
+
+            glReadBuffer(GL_COLOR_ATTACHMENT1);
+            glDrawBuffers(2, second);
+            glBlitFramebuffer(0, 0, fbo_w, fbo_h, 0, 0, fbo_w, fbo_h, GL_COLOR_BUFFER_BIT,
+                              GL_NEAREST);
+            glReadBuffer(GL_COLOR_ATTACHMENT0);
+        }
     }
+}
+
+/* the water's ripple, and its tint table applied 1 to 16 times over (a run of -1 jitters
+   tints the tinted pixel to its left again) */
+static void water_tables(const pgl_scene *s)
+{
+    unsigned char tint[16 * 256];
+    int n, c;
+
+    memcpy(tint, s->water_tint, 256);
+    for (n = 1; n < 16; n++)
+        for (c = 0; c < 256; c++)
+            tint[n * 256 + c] = s->water_tint[tint[(n - 1) * 256 + c]];
+    glBindTexture(GL_TEXTURE_2D, tex_tint);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 16, GL_RED_INTEGER, GL_UNSIGNED_BYTE, tint);
+    glBindTexture(GL_TEXTURE_2D, tex_jit);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, s->w, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE,
+                    s->water_jit);
 }
 
 /* the share of the 3D window's pixels the game changed after the 3D pass: a scene the game
@@ -1406,6 +1523,8 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, s->w, PGL_H, GL_RED_INTEGER,
                             GL_UNSIGNED_BYTE, s->side);
         }
+        if (s->water_on)
+            water_tables(s);
         last_scene = s;
     } else {
         last_scene = NULL;
@@ -1426,10 +1545,12 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
             double mean = st_gaps ? st_gap_sum / st_gaps : 0;
 
             fprintf(stderr, "port: GL %d presents: %d shown, %d stale, %d no 3D, %d none; scene %lu: "
-                    "%d vertices, %d draws; frame %d (%d shown), pools %d polygons %d spans\n",
+                    "%d vertices, %d draws; frame %d (%d shown), pools %d polygons %d spans; "
+                    "water %d (rows %d-%d)\n",
                     presents, st_shown, st_stale, st_invalid, st_none, s ? s->serial : 0,
                     s ? s->nverts : 0, s ? s->ndraws : 0, s ? s->w : 0, cols,
-                    s ? s->pool_polys : 0, s ? s->pool_spans : 0);
+                    s ? s->pool_polys : 0, s ? s->pool_spans : 0, s ? s->water_on : 0,
+                    s ? s->water_top : 0, s ? s->water_bottom : 0);
             fprintf(stderr, "port: GL presents every %.2f ms (sd %.2f, %.2f..%.2f); %d frames, "
                     "a frame every %.1f ms, %d snaps, %d held, between frames %.2f..%.2f\n",
                     mean, st_gaps ? sqrt(st_gap_sq / st_gaps - mean * mean) : 0,
@@ -1469,6 +1590,18 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
     glUniform1i(c_scene, 3);
     glUniform1i(c_pal, 4);
     glUniform1i(c_side, 5);
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D, scene_index);
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_2D, tex_jit);
+    glActiveTexture(GL_TEXTURE8);
+    glBindTexture(GL_TEXTURE_2D, tex_tint);
+    glUniform1i(c_index, 6);
+    glUniform1i(c_jit, 7);
+    glUniform1i(c_tint, 8);
+    glUniform1i(c_water, valid && s->water_on);
+    glUniform1f(c_wscale, rw / shown);
+    glUniform2i(c_wrows, s && current ? s->water_top : 0, s && current ? s->water_bottom : 0);
     glUniform1i(c_valid, current);
     glUniform1i(c_gl, valid);
     glUniform1i(c_sides, current && s->w > PGL_W);

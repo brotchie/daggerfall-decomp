@@ -10,6 +10,8 @@
    - xn_glcap_pre / xn_glcap_end_frame (rframe.c): the screen before the 3D pass, and the frame
      drawn: every polygon that got a span routine (one the S-buffer showed somewhere) becomes
      triangles, every flat whose light setup ran a quad;
+   - xn_glcap_water (water.c): the dungeon water was drawn over the frame: its plane, rows,
+     ripple and tint, and the screen again (the water is not a pixel drawn after the 3D pass);
    - xn_glcap_present (gfx.c): the frame is handed to the main thread.
 
    The texel coordinates and shades are the span routines' (span.c), evaluated at each vertex:
@@ -30,6 +32,8 @@
 #include "xcam.h"
 #include "xflat.h"
 #include "xwshare.h"
+#include "xwater.h"
+#include "xmat.h"
 #include "port_gl.h"
 
 extern struct xn_vert_cam xn_vert_cam[1024];        /* indexed by byte offset (index * 12) */
@@ -607,6 +611,7 @@ void xn_glcap_end_frame(void)
         S->clip_r = S->w;
     if (S->clip_b > PGL_H)
         S->clip_b = PGL_H;
+    S->water_on = 0;
     S->bg_fill = !(xn_render_frame_flags & 2);
     S->bg_colour = text_shadow_colour;
     fog = xn_render_span_hook == xn_shade_fog_span && xn_fog_table_last != 0;
@@ -631,6 +636,57 @@ void xn_glcap_end_frame(void)
 
     memcpy(S->post, screen_buffer, (size_t)S->w * PGL_H);
     scene_done = 1;
+}
+
+/* The water: the plane y = dungeon_water_level through three of its points in view space (as
+   water_end puts them), as n . p = d; a point is seen through the plane where the ray from the
+   eye crosses it on the way, where n . p / d > 1. Each row's ripple as water_row used it (the
+   phase already moved on), a column of the frame at a time: in a wide frame the longer table
+   water.c reads (xn_water_jitter_row) */
+void xn_glcap_water(int top, int bottom)
+{
+    static const s32 at[3][2] = { { 0, 0 }, { 0x10000, 0 }, { 0, 0x10000 } };
+    double p[3][3], a[3], b[3], n[3], d;
+    s32 y = (dungeon_water_level - xn_cam_y) << 8;
+    int k, r, x;
+
+    if (!on() || !scene_done)
+        return;
+    S = pgl_building();
+    for (k = 0; k < 3; k++) {
+        xn_vec3 v;
+
+        v.x = at[k][0];
+        v.y = y;
+        v.z = at[k][1];
+        xn_mat_transform(&v, &xn_cam_view_matrix);
+        p[k][0] = v.x;
+        p[k][1] = v.y;
+        p[k][2] = v.z;
+    }
+    for (k = 0; k < 3; k++) {
+        a[k] = p[1][k] - p[0][k];
+        b[k] = p[2][k] - p[0][k];
+    }
+    n[0] = a[1] * b[2] - a[2] * b[1];
+    n[1] = a[2] * b[0] - a[0] * b[2];
+    n[2] = a[0] * b[1] - a[1] * b[0];
+    d = n[0] * p[0][0] + n[1] * p[0][1] + n[2] * p[0][2];
+    if (d == 0 || top < 0 || bottom > PGL_H || top >= bottom)
+        return;
+    for (k = 0; k < 3; k++)
+        S->water_plane[k] = (float)(n[k] / d);
+    S->water_top = top;
+    S->water_bottom = bottom;
+    for (r = top; r < bottom; r++) {
+        const s32 *j = xn_water_jitter_row(r);
+
+        for (x = 0; x < S->w; x++)
+            S->water_jit[r * S->w + x] = (u8)(j[x] + 1);
+    }
+    memcpy(S->water_tint, (const u8 *)((uptr)xn_water_tint_table & ~(uptr)0xFF), 256);
+    memcpy(S->post, screen_buffer, (size_t)S->w * PGL_H);
+    S->water_on = 1;
 }
 
 /* A frame drawn since the last present is handed over. When the game shows pictures without

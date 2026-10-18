@@ -29,6 +29,10 @@ void xn_glcap_flat(const struct xn_flat *flat, const struct xn_tex_image *image,
 /* the 3D pass begins and ends (rframe.c) */
 void xn_glcap_pre(void);
 void xn_glcap_end_frame(void);
+/* the dungeon water was drawn on rows top..bottom - 1 (water.c), with row r's jitters read a
+   column of the frame each from xn_water_jitter_row(r) */
+void xn_glcap_water(int top, int bottom);
+const int *xn_water_jitter_row(int r);
 /* the back buffer is shown (gfx.c) */
 void xn_glcap_present(void);
 

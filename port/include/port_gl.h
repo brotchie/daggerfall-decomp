@@ -10,7 +10,8 @@
    - The renderer (port/host/vpc_gl.c, on the main thread) draws the triangles into a palette
      index framebuffer at the window's resolution, with the engine's shade and haze tables
      in the fragment shader, then puts the software screen's 2D on top: a pixel the game drew
-     after the 3D pass (the HUD, the weapon, weather, water) shows the software screen.
+     after the 3D pass (the HUD, the weapon, weather) shows the software screen. The dungeon
+     water is redone at the window's resolution from the scene's colour indices.
 
    The software renderer still runs, so the game sees exactly what it saw before (the pick,
    the screen) and the software picture is there to fall back on. Nothing here is engine
@@ -107,8 +108,16 @@ typedef struct pgl_scene {
     /* w x 200 each (rows of w): the frame before the 3D pass (the sky), after it (before the
        HUD), and as presented (the weather on it; a wide frame only) */
     unsigned char pre[PGL_MAX_W * PGL_H];
-    unsigned char post[PGL_MAX_W * PGL_H];
+    unsigned char post[PGL_MAX_W * PGL_H];  /* (after the water too) */
     unsigned char side[PGL_MAX_W * PGL_H];
+    /* the dungeon water (xn_water_draw): drawn this frame on rows water_top..water_bottom - 1;
+       a camera-space point p is seen through the plane where water_plane . p > 1; per pixel
+       of the frame (rows of w) its ripple, jitter + 1 (the pixel takes its colour from
+       x + jitter); the tint table */
+    int water_on, water_top, water_bottom;
+    float water_plane[3];
+    unsigned char water_jit[PGL_MAX_W * PGL_H];
+    unsigned char water_tint[256];
 } pgl_scene;
 
 #pragma pack(pop)
@@ -124,6 +133,8 @@ void *pgl_realloc(void *p, size_t n);
 void pgl_mouse_remainder(double *rx, double *ry);
 /* PORT_GL_VERTEX_LIGHT=1: light shaders sampled per vertex, not per pixel */
 int pgl_vertex_light(void);
+/* PORT_GL_WATER=LEVEL (a test): every dungeon cell is flooded to LEVEL (world y); else 10000 */
+int pgl_water_test(void);
 /* the mickeys the game has read through int 33h fn 0Bh, all told; and with those it has not
    read yet (the main thread's late look) */
 void pgl_mouse_used(double *x, double *y);

@@ -120,7 +120,8 @@ How it works:
   takes the frame as the engine builds it, through hooks in the renderer: `XN_GLCAP(...)` in
   poly.c (a model face's or a clipped polygon's camera-space vertices; a textured face's
   image), terrain.c (a ground cell's corners), flat.c (a flat's quad), render.c and rframe.c
-  (the frame's start, the screen before the 3D pass, the frame's end) and gfx.c (the present).
+  (the frame's start, the screen before the 3D pass, the frame's end), water.c (the dungeon
+  water was drawn) and gfx.c (the present).
   Outside the native build `XN_GLCAP` is nothing; the hooks are under `DAGGER_PORT`.
   - At the frame's end, every pool record whose span routine is no longer its first-span setup
     (the S-buffer showed it somewhere) becomes triangles; every flat whose light setup ran
@@ -162,10 +163,30 @@ How it works:
     draws them; translucent flats (ghosts) are dithered;
   - the composite then picks, per window pixel: the software screen (VGA memory) outside the
     3D window or where the game drew after the 3D pass (the screen differs from the copy taken
-    after it: the HUD, the weapon, rain and snow, the dungeon water); else the OpenGL pixel
+    after it: the HUD, the weapon, rain and snow); else the OpenGL pixel
     over what was on the screen before the 3D pass (the sky backdrop), or indoors the
     background colour, by its coverage. The scene is drawn again at every present with the
     palette of the moment, so fades and the palette's effects apply as before.
+  - **The dungeon water** (`xn_water_draw`, after the 3D pass) is drawn again at the window's
+    resolution. The capture's hook at its end takes the water's plane in camera space (three
+    of its points through the view matrix, as `water_end` puts them: a point p is seen
+    through the water where n . p > 1), the rows it drew, each row's ripple (the jitter
+    table at the row's phase, already moved on, plus its base) and WATER.TBL; then it copies
+    the screen again as the post-pass snapshot, so the water's pixels are not taken for the
+    game's 2D. While there is water the scene also writes a second colour attachment: the
+    pixel's colour index (the nearest texel's, through its rows), covered, and the world's
+    test against the plane (the flats leave it alone: the S-buffer the software tests has
+    none; where no polygon is, it stays set, as the software draws the water between the
+    spans). Integer, so the multisample resolve takes one sample. In the composite a pixel
+    on the water's rows with the test set becomes the tint of the pixel jitter columns along
+    its row (a frame column is several window pixels: the shift is scaled, the sub-column
+    position kept). In a wide frame the ripple is the wide pass's (water.c's longer jitter
+    table), so the sides ripple as the middle does. The software goes left to right in place, so a jitter of -1 reads the
+    pixel to its left already redrawn when that is water too: the tint of its tint, as far as
+    a run of -1s goes (nearly half the jitters are -1, and WATER.TBL is far from idempotent:
+    repeated, it runs to colour 106 or to black). The composite follows the run back (up to
+    16) and applies the table that many times. Water pixels are texels even in smooth mode,
+    and hard-edged.
   - The 3D window is the rows the frame loop draws (the clip top to as far below the view
     centre as it is above it, Q-RENDER-05), not the whole clip window: the HUD's rows stay on
     the screen from frame to frame inside it.
@@ -188,13 +209,25 @@ Checks:
   of random keys and clicks on six saves under AddressSanitizer (`PORT_SANITIZE=address`,
   OpenGL on) report only the original's stat-bar over-read. The game's loop runs at the same
   ~54 Hz in both renderers.
+- No classic save stands in a flooded dungeon cell (the game takes `dungeon_water_level` from
+  the player's cell every frame: 10000 in all 18). `PORT_GL_WATER=LEVEL` floods every dungeon
+  cell to LEVEL (world y; a test: `port_wide_sky_drawn` sets it after `sky_update` took the
+  cell's, in every run and in `PORT_GL_WIDE_CHECK`'s copy too).
+  2026-10-18, `PORT_GL_WATER=-560 tools/port_gl_shots.py` on the seven dungeon saves (blades,
+  mord, orcs, sentinel, uking, wayrest, worms; water on rows 29-200 down to 102-200): the
+  same scores as without the water (0.84-0.99), the ripple and the tint where the software
+  has them, the water line and the jitter's edges at the window's resolution. The eye under
+  the water was not seen: levels above the eye reach only the rows under the HUD's icons
+  there. 2026-10-20, on the wide view: blades, orcs and worms at 16:9 and 21:9 score the
+  same with water (0.87-0.99, sides 0.79-0.99), the water spans the sides, and
+  `PORT_GL_WIDE_CHECK` with both passes flooded finds the middle's colours as close to the
+  original's as without water (1.5-2.8% of the pixels, at the old edges).
 - `PORT_GL_DEBUG=1` prints, every 2 s, how many presents showed the 3D scene, and the scene's
-  vertices and draws.
+  vertices and draws, and whether it had water (its rows).
 
 Not yet:
-- The sky backdrop and the dungeon water stay the software renderer's pixels (320x200; the sky
-  filtered in smooth mode): the sky is a 2D image the game copies in, the water a post-pass
-  over the S-buffer.
+- The sky backdrop stays the software renderer's pixels (320x200, filtered in smooth mode): it
+  is a 2D image the game copies in.
 - Translucent flats are a dither, not the blend table.
 - macOS only (`<OpenGL/gl3.h>`); another platform needs a GL loader.
 

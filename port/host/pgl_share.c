@@ -225,6 +225,13 @@ int pgl_vertex_light(void)
     return e && *e == '1';
 }
 
+int pgl_water_test(void)
+{
+    const char *e = SDL_getenv("PORT_GL_WATER");
+
+    return e && *e ? SDL_atoi(e) : 10000;
+}
+
 static pgl_scene scenes[3];
 static pgl_scene *building = &scenes[0], *latest = &scenes[1], *showing = &scenes[2];
 static int latest_new;

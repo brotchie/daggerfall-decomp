@@ -77,11 +77,23 @@ static u32 check_depth[PGL_W * PGL_H];
 static u8 check_sky[PGL_W * PGL_H];     /* the game's screen after the sky, before the 3D pass */
 static unsigned long frames_at_enter;  /* port_render_frames when the frame began */
 
-/* after sky_update (game_frame): the sky's picture, for the check */
+extern u8 player_environment;           /* the game's: 3 in a dungeon */
+extern s32 dungeon_water_level;
+
+/* after sky_update (game_frame): PORT_GL_WATER's flood, and the sky's picture for the check */
 void port_wide_sky_drawn(void)
 {
+    static int water_test, water_test_read;     /* PORT_GL_WATER's level, 10000 none */
     s32 y, dx = port_wide_cols ? port_wide_dx : 0;
 
+    /* a test of the water where no classic save has any: the dungeon cell's level, as
+       sky_update just took it, replaced (the check's copy floods it too) */
+    if (!water_test_read) {
+        water_test = pgl_water_test();
+        water_test_read = 1;
+    }
+    if (water_test != 10000 && player_environment == 3)
+        dungeon_water_level = water_test;
     if (!pgl_check_pending() && !pgl_check_child())
         return;
     for (y = 0; y < PGL_H; y++)

@@ -205,6 +205,14 @@ static const s32 *wide_jitter_row(s32 phase, s32 base)
 {
     return wide_jitter + WIDE_JITTER_BEFORE + phase + base - port_wide_dx;
 }
+
+/* the jitters row r read this frame, a column of the frame each (the capture's) */
+const s32 *xn_water_jitter_row(s32 r)
+{
+    if (port_wide_cols)
+        return wide_jitter_row(xn_water_row_phase[r], xn_water_row_base[r]);
+    return xn_water_jitter + xn_water_row_phase[r] + xn_water_row_base[r];
+}
 #endif
 
 void xn_water_draw(void)
@@ -257,6 +265,7 @@ void xn_water_draw(void)
 #endif
         water_row(head, line, xn_water_jitter + phase + xn_water_row_base[r], inv);
     }
+    XN_GLCAP(xn_glcap_water(top, bottom));
 }
 
 /* ---- the span ---------------------------------------------------------------------------- */
