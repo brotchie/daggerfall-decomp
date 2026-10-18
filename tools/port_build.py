@@ -270,7 +270,18 @@ def app():
         lib = line.strip().split(" (")[0]
         if "SDL3" not in lib:
             continue
-        real = os.path.realpath(lib)
+        if lib.startswith("@rpath/"):
+            # an SDL3 built from source (not Homebrew's): found through the executable's rpaths
+            lines = run(["otool", "-l", target], capture_output=True).stdout.splitlines()
+            rpaths = [lines[i + 2].split()[1] for i, l in enumerate(lines)
+                      if l.strip() == "cmd LC_RPATH"]
+            found = [os.path.join(r, lib[len("@rpath/"):]) for r in rpaths]
+            found = [f for f in found if os.path.exists(f)]
+            if not found:
+                sys.exit("app: no %s in the rpaths %s" % (lib, rpaths))
+            real = os.path.realpath(found[0])
+        else:
+            real = os.path.realpath(lib)
         name = os.path.basename(lib)
         shutil.copy2(real, os.path.join(contents, "Frameworks", name))
         os.chmod(os.path.join(contents, "Frameworks", name), 0o755)
