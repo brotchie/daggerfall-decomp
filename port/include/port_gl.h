@@ -73,6 +73,10 @@ typedef struct pgl_scene {
     /* the view: the centre and half size on the screen, the near and far planes (camera z) */
     float cx, cy, hw, hh, near_z, far_z;
     float focal_x, focal_y;                 /* pixels (the light shaders' rays) */
+    int cam_yaw, cam_pitch;                 /* the view's angles (2048 a turn) */
+    double mouse_rem_x, mouse_rem_y;        /* the fractions of a mickey (of a step of the
+                                               view's angles) the frame's read of the mouse
+                                               left: vpc_gl.c's smooth look */
     int clip_l, clip_t, clip_r, clip_b;     /* the 3D window on the 320x200 screen */
     int bg_fill, bg_colour;                 /* indoors: what no polygon covers */
     /* the distance fog: camera z >> 8 beyond start goes step table bytes a unit toward
@@ -94,6 +98,8 @@ extern volatile int pgl_enabled;
 /* the host's realloc (the engine's objects name only what the native build defines: a C
    library name there would be taken for a game symbol, tools/port_build.py) */
 void *pgl_realloc(void *p, size_t n);
+/* the fractions of a mickey the last read of the mouse's motion left (int 33h fn 0Bh) */
+void pgl_mouse_remainder(double *rx, double *ry);
 /* PORT_GL_VERTEX_LIGHT=1: light shaders sampled per vertex, not per pixel */
 int pgl_vertex_light(void);
 
@@ -123,7 +129,12 @@ void vpc_gl_shutdown(void);
 /* shows the screen: the 320x200 picture vga (the VGA's memory) through the palette (256 RGB
    bytes, 8 bits each), with the latest 3D scene composited in; cross: where a crosshair goes
    (320x200 pixels), or NULL */
-void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const int *cross);
+/* look: the mouse turns the view ({REVERSE VERTICAL's sign, the view's pitch now}), or NULL:
+   the fraction of a step the mouse had moved past the scene's whole angles (the scene's
+   mouse_rem) is added as a turn, with a small overscan that covers the strip it brings in at
+   the edge */
+void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const int *cross,
+                    const int *look);
 /* the last frame shown, as a .bmp at the window's resolution; 0 on success */
 int vpc_gl_screenshot(const char *path);
 /* F11: the 3D view through OpenGL or the software renderer */

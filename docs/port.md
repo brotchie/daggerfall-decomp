@@ -221,10 +221,25 @@ own controls, set up differently; nothing in the game's logic changes:
 - **The crosshair** at the view's centre (both renderers; at the window's resolution with
   OpenGL) shows while the mouse looks around: VIEW mode, no cursor, no screen over the world,
   and a 3D frame drawn in the last 200 ms (`port_render_frames`, counted in rframe.c).
+- **Smooth look (OpenGL).** The engine's angles are whole steps of 1/2048 of a turn
+  (0.18 degrees): at 320x200 a step is under a pixel, at 1920 pixels across it is about 5,
+  and a slow turn showed as 5-pixel jumps between frames that did not move. The mouse driver
+  keeps the fraction of a mickey each read (fn 0Bh, once a frame) leaves behind; the capture
+  stores it with the scene (`mouse_rem_x/_y`), and the vertex shader turns the scene by that
+  fraction of a step (the yaw about the world's vertical under the scene's pitch, then the
+  pitch), so the view stands where the mouse was when the frame read it. While the crosshair
+  shows, the scene is drawn 0.85% larger, so the edge the fraction brings in is never
+  empty. It applies only when the next frame turns the view (`look_probe` in main.c:
+  player_mouse_look's conditions, SWING WEAPON not held). Measured with `PORT_GL_RECORD`
+  (below) on a slow turn: every new frame moves 0.6-2 pixels, where it moved 5 or 0.
+- `PORT_GL_RECORD=FILE` records a strip of every presented picture with the scene's angles
+  (`PORT_GL_RECORD_COLUMNS=1`: a vertical strip), for looking at motion frame by frame:
+  screenshots stall the main thread and so cannot.
 - **Sensitivity.** The mouse driver scales its motion counts by int 33h fn 1Ah's sensitivity,
   as a DOS driver does, so the HORIZONTAL and VERTICAL settings of the game's mouse options set
   the speed of the look (the default 8 is the speed before).
-- `PORT_SCRIPT` has `mdown B` and `mup B` (a mouse button held and let go) for scripted swings.
+- `PORT_SCRIPT` has `mdown B` and `mup B` (a mouse button held and let go) for scripted swings,
+  and `mrel DX DY` (relative motion in game pixels, fractions kept, as a real mouse's).
 
 ## Why the 64-bit work cannot be skipped
 

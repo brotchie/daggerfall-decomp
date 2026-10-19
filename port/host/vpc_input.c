@@ -17,6 +17,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "port_gl.h"
 #include "port_vpc.h"
 
 /* ---- scan code set 1 ----------------------------------------------------------------------- */
@@ -223,6 +224,8 @@ int vpc_bios_key(int remove)
 static struct {
     double x, y;                        /* driver units */
     double mx, my;                      /* mickeys not yet read */
+    double rem_x, rem_y;                /* the fractions fn 0Bh left at its last read (the
+                                           view's smooth look: pgl_mouse_remainder) */
     int buttons;
     int minx, maxx, miny, maxy;
     int ratio_x, ratio_y;               /* mickeys per 8 pixels */
@@ -339,8 +342,13 @@ static int handle_event(const void *ev)
         gy = e->motion.yrel * sy;
         /* the driver's units (units_x); mickeys at the drivers' ratio, scaled by the
            sensitivity (function 1Ah, 50 = 1.0: the game's mouse settings send 6 to 90) */
-        mouse.mx += gx * units_x() * mouse.ratio_x / 8.0 * mouse.sens_x / 50.0;
-        mouse.my += gy * mouse.ratio_y / 8.0 * mouse.sens_y / 50.0;
+        {
+            double ax = gx * units_x() * mouse.ratio_x / 8.0 * mouse.sens_x / 50.0;
+            double ay = gy * mouse.ratio_y / 8.0 * mouse.sens_y / 50.0;
+
+            mouse.mx += ax;
+            mouse.my += ay;
+        }
         mouse.x = clampd(mouse.x + gx * units_x(), mouse.minx, mouse.maxx);
         mouse.y = clampd(mouse.y + gy, mouse.miny, mouse.maxy);
         return 1;
@@ -458,6 +466,8 @@ static void mouse_service(struct vpc_regs *r)
         int mx = (int)mouse.mx, my = (int)mouse.my;
         mouse.mx -= mx;
         mouse.my -= my;
+        mouse.rem_x = mouse.mx;
+        mouse.rem_y = mouse.my;
         SET(r->ecx, mx);
         SET(r->edx, my);
         break;
@@ -501,6 +511,28 @@ void vpc_input_key(int sdl_scancode, int down)
 }
 
 /* the pointer to (x, y) in mode 13h pixels; button b (0 left, 1 right) down or up */
+void vpc_input_mouse_rel(double gx, double gy)
+{
+    double ax, ay;
+
+    SDL_LockMutex(mouse_lock);
+    ax = gx * units_x() * mouse.ratio_x / 8.0 * mouse.sens_x / 50.0;
+    ay = gy * mouse.ratio_y / 8.0 * mouse.sens_y / 50.0;
+    mouse.mx += ax;
+    mouse.my += ay;
+    mouse.x = clampd(mouse.x + gx * units_x(), mouse.minx, mouse.maxx);
+    mouse.y = clampd(mouse.y + gy, mouse.miny, mouse.maxy);
+    SDL_UnlockMutex(mouse_lock);
+}
+
+void pgl_mouse_remainder(double *rx, double *ry)
+{
+    SDL_LockMutex(mouse_lock);
+    *rx = mouse.rem_x;
+    *ry = mouse.rem_y;
+    SDL_UnlockMutex(mouse_lock);
+}
+
 void vpc_input_mouse_to(int x, int y)
 {
     SDL_LockMutex(mouse_lock);

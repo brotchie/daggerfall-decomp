@@ -119,6 +119,32 @@ static int view_probe(int *cx, int *cy)
     return 1;
 }
 
+extern unsigned char player_on_ground, in_dungeon_water, player_motion_flags;
+extern unsigned char mouse_buttons, key_down[];
+extern unsigned char mouse_turn_rate;
+extern int xn_cam_pitch;
+
+/* for the video's smooth look: the next frame adds the mouse's motion to the view, as
+   player_mouse_look does (src/hand/func_00081096.c: VIEW mode without the cursor, on the
+   ground, in water or climbing, SWING WEAPON not held). *reverse: the vertical sign (REVERSE
+   VERTICAL); *pitch: the view's pitch now (-256..256 of 2048 a turn) */
+static int look_probe(int *reverse, int *pitch)
+{
+    unsigned int b = key_map[33];
+    int cx, cy;
+
+    if (!view_probe(&cx, &cy))
+        return 0;
+    if (!(player_on_ground || in_dungeon_water || (player_motion_flags & 0x20)))
+        return 0;
+    if (b < 200 ? key_down[b] : b == 202 ? mouse_buttons & 1 : b == 203 ? mouse_buttons & 2
+                                : b == 212 ? mouse_buttons & 4 : 0)
+        return 0;
+    *reverse = mouse_turn_rate & 0x80 ? -1 : 1;
+    *pitch = xn_cam_pitch > 1023 ? xn_cam_pitch - 2048 : xn_cam_pitch;
+    return 1;
+}
+
 /* the game's thread (vpc_run): FALL.EXE's main */
 static int run_game(void *arg)
 {
@@ -194,6 +220,7 @@ int main(int argc, char **argv)
     }
 
     vpc_set_view_probe(view_probe);
+    vpc_set_look_probe(look_probe);
     game_argv[0] = "FALL.EXE";
     game_argv[1] = (char *)config;
     game_argv[2] = NULL;

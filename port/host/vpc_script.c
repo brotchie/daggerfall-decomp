@@ -112,6 +112,10 @@ static void run(const struct step *st)
             vpc_input_mouse_button(release_button, 1);
             release_at = now_s() + 0.1;
         }
+    } else if (!strcmp(st->cmd, "mrel")) {
+        double dx, dy;
+        if (sscanf(st->arg, "%lf %lf", &dx, &dy) == 2)
+            vpc_input_mouse_rel(dx, dy);
     } else if (!strcmp(st->cmd, "mdown") || !strcmp(st->cmd, "mup")) {
         /* a mouse button held or let go: 0 left, 1 right, 2 middle */
         int b = atoi(st->arg);

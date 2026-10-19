@@ -38,10 +38,25 @@ static Uint64 last_present, last_period;
 static int screenshot_count;
 static int use_gl;
 static int (*view_probe)(int *cx, int *cy);
+static int (*look_probe)(int *reverse, int *pitch);
 
 void vpc_set_view_probe(int (*probe)(int *cx, int *cy))
 {
     view_probe = probe;
+}
+
+void vpc_set_look_probe(int (*probe)(int *reverse, int *pitch))
+{
+    look_probe = probe;
+}
+
+/* The engine turns the view in whole steps of 1/2048 of a turn, which at the window's
+   resolution are several pixels: OpenGL adds the mouse's motion its scene does not show yet
+   (vpc_gl.c), so the view turns as smoothly as the mouse moves. look: {reverse, pitch} from
+   the game's side; 0 when the next frame will not turn the view. */
+static int smooth_look(int look[2])
+{
+    return look_probe != NULL && look_probe(&look[0], &look[1]);
 }
 
 /* where the crosshair goes (1), or none (0): while the mouse looks around the world */
@@ -205,9 +220,11 @@ static void present_now(void)
         }
         {
             int cross[2];
+            int look[2];
+            int turn = smooth_look(look);
 
             vpc_gl_present(mode == 0x13 ? port_low_memory + 0xA0000 : black, rgb,
-                           crosshair(&cross[0], &cross[1]) ? cross : NULL);
+                           crosshair(&cross[0], &cross[1]) ? cross : NULL, turn ? look : NULL);
         }
         return;
     }

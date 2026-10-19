@@ -29,6 +29,7 @@
 #include "xgfx.h"
 #include "xcam.h"
 #include "xflat.h"
+#include "xwshare.h"
 #include "port_gl.h"
 
 extern struct xn_vert_cam xn_vert_cam[1024];        /* indexed by byte offset (index * 12) */
@@ -523,6 +524,9 @@ void xn_glcap_end_frame(void)
     S->far_z = (float)xn_cam_far_z;
     S->focal_x = (float)xn_cam_focal_x;
     S->focal_y = (float)xn_cam_focal_y;
+    S->cam_yaw = xn_cam_yaw;
+    S->cam_pitch = xn_cam_pitch;
+    pgl_mouse_remainder(&S->mouse_rem_x, &S->mouse_rem_y);
     /* the 3D window: the rows the frame loop draws (from the clip top to as far below the
        view centre as that is above it, Q-RENDER-05) within the clip window, and the columns
        of the view within it. Rows below are not the 3D pass's even inside the clip window

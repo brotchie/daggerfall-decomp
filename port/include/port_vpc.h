@@ -65,13 +65,16 @@ int vpc_screenshot(const char *path);
 /* The scripted driver (vpc_script.c), for runs without a person: PORT_SCRIPT is a timeline,
    "SECONDS COMMAND [ARGS]" steps separated by ';' (seconds since start-up):
      shot FILE.bmp | key NAME (SDL's key names: Return, Escape, Up, A ...) | down NAME |
-     up NAME | type TEXT | click X Y (mode 13h pixels) | rclick X Y | move X Y | mdown B |
-     mup B (mouse button B held, let go: 0 left, 1 right, 2 middle) | quit
+     up NAME | type TEXT | click X Y (mode 13h pixels) | rclick X Y | move X Y | mrel DX DY
+     (relative motion in game pixels, fractions kept, as a real mouse) | mdown B | mup B (mouse
+     button B held, let go: 0 left, 1 right, 2 middle) | quit
    PORT_SHOT_EVERY=SECONDS with PORT_SHOT_DIR=DIR saves the screen that often (shot_NNNN.bmp);
    PORT_EXIT_AFTER=SECONDS quits. The main thread's poll runs it. */
 void vpc_script_init(void);
 void vpc_script_poll(void);
 void vpc_input_key(int sdl_scancode, int down);
+/* the mouse moved by (gx, gy) game pixels, fractions kept, as the host's motion events move it */
+void vpc_input_mouse_rel(double gx, double gy);
 void vpc_input_mouse_to(int x, int y);
 void vpc_input_mouse_button(int b, int down);
 
@@ -157,6 +160,10 @@ void vpc_music_render(short *out, int frames);
 /* the game's side (port/host/main.c) says when the mouse looks around the world, and where
    the view's centre is: the screen then shows a crosshair there */
 void vpc_set_view_probe(int (*probe)(int *cx, int *cy));
+/* and when the game turns the view by the mouse's motion (*reverse the vertical sign, *pitch
+   the pitch now): OpenGL then adds the fraction of a step the mouse had moved past the
+   engine's whole angles (2048 a turn), so the view turns smoothly */
+void vpc_set_look_probe(int (*probe)(int *reverse, int *pitch));
 void vpc_video_init(const char *title);
 void vpc_video_shutdown(void);
 unsigned char vpc_video_inb(unsigned int port);

@@ -16,6 +16,7 @@
       or the background colour indoors.
    The picture is 320x200 at 4:3, letterboxed in the window, as the software path shows it. */
 #define GL_SILENCE_DEPRECATION
+#include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +26,7 @@
 #include <OpenGL/gl3.h>
 
 #include "port_gl.h"
+#include "port_vpc.h"
 
 static SDL_Window *window;
 static SDL_GLContext context;
@@ -43,7 +45,7 @@ static int *tsize;                      /* w, h per texture id */
 
 /* scene uniforms */
 static GLint u_view, u_mode, u_colour, u_row2, u_fog, u_tsize, u_fogp, u_depth, u_tex,
-    u_tables, u_pal, u_smooth, u_focal, u_nl, u_lbase, u_lights, u_falloff;
+    u_tables, u_pal, u_smooth, u_focal, u_nl, u_lbase, u_lights, u_falloff, u_turn;
 /* composite uniforms */
 static GLint c_vga, c_pre, c_post, c_scene, c_pal, c_valid, c_clip, c_bg, c_smooth, c_cross;
 
@@ -53,20 +55,41 @@ static const char *scene_vs =
     "layout(location = 1) in vec2 a_uv;\n"
     "layout(location = 2) in float a_shade;\n"
     "uniform vec4 u_view;\n"                /* centre x, y; half width, height (pixels) */
+    "uniform vec2 u_focal;\n"
+    "uniform vec4 u_turn;\n"                /* the turn not yet in the scene: yaw, pitch, the
+                                               scene's pitch (radians), the overscan */
     "out vec2 v_uv;\n"
     "out float v_shade;\n"
     "out float v_z;\n"
     "out vec3 v_cam;\n"
+    /* a rotation about x (pitch) and y (yaw), as the view's: y down, z ahead */
+    "vec3 pitch_by(vec3 v, float a) {\n"
+    "    float c = cos(a), s = sin(a);\n"
+    "    return vec3(v.x, v.y * c - v.z * s, v.y * s + v.z * c);\n"
+    "}\n"
+    "vec3 yaw_by(vec3 v, float a) {\n"
+    "    float c = cos(a), s = sin(a);\n"
+    "    return vec3(v.x * c - v.z * s, v.y, v.x * s + v.z * c);\n"
+    "}\n"
     "void main() {\n"
-    "    float z = a_cam.z;\n"
+    "    vec3 c = a_cam;\n"
+    "    if (u_turn.x != 0.0 || u_turn.y != 0.0) {\n"
+    /* the view space unscaled (camera space has x * focal / half width), the yaw about the
+       world's vertical (under the scene's pitch), then the pitch, and scaled back */
+    "        vec3 v = vec3(c.x * u_view.z / u_focal.x, c.y * u_view.w / u_focal.y, c.z);\n"
+    "        v = pitch_by(yaw_by(pitch_by(v, -u_turn.z), u_turn.x), u_turn.z + u_turn.y);\n"
+    "        c = vec3(v.x * u_focal.x / u_view.z, v.y * u_focal.y / u_view.w, v.z);\n"
+    "    }\n"
+    "    c.xy *= u_turn.w;\n"
+    "    float z = c.z;\n"
     /* screen x = cx + x * hw / z on 320 columns, y = cy + y * hh / z on 200 rows, as clip
        coordinates with w = z (GL clips what is behind the eye) */
-    "    gl_Position = vec4((u_view.x / 160.0 - 1.0) * z + a_cam.x * u_view.z / 160.0,\n"
-    "                       (1.0 - u_view.y / 100.0) * z - a_cam.y * u_view.w / 100.0,\n"
+    "    gl_Position = vec4((u_view.x / 160.0 - 1.0) * z + c.x * u_view.z / 160.0,\n"
+    "                       (1.0 - u_view.y / 100.0) * z - c.y * u_view.w / 100.0,\n"
     "                       0.0, z);\n"
     "    v_uv = a_uv;\n"
     "    v_shade = a_shade;\n"
-    "    v_z = z;\n"
+    "    v_z = a_cam.z;\n"
     "    v_cam = a_cam;\n"
     "}\n";
 
@@ -323,6 +346,7 @@ int vpc_gl_init(void *sdl_window)
     u_pal = glGetUniformLocation(scene_prog, "u_pal");
     u_smooth = glGetUniformLocation(scene_prog, "u_smooth");
     u_focal = glGetUniformLocation(scene_prog, "u_focal");
+    u_turn = glGetUniformLocation(scene_prog, "u_turn");
     u_nl = glGetUniformLocation(scene_prog, "u_nl");
     u_lbase = glGetUniformLocation(scene_prog, "u_lbase");
     u_lights = glGetUniformLocation(scene_prog, "u_lights");
@@ -597,6 +621,12 @@ static void draw_runs(const pgl_scene *s, const int *order, int n)
     }
 }
 
+/* the turn not yet in the scene ({yaw, pitch} in 2048ths of a turn, or NULL) and whether
+   the view is the mouse's (the overscan, then, so a turn's new edge is never empty) */
+#define LOOK_AHEAD 1.0                  /* the most of a turn added, in steps */
+static float turn_yaw, turn_pitch;
+static int turn_overscan;
+
 static void draw_scene(const pgl_scene *s)
 {
     static int *order;
@@ -623,6 +653,20 @@ static void draw_scene(const pgl_scene *s)
 
     glUseProgram(scene_prog);
     glUniform4f(u_view, s->cx, s->cy, s->hw, s->hh);
+    {
+        const float step = 6.2831853f / 2048.0f;
+        float zoom = 1.0f;
+        float pitch = (float)(s->cam_pitch > 1023 ? s->cam_pitch - 2048 : s->cam_pitch);
+
+        if (turn_overscan && s->focal_x > 0 && s->focal_y > 0) {
+            /* the field of view's half angles, widened by the most the turn can bring in */
+            float hx = atanf(s->hw / s->focal_x), hy = atanf(s->hh / s->focal_y);
+            float a = (float)LOOK_AHEAD * step, zx = tanf(hx + a) / tanf(hx), zy = tanf(hy + a) / tanf(hy);
+
+            zoom = zx > zy ? zx : zy;
+        }
+        glUniform4f(u_turn, turn_yaw * step, turn_pitch * step, pitch * step, zoom);
+    }
     glUniform3f(u_fogp, s->fog_start, s->fog_step, s->fog_far);
     glUniform1f(u_depth, 1.0f / depth_far);
     glUniform1i(u_tex, 0);
@@ -711,10 +755,55 @@ static void letterbox(int *x, int *y, int *w, int *h)
     *y = (wh - *h) / 2;
 }
 
+/* PORT_GL_RECORD=FILE: every present's middle 32 rows of the picture (RGBA; with
+   PORT_GL_RECORD_COLUMNS=1 the middle 32 columns, full height), after a header {time ns,
+   scene serial, yaw, pitch, width, rows}, for looking at motion frame by frame without
+   screenshots stalling the main thread */
+static void record(const pgl_scene *s, int w, int h)
+{
+    static FILE *f;
+    static int tried, columns;
+    static unsigned char *rows;
+    long long head[6];
+    int rw = w, rh = 32;
+
+    if (!tried) {
+        const char *path = SDL_getenv("PORT_GL_RECORD");
+
+        tried = 1;
+        if (path)
+            f = fopen(path, "wb");
+        columns = SDL_getenv("PORT_GL_RECORD_COLUMNS") != NULL;
+    }
+    if (f == NULL)
+        return;
+    if (columns) {
+        rw = 32;
+        rh = h;
+    }
+    rows = realloc(rows, (size_t)rw * rh * 4);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, out_fbo);
+    if (columns)
+        glReadPixels(w / 2 - 16, 0, 32, h, GL_RGBA, GL_UNSIGNED_BYTE, rows);
+    else
+        glReadPixels(0, h * 6 / 10, w, 32, GL_RGBA, GL_UNSIGNED_BYTE, rows);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    head[0] = (long long)SDL_GetTicksNS();
+    head[1] = s ? (long long)s->serial : 0;
+    head[2] = s ? s->cam_yaw : 0;
+    head[3] = s ? s->cam_pitch : 0;
+    head[4] = rw;
+    head[5] = rh;
+    fwrite(head, sizeof head, 1, f);
+    fwrite(rows, (size_t)rw * rh * 4, 1, f);
+    fflush(f);
+}
+
 static int debug = -1, presents, st_shown, st_stale, st_invalid, st_none;
 static Uint64 last_report;
 
-void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const int *cross)
+void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const int *cross,
+                    const int *look)
 {
     unsigned char pal[256 * 4];
     const pgl_scene *s;
@@ -741,7 +830,23 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
     glBindTexture(GL_TEXTURE_2D, tex_vga);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, PGL_W, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE, vga);
 
+    turn_overscan = cross != NULL;
     s = pgl_latest();
+    turn_yaw = turn_pitch = 0.0f;
+    if (look && s && s->valid) {
+        /* the fraction of a step past the scene's angles: the view at the mouse's exact
+           place when the frame read it */
+        double dy = s->mouse_rem_x, dp = s->mouse_rem_y * look[0];
+
+        dy = dy < -LOOK_AHEAD ? -LOOK_AHEAD : dy > LOOK_AHEAD ? LOOK_AHEAD : dy;
+        dp = dp < -LOOK_AHEAD ? -LOOK_AHEAD : dp > LOOK_AHEAD ? LOOK_AHEAD : dp;
+        if (look[1] + dp > 256)                 /* the engine stops the pitch at +-256 */
+            dp = 256 - look[1];
+        if (look[1] + dp < -256)
+            dp = -256 - look[1];
+        turn_yaw = (float)dy;
+        turn_pitch = (float)dp;
+    }
     if (debug < 0)
         debug = SDL_getenv("PORT_GL_DEBUG") != NULL;
     if (debug) {
@@ -820,6 +925,7 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
     }
     glBlitFramebuffer(0, 0, rw, rh, rx, ry, rx + rw, ry + rh, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    record(s, rw, rh);
     SDL_GL_SwapWindow(window);
 }
 
