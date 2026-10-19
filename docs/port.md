@@ -125,6 +125,13 @@ How it works:
   - At the frame's end, every pool record whose span routine is no longer its first-span setup
     (the S-buffer showed it somewhere) becomes triangles; every flat whose light setup ran
     (Q-FLAT-01: the others were never drawn) becomes a quad.
+  - Ground cells are the exception: the terrain keeps a record for every cell it projects, and
+    a distant cell thinner than a pixel at 320x200 never gets a span, so its setup never runs.
+    Left out, it shows the sky through the ground near the horizon at the window's
+    resolution. The capture finishes those cells' setup itself (the texels, and
+    `xn_light_setup_terrain` for the shade row, which writes only the cell's own record) and
+    draws them. A model face with no span at all is not recoverable this way: the model
+    reuses its record for the next face.
   - Each vertex carries the texel the span routines would give at that point: the polygon's
     u/z and v/z gradients at the vertex's screen position, times z, as `tex_span`
     (u/z * z << 6 >> 32, 8.8 texels) and `tex64_span` (the ground's: * z >> 3, low dwords)

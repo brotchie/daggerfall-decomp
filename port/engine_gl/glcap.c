@@ -385,12 +385,46 @@ static void triangle(pgl_draw *d, const how *h, const pgl_vertex *a, const pgl_v
     }
 }
 
+/* A ground cell the S-buffer never showed (no span: at 320x200 it is thinner than a pixel, or
+   behind something) still had its first span's setup to come. At the window's resolution a
+   distant one can be seen, and leaving it out shows the sky through the ground, so it is set
+   up here as xn_render_span_setup_terrain would (the texels, and the lighting: its shade row,
+   from the cell's own light list), without drawing. Returns the span routine the setup would
+   have chosen, or 0. */
+static xn_span_fn finish_ground(struct xn_poly *p, xn_span_fn fn)
+{
+    struct xn_tex_image *image;
+    s32 kind;
+
+    if (p->tex == 0 || (image = p->tex->current) == 0)
+        return 0;
+    if (fn == xn_render_span_setup_terrain) {
+        p->texels = (u8 *)image + image->data_offset;
+        kind = xn_light_setup_terrain(p);
+        return kind == 4 ? xn_span_tex64_shaded : xn_span_tex64;
+    }
+    /* solid colours (the low detail): the fill colour, through the shade row */
+    {
+        u8 colour = p->tex->solid_colour;
+
+        kind = xn_light_setup_terrain(p);
+        p->colour4 = colour;
+        if (kind == 4)
+            p->colour4 = p->shade_row[colour];
+        return xn_span_solid;
+    }
+}
+
 static void world_poly(int index, int fog)
 {
-    const struct xn_poly *p = &xn_render_poly_pool[index];
+    struct xn_poly *p = &xn_render_poly_pool[index];
     const struct cap *c = &caps[index];
     xn_span_fn fn = p->span_fn;
     how h;
+
+    if ((fn == xn_render_span_setup_terrain || fn == xn_render_span_setup_terrain_solid) &&
+        (fn = finish_ground(p, fn)) == 0)
+        return;
     pgl_draw *d;
     pgl_vertex v[64];
     int k, n, tex = -1, mode = PGL_TEX_WRAP;
