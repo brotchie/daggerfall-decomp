@@ -369,7 +369,10 @@ variation about each step's neighbours (judder, apart from the walk's own change
 | orcs, turning | 45% (14 repeat) | 8% | 11% |
 
 On orcs the game moves the player a whole unit every third frame along a wall, and speeds up
-and slows down as it bumps along: what is left is mostly that. The game's loop stays
+and slows down as it bumps along: what is left is that. The game's own frames, each frame's
+step over its game time, vary 48% about their neighbours on orcs and 12% on kral: the
+presents are smoother than the motion the game makes, and smoother still would be the game
+putting the player elsewhere. The game's loop stays
 capped at 70 Hz: uncapped (`PORT_FRAME_CAP=0`) it walks and turns about a third slower (the
 frame times come in 7.14 ms steps, and shorter frames lose them).
 
