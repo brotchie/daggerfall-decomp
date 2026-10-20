@@ -81,6 +81,8 @@ void report_add_region(const char *name, const void *p, size_t size);
 /* the game's side (main.c): fill in the game's facts as JSON members ("k": v, ...), and the
    game thread's per-frame hook asks whether a save is wanted (its folder) and says it is done */
 void report_set_game_meta(void (*meta)(char *buf, size_t size));
+/* whether the game can save now (main()'s frame loop runs: not the title or character creation) */
+void report_set_can_save(int (*can_save)(void));
 const char *report_save_wanted(void);
 void report_save_done(int ok);
 /* the player's input as a PORT_SCRIPT step ("down W", "mrel 1.5 0", "mdown 0" ...), at the

@@ -476,10 +476,16 @@ void report_init(const char *overlay, const char *argv0)
 /* ---- the report's common parts ------------------------------------------------------------------ */
 
 static void (*game_meta)(char *buf, size_t size);
+static int (*game_can_save)(void);
 
 void report_set_game_meta(void (*meta)(char *buf, size_t size))
 {
     game_meta = meta;
+}
+
+void report_set_can_save(int (*can_save)(void))
+{
+    game_can_save = can_save;
 }
 
 static void write_meta(const char *dir, const char *id, const char *kind,
@@ -603,15 +609,19 @@ static int feedback_thread(void *arg)
 
     (void)arg;
     /* the game's thread saves at its next frame of the world; not there, no save */
+    fprintf(stderr, "port: feedback %s: captured%s\n", fb_id,
+            SDL_GetAtomicInt(&save_state) == 1 ? ", waiting for the game's save" : "");
     for (k = 0; k < 300 && (state = SDL_GetAtomicInt(&save_state)) == 1; k++)
         SDL_Delay(10);
     if (state == 1) {
-        SDL_SetAtomicInt(&save_state, 0);       /* not in the world: no save */
+        SDL_SetAtomicInt(&save_state, 0);       /* the game did not come to save */
         rmdir(save_request);
     }
     snprintf(extra, sizeof extra, "\"save\": %s",
              state == 2 ? "\"save/ (slot 5's files: load with tools or copy to a SAVEn)\""
                         : "null");
+    fprintf(stderr, "port: feedback %s: %s, asking for notes\n", fb_id,
+            state == 2 ? "saved" : "no save");
     notes = ask_notes();
     if (notes == NULL) {
         fprintf(stderr, "port: feedback cancelled\n");
@@ -655,10 +665,15 @@ void report_feedback(void)
     lseek(input_fd, 0, SEEK_END);
     SDL_UnlockMutex(input_lock);
     lseek(log_fd, 0, SEEK_END);
-    /* the save, from the game's thread */
-    join(save_request, sizeof save_request, fb_dir, "save");
-    mkdir(save_request, 0755);
-    SDL_SetAtomicInt(&save_state, 1);
+    /* the save, from the game's thread, when it is in its frame loop (not the title or
+       character creation: nothing to save there) */
+    if (game_can_save == NULL || game_can_save()) {
+        join(save_request, sizeof save_request, fb_dir, "save");
+        mkdir(save_request, 0755);
+        SDL_SetAtomicInt(&save_state, 1);
+    } else {
+        SDL_SetAtomicInt(&save_state, 0);
+    }
     /* the notes need the mouse: let the window go of it */
     vpc_input_release_mouse();
     SDL_DetachThread(SDL_CreateThread(feedback_thread, "report-feedback", NULL));

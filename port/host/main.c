@@ -175,6 +175,13 @@ static void game_meta(char *buf, size_t size)
              xn_cam_pitch, mouse_control_mode, view_cursor_active);
 }
 
+/* the game is in main()'s frame loop (engine_running is set just before it): a save means
+   something */
+static int game_can_save(void)
+{
+    return engine_running != 0;
+}
+
 /* the game's thread, at the top of each turn of main()'s frame loop (src/hand/func_00010010.c,
    DAGGER_PORT): a feedback report's save, into the report's folder (slot 5's folder sent there,
    so the player's slot 5 is not touched). save_game waits while a mouse button is down: then
@@ -230,6 +237,7 @@ int main(int argc, char **argv)
     report_init(overlay, argv[0]);
     report_add_region("fall_data", port_data_start, (size_t)(port_data_end - port_data_start));
     report_set_game_meta(game_meta);
+    report_set_can_save(game_can_save);
     if (!dos_host_path(config, 0, path, sizeof path)) {
         FILE *f;
         dos_host_path(config, 1, path, sizeof path);
