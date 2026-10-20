@@ -1232,6 +1232,12 @@ static Uint64 last_report, last_swap;
 static double st_gap_min = 1e9, st_gap_max, st_gap_sum, st_gap_sq;
 static int st_gaps;
 static const pgl_scene *last_scene;     /* (the screenshots of the software frame) */
+static unsigned char last_vga[PGL_W * PGL_H];  /* the picture the last present composited */
+
+const unsigned char *vpc_gl_last_vga(void)
+{
+    return last_vga;
+}
 
 /* where the eye is drawn from at this present, and the move to it from the scene's frame */
 static void eye_now(const pgl_scene *s, const int *look, pose *e, int *moved)
@@ -1334,6 +1340,7 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
        (the HUD drawn over that frame, never half of the next) */
     if (s && s->valid && vga_live != NULL && s->present_serial == pgl_present_serial)
         vga = s->vga;
+    memcpy(last_vga, vga, sizeof last_vga);
     glBindTexture(GL_TEXTURE_2D, tex_vga);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, PGL_W, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE, vga);
 

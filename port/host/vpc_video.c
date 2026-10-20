@@ -159,10 +159,10 @@ static Uint32 colour(unsigned int i)
     return 0xFF000000u | r << 16 | g << 8 | b;
 }
 
-static void render_pixels(void)
+/* the picture vga (VGA memory, or a copy of it) through the DAC, with the crosshair */
+static void render_pixels_of(const unsigned char *vga)
 {
     Uint32 pal[256];
-    const unsigned char *vga = port_low_memory + 0xA0000;
     int i;
 
     if (mode != 0x13) {
@@ -187,6 +187,11 @@ static void render_pixels(void)
                     pixels[cy * VGA_W + cx + d] = pixels[(cy + d) * VGA_W + cx] = 0xFFFFFFFFu;
         }
     }
+}
+
+static void render_pixels(void)
+{
+    render_pixels_of(port_low_memory + 0xA0000);
 }
 
 /* the window is the main thread's: the game's thread (a retrace it saw, a mode set) asks for
@@ -323,11 +328,11 @@ int vpc_screenshot(const char *path)
         const char *both = SDL_getenv("PORT_GL_SW_SHOTS");
         int sw_too = both && *both == '1';
 
-        /* the software screen first: with vsync the present's swap waits for the display,
-           and the game may show its next frame meanwhile */
-        if (sw_too)
-            render_pixels();
+        /* the software screen of the frame the present showed: the picture it composited
+           (the game may show its next frame while the swap waits for the display) */
         present_now();
+        if (sw_too)
+            render_pixels_of(vpc_gl_last_vga());
 
         if (sw_too) {
             char sw[1024];

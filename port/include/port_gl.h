@@ -181,6 +181,8 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
                     const int *look);
 /* the last frame shown, as a .bmp at the window's resolution; 0 on success */
 int vpc_gl_screenshot(const char *path);
+/* the 320x200 picture the last present composited (the software screen of the frame shown) */
+const unsigned char *vpc_gl_last_vga(void);
 /* the last scene's wide frame as the software renderer drew it (the game's screen in its
    middle; rgb: the palette), as a .bmp; -1 when the last present showed no wide frame */
 int vpc_gl_screenshot_wide_sw(const char *path, const unsigned char *rgb);
