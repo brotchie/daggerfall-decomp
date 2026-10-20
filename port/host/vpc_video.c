@@ -10,7 +10,9 @@
 
    PORT_GL=1 (fall --gl) shows the screen through OpenGL instead of SDL's renderer, with the 3D
    view drawn by OpenGL (port/host/vpc_gl.c); F11 switches the 3D view between OpenGL and the
-   software renderer, F10 OpenGL's textures between texels and smooth. F8 sends feedback
+   software renderer, F10 OpenGL's textures between texels and smooth, Shift+F11 the view
+   between 4:3 and the window's shape, Shift+F10 smooth motion. With vsync (vpc_gl.c's
+   setting) OpenGL shows a picture at every refresh of the display. F8 sends feedback
    (port/host/report.c). */
 #include <stdio.h>
 #include <string.h>
@@ -68,9 +70,31 @@ static int crosshair(int *cx, int *cy)
            *cx < VGA_W - 4 && *cy > 4 && *cy < VGA_H - 4;
 }
 
+void vpc_video_resize(int w, int h)
+{
+    if (window && w > 0 && h > 0)
+        SDL_SetWindowSize(window, w, h);
+}
+
+/* PORT_WINDOW=WxH: the window's first size in points (960x720) */
+static void first_size(int *w, int *h)
+{
+    const char *e = SDL_getenv("PORT_WINDOW");
+
+    *w = 960;
+    *h = 720;
+    if (e && sscanf(e, "%dx%d", w, h) != 2) {
+        *w = 960;
+        *h = 720;
+    }
+}
+
 void vpc_video_init(const char *title)
 {
     const char *gl = SDL_getenv("PORT_GL");
+    int ww, wh;
+
+    first_size(&ww, &wh);
 
     if (gl && *gl && *gl != '0') {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
@@ -79,7 +103,7 @@ void vpc_video_init(const char *title)
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
-        window = SDL_CreateWindow(title, 960, 720, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL |
+        window = SDL_CreateWindow(title, ww, wh, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL |
                                                        SDL_WINDOW_HIGH_PIXEL_DENSITY);
         if (window && vpc_gl_init(window)) {
             use_gl = 1;
@@ -90,7 +114,7 @@ void vpc_video_init(const char *title)
         if (window)
             SDL_DestroyWindow(window);
     }
-    window = SDL_CreateWindow(title, 960, 720, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow(title, ww, wh, SDL_WINDOW_RESIZABLE);
     if (window == NULL) {
         fprintf(stderr, "port: SDL_CreateWindow: %s\n", SDL_GetError());
         return;
@@ -202,6 +226,19 @@ static void count_frames(void)
     }
 }
 
+static void palette_rgb(unsigned char rgb[256 * 3])
+{
+    int i;
+
+    for (i = 0; i < 256; i++) {
+        Uint32 c = colour((unsigned int)i);
+
+        rgb[i * 3] = (unsigned char)(c >> 16);
+        rgb[i * 3 + 1] = (unsigned char)(c >> 8);
+        rgb[i * 3 + 2] = (unsigned char)c;
+    }
+}
+
 static void present_now(void)
 {
     SDL_FRect dst = {0, 0, VGA_W, 240};
@@ -211,23 +248,14 @@ static void present_now(void)
     if (use_gl) {
         static const unsigned char black[VGA_W * VGA_H];
         unsigned char rgb[256 * 3];
-        int i;
+        int cross[2];
+        int look[2];
+        int turn = smooth_look(look);
 
-        for (i = 0; i < 256; i++) {
-            Uint32 c = colour((unsigned int)i);
-
-            rgb[i * 3] = (unsigned char)(c >> 16);
-            rgb[i * 3 + 1] = (unsigned char)(c >> 8);
-            rgb[i * 3 + 2] = (unsigned char)c;
-        }
-        {
-            int cross[2];
-            int look[2];
-            int turn = smooth_look(look);
-
-            vpc_gl_present(mode == 0x13 ? port_low_memory + 0xA0000 : black, rgb,
-                           crosshair(&cross[0], &cross[1]) ? cross : NULL, turn ? look : NULL);
-        }
+        palette_rgb(rgb);
+        /* outside mode 13h nothing of the game's screen (nor a scene's copy of it) shows */
+        vpc_gl_present(mode == 0x13 ? port_low_memory + 0xA0000 : black, rgb,
+                       crosshair(&cross[0], &cross[1]) ? cross : NULL, turn ? look : NULL);
         return;
     }
     if (renderer == NULL || texture == NULL)
@@ -248,9 +276,17 @@ void vpc_present(void)
         SDL_SetAtomicInt(&present_wanted, 1);
 }
 
+/* OpenGL with vsync shows a picture every time the main thread comes round: the swap waits
+   for the display's refresh */
+int vpc_video_paced(void)
+{
+    return use_gl && vpc_gl_paced();
+}
+
 void vpc_video_maybe_present(void)
 {
-    if (SDL_GetAtomicInt(&present_wanted) || SDL_GetTicksNS() - last_present >= RETRACE_PERIOD_NS) {
+    if (vpc_video_paced() || SDL_GetAtomicInt(&present_wanted) ||
+        SDL_GetTicksNS() - last_present >= RETRACE_PERIOD_NS) {
         SDL_SetAtomicInt(&present_wanted, 0);
         present_now();
     }
@@ -281,7 +317,9 @@ int vpc_screenshot(const char *path)
     int ok;
 
     if (use_gl) {
-        /* PORT_GL_SW_SHOTS=1: the software screen of the same frame too (NAME_sw.bmp) */
+        /* PORT_GL_SW_SHOTS=1: the software screen of the same frame too (NAME_sw.bmp), and a
+           wide frame's software picture (NAME_swwide.bmp: the sides the software renderer
+           drew, the game's screen in the middle) */
         const char *both = SDL_getenv("PORT_GL_SW_SHOTS");
 
         present_now();
@@ -290,7 +328,9 @@ int vpc_screenshot(const char *path)
             char sw[1024];
             size_t n = strlen(path);
 
-            if (n > 4 && n < sizeof sw - 4 && strcmp(path + n - 4, ".bmp") == 0) {
+            if (n > 4 && n < sizeof sw - 8 && strcmp(path + n - 4, ".bmp") == 0) {
+                unsigned char rgb[256 * 3];
+
                 snprintf(sw, sizeof sw, "%.*s_sw.bmp", (int)(n - 4), path);
                 render_pixels();
                 s = SDL_CreateSurfaceFrom(VGA_W, VGA_H, SDL_PIXELFORMAT_XRGB8888, pixels,
@@ -299,6 +339,9 @@ int vpc_screenshot(const char *path)
                     SDL_SaveBMP(s, sw);
                     SDL_DestroySurface(s);
                 }
+                palette_rgb(rgb);
+                snprintf(sw, sizeof sw, "%.*s_swwide.bmp", (int)(n - 4), path);
+                vpc_gl_screenshot_wide_sw(sw, rgb);
             }
         }
         return vpc_gl_screenshot(path);
@@ -414,11 +457,17 @@ int vpc_video_handle_event(const void *ev)
             return 1;
         }
         if (e->key.scancode == SDL_SCANCODE_F11 && use_gl) {
-            vpc_gl_toggle();
+            if (e->key.mod & SDL_KMOD_SHIFT)
+                vpc_gl_toggle_aspect();
+            else
+                vpc_gl_toggle();
             return 1;
         }
         if (e->key.scancode == SDL_SCANCODE_F10 && use_gl) {
-            vpc_gl_toggle_smooth();
+            if (e->key.mod & SDL_KMOD_SHIFT)
+                vpc_gl_toggle_interp();
+            else
+                vpc_gl_toggle_smooth();
             return 1;
         }
         if (e->key.scancode == SDL_SCANCODE_F12) {

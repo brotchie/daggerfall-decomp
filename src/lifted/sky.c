@@ -256,6 +256,39 @@ void sky_load_day(int minutes)
     close(fd);
 }
 
+#ifdef DAGGER_PORT
+extern int xn_gfx_width;
+
+/* The wide pass (port/engine_gl/wide.c): the sky drawn straight into a frame wider than 320.
+   The original's window shows panorama column `column + k` of section `section` at screen
+   column k, up to column 510 (it copies 511 - column of them), then the next section's from
+   its column 0: column 511 is never shown. Section b_section is sky_image_b, the others
+   sky_image_a. The frame's columns left and right of its middle 320 carry on the same way,
+   511 columns a section, so the middle comes out as the original draws it. Rows below `rows`
+   (the horizon) to the view's bottom are the fill colour. b_section -1: one image (the
+   night's). */
+static void sky_draw_wide(int column, int section, int b_section, int src_offset, int rows,
+                          int view_bottom, int fill)
+{
+    int w = xn_gfx_width, dx = (w - 320) / 2, x, row, k, s;
+    unsigned char *dst = (unsigned char *)screen_buffer;
+    const unsigned char *a = (const unsigned char *)sky_image_a;
+    const unsigned char *b = (const unsigned char *)sky_image_b;
+
+    if (rows > view_bottom)
+        rows = view_bottom;
+    for (row = 0; row < rows; row++)
+        for (x = 0; x < w; x++) {
+            k = column + x - dx;
+            s = section + (k >= 0 ? k / 511 : -((510 - k) / 511));
+            k -= (s - section) * 511;
+            dst[row * w + x] = ((b_section >= 0 && s == b_section) ? b : a)[src_offset + (row << 9) + k];
+        }
+    for (row = rows < 0 ? 0 : rows; row < view_bottom; row++)
+        memset(dst + row * w, fill, w);
+}
+#endif
+
 void sky_draw_day(int horizon_y, int horizon_y2, int day, int climate)
 {
     int src_offset;
@@ -270,7 +303,11 @@ void sky_draw_day(int horizon_y, int horizon_y2, int day, int climate)
     night_sky_loaded = 0;
     view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
     if (((int)(unsigned char)(climate_weathers[climate] & 127)) == 3 || ((int)(unsigned char)(climate_weathers[climate] & 128)) != 0) {
+#ifdef DAGGER_PORT
+        mc_memset((void *)screen_buffer, 119, view_bottom * xn_gfx_width, D_00170A86, 598, 4);
+#else
         mc_memset((void *)screen_buffer, 119, view_bottom * 320, D_00170A86, 598, 4);
+#endif
         return;
     }
     view_bottom = ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y);
@@ -285,6 +322,13 @@ void sky_draw_day(int horizon_y, int horizon_y2, int day, int climate)
         b_section = 2;
     }
     horizon_y += 75;
+#ifdef DAGGER_PORT
+    if (xn_gfx_width != 320) {
+        sky_draw_wide(column, section, b_section, src_offset, horizon_y, view_bottom,
+                      (int)(unsigned char)*(signed char *)(((char *)sky_image_a) + 109058));
+        return;
+    }
+#endif
     width = 511 - column;
     if (width >= 320) {
         if (section == b_section) {
@@ -364,6 +408,12 @@ void sky_draw_night(int horizon_y, int horizon_y2)
     section = column / 512;
     column = column % 512;
     horizon_y += 75;
+#ifdef DAGGER_PORT
+    if (xn_gfx_width != 320) {
+        sky_draw_wide(column, section, -1, src_offset, horizon_y, view_bottom, 15);
+        return;
+    }
+#endif
     width = 511 - column;
     if (horizon_y > 0) {
         if (width >= 320) {

@@ -18,6 +18,13 @@ void xn_poly_setup_textured(struct xn_poly *poly, const struct xn_span *span, s3
 
 extern u8 text_colour, text_shadow_colour;
 
+#ifdef DAGGER_PORT
+/* the wide pass's pools (port/engine_gl/wide.c) */
+extern struct xn_poly port_poly_pool[];
+extern struct xn_span port_span_pool[];
+extern struct xn_light_ref port_light_pool[];
+#endif
+
 /* a draw-list pair's bytes: the lists are walked by byte offsets (8 under Watcom; natively
    the value is a pointer) */
 #define PAIR_SIZE   ((s32)sizeof(struct xn_sort_pair))
@@ -123,6 +130,16 @@ void xn_render_begin_frame(void)
     xn_render_light_list_next = xn_render_light_list_pool;
     xn_model_queue_ptr = xn_model_queue;
     xn_flat_sort_end = xn_flat_sort_list;
+#ifdef DAGGER_PORT
+    /* a wide frame (port/engine_gl/wide.c) takes larger pools; a narrow one is the game's
+       S-buffer again */
+    if (port_wide_cols) {
+        xn_render_poly_next = port_poly_pool;
+        xn_render_light_list_next = port_light_pool;
+    } else {
+        port_wide_last_cols = 0;
+    }
+#endif
 
     /* the background polygon, and the sentinel span that ends every row (it is its own next;
        the frame loop stops there, and no routine draws it) */
@@ -139,6 +156,10 @@ void xn_render_begin_frame(void)
         head++;
     } while (--rows != 0);
     xn_render_span_next = head;
+#ifdef DAGGER_PORT
+    if (port_wide_cols)
+        xn_render_span_next = port_span_pool;
+#endif
 
     xn_light_count = 0;
     xn_model_queue_count = 0;
@@ -164,6 +185,14 @@ void *xn_render_pick(s32 x, s32 y)
     struct xn_poly *poly = 0;
     struct xn_span *node;
 
+#ifdef DAGGER_PORT
+    /* the last frame was wide: the point is picked in it (port/engine_gl/wide.c) */
+    if (port_wide_pick_begin(&x)) {
+        flat = xn_render_pick(x, y);
+        port_wide_pick_end();
+        return flat;
+    }
+#endif
     if (x < xn_gfx_clip_left || x >= xn_gfx_clip_right ||
         y < xn_gfx_clip_top || y >= xn_gfx_clip_bottom)
         return 0;           /* (the asm pops one register too many here and returns through a

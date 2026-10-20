@@ -32,6 +32,10 @@ void *port_copy_forward(void *dst, const void *src, unsigned int n);
    the game folder (given, $DAGGER_GAME, the remembered one, or the player picks it): launch.c */
 const char *launch_overlay_dir(const char *given);
 const char *launch_game_dir(const char *given);
+/* the settings file (<overlay>/settings.txt, key=value lines): a key's value (1, in out; 0
+   when it has none); a key set, the others kept */
+int launch_setting(const char *key, char *out, size_t size);
+void launch_set_setting(const char *key, const char *value);
 /* a fault at a low address: finish the access against the virtual PC's low memory, as DOS's
    flat memory did (port/host/zeropage.c); 1 when handled */
 int port_zero_page_fault(void *siginfo, void *ucontext);

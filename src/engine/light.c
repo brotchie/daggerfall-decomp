@@ -209,6 +209,14 @@ static void write_asm_image(const struct xn_poly *poly, const struct xn_light_sh
     u8 *out = xn_light_code_next;
     int i;
 
+#ifdef DAGGER_PORT
+    /* a wide frame (port/engine_gl/wide.c) has more lit polygons than big_buffer holds: the
+       bytes past its end go to a sink (nothing runs them) */
+    static u8 sink[0x100];
+
+    if (out < big_buffer || out + im->size > big_buffer + PORT_BIG_BUFFER_SIZE)
+        out = sink;
+#endif
     for (i = 0; i < im->size; i++)
         out[i] = im->code[i];
     for (i = 0; i < s->nlights; i++) {

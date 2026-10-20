@@ -99,14 +99,46 @@ static int read_setting(const char *key, char *out, size_t size)
     return 0;
 }
 
+/* the key's line replaced (or added), every other line kept */
 static void write_setting(const char *key, const char *value)
 {
-    FILE *f = fopen(settings_path, "w");
+    char line[1200], *keep = NULL;
+    size_t k = strlen(key), n = 0;
+    FILE *f = fopen(settings_path, "r");
 
-    if (f == NULL)
-        return;
-    fprintf(f, "%s=%s\n", key, value);
-    fclose(f);
+    if (f != NULL) {
+        while (fgets(line, sizeof line, f) != NULL) {
+            size_t l = strlen(line);
+
+            if (strncmp(line, key, k) == 0 && line[k] == '=')
+                continue;
+            keep = realloc(keep, n + l + 2);
+            memcpy(keep + n, line, l);
+            n += l;
+            if (l > 0 && line[l - 1] != '\n')
+                keep[n++] = '\n';
+        }
+        fclose(f);
+    }
+    f = fopen(settings_path, "w");
+    if (f != NULL) {
+        if (n)
+            fwrite(keep, 1, n, f);
+        fprintf(f, "%s=%s\n", key, value);
+        fclose(f);
+    }
+    free(keep);
+}
+
+int launch_setting(const char *key, char *out, size_t size)
+{
+    return settings_path[0] && read_setting(key, out, size);
+}
+
+void launch_set_setting(const char *key, const char *value)
+{
+    if (settings_path[0])
+        write_setting(key, value);
 }
 
 struct pick {

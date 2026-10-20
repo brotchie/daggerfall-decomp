@@ -148,6 +148,10 @@ extern void doors_update(void);
 extern void travel_map_update(void);
 void world_render(void);
 void screen_shake_offset(int *, int *);
+#ifdef DAGGER_PORT
+extern void port_wide_enter(void);
+extern void port_wide_exit(void);
+#endif
 
 void game_frame(void)
 {
@@ -178,9 +182,15 @@ void game_frame(void)
     frame_checkpoint = 101;
     links_update();
     frame_checkpoint = 102;
+#ifdef DAGGER_PORT
+    port_wide_enter();      /* the sky and the world in a wider frame (port/engine_gl/wide.c) */
+#endif
     sky_update();
     frame_checkpoint = 103;
     world_render();
+#ifdef DAGGER_PORT
+    port_wide_exit();
+#endif
     frame_checkpoint = 104;
     if (D_00187CA8 != 0) {
         world_collect_objects();

@@ -178,6 +178,10 @@ void vpc_video_outb(unsigned int port, unsigned char v);
 void vpc_video_set_mode(unsigned int mode);
 unsigned int vpc_video_mode(void);
 void vpc_video_maybe_present(void);
+/* the main thread presents at every pass (OpenGL with vsync): it need not wait for events */
+int vpc_video_paced(void);
+/* the window to w x h points (the script's resize) */
+void vpc_video_resize(int w, int h);
 int vpc_video_handle_event(const void *sdl_event);
 
 void vpc_input_init(void);

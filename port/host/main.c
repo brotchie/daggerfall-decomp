@@ -13,6 +13,8 @@
      --gl           draw the 3D view with OpenGL (as PORT_GL=1; port/include/port_gl.h)
      --modern       modern controls (as PORT_CONTROLS=modern): mouse look, WASD, Shift to run
                     (port_controls_loaded below)
+     --wide         OpenGL with the view filling the window, as wide as it is (as PORT_GL=1
+                    PORT_GL_ASPECT=fill; port/host/vpc_gl.c)
      CONFIG         the config file, Z.CFG by default (written to the overlay when missing) */
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +23,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "port_gl.h"
 #include "port_host.h"
 #include "port_vpc.h"
 
@@ -165,14 +168,32 @@ extern int save_game(int slot, char *name);
 /* the game's facts for a report's meta.json */
 static void game_meta(char *buf, size_t size)
 {
+    char view[256] = "software";
+
+    if (pgl_enabled)
+        vpc_gl_describe(view, sizeof view);
     snprintf(buf, size,
              "\"engine_running\": %d, \"game_mode\": %d, \"screen_active\": %d, "
              "\"frame_counter\": %d, \"frame_checkpoint\": %d, \"region\": %d, "
              "\"game_minutes\": %d, \"camera\": [%d, %d, %d, %d, %d], "
-             "\"mouse_control_mode\": %d, \"view_cursor_active\": %d",
+             "\"mouse_control_mode\": %d, \"view_cursor_active\": %d, \"view\": \"%s\"",
              engine_running, game_mode, D_00196272, frame_counter, frame_checkpoint,
              current_region, game_minutes, xn_cam_x, xn_cam_y, xn_cam_z, xn_cam_yaw,
-             xn_cam_pitch, mouse_control_mode, view_cursor_active);
+             xn_cam_pitch, mouse_control_mode, view_cursor_active, view);
+}
+
+/* PORT_WEATHER=4 (rain) or 5 (snow): the precipitation drawn whatever the weather, to test the
+   wide view's (src/hand/func_0003533F.c); 0 none */
+int port_forced_weather(void)
+{
+    static int w = -1;
+
+    if (w < 0) {
+        const char *e = getenv("PORT_WEATHER");
+
+        w = e ? atoi(e) : 0;
+    }
+    return w;
 }
 
 /* the game is in main()'s frame loop (engine_running is set just before it): a save means
@@ -221,6 +242,10 @@ int main(int argc, char **argv)
             setenv("PORT_GL", "1", 1);
         else if (strcmp(argv[i], "--modern") == 0)
             setenv("PORT_CONTROLS", "modern", 1);
+        else if (strcmp(argv[i], "--wide") == 0) {
+            setenv("PORT_GL", "1", 1);
+            setenv("PORT_GL_ASPECT", "fill", 1);
+        }
         else if (strncmp(argv[i], "-psn_", 5) == 0)
             ;                           /* what Finder passed to apps on older macOS */
         else
@@ -230,7 +255,8 @@ int main(int argc, char **argv)
     overlay = launch_overlay_dir(overlay);
     game = launch_game_dir(game);
     if (game == NULL) {
-        fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [--nosound] [--gl] [--modern] [CONFIG]\n");
+        fprintf(stderr, "usage: fall --game DIR [--overlay DIR] [--nosound] [--gl] [--modern] [--wide] "
+                "[CONFIG]\n");
         return 2;
     }
     dos_set_dirs(game, overlay);

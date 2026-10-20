@@ -34,4 +34,15 @@ void xn_glcap_present(void);
 
 #define XN_GLCAP(call) do { if (pgl_enabled) call; } while (0)
 
+/* The wide 3D pass (port/engine_gl/wide.c): the frame's width while it runs (else 0) and the
+   game's column 0 in it; the last frame's, whose S-buffer the pick reads */
+extern int port_wide_cols, port_wide_dx, port_wide_last_cols, port_wide_last_dx;
+/* the pick at a point of the game's screen (xn_render_pick): 1 if it goes to the last wide
+   frame, with *x made its column (then port_wide_pick_end) */
+int port_wide_pick_begin(int *x);
+void port_wide_pick_end(void);
+/* the light shaders' bytes (Q-LIGHT-07) past big_buffer's end go to a sink: a wide frame has
+   more lit polygons than it holds */
+#define PORT_BIG_BUFFER_SIZE 102400
+
 #endif

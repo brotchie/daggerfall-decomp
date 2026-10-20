@@ -59,8 +59,15 @@ typedef struct pgl_draw {
     float lights[3][5];
 } pgl_draw;
 
-#define PGL_W 320
+#define PGL_W 320               /* the game's screen */
 #define PGL_H 200
+#define PGL_MAX_W 1024          /* the widest frame: the ray tables cover 1024 columns */
+
+/* the wide pass's own pools (the engine's were sized for 320 columns and have no bounds):
+   polygon records, span nodes, light references (port/engine_gl/wide.c) */
+#define PORT_POLY_POOL 6000
+#define PORT_SPAN_POOL 60000
+#define PORT_LIGHT_POOL 9600
 
 /* a frame of the 3D view */
 typedef struct pgl_scene {
@@ -70,23 +77,38 @@ typedef struct pgl_scene {
     int ndraws, cap_draws;
     int valid;              /* 0: no 3D view (show the software screen) */
     unsigned long serial;   /* counts the frames drawn */
-    /* the view: the centre and half size on the screen, the near and far planes (camera z) */
+    /* the frame: the game's 320 columns, or the wide pass's W (port/engine_gl/wide.c) with the
+       game's screen at column dx */
+    int w, dx;
+    /* the view: the centre and half size on the frame, the near and far planes (camera z) */
     float cx, cy, hw, hh, near_z, far_z;
     float focal_x, focal_y;                 /* pixels (the light shaders' rays) */
-    int cam_yaw, cam_pitch;                 /* the view's angles (2048 a turn) */
+    int cam_yaw, cam_pitch, cam_roll;       /* the view's angles (2048 a turn) */
+    int cam_x, cam_y, cam_z;                /* the eye, world units */
     double mouse_rem_x, mouse_rem_y;        /* the fractions of a mickey (of a step of the
                                                view's angles) the frame's read of the mouse
                                                left: vpc_gl.c's smooth look */
-    int clip_l, clip_t, clip_r, clip_b;     /* the 3D window on the 320x200 screen */
+    double mouse_used_x, mouse_used_y;      /* the mickeys the game had read, all told, when
+                                               the frame was drawn (vpc_gl.c's late look) */
+    double game_ms;                         /* the game's clock: its frame times summed (the
+                                               time the eye's motion is measured in) */
+    unsigned long long host_ns;             /* when it was handed over */
+    unsigned long present_serial;           /* the present that showed it (vga's) */
+    int clip_l, clip_t, clip_r, clip_b;     /* the 3D window on the frame */
     int bg_fill, bg_colour;                 /* indoors: what no polygon covers */
     /* the distance fog: camera z >> 8 beyond start goes step table bytes a unit toward
        haze row 0 (xshade.h) */
     int fog_on;
     float fog_start, fog_step, fog_far;
+    int pool_polys, pool_spans;             /* the frame's use of the pools (PORT_GL_DEBUG) */
     unsigned char tables[128 * 256];        /* the shade table, then the haze table */
     unsigned short falloff[32768];          /* LIGHT.DAT: a light's falloff by distance */
-    unsigned char pre[PGL_W * PGL_H];       /* the screen before the 3D pass (the sky) */
-    unsigned char post[PGL_W * PGL_H];      /* and after it (before the HUD) */
+    unsigned char vga[PGL_W * PGL_H];       /* the game's screen as the present showed it */
+    /* w x 200 each (rows of w): the frame before the 3D pass (the sky), after it (before the
+       HUD), and as presented (the weather on it; a wide frame only) */
+    unsigned char pre[PGL_MAX_W * PGL_H];
+    unsigned char post[PGL_MAX_W * PGL_H];
+    unsigned char side[PGL_MAX_W * PGL_H];
 } pgl_scene;
 
 #pragma pack(pop)
@@ -102,6 +124,25 @@ void *pgl_realloc(void *p, size_t n);
 void pgl_mouse_remainder(double *rx, double *ry);
 /* PORT_GL_VERTEX_LIGHT=1: light shaders sampled per vertex, not per pixel */
 int pgl_vertex_light(void);
+/* the mickeys the game has read through int 33h fn 0Bh, all told; and with those it has not
+   read yet (the main thread's late look) */
+void pgl_mouse_used(double *x, double *y);
+void pgl_mouse_total(double *x, double *y);
+/* the host's clock, ns */
+unsigned long long pgl_now_ns(void);
+/* the frame width the main thread wants from the wide pass (columns; 0 or 320: none) */
+extern volatile int pgl_wide_request;
+/* the presents so far (xn_gfx_drv0_present, after its copy to the VGA) */
+extern volatile unsigned long pgl_present_serial;
+/* PORT_GL_WIDE_CHECK=N: every Nth wide frame a copy of the process draws it the original way
+   and the two screens are compared. begin: 1 in the copy (it draws the narrow frame); the
+   copy's screen at the frame's end (child_done ends it); end: the wide pass's screen, compared */
+int pgl_check_fork_begin(void);
+int pgl_check_child(void);              /* in the copy */
+int pgl_check_pending(void);            /* a copy is drawing this frame */
+/* the screens and the depth of each pixel (1/z of what covers it, 0 none) */
+void pgl_check_child_done(const unsigned char *screen, const unsigned int *depth);
+void pgl_check_fork_end(const unsigned char *screen, const unsigned int *depth);
 
 /* ---- the hand-over: a frame drawn on the game's thread, shown on the main thread ---------- */
 
@@ -137,9 +178,20 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
                     const int *look);
 /* the last frame shown, as a .bmp at the window's resolution; 0 on success */
 int vpc_gl_screenshot(const char *path);
+/* the last scene's wide frame as the software renderer drew it (the game's screen in its
+   middle; rgb: the palette), as a .bmp; -1 when the last present showed no wide frame */
+int vpc_gl_screenshot_wide_sw(const char *path, const unsigned char *rgb);
 /* F11: the 3D view through OpenGL or the software renderer */
 void vpc_gl_toggle(void);
 /* F10: OpenGL's textures as texels or smooth (bilinear, through the palette) */
 void vpc_gl_toggle_smooth(void);
+/* Shift+F11: the view 4:3 or the window's shape; Shift+F10: smooth motion (both saved in the
+   settings file) */
+void vpc_gl_toggle_aspect(void);
+void vpc_gl_toggle_interp(void);
+/* vsync paces the presents: one at every pass of the main thread */
+int vpc_gl_paced(void);
+/* the view's settings, one line (reports) */
+void vpc_gl_describe(char *buf, size_t size);
 
 #endif

@@ -9,32 +9,69 @@
       the engine's own, then through the palette. F10 blends the four nearest texels, each
       through the tables and the palette (smooth textures). The world's polygons write
       depth; the flats test it and are drawn back to front, as the engine draws them. The
-      scene's alpha is its coverage (fractional on the edges once resolved);
+      scene's alpha is its coverage (fractional on the edges once resolved). The scene is
+      drawn from where the eye is at this present (below), not only where it was when the
+      game drew the frame;
    3. the composite: per pixel of the window, the software screen's pixel (VGA memory) where
       the game drew after the 3D pass (the screen differs from the copy taken after it) or
       outside the 3D window; else the scene over what was there before the 3D pass (the sky)
       or the background colour indoors.
-   The picture is 320x200 at 4:3, letterboxed in the window, as the software path shows it. */
+
+   The view (docs/port.md, "Widescreen"): with aspect=fill the view fills the window. The
+   engine draws a frame as much wider than 320 columns as the window is wider than 4:3 (the
+   wide pass, port/engine_gl/wide.c: the focal stays the game's, so the field of view widens
+   sideways), with the game's 320x200 screen as its middle; the HUD stays in that 4:3 column,
+   the full height of the window, and the sides are the wide frame's. With aspect=4:3 the
+   picture is 4:3, letterboxed, as the software path shows it. The HUD's pixels are scaled
+   sharply: whole pixels, with a one-pixel blend at their edges where the scale is not whole.
+
+   Smooth motion: the game draws about 54 frames a second; the window shows one at every
+   refresh of the display (vsync). The eye's position and angles are kept with each frame,
+   with the game's clock (its frame times summed), and each present draws the latest frame
+   from the eye's place a little in the past (one and a half frames), between the two frames
+   around it: the latest frame's geometry moved by the change of view. While the mouse looks
+   around, the view's angles are the mouse's now (the motion the game has not read yet is
+   added). The wide pass draws a margin of columns past each side that the window does not
+   show, so a view moved this way has something at its edges.
+
+   Settings (<overlay>/settings.txt; each PORT_GL_* environment variable overrides its line):
+     aspect=4:3|fill        PORT_GL_ASPECT       the view's shape (Shift+F11 switches)
+     fov_max=DEGREES        PORT_GL_FOV_MAX      the widest horizontal view (110; 0 none):
+                                                 a wider window is pillarboxed
+     hud_filter=sharp|nearest PORT_GL_HUD_FILTER how the 320x200 pixels are scaled
+     vsync=on|adaptive|off  PORT_GL_VSYNC        presents paced by the display
+     interpolate=on|off     PORT_GL_INTERP       smooth motion (Shift+F10 switches)
+     overscan=COLUMNS       PORT_GL_OVERSCAN     the margin each side (24) */
 #define GL_SILENCE_DEPRECATION
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #include <SDL3/SDL.h>
 #include <OpenGL/gl3.h>
 
 #include "port_gl.h"
+#include "port_host.h"
 #include "port_vpc.h"
 
 static SDL_Window *window;
 static SDL_GLContext context;
 static int ready, gl_on = 1, smooth, msaa = 4;
 
+/* the settings */
+static int aspect_fill;                 /* the view fills the window (else 4:3) */
+static int fov_max = 110;               /* degrees; 0 none */
+static int hud_sharp = 1;
+static int vsync = 1;                   /* 1 on, -1 adaptive, 0 off */
+static int interp = 1;
+static int overscan = 24;               /* columns past each side */
+
 static GLuint scene_prog, comp_prog;
 static GLuint vao, vbo, empty_vao;
-static GLuint tex_vga, tex_pre, tex_post, tex_tables, tex_pal, tex_falloff;
+static GLuint tex_vga, tex_pre, tex_post, tex_side, tex_tables, tex_pal, tex_falloff;
 static GLuint scene_fbo, scene_colour, scene_depth;     /* (resolved) colour, and its FBO */
 static GLuint ms_fbo, ms_colour, ms_depth;              /* the multisampled target */
 static GLuint out_fbo, out_colour;
@@ -44,52 +81,43 @@ static int ntextures;
 static int *tsize;                      /* w, h per texture id */
 
 /* scene uniforms */
-static GLint u_view, u_mode, u_colour, u_row2, u_fog, u_tsize, u_fogp, u_depth, u_tex,
-    u_tables, u_pal, u_smooth, u_focal, u_nl, u_lbase, u_lights, u_falloff, u_turn;
+static GLint u_view, u_frame, u_mode, u_colour, u_row2, u_fog, u_tsize, u_fogp, u_depth, u_tex,
+    u_tables, u_pal, u_smooth, u_focal, u_nl, u_lbase, u_lights, u_falloff, u_move, u_shift,
+    u_zoom;
 /* composite uniforms */
-static GLint c_vga, c_pre, c_post, c_scene, c_pal, c_valid, c_clip, c_bg, c_smooth, c_cross;
+static GLint c_vga, c_pre, c_post, c_side, c_scene, c_pal, c_valid, c_gl, c_sides, c_clip, c_bg,
+    c_smooth, c_cross, c_map, c_sharp, c_scale, c_presh;
 
 static const char *scene_vs =
     "#version 410 core\n"
     "layout(location = 0) in vec3 a_cam;\n"
     "layout(location = 1) in vec2 a_uv;\n"
     "layout(location = 2) in float a_shade;\n"
-    "uniform vec4 u_view;\n"                /* centre x, y; half width, height (pixels) */
-    "uniform vec2 u_focal;\n"
-    "uniform vec4 u_turn;\n"                /* the turn not yet in the scene: yaw, pitch, the
-                                               scene's pitch (radians), the overscan */
+    "uniform vec4 u_view;\n"                /* centre x, y; half width, height (frame pixels) */
+    "uniform vec2 u_frame;\n"               /* the frame's first column shown, the columns shown */
+    "uniform mat3 u_move;\n"                /* the frame's camera space to the eye's now */
+    "uniform vec3 u_shift;\n"
+    "uniform float u_zoom;\n"               /* the overscan for a turn's new edge */
     "out vec2 v_uv;\n"
     "out float v_shade;\n"
     "out float v_z;\n"
+    "out float v_zd;\n"
     "out vec3 v_cam;\n"
-    /* a rotation about x (pitch) and y (yaw), as the view's: y down, z ahead */
-    "vec3 pitch_by(vec3 v, float a) {\n"
-    "    float c = cos(a), s = sin(a);\n"
-    "    return vec3(v.x, v.y * c - v.z * s, v.y * s + v.z * c);\n"
-    "}\n"
-    "vec3 yaw_by(vec3 v, float a) {\n"
-    "    float c = cos(a), s = sin(a);\n"
-    "    return vec3(v.x * c - v.z * s, v.y, v.x * s + v.z * c);\n"
-    "}\n"
     "void main() {\n"
-    "    vec3 c = a_cam;\n"
-    "    if (u_turn.x != 0.0 || u_turn.y != 0.0) {\n"
-    /* the view space unscaled (camera space has x * focal / half width), the yaw about the
-       world's vertical (under the scene's pitch), then the pitch, and scaled back */
-    "        vec3 v = vec3(c.x * u_view.z / u_focal.x, c.y * u_view.w / u_focal.y, c.z);\n"
-    "        v = pitch_by(yaw_by(pitch_by(v, -u_turn.z), u_turn.x), u_turn.z + u_turn.y);\n"
-    "        c = vec3(v.x * u_focal.x / u_view.z, v.y * u_focal.y / u_view.w, v.z);\n"
-    "    }\n"
-    "    c.xy *= u_turn.w;\n"
+    "    vec3 c = u_move * a_cam + u_shift;\n"
+    "    c.xy *= u_zoom;\n"
     "    float z = c.z;\n"
-    /* screen x = cx + x * hw / z on 320 columns, y = cy + y * hh / z on 200 rows, as clip
-       coordinates with w = z (GL clips what is behind the eye) */
-    "    gl_Position = vec4((u_view.x / 160.0 - 1.0) * z + c.x * u_view.z / 160.0,\n"
+    /* the frame's column x = cx + x * hw / z, row y = cy + y * hh / z; the window shows the
+       columns from u_frame.x, u_frame.y of them, and the 200 rows: as clip coordinates with
+       w = z (GL clips what is behind the eye) */
+    "    gl_Position = vec4((2.0 * (u_view.x - u_frame.x) / u_frame.y - 1.0) * z +\n"
+    "                           c.x * 2.0 * u_view.z / u_frame.y,\n"
     "                       (1.0 - u_view.y / 100.0) * z - c.y * u_view.w / 100.0,\n"
     "                       0.0, z);\n"
     "    v_uv = a_uv;\n"
     "    v_shade = a_shade;\n"
     "    v_z = a_cam.z;\n"
+    "    v_zd = z;\n"
     "    v_cam = a_cam;\n"
     "}\n";
 
@@ -98,6 +126,7 @@ static const char *scene_fs =
     "in vec2 v_uv;\n"
     "in float v_shade;\n"
     "in float v_z;\n"
+    "in float v_zd;\n"
     "in vec3 v_cam;\n"
     "uniform vec4 u_view;\n"
     "uniform vec2 u_focal;\n"
@@ -191,7 +220,7 @@ static const char *scene_fs =
     "    if (u_mode == 3 && ((int(gl_FragCoord.x) + int(gl_FragCoord.y)) & 1) == 1)\n"
     "        discard;\n"
     "    o = vec4(c, 1.0);\n"
-    "    gl_FragDepth = clamp(v_z * u_depth, 0.0, 1.0);\n"
+    "    gl_FragDepth = clamp(v_zd * u_depth, 0.0, 1.0);\n"
     "}\n";
 
 /* a triangle over the whole viewport; v_pos is (0, 0) at its top left, (1, 1) bottom right */
@@ -204,19 +233,34 @@ static const char *comp_vs =
     "    gl_Position = vec4(p, 0.0, 1.0);\n"
     "}\n";
 
+/* The composite works on the frame's pixels: the frame is the wide pass's (or the game's
+   320 columns), the window shows u_map.y of its columns from u_map.x, all 200 rows. The game's
+   screen (VGA) is the frame's columns u_map.z.. u_map.z + 319; the sides are the wide frame
+   as the game left it (u_side). A frame pixel is the 3D scene where the 3D pass's pixel is
+   still there (the screen equals the copy after the pass), else the software pixel. */
 static const char *comp_fs =
     "#version 410 core\n"
     "in vec2 v_pos;\n"
-    "uniform usampler2D u_vga, u_pre, u_post;\n"
+    "uniform usampler2D u_vga, u_pre, u_post, u_side;\n"
     "uniform sampler2D u_scene, u_pal;\n"
-    "uniform int u_valid;\n"
-    "uniform ivec4 u_clip;\n"               /* left, top, right, bottom */
+    "uniform int u_valid;\n"                /* a 3D frame goes with this picture */
+    "uniform int u_gl;\n"                   /* drawn by OpenGL (else the software pixels) */
+    "uniform int u_sides;\n"                /* the wide frame's sides are there to show */
+    "uniform ivec4 u_clip;\n"               /* the 3D window: left, top, right, bottom */
     "uniform ivec2 u_bg;\n"                 /* fill?, colour */
     "uniform int u_smooth;\n"
-    "uniform vec3 u_cross;\n"              /* the crosshair: x, y (320x200 pixels), on */
+    "uniform vec3 u_cross;\n"              /* the crosshair: x, y (the game's screen), on */
+    "uniform vec4 u_map;\n"                /* first column shown, columns shown, the game's
+                                              screen's column 0, the frame's width */
+    "uniform int u_sharp;\n"
+    "uniform vec2 u_scale;\n"              /* window pixels a frame pixel */
+    "uniform vec2 u_presh;\n"              /* the sky backdrop's move with the scene's (frame
+                                              pixels): the panorama a column a step of yaw,
+                                              the horizon with the pitch */
     "layout(location = 0) out vec4 o;\n"
     "vec3 pal(uint c) { return texelFetch(u_pal, ivec2(int(c), 0), 0).rgb; }\n"
-    /* the picture before the 3D pass at q (320x200 pixels), filtered through the palette */
+    "int frame_w() { return int(u_map.w); }\n"
+    /* the picture before the 3D pass at q (frame pixels), filtered through the palette */
     "vec3 pre_smooth(vec2 q) {\n"
     "    vec2 p = q - 0.5;\n"
     "    vec2 f = fract(p);\n"
@@ -225,7 +269,7 @@ static const char *comp_fs =
     "    for (int k = 0; k < 4; k++) {\n"
     "        ivec2 d = ivec2(k & 1, k >> 1);\n"
     "        float w = (d.x == 1 ? f.x : 1.0 - f.x) * (d.y == 1 ? f.y : 1.0 - f.y);\n"
-    "        s += pal(texelFetch(u_pre, clamp(b + d, ivec2(0), ivec2(319, 199)), 0).r) * w;\n"
+    "        s += pal(texelFetch(u_pre, clamp(b + d, ivec2(0), ivec2(frame_w() - 1, 199)), 0).r) * w;\n"
     "    }\n"
     "    return s;\n"
     "}\n"
@@ -237,24 +281,58 @@ static const char *comp_fs =
     "    float t = 0.3 + grow, a = 1.2 - grow, b = 4.2 + grow;\n"
     "    return (d.x < t && d.y > a && d.y < b) || (d.y < t && d.x > a && d.x < b) ? 1.0 : 0.0;\n"
     "}\n"
-    "void main() {\n"
-    "    if (u_cross.z > 0.5) {\n"
-    "        vec2 q = v_pos * vec2(320.0, 200.0);\n"
-    "        if (cross_at(q, 0.0) > 0.5) { o = vec4(1.0); return; }\n"
-    "        if (cross_at(q, 0.25) > 0.5) { o = vec4(0.0, 0.0, 0.0, 1.0); return; }\n"
+    /* the scene here (its colour premultiplied by its coverage) over what is behind it */
+    "vec3 scene_at(vec2 q, ivec2 p) {\n"
+    "    vec4 s = texelFetch(u_scene, ivec2(gl_FragCoord.xy), 0);\n"
+    "    if (s.a >= 1.0 || u_bg.x != 0)\n"
+    "        return u_bg.x != 0 ? s.rgb + pal(uint(u_bg.y)) * (1.0 - s.a) : s.rgb;\n"
+    "    vec2 k = q + u_presh;\n"
+    "    ivec2 kp = clamp(ivec2(floor(k)), ivec2(0), ivec2(frame_w() - 1, 199));\n"
+    "    vec3 u = u_smooth != 0 ? pre_smooth(k) : pal(texelFetch(u_pre, kp, 0).r);\n"
+    "    return s.rgb + u * (1.0 - s.a);\n"
+    "}\n"
+    /* the frame's pixel p (q: this fragment's point in the frame) */
+    "vec3 frame_px(ivec2 p, vec2 q) {\n"
+    "    int dx = int(u_map.z);\n"
+    "    p.y = clamp(p.y, 0, 199);\n"
+    "    bool in3d = u_valid != 0 && p.x >= u_clip.x && p.x < u_clip.z && p.y >= u_clip.y &&\n"
+    "                p.y < u_clip.w;\n"
+    "    if (p.x >= dx && p.x < dx + 320) {\n"
+    "        uint c = texelFetch(u_vga, ivec2(p.x - dx, p.y), 0).r;\n"
+    "        if (in3d && u_gl != 0 && c == texelFetch(u_post, p, 0).r)\n"
+    "            return scene_at(q, p);\n"
+    "        return pal(c);\n"
     "    }\n"
-    "    ivec2 p = clamp(ivec2(floor(v_pos * vec2(320.0, 200.0))), ivec2(0), ivec2(319, 199));\n"
-    "    uint c = texelFetch(u_vga, p, 0).r;\n"
-    "    if (u_valid != 0 && p.x >= u_clip.x && p.x < u_clip.z && p.y >= u_clip.y &&\n"
-    "        p.y < u_clip.w && c == texelFetch(u_post, p, 0).r) {\n"
-    /* the scene (its colour premultiplied by its coverage) over what is behind it */
-    "        vec4 s = texelFetch(u_scene, ivec2(gl_FragCoord.xy), 0);\n"
-    "        vec3 u = u_bg.x != 0 ? pal(uint(u_bg.y)) : u_smooth != 0 ?\n"
-    "                 pre_smooth(v_pos * vec2(320.0, 200.0)) : pal(texelFetch(u_pre, p, 0).r);\n"
-    "        o = vec4(s.rgb + u * (1.0 - s.a), 1.0);\n"
+    /* a side: the wide frame's, within its 3D window's rows (below them it is not drawn) */
+    "    if (u_sides == 0 || p.x < 0 || p.x >= frame_w() || p.y >= u_clip.w)\n"
+    "        return vec3(0.0);\n"
+    "    uint c = texelFetch(u_side, p, 0).r;\n"
+    "    if (in3d && u_gl != 0 && c == texelFetch(u_post, p, 0).r)\n"
+    "        return scene_at(q, p);\n"
+    "    return pal(c);\n"
+    "}\n"
+    "void main() {\n"
+    "    vec2 q = vec2(u_map.x + v_pos.x * u_map.y, v_pos.y * 200.0);\n"
+    "    if (u_cross.z > 0.5) {\n"
+    "        vec2 h = q - vec2(u_map.z, 0.0);\n"
+    "        if (cross_at(h, 0.0) > 0.5) { o = vec4(1.0); return; }\n"
+    "        if (cross_at(h, 0.25) > 0.5) { o = vec4(0.0, 0.0, 0.0, 1.0); return; }\n"
+    "    }\n"
+    "    if (u_sharp == 0) {\n"
+    "        o = vec4(frame_px(ivec2(floor(q)), q), 1.0);\n"
     "        return;\n"
     "    }\n"
-    "    o = texelFetch(u_pal, ivec2(int(c), 0), 0);\n"
+    /* sharp: each pixel whole, blended with its neighbour only over the window pixel that
+       straddles their edge */
+    "    vec2 g = q - 0.5;\n"
+    "    vec2 b = floor(g);\n"
+    "    vec2 t = clamp((g - b - 0.5) * u_scale + 0.5, 0.0, 1.0);\n"
+    "    ivec2 i = ivec2(b);\n"
+    "    vec3 c00 = frame_px(i, q);\n"
+    "    vec3 c10 = t.x > 0.0 ? frame_px(i + ivec2(1, 0), q) : c00;\n"
+    "    vec3 c01 = t.y > 0.0 ? frame_px(i + ivec2(0, 1), q) : c00;\n"
+    "    vec3 c11 = t.x > 0.0 && t.y > 0.0 ? frame_px(i + ivec2(1, 1), q) : c00;\n"
+    "    o = vec4(mix(mix(c00, c10, t.x), mix(c01, c11, t.x), t.y), 1.0);\n"
     "}\n";
 
 static GLuint compile(GLenum type, const char *src)
@@ -314,6 +392,50 @@ static GLuint index_texture(int w, int h)
     return t;
 }
 
+/* ---- settings ------------------------------------------------------------------------------- */
+
+/* a setting: its environment variable, else its line in the settings file */
+static int setting(const char *env, const char *key, char *out, size_t size)
+{
+    const char *e = SDL_getenv(env);
+
+    if (e && *e) {
+        snprintf(out, size, "%s", e);
+        return 1;
+    }
+    return launch_setting(key, out, size);
+}
+
+static int is_on(const char *v)
+{
+    return strcasecmp(v, "on") == 0 || strcmp(v, "1") == 0 || strcasecmp(v, "yes") == 0 ||
+           strcasecmp(v, "true") == 0;
+}
+
+static void read_settings(void)
+{
+    char v[64];
+
+    if (setting("PORT_GL_ASPECT", "aspect", v, sizeof v))
+        aspect_fill = strcasecmp(v, "fill") == 0 || strcasecmp(v, "wide") == 0;
+    if (setting("PORT_GL_FOV_MAX", "fov_max", v, sizeof v))
+        fov_max = atoi(v);
+    if (setting("PORT_GL_HUD_FILTER", "hud_filter", v, sizeof v))
+        hud_sharp = strcasecmp(v, "nearest") != 0;
+    if (setting("PORT_GL_VSYNC", "vsync", v, sizeof v))
+        vsync = strcasecmp(v, "adaptive") == 0 ? -1 : is_on(v) ? 1 : 0;
+    if (setting("PORT_GL_INTERP", "interpolate", v, sizeof v))
+        interp = is_on(v);
+    if (setting("PORT_GL_OVERSCAN", "overscan", v, sizeof v))
+        overscan = atoi(v);
+    if (fov_max < 0 || fov_max >= 175)
+        fov_max = 0;
+    if (overscan < 0)
+        overscan = 0;
+    if (overscan > 64)
+        overscan = 64;
+}
+
 int vpc_gl_init(void *sdl_window)
 {
     const char *env = SDL_getenv("PORT_GL_SOFTWARE");
@@ -325,15 +447,22 @@ int vpc_gl_init(void *sdl_window)
         return 0;
     }
     SDL_GL_MakeCurrent(window, context);
-    SDL_GL_SetSwapInterval(0);
-    fprintf(stderr, "port: OpenGL %s, %s\n", (const char *)glGetString(GL_VERSION),
-            (const char *)glGetString(GL_RENDERER));
+    read_settings();
+    if (vsync < 0 && !SDL_GL_SetSwapInterval(-1))
+        vsync = 1;
+    if (vsync >= 0)
+        SDL_GL_SetSwapInterval(vsync);
+    fprintf(stderr, "port: OpenGL %s, %s; view %s, vsync %s, smooth motion %s\n",
+            (const char *)glGetString(GL_VERSION), (const char *)glGetString(GL_RENDERER),
+            aspect_fill ? "fill" : "4:3", vsync < 0 ? "adaptive" : vsync ? "on" : "off",
+            interp ? "on" : "off");
 
     scene_prog = program(scene_vs, scene_fs);
     comp_prog = program(comp_vs, comp_fs);
     if (!scene_prog || !comp_prog)
         return 0;
     u_view = glGetUniformLocation(scene_prog, "u_view");
+    u_frame = glGetUniformLocation(scene_prog, "u_frame");
     u_mode = glGetUniformLocation(scene_prog, "u_mode");
     u_colour = glGetUniformLocation(scene_prog, "u_colour");
     u_row2 = glGetUniformLocation(scene_prog, "u_row2");
@@ -346,7 +475,9 @@ int vpc_gl_init(void *sdl_window)
     u_pal = glGetUniformLocation(scene_prog, "u_pal");
     u_smooth = glGetUniformLocation(scene_prog, "u_smooth");
     u_focal = glGetUniformLocation(scene_prog, "u_focal");
-    u_turn = glGetUniformLocation(scene_prog, "u_turn");
+    u_move = glGetUniformLocation(scene_prog, "u_move");
+    u_shift = glGetUniformLocation(scene_prog, "u_shift");
+    u_zoom = glGetUniformLocation(scene_prog, "u_zoom");
     u_nl = glGetUniformLocation(scene_prog, "u_nl");
     u_lbase = glGetUniformLocation(scene_prog, "u_lbase");
     u_lights = glGetUniformLocation(scene_prog, "u_lights");
@@ -354,13 +485,20 @@ int vpc_gl_init(void *sdl_window)
     c_vga = glGetUniformLocation(comp_prog, "u_vga");
     c_pre = glGetUniformLocation(comp_prog, "u_pre");
     c_post = glGetUniformLocation(comp_prog, "u_post");
+    c_side = glGetUniformLocation(comp_prog, "u_side");
     c_scene = glGetUniformLocation(comp_prog, "u_scene");
     c_pal = glGetUniformLocation(comp_prog, "u_pal");
     c_valid = glGetUniformLocation(comp_prog, "u_valid");
+    c_gl = glGetUniformLocation(comp_prog, "u_gl");
+    c_sides = glGetUniformLocation(comp_prog, "u_sides");
     c_clip = glGetUniformLocation(comp_prog, "u_clip");
     c_bg = glGetUniformLocation(comp_prog, "u_bg");
     c_smooth = glGetUniformLocation(comp_prog, "u_smooth");
     c_cross = glGetUniformLocation(comp_prog, "u_cross");
+    c_map = glGetUniformLocation(comp_prog, "u_map");
+    c_sharp = glGetUniformLocation(comp_prog, "u_sharp");
+    c_scale = glGetUniformLocation(comp_prog, "u_scale");
+    c_presh = glGetUniformLocation(comp_prog, "u_presh");
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -380,8 +518,9 @@ int vpc_gl_init(void *sdl_window)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     tex_vga = index_texture(PGL_W, PGL_H);
-    tex_pre = index_texture(PGL_W, PGL_H);
-    tex_post = index_texture(PGL_W, PGL_H);
+    tex_pre = index_texture(PGL_MAX_W, PGL_H);
+    tex_post = index_texture(PGL_MAX_W, PGL_H);
+    tex_side = index_texture(PGL_MAX_W, PGL_H);
     tex_tables = index_texture(256, 128);
     glGenTextures(1, &tex_falloff);
     glBindTexture(GL_TEXTURE_2D, tex_falloff);
@@ -419,6 +558,7 @@ int vpc_gl_init(void *sdl_window)
 void vpc_gl_shutdown(void)
 {
     pgl_enabled = 0;
+    pgl_wide_request = 0;
     if (context)
         SDL_GL_DestroyContext(context);
     context = NULL;
@@ -435,6 +575,33 @@ void vpc_gl_toggle_smooth(void)
 {
     smooth = !smooth;
     fprintf(stderr, "port: OpenGL textures %s\n", smooth ? "smooth" : "as texels");
+}
+
+void vpc_gl_toggle_aspect(void)
+{
+    aspect_fill = !aspect_fill;
+    launch_set_setting("aspect", aspect_fill ? "fill" : "4:3");
+    fprintf(stderr, "port: the view %s\n", aspect_fill ? "fills the window" : "is 4:3");
+}
+
+void vpc_gl_toggle_interp(void)
+{
+    interp = !interp;
+    launch_set_setting("interpolate", interp ? "on" : "off");
+    fprintf(stderr, "port: smooth motion %s\n", interp ? "on" : "off");
+}
+
+int vpc_gl_paced(void)
+{
+    return ready && vsync != 0;
+}
+
+void vpc_gl_describe(char *buf, size_t size)
+{
+    snprintf(buf, size, "gl=%s aspect=%s fov_max=%d hud_filter=%s vsync=%s interpolate=%s "
+             "overscan=%d frame=%d", gl_on ? "on" : "off", aspect_fill ? "fill" : "4:3", fov_max,
+             hud_sharp ? "sharp" : "nearest", vsync < 0 ? "adaptive" : vsync ? "on" : "off",
+             interp ? "on" : "off", overscan, pgl_wide_request);
 }
 
 /* ---- textures ------------------------------------------------------------------------------ */
@@ -536,6 +703,213 @@ static void make_fbos(int w, int h)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+/* ---- the view: the window's rectangle and the frame's columns in it ----------------------- */
+
+/* The window's picture: its rectangle (window pixels) and the frame columns it shows (cols:
+   320 for 4:3, more for a wider window with aspect=fill). A 320x200 picture at 4:3 has pixels
+   1.2 times as tall as wide, so a view of aspect A is 240 * A columns. */
+static void view_rect(int *x, int *y, int *w, int *h, int *cols)
+{
+    int ww, wh, c = PGL_W;
+
+    SDL_GetWindowSizeInPixels(window, &ww, &wh);
+    if (ww < 1 || wh < 1) {
+        *x = *y = 0;
+        *w = *h = 0;
+        *cols = PGL_W;
+        return;
+    }
+    if (aspect_fill && ww * 3 > wh * 4) {
+        int most = PGL_MAX_W - 2 * overscan;
+
+        c = (int)(240.0 * ww / wh + 0.5) & ~1;
+        if (fov_max > 0) {
+            int f = (int)(2.0 * 200.0 * tan(fov_max * M_PI / 360.0)) & ~1;
+
+            if (f < most)
+                most = f;
+        }
+        if (c > most)
+            c = most;
+        if (c < PGL_W)
+            c = PGL_W;
+        *h = wh;
+        *w = (int)((double)wh * c / 240.0 + 0.5);
+        if (*w > ww)
+            *w = ww;
+    } else if (ww * 3 > wh * 4) {
+        *h = wh;
+        *w = wh * 4 / 3;
+    } else {
+        *w = ww;
+        *h = ww * 3 / 4;
+    }
+    *x = (ww - *w) / 2;
+    *y = (wh - *h) / 2;
+    *cols = c;
+}
+
+/* ---- the eye's motion: frames' poses, and where the eye is at a present --------------------- */
+
+typedef struct pose {
+    double t;                           /* the game's clock, ms */
+    double host;                        /* the host's, ms, when handed over */
+    double x, y, z;                     /* world units */
+    double pitch, yaw, roll;            /* 2048ths of a turn */
+    unsigned long serial;
+} pose;
+
+#define HISTORY 8
+static pose hist[HISTORY];
+static int nhist;                       /* the newest last */
+static double clock_off, frame_dt = 18.5, last_render_t;
+static int clock_set;
+/* PORT_GL_DEBUG */
+static int st_snaps, st_held, st_scenes;
+static double st_alpha_min = 1e9, st_alpha_max = -1e9;
+
+static double wrap(double a)             /* to -1024..1024 */
+{
+    a = fmod(a, 2048.0);
+    if (a >= 1024.0)
+        a -= 2048.0;
+    if (a < -1024.0)
+        a += 2048.0;
+    return a;
+}
+
+static void push_pose(const pgl_scene *s)
+{
+    pose p;
+    double dt = 0;
+
+    p.t = s->game_ms;
+    p.host = (double)s->host_ns / 1e6;
+    p.x = s->cam_x;
+    p.y = s->cam_y;
+    p.z = s->cam_z;
+    p.pitch = s->cam_pitch;
+    p.yaw = s->cam_yaw;
+    p.roll = s->cam_roll;
+    p.serial = s->serial;
+    st_scenes++;
+    if (nhist > 0) {
+        const pose *q = &hist[nhist - 1];
+        double d = fabs(p.x - q->x) + fabs(p.y - q->y) + fabs(p.z - q->z);
+
+        dt = p.t - q->t;
+        /* a cut (a teleport, a door to another place, a load): no motion between them */
+        if (dt <= 0 || dt > 250 || d > 4000 || fabs(wrap(p.yaw - q->yaw)) > 300 ||
+            fabs(wrap(p.pitch - q->pitch)) > 300) {
+            nhist = 0;
+            st_snaps++;
+        }
+    }
+    if (nhist == HISTORY) {
+        memmove(hist, hist + 1, (HISTORY - 1) * sizeof *hist);
+        nhist--;
+    }
+    hist[nhist++] = p;
+    if (nhist >= 2) {
+        if (dt > 0 && dt < 100)
+            frame_dt += (dt - frame_dt) * 0.1;
+        clock_off += (p.t - p.host - clock_off) * 0.05;
+        if (fabs(p.t - p.host - clock_off) > 100)
+            clock_off = p.t - p.host;
+    } else {
+        clock_off = p.t - p.host;
+        last_render_t = -1e18;
+    }
+    clock_set = 1;
+}
+
+/* the eye at the game's time t (between the frames around it; the newest's after it) */
+static void pose_at(double t, pose *out)
+{
+    int i;
+
+    *out = hist[nhist - 1];
+    if (nhist < 2 || t >= hist[nhist - 1].t) {
+        st_held += nhist >= 2 && t > hist[nhist - 1].t + 1.0;
+        return;
+    }
+    if (t <= hist[0].t) {
+        *out = hist[0];
+        return;
+    }
+    for (i = nhist - 1; i > 0; i--)
+        if (hist[i - 1].t <= t) {
+            const pose *a = &hist[i - 1], *b = &hist[i];
+            double k = (t - a->t) / (b->t - a->t);
+
+            if (k < st_alpha_min)
+                st_alpha_min = k;
+            if (k > st_alpha_max)
+                st_alpha_max = k;
+            out->x = a->x + (b->x - a->x) * k;
+            out->y = a->y + (b->y - a->y) * k;
+            out->z = a->z + (b->z - a->z) * k;
+            out->pitch = a->pitch + wrap(b->pitch - a->pitch) * k;
+            out->yaw = a->yaw + wrap(b->yaw - a->yaw) * k;
+            out->roll = a->roll + wrap(b->roll - a->roll) * k;
+            out->t = t;
+            return;
+        }
+}
+
+/* xn_mat_from_angles (src/engine/mat.c), in floating point: world to view */
+static void rotation(double pitch, double yaw, double roll, double m[3][3])
+{
+    const double a = 2.0 * M_PI / 2048.0;
+    double sp = sin(pitch * a), cp = cos(pitch * a), sy = sin(yaw * a), cy = cos(yaw * a);
+    double sr = sin(roll * a), cr = cos(roll * a);
+
+    m[0][0] = sp * (sr * sy) + cr * cy;
+    m[0][1] = -sr * cp;
+    m[0][2] = sr * (sp * cy) - sy * cr;
+    m[1][0] = -sp * (sy * cr) + sr * cy;
+    m[1][1] = cp * cr;
+    m[1][2] = -cr * (sp * cy) - sr * sy;
+    m[2][0] = sy * cp;
+    m[2][1] = sp;
+    m[2][2] = cp * cy;
+}
+
+/* The scene's camera space (the view's rows scaled so the side planes are x = +-z) moved to
+   the eye at e: c' = S Rt Rs^T S^-1 c + S Rt (eye_s - eye_t) << 8 */
+static void move_matrix(const pgl_scene *s, const pose *e, float m3[9], float shift[3])
+{
+    double rs[3][3], rt[3][3], m[3][3], sc[3], d[3], v[3];
+    int i, j, k;
+
+    rotation(s->cam_pitch, s->cam_yaw, s->cam_roll, rs);
+    rotation(e->pitch, e->yaw, e->roll, rt);
+    sc[0] = s->hw > 0 ? s->focal_x / s->hw : 1.0;
+    sc[1] = s->hh > 0 ? s->focal_y / s->hh : 1.0;
+    sc[2] = 1.0;
+    for (i = 0; i < 3; i++)
+        for (j = 0; j < 3; j++) {
+            double t = 0;
+
+            for (k = 0; k < 3; k++)
+                t += rt[i][k] * rs[j][k];
+            m[i][j] = sc[i] * t / sc[j];
+        }
+    d[0] = (s->cam_x - e->x) * 256.0;
+    d[1] = (s->cam_y - e->y) * 256.0;
+    d[2] = (s->cam_z - e->z) * 256.0;
+    for (i = 0; i < 3; i++) {
+        v[i] = 0;
+        for (k = 0; k < 3; k++)
+            v[i] += rt[i][k] * d[k];
+        shift[i] = (float)(sc[i] * v[i]);
+    }
+    /* column-major for GL: m3[col * 3 + row] */
+    for (i = 0; i < 3; i++)
+        for (j = 0; j < 3; j++)
+            m3[j * 3 + i] = (float)m[i][j];
+}
+
 /* ---- the scene ------------------------------------------------------------------------------- */
 
 static const pgl_scene *sort_scene;
@@ -621,13 +995,17 @@ static void draw_runs(const pgl_scene *s, const int *order, int n)
     }
 }
 
-/* the turn not yet in the scene ({yaw, pitch} in 2048ths of a turn, or NULL) and whether
-   the view is the mouse's (the overscan, then, so a turn's new edge is never empty) */
-#define LOOK_AHEAD 1.0                  /* the most of a turn added, in steps */
-static float turn_yaw, turn_pitch;
-static int turn_overscan;
+/* how the scene is drawn at this present: the frame's columns shown (from c0, cols of them),
+   the eye's move from where the frame was drawn, and a zoom (the vertical overscan while the
+   mouse turns the view) */
+typedef struct view {
+    float c0, cols;
+    float move[9], shift[3];
+    float zoom;
+    float presh[2];             /* the sky backdrop's move (composite) */
+} view;
 
-static void draw_scene(const pgl_scene *s)
+static void draw_scene(const pgl_scene *s, const view *v)
 {
     static int *order;
     static int cap;
@@ -643,30 +1021,28 @@ static void draw_scene(const pgl_scene *s)
     glDepthMask(GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /* the 3D window */
-    x0 = s->clip_l * fbo_w / PGL_W;
-    x1 = (s->clip_r * fbo_w + PGL_W - 1) / PGL_W;
+    /* the 3D window, in the window's pixels */
+    x0 = (int)floor((s->clip_l - v->c0) * fbo_w / v->cols);
+    x1 = (int)ceil((s->clip_r - v->c0) * fbo_w / v->cols);
     y0 = fbo_h - (s->clip_b * fbo_h + PGL_H - 1) / PGL_H;
     y1 = fbo_h - s->clip_t * fbo_h / PGL_H;
+    if (x0 < 0)
+        x0 = 0;
+    if (x1 > fbo_w)
+        x1 = fbo_w;
+    if (y0 < 0)
+        y0 = 0;
+    if (x1 <= x0 || y1 <= y0)
+        return;
     glEnable(GL_SCISSOR_TEST);
-    glScissor(x0, y0 < 0 ? 0 : y0, x1 - x0, y1 - y0);
+    glScissor(x0, y0, x1 - x0, y1 - y0);
 
     glUseProgram(scene_prog);
     glUniform4f(u_view, s->cx, s->cy, s->hw, s->hh);
-    {
-        const float step = 6.2831853f / 2048.0f;
-        float zoom = 1.0f;
-        float pitch = (float)(s->cam_pitch > 1023 ? s->cam_pitch - 2048 : s->cam_pitch);
-
-        if (turn_overscan && s->focal_x > 0 && s->focal_y > 0) {
-            /* the field of view's half angles, widened by the most the turn can bring in */
-            float hx = atanf(s->hw / s->focal_x), hy = atanf(s->hh / s->focal_y);
-            float a = (float)LOOK_AHEAD * step, zx = tanf(hx + a) / tanf(hx), zy = tanf(hy + a) / tanf(hy);
-
-            zoom = zx > zy ? zx : zy;
-        }
-        glUniform4f(u_turn, turn_yaw * step, turn_pitch * step, pitch * step, zoom);
-    }
+    glUniform2f(u_frame, v->c0, v->cols);
+    glUniformMatrix3fv(u_move, 1, GL_FALSE, v->move);
+    glUniform3f(u_shift, v->shift[0], v->shift[1], v->shift[2]);
+    glUniform1f(u_zoom, v->zoom);
     glUniform3f(u_fogp, s->fog_start, s->fog_step, s->fog_far);
     glUniform1f(u_depth, 1.0f / depth_far);
     glUniform1i(u_tex, 0);
@@ -724,47 +1100,37 @@ static void draw_scene(const pgl_scene *s)
 }
 
 /* the share of the 3D window's pixels the game changed after the 3D pass: a scene the game
-   has drawn over (a menu) is not shown */
+   has drawn over (a menu) is not shown. Only the game's screen can be drawn over: its
+   columns of the frame. */
 static int scene_current(const pgl_scene *s, const unsigned char *vga)
 {
     int x, y, n = 0, diff = 0;
 
     for (y = s->clip_t; y < s->clip_b && y < PGL_H; y += 2)
-        for (x = s->clip_l; x < s->clip_r && x < PGL_W; x += 2) {
+        for (x = s->clip_l; x < s->clip_r && x < s->w; x += 2) {
+            int gx = x - s->dx;
+
+            if (gx < 0 || gx >= PGL_W)
+                continue;
             n++;
-            diff += vga[y * PGL_W + x] != s->post[y * PGL_W + x];
+            diff += vga[y * PGL_W + gx] != s->post[y * s->w + x];
         }
     return n > 0 && diff * 10 < n * 6;
 }
 
 /* ---- present ---------------------------------------------------------------------------------- */
 
-static void letterbox(int *x, int *y, int *w, int *h)
-{
-    int ww, wh;
-
-    SDL_GetWindowSizeInPixels(window, &ww, &wh);
-    if (ww * 3 > wh * 4) {
-        *h = wh;
-        *w = wh * 4 / 3;
-    } else {
-        *w = ww;
-        *h = ww * 3 / 4;
-    }
-    *x = (ww - *w) / 2;
-    *y = (wh - *h) / 2;
-}
-
 /* PORT_GL_RECORD=FILE: every present's middle 32 rows of the picture (RGBA; with
    PORT_GL_RECORD_COLUMNS=1 the middle 32 columns, full height), after a header {time ns,
-   scene serial, yaw, pitch, width, rows}, for looking at motion frame by frame without
-   screenshots stalling the main thread */
-static void record(const pgl_scene *s, int w, int h)
+   scene serial, yaw, pitch, width, rows, the eye drawn: x, y, z (world units * 1000), yaw
+   and pitch (2048ths * 1000), the game's time (us)}, for looking at motion frame by frame
+   without screenshots stalling the main thread (tools/port_gl_motion.py) */
+static void record(const pgl_scene *s, const pose *e, int w, int h)
 {
     static FILE *f;
     static int tried, columns;
     static unsigned char *rows;
-    long long head[6];
+    long long head[12];
     int rw = w, rh = 32;
 
     if (!tried) {
@@ -794,29 +1160,106 @@ static void record(const pgl_scene *s, int w, int h)
     head[3] = s ? s->cam_pitch : 0;
     head[4] = rw;
     head[5] = rh;
+    head[6] = (long long)(e->x * 1000);
+    head[7] = (long long)(e->y * 1000);
+    head[8] = (long long)(e->z * 1000);
+    head[9] = (long long)(e->yaw * 1000);
+    head[10] = (long long)(e->pitch * 1000);
+    head[11] = (long long)(e->t * 1000);
     fwrite(head, sizeof head, 1, f);
     fwrite(rows, (size_t)rw * rh * 4, 1, f);
     fflush(f);
 }
 
 static int debug = -1, presents, st_shown, st_stale, st_invalid, st_none;
-static Uint64 last_report;
+static Uint64 last_report, last_swap;
+static double st_gap_min = 1e9, st_gap_max, st_gap_sum, st_gap_sq;
+static int st_gaps;
+static const pgl_scene *last_scene;     /* (the screenshots of the software frame) */
 
-void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const int *cross,
+/* where the eye is drawn from at this present, and the move to it from the scene's frame */
+static void eye_now(const pgl_scene *s, const int *look, pose *e, int *moved)
+{
+    double now = (double)SDL_GetTicksNS() / 1e6;
+
+    *moved = 0;
+    e->x = s->cam_x;
+    e->y = s->cam_y;
+    e->z = s->cam_z;
+    e->pitch = s->cam_pitch;
+    e->yaw = s->cam_yaw;
+    e->roll = s->cam_roll;
+    e->t = s->game_ms;
+    if (interp && nhist > 0 && hist[nhist - 1].serial == s->serial) {
+        /* a frame and a half behind the game's clock now: between the frames around it */
+        double delay = frame_dt * 1.5, t;
+
+        if (delay < 8)
+            delay = 8;
+        if (delay > 60)
+            delay = 60;
+        t = now + clock_off - delay;
+        if (t < last_render_t && last_render_t - t < 100)
+            t = last_render_t;              /* never backwards */
+        last_render_t = t;
+        pose_at(t, e);
+        *moved = 1;
+    }
+    if (look) {
+        /* the mouse turns the view: its angles are the mouse's now. Smooth motion adds every
+           mickey the game has not read into the frame's angles yet; otherwise the fraction of
+           a step its last read left (the frame drawn where the mouse was when it read it) */
+        double dy, dp, most = interp ? 64.0 : 1.0, p0;
+
+        if (interp) {
+            double tx, ty;
+
+            pgl_mouse_total(&tx, &ty);
+            dy = tx - s->mouse_used_x;
+            dp = (ty - s->mouse_used_y) * look[0];
+        } else {
+            dy = s->mouse_rem_x;
+            dp = s->mouse_rem_y * look[0];
+        }
+        dy = dy < -most ? -most : dy > most ? most : dy;
+        dp = dp < -most ? -most : dp > most ? most : dp;
+        p0 = wrap(s->cam_pitch);
+        if (p0 + dp > 256)                      /* the engine stops the pitch at +-256 */
+            dp = 256 - p0;
+        if (p0 + dp < -256)
+            dp = -256 - p0;
+        e->yaw = s->cam_yaw + dy;
+        e->pitch = s->cam_pitch + dp;
+        *moved = 1;
+    }
+}
+
+void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, const int *cross,
                     const int *look)
 {
     unsigned char pal[256 * 4];
+    const unsigned char *vga = vga_live;
     const pgl_scene *s;
-    int i, rx, ry, rw, rh, valid = 0;
+    int i, rx, ry, rw, rh, cols, valid = 0, current = 0, want;
+    view v;
+    pose e;
+    float c0, shown, dx, fw;
 
     if (!ready)
         return;
     SDL_GL_MakeCurrent(window, context);
     upload_textures();
-    letterbox(&rx, &ry, &rw, &rh);
+    view_rect(&rx, &ry, &rw, &rh, &cols);
     if (rw < 1 || rh < 1)
         return;
     make_fbos(rw, rh);
+
+    /* the frame the game is asked for: the columns shown, a margin each side for smooth
+       motion; none past 320 is the original pass */
+    want = cols + (interp ? 2 * overscan : 0);
+    if (want > PGL_MAX_W)
+        want = PGL_MAX_W;
+    pgl_wide_request = want > PGL_W ? want : 0;
 
     for (i = 0; i < 256; i++) {
         pal[i * 4] = rgb[i * 3];
@@ -827,28 +1270,83 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex_pal);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGBA, GL_UNSIGNED_BYTE, pal);
+
+    s = pgl_latest();
+    if (s && s->valid && (nhist == 0 || hist[nhist - 1].serial != s->serial))
+        push_pose(s);
+    /* the picture shown with the scene: the scene's own copy while no present has come since
+       (the HUD drawn over that frame, never half of the next) */
+    if (s && s->valid && vga_live != NULL && s->present_serial == pgl_present_serial)
+        vga = s->vga;
     glBindTexture(GL_TEXTURE_2D, tex_vga);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, PGL_W, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE, vga);
 
-    turn_overscan = cross != NULL;
-    s = pgl_latest();
-    turn_yaw = turn_pitch = 0.0f;
-    if (look && s && s->valid) {
-        /* the fraction of a step past the scene's angles: the view at the mouse's exact
-           place when the frame read it */
-        double dy = s->mouse_rem_x, dp = s->mouse_rem_y * look[0];
+    if (s && s->valid && vga_live != NULL && scene_current(s, vga))
+        current = 1;
+    /* the columns shown: the frame's middle `cols` of its w, or a narrower frame in the
+       middle of them */
+    fw = s && current ? (float)s->w : (float)cols;
+    shown = (float)cols;
+    c0 = (fw - shown) / 2.0f;
+    dx = (fw - PGL_W) / 2.0f;
+    if (s && current)
+        dx = (float)s->dx;
 
-        dy = dy < -LOOK_AHEAD ? -LOOK_AHEAD : dy > LOOK_AHEAD ? LOOK_AHEAD : dy;
-        dp = dp < -LOOK_AHEAD ? -LOOK_AHEAD : dp > LOOK_AHEAD ? LOOK_AHEAD : dp;
-        if (look[1] + dp > 256)                 /* the engine stops the pitch at +-256 */
-            dp = 256 - look[1];
-        if (look[1] + dp < -256)
-            dp = -256 - look[1];
-        turn_yaw = (float)dy;
-        turn_pitch = (float)dp;
-    }
     if (debug < 0)
         debug = SDL_getenv("PORT_GL_DEBUG") != NULL;
+    e.x = e.y = e.z = e.pitch = e.yaw = e.roll = e.t = 0;
+    if (s && current) {
+        int moved;
+
+        eye_now(s, look, &e, &moved);
+        v.c0 = c0;
+        v.cols = shown;
+        if (moved)
+            move_matrix(s, &e, v.move, v.shift);
+        else {
+            memset(v.move, 0, sizeof v.move);
+            v.move[0] = v.move[4] = v.move[8] = 1.0f;
+            v.shift[0] = v.shift[1] = v.shift[2] = 0.0f;
+        }
+        v.zoom = 1.0f;
+        /* the sky drawn for the frame (sky.c: panorama column = yaw + screen column; the
+           horizon at -focal_y tan(pitch)) moved as the scene was */
+        v.presh[0] = (float)wrap(e.yaw - s->cam_yaw);
+        v.presh[1] = (float)(s->focal_y * (tan(wrap(e.pitch) * M_PI / 1024.0) -
+                                           tan(wrap(s->cam_pitch) * M_PI / 1024.0)));
+        if (cross && s->focal_x > 0 && s->focal_y > 0) {
+            /* the field of view's half height, widened by the most a step of pitch can bring
+               in (the sides have the overscan's columns) */
+            const float step = 6.2831853f / 2048.0f;
+            float hy = atanf(s->hh / s->focal_y);
+
+            v.zoom = tanf(hy + step) / tanf(hy);
+            if (!(interp && overscan > 0)) {
+                float hx = atanf(s->hw / s->focal_x), zx = tanf(hx + step) / tanf(hx);
+
+                if (zx > v.zoom)
+                    v.zoom = zx;
+            }
+        }
+        if (gl_on) {
+            valid = 1;
+            draw_scene(s, &v);
+        }
+        glBindTexture(GL_TEXTURE_2D, tex_pre);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, s->w, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE,
+                        s->pre);
+        glBindTexture(GL_TEXTURE_2D, tex_post);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, s->w, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE,
+                        s->post);
+        if (s->w > PGL_W) {
+            glBindTexture(GL_TEXTURE_2D, tex_side);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, s->w, PGL_H, GL_RED_INTEGER,
+                            GL_UNSIGNED_BYTE, s->side);
+        }
+        last_scene = s;
+    } else {
+        last_scene = NULL;
+    }
     if (debug) {
         Uint64 now = SDL_GetTicksNS();
 
@@ -857,27 +1355,32 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
             st_none++;
         else if (!s->valid)
             st_invalid++;
-        else if (!scene_current(s, vga))
+        else if (!current)
             st_stale++;
         else
             st_shown++;
         if (now - last_report > 2000000000ull) {
+            double mean = st_gaps ? st_gap_sum / st_gaps : 0;
+
             fprintf(stderr, "port: GL %d presents: %d shown, %d stale, %d no 3D, %d none; scene %lu: "
-                    "%d vertices, %d draws\n", presents, st_shown, st_stale, st_invalid, st_none,
-                    s ? s->serial : 0, s ? s->nverts : 0, s ? s->ndraws : 0);
+                    "%d vertices, %d draws; frame %d (%d shown), pools %d polygons %d spans\n",
+                    presents, st_shown, st_stale, st_invalid, st_none, s ? s->serial : 0,
+                    s ? s->nverts : 0, s ? s->ndraws : 0, s ? s->w : 0, cols,
+                    s ? s->pool_polys : 0, s ? s->pool_spans : 0);
+            fprintf(stderr, "port: GL presents every %.2f ms (sd %.2f, %.2f..%.2f); %d frames, "
+                    "a frame every %.1f ms, %d snaps, %d held, between frames %.2f..%.2f\n",
+                    mean, st_gaps ? sqrt(st_gap_sq / st_gaps - mean * mean) : 0,
+                    st_gaps ? st_gap_min : 0, st_gap_max, st_scenes, frame_dt, st_snaps, st_held,
+                    st_alpha_min < 1e8 ? st_alpha_min : 0, st_alpha_max > -1e8 ? st_alpha_max : 0);
             presents = st_shown = st_stale = st_invalid = st_none = 0;
+            st_gaps = 0;
+            st_gap_sum = st_gap_sq = st_gap_max = 0;
+            st_gap_min = 1e9;
+            st_snaps = st_held = st_scenes = 0;
+            st_alpha_min = 1e9;
+            st_alpha_max = -1e9;
             last_report = now;
         }
-    }
-    if (gl_on && s && s->valid && scene_current(s, vga)) {
-        valid = 1;
-        draw_scene(s);
-        glBindTexture(GL_TEXTURE_2D, tex_pre);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, PGL_W, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE,
-                        s->pre);
-        glBindTexture(GL_TEXTURE_2D, tex_post);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, PGL_W, PGL_H, GL_RED_INTEGER, GL_UNSIGNED_BYTE,
-                        s->post);
     }
 
     /* the composite, into the output framebuffer */
@@ -895,20 +1398,32 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
     glBindTexture(GL_TEXTURE_2D, scene_colour);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, tex_pal);
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, tex_side);
     glUniform1i(c_vga, 0);
     glUniform1i(c_pre, 1);
     glUniform1i(c_post, 2);
     glUniform1i(c_scene, 3);
     glUniform1i(c_pal, 4);
-    glUniform1i(c_valid, valid);
+    glUniform1i(c_side, 5);
+    glUniform1i(c_valid, current);
+    glUniform1i(c_gl, valid);
+    glUniform1i(c_sides, current && s->w > PGL_W);
     glUniform1i(c_smooth, smooth);
+    glUniform4f(c_map, c0, shown, dx, fw);
+    glUniform1i(c_sharp, hud_sharp);
+    glUniform2f(c_scale, rw / shown, rh / (float)PGL_H);
+    glUniform2f(c_presh, s && current ? v.presh[0] : 0.0f, s && current ? v.presh[1] : 0.0f);
     if (cross)
         glUniform3f(c_cross, cross[0] + 0.5f, cross[1] + 0.5f, 1.0f);
     else
         glUniform3f(c_cross, 0.0f, 0.0f, 0.0f);
-    if (s) {
+    if (s && current) {
         glUniform4i(c_clip, s->clip_l, s->clip_t, s->clip_r, s->clip_b);
         glUniform2i(c_bg, s->bg_fill, s->bg_colour);
+    } else {
+        glUniform4i(c_clip, 0, 0, 0, 0);
+        glUniform2i(c_bg, 0, 0);
     }
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -925,33 +1440,90 @@ void vpc_gl_present(const unsigned char *vga, const unsigned char *rgb, const in
     }
     glBlitFramebuffer(0, 0, rw, rh, rx, ry, rx + rw, ry + rh, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    record(s, rw, rh);
+    record(s, &e, rw, rh);
     SDL_GL_SwapWindow(window);
+    {
+        /* a swap the display did not wait for (a hidden window): no faster than 250 a second */
+        Uint64 now = SDL_GetTicksNS();
+
+        if (vsync && last_swap && now - last_swap < 4000000ull) {
+            SDL_DelayNS(4000000ull - (now - last_swap));
+            now = SDL_GetTicksNS();
+        }
+        if (debug && last_swap) {
+            double gap = (double)(now - last_swap) / 1e6;
+
+            st_gaps++;
+            st_gap_sum += gap;
+            st_gap_sq += gap * gap;
+            if (gap < st_gap_min)
+                st_gap_min = gap;
+            if (gap > st_gap_max)
+                st_gap_max = gap;
+        }
+        last_swap = now;
+    }
+}
+
+static int save_rgba(const char *path, const unsigned char *px, int w, int h, int flip)
+{
+    SDL_Surface *surf = SDL_CreateSurface(w, h, SDL_PIXELFORMAT_RGBA32);
+    int y, ok;
+
+    if (surf == NULL)
+        return -1;
+    for (y = 0; y < h; y++)
+        memcpy((unsigned char *)surf->pixels + (size_t)y * surf->pitch,
+               px + (size_t)(flip ? h - 1 - y : y) * w * 4, (size_t)w * 4);
+    ok = SDL_SaveBMP(surf, path);
+    SDL_DestroySurface(surf);
+    return ok ? 0 : -1;
 }
 
 int vpc_gl_screenshot(const char *path)
 {
-    SDL_Surface *surf;
     unsigned char *px;
-    int y, ok;
+    int ok;
 
     if (!ready || fbo_w == 0)
         return -1;
     SDL_GL_MakeCurrent(window, context);
     px = malloc((size_t)fbo_w * fbo_h * 4);
-    surf = SDL_CreateSurface(fbo_w, fbo_h, SDL_PIXELFORMAT_RGBA32);
-    if (px == NULL || surf == NULL) {
-        free(px);
+    if (px == NULL)
         return -1;
-    }
     glBindFramebuffer(GL_READ_FRAMEBUFFER, out_fbo);
     glReadPixels(0, 0, fbo_w, fbo_h, GL_RGBA, GL_UNSIGNED_BYTE, px);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    for (y = 0; y < fbo_h; y++)
-        memcpy((unsigned char *)surf->pixels + (size_t)y * surf->pitch,
-               px + (size_t)(fbo_h - 1 - y) * fbo_w * 4, (size_t)fbo_w * 4);
+    ok = save_rgba(path, px, fbo_w, fbo_h, 1);
     free(px);
-    ok = SDL_SaveBMP(surf, path);
-    SDL_DestroySurface(surf);
-    return ok ? 0 : -1;
+    return ok;
+}
+
+/* the last scene's wide frame as the software renderer drew it, the game's screen in its
+   middle (rgb: the palette), w x 200; -1 when the last present showed no wide frame */
+int vpc_gl_screenshot_wide_sw(const char *path, const unsigned char *rgb)
+{
+    const pgl_scene *s = last_scene;
+    unsigned char *px;
+    int x, y, ok;
+
+    if (s == NULL || s->w <= PGL_W)
+        return -1;
+    px = malloc((size_t)s->w * PGL_H * 4);
+    if (px == NULL)
+        return -1;
+    for (y = 0; y < PGL_H; y++)
+        for (x = 0; x < s->w; x++) {
+            int gx = x - s->dx;
+            unsigned c = gx >= 0 && gx < PGL_W ? s->vga[y * PGL_W + gx] : s->side[y * s->w + x];
+            unsigned char *p = px + ((size_t)y * s->w + x) * 4;
+
+            p[0] = rgb[c * 3];
+            p[1] = rgb[c * 3 + 1];
+            p[2] = rgb[c * 3 + 2];
+            p[3] = 255;
+        }
+    ok = save_rgba(path, px, s->w, PGL_H, 0);
+    free(px);
+    return ok;
 }

@@ -78,6 +78,25 @@ extern s32 xn_cam_focal_x, xn_cam_inv_focal_x;  /* pixels; 2^38 / focal_x */
 extern s32 xn_cam_focal_y, xn_cam_inv_focal_y;
 extern s32 xn_cam_scale_x, xn_cam_inv_scale_x;  /* focal * 2^14 / half size; 2^45 / scale */
 extern s32 xn_cam_scale_y, xn_cam_inv_scale_y;
+#ifdef DAGGER_PORT
+/* xn_mulhi(a, xn_cam_inv_scale_x): a * 2^13 / scale. The wide pass (port/engine_gl/wide.c)
+   widens the half width to the focal and past it, where 2^45 / scale no longer fits in 32
+   bits (it is 2^31 at a half width of 200, 0 past 400): there the quotient in 64 bits */
+static __inline__ s32 xn_cam_unscale_x(s32 a)
+{
+    int64_t n, q;
+
+    if (xn_cam_scale_x > 16384)
+        return xn_mulhi(a, xn_cam_inv_scale_x);
+    if (xn_cam_scale_x <= 0)
+        return 0;
+    n = (int64_t)a * 8192;
+    q = n / xn_cam_scale_x;
+    if (n % xn_cam_scale_x < 0)
+        q--;                            /* the floor, as xn_mulhi's shift */
+    return (s32)q;
+}
+#endif
 extern s32 xn_cam_hfov_cos, xn_cam_hfov_sin;    /* the side planes' normals, 16.16 */
 extern s32 xn_cam_vfov_cos, xn_cam_vfov_sin;
 extern s32 xn_cam_flat_scale_x, xn_cam_flat_scale_y;       /* unaligned (0xCEA99, 0xCEA9D) */

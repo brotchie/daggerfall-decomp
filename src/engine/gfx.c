@@ -110,9 +110,17 @@ void xn_gfx_drv0_present(s32 keep)
     s32 top, offset;
     u32 n;
 
+#ifdef DAGGER_PORT
+    /* the frame goes to OpenGL after the copy, with the picture it is shown with (vpc_gl.c) */
+    if ((s8)xn_gfx_present_mode <= 0) {
+        XN_GLCAP(xn_glcap_present());
+        return;
+    }
+#else
     XN_GLCAP(xn_glcap_present());
     if ((s8)xn_gfx_present_mode <= 0)
         return;
+#endif
     if (xn_gfx_present_mode == 3) {
         /* the linear frame buffer: show the page drawn, draw into the next */
         xn_gfx_vesa_set_display_start(0, xn_gfx_vesa_page * xn_gfx_height);
@@ -134,6 +142,9 @@ void xn_gfx_drv0_present(s32 keep)
         xn_gfx_copy_rows(VGA_MEMORY + offset, screen_buffer + offset, n);
     else
         copy_and_clear(VGA_MEMORY + offset, screen_buffer + offset, n);
+#ifdef DAGGER_PORT
+    XN_GLCAP(xn_glcap_present());
+#endif
 }
 
 void xn_gfx_drv0_shutdown(void)

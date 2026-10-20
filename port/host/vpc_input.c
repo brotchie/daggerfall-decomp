@@ -227,6 +227,8 @@ static struct {
     double mx, my;                      /* mickeys not yet read */
     double rem_x, rem_y;                /* the fractions fn 0Bh left at its last read (the
                                            view's smooth look: pgl_mouse_remainder) */
+    double used_x, used_y;              /* the mickeys fn 0Bh has given, all told (OpenGL's
+                                           late look: pgl_mouse_used, pgl_mouse_total) */
     int buttons;
     int minx, maxx, miny, maxy;
     int ratio_x, ratio_y;               /* mickeys per 8 pixels */
@@ -550,6 +552,8 @@ static void mouse_service(struct vpc_regs *r)
         mouse.my -= my;
         mouse.rem_x = mouse.mx;
         mouse.rem_y = mouse.my;
+        mouse.used_x += mx;
+        mouse.used_y += my;
         SET(r->ecx, mx);
         SET(r->edx, my);
         break;
@@ -615,6 +619,22 @@ void pgl_mouse_remainder(double *rx, double *ry)
     SDL_LockMutex(mouse_lock);
     *rx = mouse.rem_x;
     *ry = mouse.rem_y;
+    SDL_UnlockMutex(mouse_lock);
+}
+
+void pgl_mouse_used(double *x, double *y)
+{
+    SDL_LockMutex(mouse_lock);
+    *x = mouse.used_x;
+    *y = mouse.used_y;
+    SDL_UnlockMutex(mouse_lock);
+}
+
+void pgl_mouse_total(double *x, double *y)
+{
+    SDL_LockMutex(mouse_lock);
+    *x = mouse.used_x + mouse.mx;
+    *y = mouse.used_y + mouse.my;
     SDL_UnlockMutex(mouse_lock);
 }
 

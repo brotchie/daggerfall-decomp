@@ -461,8 +461,14 @@ void xn_poly_setup_textured(struct xn_poly *poly, const struct xn_span *span, s3
     d = poly->inv_z_dx;
     if ((s32)d < 0)
         d = 0u - d;
+#ifdef DAGGER_PORT
+    /* the wide pass (port/engine_gl/wide.c) draws mode 13h's columns: its routines too */
+    if ((d >> (xn_gfx_width == 320 || port_wide_cols ? 18 : 25)) == 0)
+        kind += 12;
+#else
     if ((d >> (xn_gfx_width == 320 ? 18 : 25)) == 0)
         kind += 12;
+#endif
     poly->span_fn = xn_render_tmap_span_fns[kind / 4];
     xn_poly_tex_gradients((const xn_mat3 *)poly->handle->matrix, XN_FACE_DATA(poly->face),
                           poly);

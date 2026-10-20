@@ -33,13 +33,21 @@
 #include "port_gl.h"
 
 extern struct xn_vert_cam xn_vert_cam[1024];        /* indexed by byte offset (index * 12) */
+/* the wide pass's (port/engine_gl/wide.c) */
+extern struct xn_poly port_poly_pool[];
+extern u8 port_wide_buffer[];
+extern double port_game_ms;
+extern s32 xn_cam_roll;                 /* the game's (the eye's roll, 2048ths of a turn) */
+extern unsigned char *port_low_memory;  /* the virtual PC's: the VGA at 0xA0000 */
 
-#define POOL 1000
-#define MAX_CAM 40000
+#define POOL PORT_POLY_POOL             /* the larger pool's records */
+#define MAX_CAM 160000
 
 enum { CAP_WORLD = 1, CAP_FLAT };
 
 /* what the hooks saw of each pool record this frame */
+extern struct xn_span port_span_pool[];
+
 static struct cap {
     unsigned int gen;
     int kind;
@@ -55,14 +63,26 @@ static unsigned long serial;
 
 static int on(void)
 {
-    return pgl_enabled && xn_gfx_width == PGL_W && xn_gfx_height == PGL_H;
+    return pgl_enabled && xn_gfx_height == PGL_H &&
+           (xn_gfx_width == PGL_W || (port_wide_cols && xn_gfx_width == port_wide_cols));
+}
+
+/* the frame's polygon pool: the game's, or the wide pass's larger one */
+static struct xn_poly *pool_base(void)
+{
+    return port_wide_cols ? port_poly_pool : xn_render_poly_pool;
+}
+
+static int pool_size(void)
+{
+    return port_wide_cols ? PORT_POLY_POOL : 1000;
 }
 
 static struct cap *cap_of(const void *record)
 {
-    ptrdiff_t i = (const struct xn_poly *)record - xn_render_poly_pool;
+    ptrdiff_t i = (const struct xn_poly *)record - pool_base();
 
-    if (i < 0 || i >= POOL)
+    if (i < 0 || i >= pool_size())
         return 0;
     return &caps[i];
 }
@@ -165,7 +185,7 @@ void xn_glcap_pre(void)
 {
     if (!on())
         return;
-    memcpy(pgl_building()->pre, screen_buffer, PGL_W * PGL_H);
+    memcpy(pgl_building()->pre, screen_buffer, (size_t)xn_gfx_width * PGL_H);
 }
 
 /* ---- the frame ------------------------------------------------------------------------------ */
@@ -417,7 +437,7 @@ static xn_span_fn finish_ground(struct xn_poly *p, xn_span_fn fn)
 
 static void world_poly(int index, int fog)
 {
-    struct xn_poly *p = &xn_render_poly_pool[index];
+    struct xn_poly *p = &pool_base()[index];
     const struct cap *c = &caps[index];
     xn_span_fn fn = p->span_fn;
     how h;
@@ -550,6 +570,8 @@ void xn_glcap_end_frame(void)
     S->ndraws = 0;
     S->valid = 1;
     S->serial = ++serial;
+    S->w = xn_gfx_width;
+    S->dx = port_wide_cols ? port_wide_dx : 0;
     S->cx = (float)xn_cam_centre_x;
     S->cy = (float)xn_cam_centre_y;
     S->hw = (float)xn_cam_half_width;
@@ -560,7 +582,13 @@ void xn_glcap_end_frame(void)
     S->focal_y = (float)xn_cam_focal_y;
     S->cam_yaw = xn_cam_yaw;
     S->cam_pitch = xn_cam_pitch;
+    S->cam_roll = xn_cam_roll;
+    S->cam_x = xn_cam_x;
+    S->cam_y = xn_cam_y;
+    S->cam_z = xn_cam_z;
+    S->game_ms = port_game_ms;
     pgl_mouse_remainder(&S->mouse_rem_x, &S->mouse_rem_y);
+    pgl_mouse_used(&S->mouse_used_x, &S->mouse_used_y);
     /* the 3D window: the rows the frame loop draws (from the clip top to as far below the
        view centre as that is above it, Q-RENDER-05) within the clip window, and the columns
        of the view within it. Rows below are not the 3D pass's even inside the clip window
@@ -575,8 +603,8 @@ void xn_glcap_end_frame(void)
         S->clip_b = xn_gfx_clip_bottom;
     if (S->clip_l < 0)
         S->clip_l = 0;
-    if (S->clip_r > PGL_W)
-        S->clip_r = PGL_W;
+    if (S->clip_r > S->w)
+        S->clip_r = S->w;
     if (S->clip_b > PGL_H)
         S->clip_b = PGL_H;
     S->bg_fill = !(xn_render_frame_flags & 2);
@@ -592,13 +620,16 @@ void xn_glcap_end_frame(void)
     if (xn_light_falloff)
         memcpy(S->falloff, xn_light_falloff, sizeof S->falloff);
 
-    for (i = 1; i < (int)(xn_render_poly_next - xn_render_poly_pool) && i < POOL; i++)
+    S->pool_polys = (int)(xn_render_poly_next - pool_base());
+    S->pool_spans = (int)(xn_render_span_next - (port_wide_cols ? port_span_pool :
+                                                 xn_render_span_rows + PGL_H));
+    for (i = 1; i < S->pool_polys && i < pool_size(); i++)
         if (caps[i].gen == gen && caps[i].kind == CAP_WORLD)
             world_poly(i, fog);
     for (i = 0; i < xn_flat_count && i < 512; i++)
         flat_quad((const struct xn_flat *)xn_flat_sort_list[i].value);
 
-    memcpy(S->post, screen_buffer, PGL_W * PGL_H);
+    memcpy(S->post, screen_buffer, (size_t)S->w * PGL_H);
     scene_done = 1;
 }
 
@@ -610,7 +641,16 @@ void xn_glcap_present(void)
 {
     if (!pgl_enabled)
         return;
+    pgl_present_serial++;
     if (scene_done) {
+        /* with the picture the present showed (the HUD over this frame), and a wide frame as
+           the game left it (its weather drawn over it after the 3D pass) */
+        S = pgl_building();
+        memcpy(S->vga, port_low_memory + 0xA0000, PGL_W * PGL_H);
+        if (S->w > PGL_W)
+            memcpy(S->side, port_wide_buffer, (size_t)S->w * PGL_H);
+        S->present_serial = pgl_present_serial;
+        S->host_ns = pgl_now_ns();
         pgl_publish();
         scene_done = 0;
     }

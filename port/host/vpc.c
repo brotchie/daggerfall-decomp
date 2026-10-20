@@ -182,7 +182,8 @@ int vpc_run(int (*fn)(void *), void *arg)
     }
     SDL_DetachThread(t);
     while (!SDL_GetAtomicInt(&game_done)) {
-        SDL_WaitEventTimeout(NULL, 2);
+        /* with vsync the present waits for the display instead */
+        SDL_WaitEventTimeout(NULL, vpc_video_paced() ? 0 : 2);
         pump();
         if (vpc_quit_requested) {
             /* the game stops at its next port access; one in a loop without any, soon after */

@@ -48,6 +48,9 @@ extern void xn_mat_from_angles(int, int, int, void *);
 extern void xn_mat_transform_ptr(int *, int *, int *, void *);
 extern void xn_cam_project_ptr(int, int, int, int *, int *);
 extern void xn_cam_scale_matrix(void *, void *);
+#ifdef DAGGER_PORT
+extern int xn_gfx_width;    /* the wide pass's frame (port/engine_gl/wide.c), else 320 */
+#endif
 
 void sky_update(void)
 {
@@ -170,13 +173,21 @@ void sky_update(void)
             sky_draw_day(screen_y, horizon_y, daylight, climate);
             return;
         }
+#ifdef DAGGER_PORT
+        mc_memset((void *)screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y) * xn_gfx_width, D_00170A86, 251, 4);
+#else
         mc_memset((void *)screen_buffer, (int)(unsigned char)*(signed char *)(((char *)D_00195CF4)), ((((int)(unsigned short)(game_settings->view_flags & 1)) != 0) ? 199 : hud_bar_image->y) * 320, D_00170A86, 251, 4);
+#endif
     } else {
         sky_draw_night(screen_y, horizon_y);
     }
     if (horizon_row == 0) return;
     if (daylight == 0 && ((int)(unsigned char)weather) > 1) {
+#ifdef DAGGER_PORT
+        mc_memset((void *)screen_buffer, 223, xn_gfx_width * 200, D_00170A86, 262, 4);
+#else
         mc_memset((void *)screen_buffer, 223, 64000, D_00170A86, 262, 4);
+#endif
         sun_light = 0;
         return;
     }

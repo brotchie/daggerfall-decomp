@@ -217,7 +217,11 @@ int xn_cam_cull_sphere(s32 x, s32 y, s32 z, s32 radius, s32 *residue)
     if (v.y < -v.z)
         code |= 8;
     /* the centre unscaled, for the pick */
+#ifdef DAGGER_PORT
+    xn_pick_view_x = xn_cam_unscale_x(v.x * 2);       /* (a wide view: xpipe.h) */
+#else
     xn_pick_view_x = xn_mulhi(v.x * 2, xn_cam_inv_scale_x);
+#endif
     xn_pick_view_y = xn_mulhi(v.y * 2, xn_cam_inv_scale_y);
     *residue = XN_LOW32(v.y * 2, xn_cam_inv_scale_y);  /* Quirk Q-CAM-02: the leftovers */
     pick_distance = v.z;

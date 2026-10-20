@@ -682,7 +682,11 @@ void xn_model_scale_matrix(struct xn_model_matrix_slot *slot)
     int k;
 
     for (k = 0; k < 3; k++) {
+#ifdef DAGGER_PORT
+        light[k] = xn_cam_unscale_x(m[k]) * 2;
+#else
         light[k] = xn_mulhi(m[k], xn_cam_inv_scale_x) * 2;
+#endif
         m[k] = xn_mulhi(light[k], focal_x);
     }
     for (k = 3; k < 6; k++) {

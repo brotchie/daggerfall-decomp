@@ -198,6 +198,142 @@ Not yet:
 - Translucent flats are a dither, not the blend table.
 - macOS only (`<OpenGL/gl3.h>`); another platform needs a GL loader.
 
+## Widescreen and smooth motion
+
+`fall --wide` (or `PORT_GL=1 PORT_GL_ASPECT=fill`) fills the window with the 3D view, however
+wide it is, and with OpenGL every refresh of the display shows a picture with the eye where it
+is at that moment, not only the ~54 frames a second the game draws. Both are settings
+(`<overlay>/settings.txt`, each overridden by its environment variable):
+
+| Setting | settings.txt | Environment | Key | Default |
+|---|---|---|---|---|
+| the view's shape | `aspect=4:3\|fill` | `PORT_GL_ASPECT` | Shift+F11 switches | `4:3` |
+| the widest horizontal view, degrees (0: none) | `fov_max=N` | `PORT_GL_FOV_MAX` | | `110` |
+| how the 320x200 pixels scale | `hud_filter=sharp\|nearest` | `PORT_GL_HUD_FILTER` | | `sharp` |
+| presents paced by the display | `vsync=on\|adaptive\|off` | `PORT_GL_VSYNC` | | `on` |
+| smooth motion | `interpolate=on\|off` | `PORT_GL_INTERP` | Shift+F10 switches | `on` |
+| the margin each side for smooth motion, columns | `overscan=N` | `PORT_GL_OVERSCAN` | | `24` |
+
+The keys save their setting. The settings file keeps every line now (`launch_set_setting`);
+it used to hold only `game=`.
+
+**The wide pass** (`port/engine_gl/wide.c`, on the game's thread). The game draws into a
+320x200 screen, and so does the engine, so the port widens the engine around the world's
+drawing instead: `game_frame` calls `port_wide_enter` before `sky_update` and
+`port_wide_exit` after `world_render` (src/lifted/main.c, `DAGGER_PORT`). In between the
+engine draws into a W x 200 frame (`port_wide_buffer`) whose middle 320 columns start as the
+game's screen and go back into it at the end, with the view window as wide as the frame
+(`xn_cam_set_view_window(W/2, hh, W/2, cy)`) and the focal the game's: the vertical field of
+view stays the game's and the horizontal one widens (Hor+). A 320x200 picture at 4:3 has
+pixels 1.2 times as tall as wide, so a view of aspect A is 240 * A columns: 428 at 16:9 (94
+degrees), 570 at 21:9 (110 degrees; `fov_max` stops it there and pillarboxes a wider window),
+1024 at most (the ray tables cover 1024 columns). The HUD, the weapon and the pick run on the
+game's screen as they always did. What the frame needed:
+- the sky: `sky_draw_day`/`_night` draw a wide frame's sky straight into it
+  (`sky_draw_wide`, src/lifted/sky.c): the original's window shows panorama column
+  `column + k` at screen column k up to column 510 and then the next section's from 0 (it
+  copies `511 - column` columns: column 511 is never shown), and the columns either side carry
+  on the same way, 511 a section, with the original's choice of image per section;
+  `sky_update`'s fills are as wide as the frame;
+- the pools: the engine takes its polygons, spans and light lists from pools sized for 320
+  columns, with no bounds (the polygon pool runs straight into the span rows). A wide frame
+  takes larger ones of its own (`port_poly_pool` 6000, `port_span_pool` 60000,
+  `port_light_pool` 9600; `xn_render_begin_frame`), and the light shaders' bytes past
+  big_buffer's 100 KB (Q-LIGHT-07) go to a sink (light.c);
+- `xn_poly_setup_textured` keeps mode 13h's choice of 8- and 16-pixel routines (it tested
+  `xn_gfx_width == 320`);
+- 2^45 / scale_x (`xn_cam_inv_scale_x`) is 2^31 at a half width of 200, the focal: past
+  398 columns it no longer fits in 32 bits, and the models' unscaled matrix
+  (`xn_model_scale_matrix`, the textures' gradients) and the sphere test's pick point came
+  out wrong (textures stretched across every model). `xn_cam_unscale_x` (xpipe.h) divides in
+  64 bits there;
+- the pick (`xn_render_pick`) reads the S-buffer the last frame left: after a wide frame it
+  runs in the wide frame's view, the point moved to its column (`port_wide_pick_begin`);
+- the weather: the game draws its rain and snow over its own columns after the 3D pass; the
+  sides get as many streaks and flakes of their own, from a generator of their own
+  (`port_wide_weather`, from `weather_draw_precipitation`), so the engine's random numbers
+  are as they were.
+
+The middle 320 columns are the original's pass in their geometry, not in every texel: the
+spans of a polygon that crosses the 320-column view's left or right edge start farther out
+in the wide frame (the span routines step their perspective every 8 or 16 pixels from a
+span's start), and a face's texture origin goes through the view's scaling, whose rounding
+changes with the half width, so a whole face can land a texel over (2-4% of the pixels). The
+geometry must agree. `PORT_GL_WIDE_CHECK=N` checks it: every Nth wide frame the game's thread
+forks at the frame's start, the copy draws the frame the original way and hands its screen
+and its depth (1/z of what covers each pixel, from the S-buffer's spans as the pick reads
+them) back through shared memory, and the two are compared (`pgl_share.c`): more than 1% of
+the pixels at another depth (beyond 1/32), or 0.5% of the uncovered ones (the sky) in another
+colour, is a failure; the first failure's screens and depths are saved as
+`wide_check_*.pgm`. `PORT_WEATHER=4` or `5` draws rain or snow whatever the weather, to look
+at the sides' (port/host/main.c).
+
+**The picture** (`port/host/vpc_gl.c`). With `aspect=fill` the window's rectangle is its
+whole height and 240 * A columns of the frame wide; the scene's framebuffers are that size,
+and the vertex shader maps the frame's columns into it. The composite works in frame pixels:
+the game's screen is the 4:3 column in the middle, the full height of the window (the HUD,
+menus and screens over it, at their 320x200 resolution), as before; beside it the wide frame
+as the game left it (`side`: the software pixels, the weather), with the OpenGL scene where
+the 3D pass's pixel is still there, within the 3D window's rows. Below them (the HUD bar's
+rows), and beside a screen with no 3D frame (the title, a menu), the sides are black. With
+F11 the sides are the software renderer's wide frame. `hud_filter=sharp` scales the 320x200
+pixels whole, blending neighbours only over the window pixel that straddles their edge, so a
+scale that is not a whole number (7.2 at 1440 rows) has no uneven rows. The mouse's mapping is
+the 4:3 column's, as before (`picture_scale`).
+
+**Smooth motion** (`vpc_gl.c`):
+1. *The hand-over.* `xn_glcap_present` runs after `xn_gfx_drv0_present` has copied the frame
+   to the VGA (it ran before: the main thread could pair a new scene with the last picture),
+   and the scene keeps that picture (`vga`): while no present has come since
+   (`pgl_present_serial`), the composite shows the scene's copy, never half of the next.
+2. *The pacing.* With `vsync=on` the main thread presents at every pass and the swap waits for
+   the display's refresh (no 2 ms event wait; at most 250 presents a second when the window
+   is hidden and the swap does not wait).
+3. *The clock.* Each scene carries the eye (`xn_cam_x/y/z`, pitch, yaw, roll) and the game's
+   clock: its frame times summed (`port_game_ms`, the time `frame_ticks` moves the player
+   by). The main thread keeps the last 8 eyes, and maps the host's clock to the game's
+   (smoothed); a present draws the eye of a frame and a half ago (between the two frames
+   around it, interpolated: position linearly, angles the short way round) and never
+   further back than the last present. A jump (more than 4000 units, a third of a turn,
+   250 ms) starts again without blending.
+4. *Re-posing.* The latest frame's geometry is drawn from that eye: camera space back to the
+   world with the frame's rotation (the engine's own formula, `xn_mat_from_angles`, in
+   floating point), into the eye's with its rotation, `c' = S Rt Rs^T S^-1 c + S Rt (eye_s -
+   eye_t) << 8` (S: the view's scaling, focal / half size), one matrix and a shift for the
+   vertex shader. The light shaders and the fog keep the frame's camera space; the depth is
+   the new one. The sky backdrop moves with it (the panorama a column a step of yaw, the
+   horizon focal_y tan(pitch)).
+5. *Late look.* While the mouse looks around, the view's angles are the mouse's now: every
+   mickey the game has not read into the frame's angles yet is added (the driver counts what
+   fn 0Bh has handed over, `pgl_mouse_used`, and what is waiting, `pgl_mouse_total`), up to 64
+   steps. Turning shows no delay; walking shows the frame and a half's.
+6. *The margin.* A view moved this way shows a strip at the side the frame never drew: the
+   wide pass draws `overscan` columns past each side (24: about 3 degrees at a 16:9 view's
+   edge), which the window does not show. With 4:3 and smooth motion the wide pass runs too,
+   for those columns. Vertically the scene is drawn 0.85% larger while the mouse looks around,
+   as before.
+
+What stays at the game's rate: creatures, flats' animation, projectiles, the HUD and the
+weapon. They are the latest frame's, so they hold still on the screen while the eye moves
+smoothly past them. Smooth motion off (`interpolate=off`) is the earlier smooth look: the
+fraction of a step the mouse's last read left.
+
+Checks:
+- `tools/port_gl_shots.py --aspect 4:3,16:9,21:9` (windows 960x720, 1280x720, 1680x720 points;
+  smooth motion off, so the shots are the frames as drawn): the 4:3 column scored against the
+  game's screen as before, and the sides against the software renderer's wide frame
+  (`gl_T_swwide.bmp`, `PORT_GL_SW_SHOTS`).
+- `PORT_GL_WIDE_CHECK=N` over the saves (above).
+- `tools/port_gl_motion.py run [--interp on|off] [NAME]` walks and turns with `PORT_GL_RECORD`
+  (whose header now has the eye each present was drawn from) and measures the eye's step per
+  present, and the picture's shift per present turning.
+- `tools/port_monkey.py` (random keys, clicks, mouse motion, `--resize`d windows) with
+  AddressSanitizer.
+- `PORT_GL_DEBUG=1` adds the presents' spacing, the frames' rate, snaps, the interpolation's
+  range, the frame's width and its pools' use. F8 reports carry the view's settings
+  (`meta.json`'s `view`).
+- `PORT_WINDOW=WxH` sets the window's first size; `PORT_SCRIPT`'s `resize W H` changes it.
+
 ## Modern controls
 
 `fall --modern` (or `PORT_CONTROLS=modern`) plays with mouse look and WASD. It is the game's
