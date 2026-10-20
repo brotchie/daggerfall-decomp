@@ -47,8 +47,12 @@ static void backtrace_stderr(void)
 
 void port_unimplemented(const char *name)
 {
+    char what[256];
+
     fprintf(stderr, "port: %s is not in the native build yet\n", name);
     backtrace_stderr();
+    snprintf(what, sizeof what, "stub: %s is not in the native build yet", name);
+    report_crash(what, 0, NULL, __builtin_return_address(0));
     shutdown_for_abort();
     abort();
 }
@@ -63,6 +67,14 @@ void port_fatal(const char *fmt, ...)
     va_end(ap);
     fprintf(stderr, "\n");
     backtrace_stderr();
+    {
+        char what[512];
+
+        va_start(ap, fmt);
+        vsnprintf(what, sizeof what, fmt, ap);
+        va_end(ap);
+        report_crash(what, 0, NULL, __builtin_return_address(0));
+    }
     shutdown_for_abort();
     abort();
 }
@@ -91,6 +103,9 @@ static void on_fault(int sig, siginfo_t *info, void *ucontext)
 
     write(2, msg, sizeof msg - 1);
     backtrace_stderr();
+    /* the report (it becomes the uploader when the build has a service) */
+    report_crash("fatal signal", sig, info ? info->si_addr : NULL,
+                 ucontext ? (void *)((ucontext_t *)ucontext)->uc_mcontext->__ss.__pc : NULL);
     signal(sig, SIG_DFL);
     raise(sig);
 }
@@ -114,4 +129,5 @@ void host_install_fault_handlers(void)
     sigaction(SIGILL, &sa, NULL);
     sigaction(SIGFPE, &sa, NULL);
     sigaction(SIGTRAP, &sa, NULL);      /* libmalloc's checks (heap corruption) trap */
+    sigaction(SIGABRT, &sa, NULL);      /* abort(): a failed check, the C library's */
 }

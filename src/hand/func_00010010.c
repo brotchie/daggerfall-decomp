@@ -53,6 +53,10 @@ extern void func_0009DB3F(void (*)(void));
 #pragma aux func_0009DBFE parm routine [];
 extern void func_0009DBFE(void (*)(void));
 
+#ifdef DAGGER_PORT
+extern void port_frame_hook(void);
+#endif
+
 int func_00010010(short argc, char **argv)
 {
     int fps;
@@ -105,6 +109,9 @@ restart:
     xn_sys_zero_page_save();
     engine_running = 1;
     for (;;) {
+#ifdef DAGGER_PORT
+        port_frame_hook();      /* a feedback report's save (port/host/main.c) */
+#endif
         frame_checkpoint = 0;
         game_frame();
         frame_checkpoint = 1;

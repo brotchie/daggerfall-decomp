@@ -25,6 +25,21 @@
 static char game_dir[1024] = ".";
 static char overlay_dir[1024] = ".";
 
+/* a save slot's folder sent elsewhere (dos_redirect_dir): a feedback report has the game save
+   into its own folder, not the player's slot */
+static char redirect_name[64];
+static char redirect_root[1024];
+
+void dos_redirect_dir(const char *name, const char *root)
+{
+    if (name == NULL || root == NULL) {
+        redirect_name[0] = '\0';
+        return;
+    }
+    snprintf(redirect_root, sizeof redirect_root, "%s", root);
+    snprintf(redirect_name, sizeof redirect_name, "%s", name);
+}
+
 void dos_set_dirs(const char *game, const char *overlay)
 {
     snprintf(game_dir, sizeof game_dir, "%s", game);
@@ -63,6 +78,16 @@ static int resolve(const char *root, char comp[][64], int n, char *out, size_t s
 {
     int i, exists = 1;
 
+    /* the redirected folder: the overlay's is the redirect's root, the install has none */
+    if (redirect_name[0] && n > 0 && strcasecmp(comp[0], redirect_name) == 0) {
+        if (root == game_dir) {
+            snprintf(out, size, "%s", redirect_root);
+            return 0;
+        }
+        root = redirect_root;
+        comp++;
+        n--;
+    }
     snprintf(out, size, "%s", root);
     for (i = 0; i < n; i++) {
         size_t len = strlen(out);

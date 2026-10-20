@@ -20,6 +20,19 @@ int port_rand(void)
 
 void port_srand(unsigned int seed)
 {
+    /* the first seed is main's, from the BIOS clock: a report's log has it, and PORT_SRAND=N
+       sets it, for a report's input replayed (report.c). The game seeds again and again after
+       (its generators): those stay as they are. */
+    static int first = 1;
+
+    if (first) {
+        const char *forced = getenv("PORT_SRAND");
+
+        first = 0;
+        if (forced && *forced)
+            seed = (unsigned int)strtoul(forced, NULL, 0);
+        report_note("srand %u (the session's first seed: PORT_SRAND=%u replays it)", seed, seed);
+    }
     rand_next = seed;
 }
 

@@ -65,7 +65,7 @@ int vpc_screenshot(const char *path);
 /* The scripted driver (vpc_script.c), for runs without a person: PORT_SCRIPT is a timeline,
    "SECONDS COMMAND [ARGS]" steps separated by ';' (seconds since start-up):
      shot FILE.bmp | key NAME (SDL's key names: Return, Escape, Up, A ...) | down NAME |
-     up NAME | type TEXT | click X Y (mode 13h pixels) | rclick X Y | move X Y | mrel DX DY
+     up NAME | type TEXT | click X Y (mode 13h pixels) | rclick X Y | move X Y | feedback (F8) | crash (a test) | mrel DX DY
      (relative motion in game pixels, fractions kept, as a real mouse) | mdown B | mup B (mouse
      button B held, let go: 0 left, 1 right, 2 middle) | quit
    PORT_SHOT_EVERY=SECONDS with PORT_SHOT_DIR=DIR saves the screen that often (shot_NNNN.bmp);
@@ -164,6 +164,12 @@ void vpc_set_view_probe(int (*probe)(int *cx, int *cy));
    the pitch now): OpenGL then adds the fraction of a step the mouse had moved past the
    engine's whole angles (2048 a turn), so the view turns smoothly */
 void vpc_set_look_probe(int (*probe)(int *reverse, int *pitch));
+/* for reports (port/host/report.c): the script clock's start, the VGA's 320x200 picture as a
+   .bmp, the DAC's 256 x 3 six-bit components, the window letting go of the mouse */
+uint64_t vpc_script_start_ns(void);
+int vpc_screenshot_vga(const char *path);
+const unsigned char *vpc_video_dac(void);
+void vpc_input_release_mouse(void);
 void vpc_video_init(const char *title);
 void vpc_video_shutdown(void);
 unsigned char vpc_video_inb(unsigned int port);

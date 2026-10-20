@@ -18,6 +18,7 @@
 #include <SDL3/SDL.h>
 
 #include "port_gl.h"
+#include "port_host.h"
 #include "port_vpc.h"
 
 /* ---- scan code set 1 ----------------------------------------------------------------------- */
@@ -302,6 +303,63 @@ static void set_capture(SDL_Window *w, int on)
 
 static int handle_event(const void *ev);
 
+void vpc_input_release_mouse(void)
+{
+    SDL_Window *w = SDL_GetMouseFocus();
+
+    if (w == NULL)
+        w = SDL_GetKeyboardFocus();
+    SDL_LockMutex(mouse_lock);
+    set_capture(w, 0);
+    SDL_UnlockMutex(mouse_lock);
+}
+
+/* ---- the session's input, for reports: PORT_SCRIPT steps (report_input) ------------------- */
+
+static double rec_dx, rec_dy;           /* motion not yet written */
+static Uint64 rec_last;
+
+static void rec_flush_motion(void)
+{
+    char step[64];
+
+    if (rec_dx == 0 && rec_dy == 0)
+        return;
+    snprintf(step, sizeof step, "mrel %.3f %.3f", rec_dx, rec_dy);
+    report_input(step);
+    rec_dx = rec_dy = 0;
+}
+
+static void rec_motion(double gx, double gy)
+{
+    Uint64 now = SDL_GetTicksNS();
+
+    rec_dx += gx;
+    rec_dy += gy;
+    if (now - rec_last >= 20000000ull) {        /* at most one step every 20 ms */
+        rec_flush_motion();
+        rec_last = now;
+    }
+}
+
+static void rec_key(SDL_Scancode sc, int down)
+{
+    char step[96];
+
+    rec_flush_motion();
+    snprintf(step, sizeof step, "%s %s", down ? "down" : "up", SDL_GetScancodeName(sc));
+    report_input(step);
+}
+
+static void rec_button(int b, int down)
+{
+    char step[32];
+
+    rec_flush_motion();
+    snprintf(step, sizeof step, "%s %d", down ? "mdown" : "mup", b);
+    report_input(step);
+}
+
 int vpc_input_handle_event(const void *ev)
 {
     int r;
@@ -329,6 +387,8 @@ static int handle_event(const void *ev)
         code = set1(e->key.scancode);
         if (code == 0)
             return 1;
+        if (!e->key.repeat)
+            rec_key(e->key.scancode, e->type == SDL_EVENT_KEY_DOWN);
         if (code & 0x100)
             kq_put(0xE0);
         kq_put((unsigned char)((code & 0x7F) | (e->type == SDL_EVENT_KEY_UP ? 0x80 : 0)));
@@ -348,6 +408,7 @@ static int handle_event(const void *ev)
 
             mouse.mx += ax;
             mouse.my += ay;
+            rec_motion(gx, gy);
         }
         mouse.x = clampd(mouse.x + gx * units_x(), mouse.minx, mouse.maxx);
         mouse.y = clampd(mouse.y + gy, mouse.miny, mouse.maxy);
@@ -364,6 +425,7 @@ static int handle_event(const void *ev)
         }
         if (b < 0)
             return 1;
+        rec_button(b, e->type == SDL_EVENT_MOUSE_BUTTON_DOWN);
         if (e->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
             mouse.buttons |= 1 << b;
             mouse.press_count[b]++;
@@ -503,6 +565,8 @@ void vpc_input_key(int sdl_scancode, int down)
 {
     unsigned short code = set1((SDL_Scancode)sdl_scancode);
 
+    if (code != 0)
+        rec_key((SDL_Scancode)sdl_scancode, down);
     if (code == 0)
         return;
     if (code & 0x100)
@@ -516,6 +580,7 @@ void vpc_input_mouse_rel(double gx, double gy)
     double ax, ay;
 
     SDL_LockMutex(mouse_lock);
+    rec_motion(gx, gy);
     ax = gx * units_x() * mouse.ratio_x / 8.0 * mouse.sens_x / 50.0;
     ay = gy * mouse.ratio_y / 8.0 * mouse.sens_y / 50.0;
     mouse.mx += ax;
@@ -537,6 +602,11 @@ void vpc_input_mouse_to(int x, int y)
 {
     SDL_LockMutex(mouse_lock);
     double dx = x * units_x() - mouse.x, dy = y - mouse.y;
+    char step[48];
+
+    rec_flush_motion();
+    snprintf(step, sizeof step, "move %d %d", x, y);
+    report_input(step);
 
     mouse.mx += dx * mouse.ratio_x / 8.0;
     mouse.my += dy * mouse.ratio_y / 8.0;
@@ -547,6 +617,7 @@ void vpc_input_mouse_to(int x, int y)
 
 void vpc_input_mouse_button(int b, int down)
 {
+    rec_button(b, down);
     SDL_LockMutex(mouse_lock);
     if (down) {
         mouse.buttons |= 1 << b;

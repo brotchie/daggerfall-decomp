@@ -10,13 +10,15 @@
 
    PORT_GL=1 (fall --gl) shows the screen through OpenGL instead of SDL's renderer, with the 3D
    view drawn by OpenGL (port/host/vpc_gl.c); F11 switches the 3D view between OpenGL and the
-   software renderer, F10 OpenGL's textures between texels and smooth. */
+   software renderer, F10 OpenGL's textures between texels and smooth. F8 sends feedback
+   (port/host/report.c). */
 #include <stdio.h>
 #include <string.h>
 
 #include <SDL3/SDL.h>
 
 #include "port_gl.h"
+#include "port_host.h"
 #include "port_vpc.h"
 
 #define VGA_W 320
@@ -254,6 +256,25 @@ void vpc_video_maybe_present(void)
     }
 }
 
+const unsigned char *vpc_video_dac(void)
+{
+    return &dac[0][0];
+}
+
+int vpc_screenshot_vga(const char *path)
+{
+    SDL_Surface *s;
+    int ok;
+
+    render_pixels();
+    s = SDL_CreateSurfaceFrom(VGA_W, VGA_H, SDL_PIXELFORMAT_XRGB8888, pixels, VGA_W * 4);
+    if (s == NULL)
+        return -1;
+    ok = SDL_SaveBMP(s, path);
+    SDL_DestroySurface(s);
+    return ok ? 0 : -1;
+}
+
 int vpc_screenshot(const char *path)
 {
     SDL_Surface *s;
@@ -388,6 +409,10 @@ int vpc_video_handle_event(const void *ev)
             SDL_SetWindowFullscreen(window, !(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN));
             return 1;
         }
+        if (e->key.scancode == SDL_SCANCODE_F8) {
+            report_feedback();
+            return 1;
+        }
         if (e->key.scancode == SDL_SCANCODE_F11 && use_gl) {
             vpc_gl_toggle();
             return 1;
@@ -406,6 +431,7 @@ int vpc_video_handle_event(const void *ev)
     }
     if (e->type == SDL_EVENT_KEY_UP &&
         (e->key.scancode == SDL_SCANCODE_F12 || e->key.scancode == SDL_SCANCODE_F11 ||
+         e->key.scancode == SDL_SCANCODE_F8 ||
          (e->key.scancode == SDL_SCANCODE_F10 && use_gl) ||
          (e->key.scancode == SDL_SCANCODE_RETURN && (e->key.mod & SDL_KMOD_ALT))))
         return 1;

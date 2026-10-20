@@ -57,5 +57,36 @@ int port_write(int fd, const void *buf, unsigned int n);
 int port_lseek(int fd, int offset, int whence);
 int port_close(int fd);
 void port_exit(int status) __attribute__((noreturn));
+/* a save slot's folder (its DOS name, e.g. "SAVE5") sent to a host folder, or (NULL, NULL) to
+   stop: the feedback report's save (port/host/report.c) */
+void dos_redirect_dir(const char *name, const char *root);
+
+/* ---- feedback and crash reports (port/host/report.c, docs/port.md) ------------------------- */
+
+/* the spool under the overlay (reports/), the session's log (stderr, teed) and input record,
+   and the uploader; argv0 for the crash path's re-exec as the uploader */
+void report_init(const char *overlay, const char *argv0);
+/* the main thread, on F8: the screen, the memory, the log and input now; the game's save from
+   the game's thread when it is in the world; then a box for the player's notes, and the upload */
+void report_feedback(void);
+/* a crash (a fault, a stub, a fatal error): what is known, written with plain system calls
+   (a signal handler's), then the process becomes the uploader. what: a line of text */
+void report_crash(const char *what, int sig, const void *addr, const void *pc);
+/* `fall --upload-reports SPOOL`: sends what is pending and returns the exit code */
+int report_upload_main(const char *spool);
+/* the same as a crashed process becomes it (re-exec from report_crash): exits 70 */
+int report_upload_after_crash(const char *spool);
+/* a region of the game's memory for the snapshot (main.c: FALL.EXE's data block, low memory) */
+void report_add_region(const char *name, const void *p, size_t size);
+/* the game's side (main.c): fill in the game's facts as JSON members ("k": v, ...), and the
+   game thread's per-frame hook asks whether a save is wanted (its folder) and says it is done */
+void report_set_game_meta(void (*meta)(char *buf, size_t size));
+const char *report_save_wanted(void);
+void report_save_done(int ok);
+/* the player's input as a PORT_SCRIPT step ("down W", "mrel 1.5 0", "mdown 0" ...), at the
+   script clock's time (port/host/vpc_input.c) */
+void report_input(const char *step);
+/* a line in the session's notes (the srand seed ...) */
+void report_note(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 #endif

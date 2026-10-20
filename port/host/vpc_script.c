@@ -7,6 +7,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "port_host.h"
 #include "port_vpc.h"
 
 #define MAX_STEPS 512
@@ -25,6 +26,11 @@ static const char *shot_dir;
 static int shot_count;
 static int release_key = -1, release_button = -1;
 static double release_at;
+
+Uint64 vpc_script_start_ns(void)
+{
+    return start_ns;
+}
 
 static double now_s(void)
 {
@@ -121,6 +127,14 @@ static void run(const struct step *st)
         int b = atoi(st->arg);
         if (b >= 0 && b <= 2)
             vpc_input_mouse_button(b, st->cmd[1] == 'd');
+    } else if (!strcmp(st->cmd, "crash")) {
+        /* testing the crash report: a fatal error, or (crash segv) a fault far above the zero
+           page */
+        if (!strcmp(st->arg, "segv"))
+            *(volatile int *)(uintptr_t)0xDEAD00000000ull = 1;
+        port_fatal("a crash the script asked for (testing the crash report)");
+    } else if (!strcmp(st->cmd, "feedback")) {
+        report_feedback();              /* F8 (PORT_FEEDBACK_NOTES gives the notes) */
     } else if (!strcmp(st->cmd, "quit")) {
         vpc_quit_requested = 1;
     } else {

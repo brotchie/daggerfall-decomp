@@ -248,6 +248,57 @@ own controls, set up differently; nothing in the game's logic changes:
 - `PORT_SCRIPT` has `mdown B` and `mup B` (a mouse button held and let go) for scripted swings,
   and `mrel DX DY` (relative motion in game pixels, fractions kept, as a real mouse's).
 
+## Feedback and crash reports
+
+The port reports bugs to a service on this Mac:
+- **F8**, anywhere (the title, character creation, the world, a menu), captures at once: the
+  window's picture and the VGA's 320x200 one, the game's memory, the session's log and input,
+  and, when the game is in the world, a save. Then a dialog asks for notes; Send uploads the
+  report, Cancel drops it.
+- **A crash** (a fault, a stub, `port_fatal`, an abort) writes a report from the fault handler
+  with plain system calls (the cause and call chain, the screen as raw VGA bytes, the memory,
+  the log and input); the process then execs itself as `fall --upload-reports SPOOL
+  --after-crash`, which sends it, shows a notification and exits 70.
+
+A report (port/host/report.c) is a folder, first in the spool `<overlay>/reports/pending/`:
+
+| file | what |
+|---|---|
+| meta.json | id, kind, time, the commit built, the notes, the game's facts (engine_running, game_mode, region, game_minutes, camera, mouse mode) |
+| screen.bmp, screen320.bmp | the window's picture (OpenGL's when on), the VGA's |
+| log.txt | the session's stderr (teed from the start), with the first srand seed |
+| input.script | every key, click and mouse motion that reached the game, as PORT_SCRIPT steps on the script clock |
+| memory/ | fall_data.bin (FALL.EXE's data block in address order, `port_data_start`..`port_data_end` from tools/port_data.py), low_memory.bin (the virtual PC's 1 MB + 64K: VGA, BIOS), regions.txt (their native addresses), fall.symbols (`nm -n` of the build) |
+| save/ | in the world: `save_game(5, "FEEDBACK")` from main()'s loop on the game's thread (`port_frame_hook`, src/hand/func_00010010.c under DAGGER_PORT), with the DOS layer sending `SAVE5\` to this folder (`dos_redirect_dir`): the player's slot 5 is untouched |
+| crash.txt | a crash's cause, signal, address, pc and call chain |
+
+**The service** is tools/feedbackd.py (Python's standard library only):
+- `init` makes a bearer token and the URL from this Mac's Bonjour name
+  (`http://<LocalHostName>.local:8742/v1/report`) in `~/.config/daggerfall-feedback/`;
+- `install` also installs a LaunchAgent that runs `serve` at login and keeps it running
+  (`uninstall` removes it);
+- `serve` takes `POST /v1/report` (the bearer token, compared in constant time; X-Report-Id,
+  X-Report-Kind; a gzip'd tar up to 1 GB), unpacks it with tarfile's `data` filter into
+  `build/feedback/<time>_<kind>_<id>/` (gitignored), logs it in `index.jsonl` and shows a
+  notification; `status` and `list` show the rest.
+
+**The build** carries the URL and token: tools/port_build.py writes them, with the commit, into
+`gen/feedback_config.c` (never committed) from `~/.config/daggerfall-feedback` or
+`PORT_FEEDBACK_URL`/`PORT_FEEDBACK_TOKEN`. A build without them keeps its reports in the
+spool. The port sends with `/usr/bin/tar` and `/usr/bin/curl`, the token in a 0600 header file
+rather than on curl's command line; pending reports go at the next start too.
+
+**Reading a report:**
+- `tools/port_replay.py build/feedback/<report>` replays the session: input.script as
+  PORT_SCRIPT, the first srand seed as `PORT_SRAND` (port/shim/libc.c forces main's seed only:
+  the game reseeds its generators all the time), screenshots every second into
+  `<report>/replay/`. A character-creation report replayed matched its screen pixel for pixel.
+- save/ loads as any slot: copy it to an overlay's SAVE0.
+- fall_data.bin is FALL.EXE's data in place: `fall.symbols` gives each global's native address,
+  and regions.txt the dump's start.
+- Script steps for testing: `feedback` (F8; `PORT_FEEDBACK_NOTES` gives the notes without the
+  dialog), `crash` and `crash segv`.
+
 ## Why the 64-bit work cannot be skipped
 
 The game keeps pointers in `int`s everywhere: casts, globals typed `int`, functions declared
@@ -261,6 +312,9 @@ half. A 32-bit address space would hide that, but arm64 macOS has none:
 So every value that holds an address must have a type as wide as a pointer.
 
 ## Status
+
+**2026-10-19, feedback and crash reports.** F8 and crashes send reports to a service on this
+Mac (see "Feedback and crash reports").
 
 **2026-10-18, modern controls.** `fall --modern`: mouse look, WASD, Shift to run, E to use,
 a crosshair (see "Modern controls").

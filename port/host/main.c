@@ -97,6 +97,7 @@ void port_controls_loaded(void)
    screen over the world); *cx, *cy the view's centre */
 extern volatile unsigned long port_render_frames;   /* rframe.c: the 3D frames drawn */
 
+
 static int view_probe(int *cx, int *cy)
 {
     static unsigned long frames;
@@ -152,6 +153,44 @@ static int run_game(void *arg)
     return func_00010010(2, game_argv);
 }
 
+/* ---- reports (port/host/report.c) ----------------------------------------------------------- */
+
+/* FALL.EXE's data block, in address order (tools/port_data.py's labels) */
+extern unsigned char port_data_start[], port_data_end[];
+extern int engine_running, frame_counter, frame_checkpoint, game_minutes;
+extern unsigned char current_region;
+extern int xn_cam_x, xn_cam_y, xn_cam_z, xn_cam_yaw;
+extern int save_game(int slot, char *name);
+
+/* the game's facts for a report's meta.json */
+static void game_meta(char *buf, size_t size)
+{
+    snprintf(buf, size,
+             "\"engine_running\": %d, \"game_mode\": %d, \"screen_active\": %d, "
+             "\"frame_counter\": %d, \"frame_checkpoint\": %d, \"region\": %d, "
+             "\"game_minutes\": %d, \"camera\": [%d, %d, %d, %d, %d], "
+             "\"mouse_control_mode\": %d, \"view_cursor_active\": %d",
+             engine_running, game_mode, D_00196272, frame_counter, frame_checkpoint,
+             current_region, game_minutes, xn_cam_x, xn_cam_y, xn_cam_z, xn_cam_yaw,
+             xn_cam_pitch, mouse_control_mode, view_cursor_active);
+}
+
+/* the game's thread, at the top of each turn of main()'s frame loop (src/hand/func_00010010.c,
+   DAGGER_PORT): a feedback report's save, into the report's folder (slot 5's folder sent there,
+   so the player's slot 5 is not touched). save_game waits while a mouse button is down: then
+   the next frame. */
+void port_frame_hook(void)
+{
+    const char *dir = report_save_wanted();
+
+    if (dir == NULL || mouse_buttons)
+        return;
+    dos_redirect_dir("SAVE5", dir);
+    save_game(5, "FEEDBACK");
+    dos_redirect_dir(NULL, NULL);
+    report_save_done(1);
+}
+
 int main(int argc, char **argv)
 {
     const char *game = NULL;
@@ -161,6 +200,9 @@ int main(int argc, char **argv)
     char path[1024];
     int i, code;
 
+    /* a crash's report: the crashed process became this, to send it (report.c) */
+    if (argc >= 3 && strcmp(argv[1], "--upload-reports") == 0)
+        return argc > 3 ? report_upload_after_crash(argv[2]) : report_upload_main(argv[2]);
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--game") == 0 && i + 1 < argc)
             game = argv[++i];
@@ -185,6 +227,9 @@ int main(int argc, char **argv)
         return 2;
     }
     dos_set_dirs(game, overlay);
+    report_init(overlay, argv[0]);
+    report_add_region("fall_data", port_data_start, (size_t)(port_data_end - port_data_start));
+    report_set_game_meta(game_meta);
     if (!dos_host_path(config, 0, path, sizeof path)) {
         FILE *f;
         dos_host_path(config, 1, path, sizeof path);
@@ -218,6 +263,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "port: no memory for the virtual PC\n");
         return 1;
     }
+    report_add_region("low_memory", port_low_memory, VPC_LOWMEM_SIZE);
 
     vpc_set_view_probe(view_probe);
     vpc_set_look_probe(look_probe);
