@@ -10,16 +10,26 @@
 #include "port_host.h"
 #include "port_vpc.h"
 
-#define MAX_STEPS 512
-
 struct step {
     double at;
+    int order;                          /* its place in PORT_SCRIPT (ties keep it) */
     char cmd[16];
     char arg[240];
 };
 
-static struct step steps[MAX_STEPS];
-static int n_steps, next_step;
+/* as many steps as the script has (a report's recorded session can be thousands) */
+static struct step *steps;
+static int n_steps, cap_steps, next_step;
+
+/* by time, steps at the same time in the script's order */
+static int by_time(const void *a, const void *b)
+{
+    const struct step *p = a, *q = b;
+
+    if (p->at != q->at)
+        return p->at < q->at ? -1 : 1;
+    return p->order - q->order;
+}
 static Uint64 start_ns;
 static double shot_every, exit_after, next_shot;
 static const char *shot_dir;
@@ -48,11 +58,18 @@ void vpc_script_init(void)
     shot_every = e ? atof(e) : 0;
     next_shot = shot_every;
     exit_after = x ? atof(x) : 0;
-    while (s != NULL && *s && n_steps < MAX_STEPS) {
+    while (s != NULL && *s) {
         const char *end = strchr(s, ';');
         size_t len = end ? (size_t)(end - s) : strlen(s);
         char buf[300];
-        struct step *st = &steps[n_steps];
+        struct step *st;
+
+        if (n_steps == cap_steps) {
+            cap_steps = cap_steps ? cap_steps * 2 : 256;
+            steps = realloc(steps, (size_t)cap_steps * sizeof *steps);
+        }
+        st = &steps[n_steps];
+        st->order = n_steps;
 
         if (len >= sizeof buf)
             len = sizeof buf - 1;
@@ -63,6 +80,9 @@ void vpc_script_init(void)
             n_steps++;
         s = end ? end + 1 : NULL;
     }
+    /* the steps run in time order, whatever order the script gave them in */
+    if (n_steps > 1)
+        qsort(steps, (size_t)n_steps, sizeof *steps, by_time);
 }
 
 static int scancode(const char *name)

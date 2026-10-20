@@ -69,7 +69,8 @@ int vpc_screenshot(const char *path);
      (relative motion in game pixels, fractions kept, as a real mouse) | mdown B | mup B (mouse
      button B held, let go: 0 left, 1 right, 2 middle) | quit
    PORT_SHOT_EVERY=SECONDS with PORT_SHOT_DIR=DIR saves the screen that often (shot_NNNN.bmp);
-   PORT_EXIT_AFTER=SECONDS quits. The main thread's poll runs it. */
+   PORT_EXIT_AFTER=SECONDS quits; PORT_INPUT_OFF=1 keeps the host's keyboard and mouse from the
+   game (a replay's script is its only input). The main thread's poll runs it. */
 void vpc_script_init(void);
 void vpc_script_poll(void);
 void vpc_input_key(int sdl_scancode, int down);

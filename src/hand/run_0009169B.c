@@ -27,6 +27,15 @@ extern short scratch_190de4[];
 extern short D_00190DEA[];
 extern short scratch_190dec;
 extern short D_00190DEE;
+#ifdef DAGGER_PORT
+/* The skills screen's points left in the three groups are three shorts at 0x190DEA, 0x190DEC
+   and 0x190DEE of the temporaries block (0x190BE4-0x190E1F), where talk keeps pointers in
+   4-byte slots: natively those slots are 8 bytes, so the names no longer fall 2 bytes apart.
+   The arrows and the drawing take the points as D_00190DEA[group]: the names are that array
+   here too (a player who spent every point could not pass OK: feedback 2026-10-19). */
+#define scratch_190dec (D_00190DEA[1])
+#define D_00190DEE (D_00190DEA[2])
+#endif
 extern short scratch_190df0[3];
 extern struct image *D_00195B5C;
 extern char *D_00195B60;

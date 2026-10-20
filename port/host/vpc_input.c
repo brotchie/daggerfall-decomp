@@ -374,6 +374,26 @@ static int handle_event(const void *ev)
 {
     const SDL_Event *e = ev;
     SDL_Window *w;
+    static int input_off = -1;
+
+    /* PORT_INPUT_OFF=1: the host's keyboard and mouse do not reach the game (a replay's
+       PORT_SCRIPT is its only input), and the window never takes the mouse */
+    if (input_off < 0) {
+        const char *v = SDL_getenv("PORT_INPUT_OFF");
+
+        input_off = v && *v == '1';
+    }
+    if (input_off) {
+        switch (e->type) {
+        case SDL_EVENT_KEY_DOWN:
+        case SDL_EVENT_KEY_UP:
+        case SDL_EVENT_MOUSE_MOTION:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+        case SDL_EVENT_MOUSE_WHEEL:
+            return 1;
+        }
+    }
 
     switch (e->type) {
     case SDL_EVENT_KEY_DOWN:

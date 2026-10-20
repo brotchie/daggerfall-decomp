@@ -292,7 +292,13 @@ rather than on curl's command line; pending reports go at the next start too.
 - `tools/port_replay.py build/feedback/<report>` replays the session: input.script as
   PORT_SCRIPT, the first srand seed as `PORT_SRAND` (port/shim/libc.c forces main's seed only:
   the game reseeds its generators all the time), screenshots every second into
-  `<report>/replay/`. A character-creation report replayed matched its screen pixel for pixel.
+  `<report>/replay/`. It runs without a window (SDL's offscreen driver; `--show` for one) and
+  with `PORT_INPUT_OFF=1`, which keeps the host's keyboard and mouse from the game, so nothing
+  but the report's input drives it. A short character-creation report replayed matched its
+  screen pixel for pixel; a longer one follows the same screens, but the game draws random
+  numbers every frame, so rolls differ, and clicks closer together than a debounce (the
+  attribute and skill arrows take one click per 6 BIOS ticks) can land differently: replaying
+  by the game's BIOS tick instead of the script clock would close that.
 - save/ loads as any slot: copy it to an overlay's SAVE0.
 - fall_data.bin is FALL.EXE's data in place: `fall.symbols` gives each global's native address,
   and regions.txt the dump's start.
@@ -312,6 +318,12 @@ half. A 32-bit address space would hide that, but arm64 macOS has none:
 So every value that holds an address must have a type as wide as a pointer.
 
 ## Status
+
+**2026-10-19, the first report fixed.** Character creation's skill points: the three groups'
+points are shorts at 0x190DEA-0x190DEE in the temporaries block, where the native layout widens
+talk's pointer slots, so the names fell apart (the arrows spent one place, OK checked another).
+The two chargen files now take all three as `D_00190DEA[group]` under DAGGER_PORT; a scan of the
+symbol map found no other name moved this way.
 
 **2026-10-19, feedback and crash reports.** F8 and crashes send reports to a service on this
 Mac (see "Feedback and crash reports").

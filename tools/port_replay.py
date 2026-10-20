@@ -4,7 +4,11 @@ crash reports"): the report's input.script (every key, click and mouse motion th
 game, on the script clock) as PORT_SCRIPT, its first srand seed (log.txt) as PORT_SRAND, and
 screenshots every second up to the moment of the report, into <report>/replay/.
 
-usage: port_replay.py REPORT_DIR [--game DIR] [--gl] [--every SECONDS] [--extra SECONDS]
+usage: port_replay.py REPORT_DIR [--game DIR] [--gl] [--show] [--every SECONDS] [--extra SECONDS]
+
+The replay runs without a window (SDL's offscreen video) and with the host's keyboard and mouse
+cut off (PORT_INPUT_OFF=1), so nothing but the report's input drives it; --show gives it a window
+to watch, --gl the OpenGL renderer (which needs one).
 
 The game's own timing (the frame clock) can still differ between two runs: a replay follows the
 player's input, not always every frame of the game. The report's save/ (when it was taken in the
@@ -37,6 +41,7 @@ def main():
     ap.add_argument("report")
     ap.add_argument("--game", default=os.environ.get("DAGGER_GAME") or os.path.join(ROOT, "build", "game"))
     ap.add_argument("--gl", action="store_true")
+    ap.add_argument("--show", action="store_true", help="a window on the screen (input still off)")
     ap.add_argument("--every", type=float, default=1.0)
     ap.add_argument("--extra", type=float, default=3.0)
     a = ap.parse_args()
@@ -61,8 +66,13 @@ def main():
     while t <= end + a.extra:
         shots.append("%.2f shot %s" % (t, os.path.join(out, "t%07.2f.bmp" % t)))
         t += a.every
+    # the script is the only input (PORT_INPUT_OFF: the host's keyboard and mouse are not
+    # the game's), and without a window on the screen unless --show (or --gl, which needs one)
     env = dict(os.environ, PORT_SCRIPT="; ".join(steps + shots),
-               PORT_EXIT_AFTER=str(end + a.extra + 1))
+               PORT_EXIT_AFTER=str(end + a.extra + 1), PORT_INPUT_OFF="1")
+    if not a.gl and not a.show:
+        env["SDL_VIDEO_DRIVER"] = "offscreen"
+        env["SDL_AUDIO_DRIVER"] = "dummy"
     if seed:
         env["PORT_SRAND"] = seed
     if a.gl:
