@@ -74,12 +74,28 @@ double port_game_ms;
    reads them. The geometry decides it, not the texels, so the narrow and the wide pass agree
    on it but at polygons' edges. dx: the game's column 0 in the frame */
 static u32 check_depth[PGL_W * PGL_H];
+static u8 check_sky[PGL_W * PGL_H];     /* the game's screen after the sky, before the 3D pass */
+static unsigned long frames_at_enter;  /* port_render_frames when the frame began */
+
+/* after sky_update (game_frame): the sky's picture, for the check */
+void port_wide_sky_drawn(void)
+{
+    s32 y, dx = port_wide_cols ? port_wide_dx : 0;
+
+    if (!pgl_check_pending() && !pgl_check_child())
+        return;
+    for (y = 0; y < PGL_H; y++)
+        memcpy(check_sky + y * PGL_W, screen_buffer + y * xn_gfx_width + dx, PGL_W);
+}
 
 static const u32 *screen_depth(s32 dx)
 {
     int y;
 
     memset(check_depth, 0, sizeof check_depth);
+    if (port_render_frames == frames_at_enter)
+        return check_depth;             /* no 3D pass this frame (a menu): the S-buffer is an
+                                           older frame's */
     for (y = 0; y < PGL_H; y++) {
         const struct xn_span *node;
 
@@ -105,6 +121,7 @@ void port_wide_enter(void)
     port_game_ms += prev_ticks;
     prev_ticks = frame_ticks;
     port_wide_cols = 0;
+    frames_at_enter = port_render_frames;
     if (!pgl_enabled || w <= PGL_W || !game_view_is_wide_able())
         return;
     if (w > PGL_MAX_W)
@@ -141,7 +158,7 @@ void port_wide_exit(void)
 
     if (w == 0) {
         if (pgl_check_child())          /* the check's copy ends here */
-            pgl_check_child_done(screen_buffer, screen_depth(0));
+            pgl_check_child_done(screen_buffer, screen_depth(0), check_sky);
         return;
     }
     if (pgl_check_pending())
@@ -156,7 +173,7 @@ void port_wide_exit(void)
     port_wide_last_dx = port_wide_dx;
     port_wide_cols = 0;
     port_wide_frames++;
-    pgl_check_fork_end(saved.buffer, check_depth);
+    pgl_check_fork_end(saved.buffer, check_depth, check_sky);
 }
 
 /* ---- the pick: a point of the game's screen in the last wide frame ------------------------- */

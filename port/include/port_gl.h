@@ -140,9 +140,12 @@ extern volatile unsigned long pgl_present_serial;
 int pgl_check_fork_begin(void);
 int pgl_check_child(void);              /* in the copy */
 int pgl_check_pending(void);            /* a copy is drawing this frame */
-/* the screens and the depth of each pixel (1/z of what covers it, 0 none) */
-void pgl_check_child_done(const unsigned char *screen, const unsigned int *depth);
-void pgl_check_fork_end(const unsigned char *screen, const unsigned int *depth);
+/* the screens, the depth of each pixel (1/z of what covers it, 0 none), and the screen after
+   the sky (before the 3D pass) */
+void pgl_check_child_done(const unsigned char *screen, const unsigned int *depth,
+                          const unsigned char *sky);
+void pgl_check_fork_end(const unsigned char *screen, const unsigned int *depth,
+                        const unsigned char *sky);
 
 /* ---- the hand-over: a frame drawn on the game's thread, shown on the main thread ---------- */
 

@@ -254,18 +254,22 @@ game's screen as they always did. What the frame needed:
   (`port_wide_weather`, from `weather_draw_precipitation`), so the engine's random numbers
   are as they were.
 
-The middle 320 columns are the original's pass in their geometry, not in every texel: the
-spans of a polygon that crosses the 320-column view's left or right edge start farther out
-in the wide frame (the span routines step their perspective every 8 or 16 pixels from a
-span's start), and a face's texture origin goes through the view's scaling, whose rounding
-changes with the half width, so a whole face can land a texel over (2-4% of the pixels). The
-geometry must agree. `PORT_GL_WIDE_CHECK=N` checks it: every Nth wide frame the game's thread
-forks at the frame's start, the copy draws the frame the original way and hands its screen
-and its depth (1/z of what covers each pixel, from the S-buffer's spans as the pick reads
-them) back through shared memory, and the two are compared (`pgl_share.c`): more than 1% of
-the pixels at another depth (beyond 1/32), or 0.5% of the uncovered ones (the sky) in another
-colour, is a failure; the first failure's screens and depths are saved as
-`wide_check_*.pgm`. `PORT_WEATHER=4` or `5` draws rain or snow whatever the weather, to look
+The middle 320 columns are the original's pass in their sky and their geometry, not in every
+texel: the spans of a polygon that crosses the 320-column view's left or right edge start
+farther out in the wide frame (the span routines step their perspective every 8 or 16 pixels
+from a span's start), a face's texture origin goes through the view's scaling, whose rounding
+changes with the half width, so a whole face can land a texel over, and a flat that crosses
+the old edge steps its texels from farther out too (2-5% of the pixels). `PORT_GL_WIDE_CHECK=N`
+checks the rest: every Nth wide frame the game's thread forks at the frame's start, the copy
+draws the frame the original way and hands back through shared memory its screen, its screen
+after the sky (before the 3D pass) and its depth (1/z of what covers each pixel, from the
+S-buffer's spans as the pick reads them), and the two are compared (`pgl_share.c`). Any pixel
+of the sky different, or more than 3% of the pixels at another depth (beyond 1/32), is a
+failure; the first failure's pictures are saved as `wide_check_*.pgm`. Polygons' edges differ
+by a pixel here and there (0-1.2% of the pixels over the classic saves, more while the view
+moves); a wrong sky seam showed as hundreds of sky pixels, the 32-bit 2^45 / scale as 50% of
+the depths. A frame with no 3D pass (a menu) compares only the sky.
+`PORT_WEATHER=4` or `5` draws rain or snow whatever the weather, to look
 at the sides' (port/host/main.c).
 
 **The picture** (`port/host/vpc_gl.c`). With `aspect=fill` the window's rectangle is its
@@ -312,6 +316,15 @@ the 4:3 column's, as before (`picture_scale`).
    edge), which the window does not show. With 4:3 and smooth motion the wide pass runs too,
    for those columns. Vertically the scene is drawn 0.85% larger while the mouse looks around,
    as before.
+
+Measured (`tools/port_gl_motion.py run`, kral, 4:3, a 60 Hz display; the game draws 57-60
+frames a second on an M4): presents every 16.67 ms (sd 0.9). Walking, the eye's step per
+present varies by 47% without smooth motion (14 of 203 presents repeat a frame) and 11% with
+it (none); turning with the keys, 51% and 8%, and the picture's own shift 53% and 14% (12
+presents unmoved, then none). On orcs the walk slides along a wall and the game moves the
+player a whole unit every third frame: no interpolation evens that. The game's loop stays
+capped at 70 Hz: uncapped (`PORT_FRAME_CAP=0`) it walks and turns about a third slower (the
+frame times come in 7.14 ms steps, and shorter frames lose them).
 
 What stays at the game's rate: creatures, flats' animation, projectiles, the HUD and the
 weapon. They are the latest frame's, so they hold still on the screen while the eye moves

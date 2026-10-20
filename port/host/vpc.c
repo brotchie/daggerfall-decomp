@@ -7,9 +7,12 @@
 #include <string.h>
 #include <time.h>
 
+#include <unistd.h>
+
 #include <SDL3/SDL.h>
 
 #include "port_host.h"
+#include "port_gl.h"
 #include "port_vpc.h"
 
 /* real-mode memory: a fixed block, so the game's data can point into it (tools/port_data.py
@@ -138,6 +141,8 @@ void vpc_poll(void)
 
 void vpc_game_exit(int code)
 {
+    if (pgl_check_child())              /* PORT_GL_WIDE_CHECK's copy (pgl_share.c) */
+        _exit(0);
     if (!threaded || vpc_on_main_thread())
         return;
     game_exit_code = code;

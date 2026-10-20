@@ -79,10 +79,17 @@ def run(name, out, gl, shots, keys, aspect="4:3", interp=False):
         env["PORT_GL_INTERP"] = "on" if interp else "off"
         env["PORT_WINDOW"] = "%dx%d" % WINDOWS[aspect]
         env["PORT_GL_ASPECT"] = "4:3" if aspect == "4:3" else "fill"
-    r = subprocess.run([FALL, "--game", GAME, "--overlay", overlay, "--nosound"], env=env,
-                       capture_output=True, text=True, timeout=max(shots) + 60)
+    try:
+        r = subprocess.run([FALL, "--game", GAME, "--overlay", overlay, "--nosound"], env=env,
+                           capture_output=True, text=True, timeout=max(shots) + 60)
+        log = r.stdout + r.stderr
+    except subprocess.TimeoutExpired as e:
+        # a run that never ended: its output so far, and the run counted as no shots
+        log = ((e.stdout or b"").decode(errors="replace") + (e.stderr or b"").decode(
+            errors="replace") + "\nport_gl_shots: the run did not end in time\n")
+        print("%s %s: the run did not end in time" % (name, tag), file=sys.stderr, flush=True)
     with open(os.path.join(out, tag + ".log"), "w") as f:
-        f.write(r.stdout + r.stderr)
+        f.write(log)
     shutil.rmtree(overlay, ignore_errors=True)
     return [p for p in paths if os.path.exists(p)]
 

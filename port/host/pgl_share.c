@@ -9,9 +9,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <fcntl.h>
+#include <pthread.h>
+
 #include <SDL3/SDL.h>
 
 #include "port_gl.h"
+#include "port_vpc.h"
 
 volatile int pgl_enabled;
 volatile unsigned long port_render_frames;
@@ -35,14 +39,16 @@ unsigned long long pgl_now_ns(void)
    The texels may differ: in the wide pass the spans of a polygon that crosses the 320-column
    view's edge start farther out (the span routines step their perspective every 8 or 16
    pixels from a span's start), and a face's texture origin goes through the view's scaling,
-   whose rounding changes with the half width, so a whole face can land a texel over. What
-   must agree is the geometry: the depth of every pixel (within 1/32: the gradients' rounding)
-   and, where nothing covers it, the sky's colour. More than 1% of the pixels with another
-   depth, or 0.5% of the uncovered ones with another colour, is a failure (a wrong stride, a
-   misplaced sky or a lost polygon is far more); its two screens and depths are saved as
-   wide_check_*.pgm. */
+   whose rounding changes with the half width, so a whole face can land a texel over; a flat
+   (a tree, a person) that crosses the old edge too. What must agree is the sky, the screen
+   before the 3D pass (byte for byte), and the geometry: the depth of every pixel (within
+   1/32, the gradients' rounding). Polygons' edges differ by a pixel here and there, more while
+   the view moves: more than 3% of the pixels at another depth, or any pixel of the sky, is a
+   failure (a wrong stride or a lost polygon is tens of percent); its screens and depths are
+   saved as wide_check_*.pgm. */
 #define CHECK_SCREEN (PGL_W * PGL_H)
 #define CHECK_DEPTH 65536               /* the depth's offset in the shared block */
+#define CHECK_SKY (CHECK_DEPTH + CHECK_SCREEN * 4)      /* the sky's */
 
 static int check_every = -1, check_child, check_pending;
 static unsigned long check_count, check_frames, check_bad;
@@ -56,10 +62,11 @@ int pgl_check_fork_begin(void)
 
         check_every = e ? atoi(e) : 0;
     }
-    if (check_every <= 0 || ++check_count % (unsigned long)check_every != 0)
-        return 0;
+    if (check_every <= 0 || ++check_count % (unsigned long)check_every != 0 || vpc_quit_requested)
+        return 0;                       /* (a copy made as the game quits would wait for a main
+                                           thread it has not got: vpc_game_exit) */
     if (check_shared == NULL) {
-        void *m = mmap(NULL, CHECK_DEPTH + CHECK_SCREEN * 4, PROT_READ | PROT_WRITE,
+        void *m = mmap(NULL, CHECK_SKY + CHECK_SCREEN, PROT_READ | PROT_WRITE,
                        MAP_SHARED | MAP_ANON, -1, 0);
 
         if (m == MAP_FAILED) {
@@ -72,9 +79,24 @@ int pgl_check_fork_begin(void)
     fflush(stderr);
     check_pid = fork();
     if (check_pid == 0) {
+        sigset_t alrm;
+        int null = open("/dev/null", O_WRONLY);
+
         check_child = 1;
         pgl_enabled = 0;
-        alarm(10);                      /* a copy stuck on a lock another thread held */
+        /* never the holder of the game's output (a test waits for it to close), and ended by
+           the alarm if it is stuck on a lock another thread held when it was made (the game's
+           thread has its signals blocked) */
+        if (null >= 0) {
+            dup2(null, 1);
+            dup2(null, 2);
+            close(null);
+        }
+        sigemptyset(&alrm);
+        sigaddset(&alrm, SIGALRM);
+        pthread_sigmask(SIG_UNBLOCK, &alrm, NULL);
+        signal(SIGALRM, SIG_DFL);
+        alarm(10);
         return 1;
     }
     if (check_pid < 0)
@@ -93,12 +115,14 @@ int pgl_check_pending(void)
     return check_pending;
 }
 
-void pgl_check_child_done(const unsigned char *screen, const unsigned int *depth)
+void pgl_check_child_done(const unsigned char *screen, const unsigned int *depth,
+                          const unsigned char *sky)
 {
     if (!check_child)
         return;
     memcpy(check_shared, screen, CHECK_SCREEN);
     memcpy(check_shared + CHECK_DEPTH, depth, CHECK_SCREEN * 4);
+    memcpy(check_shared + CHECK_SKY, sky, CHECK_SCREEN);
     check_shared[CHECK_SCREEN] = 1;
     _exit(0);
 }
@@ -142,11 +166,13 @@ static int depth_differs(unsigned int a, unsigned int b)
     return d > m / 32;
 }
 
-void pgl_check_fork_end(const unsigned char *screen, const unsigned int *depth)
+void pgl_check_fork_end(const unsigned char *screen, const unsigned int *depth,
+                        const unsigned char *sky_now)
 {
     const unsigned int *orig;
+    const unsigned char *sky_orig;
     Uint64 t0;
-    int status, i, texels = 0, depths = 0, sky = 0, sky_px = 0, bad;
+    int status, i, texels = 0, depths = 0, sky = 0, bad;
 
     if (check_pid <= 0)
         return;
@@ -167,25 +193,24 @@ void pgl_check_fork_end(const unsigned char *screen, const unsigned int *depth)
         return;
     }
     orig = (const unsigned int *)(check_shared + CHECK_DEPTH);
+    sky_orig = check_shared + CHECK_SKY;
     for (i = 0; i < CHECK_SCREEN; i++) {
         texels += check_shared[i] != screen[i];
         depths += depth_differs(orig[i], depth[i]);
-        if (orig[i] == 0 && depth[i] == 0) {
-            sky_px++;
-            sky += check_shared[i] != screen[i];
-        }
+        sky += sky_orig[i] != sky_now[i];
     }
-    bad = depths * 100 > CHECK_SCREEN || sky * 200 > (sky_px ? sky_px : 1);
+    bad = depths * 100 > CHECK_SCREEN * 3 || sky != 0;
     if (bad && check_bad++ == 0) {
         dump_pgm("wide_check_original.pgm", check_shared);
         dump_pgm("wide_check_wide.pgm", screen);
+        dump_pgm("wide_check_original_sky.pgm", sky_orig);
+        dump_pgm("wide_check_wide_sky.pgm", sky_now);
         dump_depth("wide_check_original_depth.pgm", orig);
         dump_depth("wide_check_wide_depth.pgm", depth);
     }
-    fprintf(stderr, "port: wide check %lu: %s: depth differs at %d pixels (%.2f%%), the sky's "
-            "colour at %d of %d; %d pixels' colours differ (%.2f%%)\n", check_frames,
-            bad ? "FAILED" : "ok", depths, depths * 100.0 / CHECK_SCREEN, sky, sky_px, texels,
-            texels * 100.0 / CHECK_SCREEN);
+    fprintf(stderr, "port: wide check %lu: %s: depth differs at %d pixels (%.2f%%), the sky at "
+            "%d; %d pixels' colours differ (%.2f%%)\n", check_frames, bad ? "FAILED" : "ok",
+            depths, depths * 100.0 / CHECK_SCREEN, sky, texels, texels * 100.0 / CHECK_SCREEN);
 }
 
 void *pgl_realloc(void *p, size_t n)
