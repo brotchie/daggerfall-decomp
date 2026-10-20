@@ -319,6 +319,13 @@ So every value that holds an address must have a type as wide as a pointer.
 
 ## Status
 
+**2026-10-19, the first crash report fixed.** Starting a new game: quest_init_person's second
+location, `D_001970C8`, a struct loaded_location that location_pick_random_town fills and
+location_free frees, was declared only as bytes, so it stayed in place as 20 bytes while its
+pointer fields (`D_001970D0/D4/D8`, read by name) were moved out of line: the fields read null
+and location_free freed what the native struct had overrun. A port_data TYPES entry lays it out
+as the struct (its fields' names on its native fields).
+
 **2026-10-19, the first report fixed.** Character creation's skill points: the three groups'
 points are shorts at 0x190DEA-0x190DEE in the temporaries block, where the native layout widens
 talk's pointer slots, so the names fell apart (the arrows spent one place, OK checked another).

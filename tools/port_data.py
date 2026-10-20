@@ -76,6 +76,13 @@ TYPES = {
     "saved_player_object": RECORD_HEADER,  # the player's header (SAVEVARS.DAT)
     "object_debug_watch_copy": RECORD_HEADER,
     "npc_record_buffer": CHARACTER_TO_CAREER,
+    # quest_init_person's second location (the town it picks for a person): a struct
+    # loaded_location that location_pick_random_town fills and location_free frees, its fields
+    # also read as D_001970CC (door count), D_001970D0 (doors), D_001970D4 (object) and
+    # D_001970D8 (data). Declared only as char[]/short it stayed in place as 20 bytes while its
+    # pointer fields were moved out of line: the native struct ran past it, and location_free
+    # freed what was there (crash report 2026-10-19, starting a new game)
+    "D_001970C8": "struct loaded_location __v",
     # 256 bytes of scratch: a table of 64 pointers (<< 2 under Watcom), and screens' named slots
     # (scratch_190de8 ..., D_00190E18 ...) inside it, all zero in FALL.EXE: natively 512 bytes,
     # the slots at twice their offsets
