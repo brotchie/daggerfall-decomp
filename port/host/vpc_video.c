@@ -321,10 +321,15 @@ int vpc_screenshot(const char *path)
            wide frame's software picture (NAME_swwide.bmp: the sides the software renderer
            drew, the game's screen in the middle) */
         const char *both = SDL_getenv("PORT_GL_SW_SHOTS");
+        int sw_too = both && *both == '1';
 
+        /* the software screen first: with vsync the present's swap waits for the display,
+           and the game may show its next frame meanwhile */
+        if (sw_too)
+            render_pixels();
         present_now();
 
-        if (both && *both == '1') {
+        if (sw_too) {
             char sw[1024];
             size_t n = strlen(path);
 
@@ -332,7 +337,6 @@ int vpc_screenshot(const char *path)
                 unsigned char rgb[256 * 3];
 
                 snprintf(sw, sizeof sw, "%.*s_sw.bmp", (int)(n - 4), path);
-                render_pixels();
                 s = SDL_CreateSurfaceFrom(VGA_W, VGA_H, SDL_PIXELFORMAT_XRGB8888, pixels,
                                           VGA_W * 4);
                 if (s) {

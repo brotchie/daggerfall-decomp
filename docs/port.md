@@ -249,6 +249,11 @@ game's screen as they always did. What the frame needed:
   64 bits there;
 - the pick (`xn_render_pick`) reads the S-buffer the last frame left: after a wide frame it
   runs in the wide frame's view, the point moved to its column (`port_wide_pick_begin`);
+- the dungeon water: a row's ripple reads a jitter a column from phase + base (up to 131) on,
+  and the 512 jitters run out past 381 columns, into whatever follows them (the offsets of
+  the pixels the water takes its colours from). A wide frame reads a longer table, the
+  original's over and over, shifted so that the game's 320 columns read what they always did
+  (water.c);
 - the weather: the game draws its rain and snow over its own columns after the 3D pass; the
   sides get as many streaks and flakes of their own, from a generator of their own
   (`port_wide_weather`, from `weather_draw_precipitation`), so the engine's random numbers
@@ -297,8 +302,10 @@ the 4:3 column's, as before (`picture_scale`).
    clock: its frame times summed (`port_game_ms`, the time `frame_ticks` moves the player
    by). The main thread keeps the last 8 eyes, and maps the host's clock to the game's
    (smoothed); a present draws the eye of a frame and a half ago (between the two frames
-   around it, interpolated: position linearly, angles the short way round) and never
-   further back than the last present. A jump (more than 4000 units, a third of a turn,
+   around it: angles the short way round; the position a line fitted to the frames within
+   two frame times, nearer ones weighing more, since the game keeps the eye in whole units
+   and a slow move comes as a unit every few frames; `PORT_GL_FIT=0` is the straight line
+   between two frames) and never further back than the last present. A jump (more than 4000 units, a third of a turn,
    250 ms) starts again without blending.
 4. *Re-posing.* The latest frame's geometry is drawn from that eye: camera space back to the
    world with the frame's rotation (the engine's own formula, `xn_mat_from_angles`, in
@@ -317,12 +324,19 @@ the 4:3 column's, as before (`picture_scale`).
    for those columns. Vertically the scene is drawn 0.85% larger while the mouse looks around,
    as before.
 
-Measured (`tools/port_gl_motion.py run`, kral, 4:3, a 60 Hz display; the game draws 57-60
-frames a second on an M4): presents every 16.67 ms (sd 0.9). Walking, the eye's step per
-present varies by 47% without smooth motion (14 of 203 presents repeat a frame) and 11% with
-it (none); turning with the keys, 51% and 8%, and the picture's own shift 53% and 14% (12
-presents unmoved, then none). On orcs the walk slides along a wall and the game moves the
-player a whole unit every third frame: no interpolation evens that. The game's loop stays
+Measured (`tools/port_gl_motion.py run`, 4:3, a 60 Hz display; the game draws 57-60 frames a
+second on an M4): presents every 16.67 ms (sd 0.9). The eye's step per present, its
+variation about each step's neighbours (judder, apart from the walk's own changes of speed):
+
+| | smooth motion off | the line between two frames | the fitted line |
+|---|---|---|---|
+| kral, walking | 44% (20 presents repeat a frame) | 13% (none) | 8% (none) |
+| kral, turning with the keys | 58% (17 repeat) | 6% | 8% |
+| orcs, walking (it slides along walls) | 89% | 34% | 27% |
+| orcs, turning | 45% (14 repeat) | 8% | 11% |
+
+On orcs the game moves the player a whole unit every third frame along a wall, and speeds up
+and slows down as it bumps along: what is left is mostly that. The game's loop stays
 capped at 70 Hz: uncapped (`PORT_FRAME_CAP=0`) it walks and turns about a third slower (the
 frame times come in 7.14 ms steps, and shorter frames lose them).
 

@@ -9,7 +9,8 @@ was drawn from, and the middle rows of the picture); then the record is measured
 For each stretch of motion (the walk, the turn), between its first and last presents that
 moved, less 0.3 s at each end:
   - the eye's step per present (world units walking, 2048ths of a turn turning): its mean,
-    and its variation (standard deviation / mean). The game draws about 54 frames a second
+    and its variation (standard deviation / mean), overall and about each step's own
+    neighbourhood (11 presents: judder, apart from the walk's own changes of speed). The game draws about 54 frames a second
     and the display shows 60: without smooth motion a present repeats a frame now and then
     (a step of 0) and the variation is large; with it each step is about the same;
   - turning, the picture's own sideways shift per present (pixels), found by matching each
@@ -94,6 +95,20 @@ def stats(values):
     return m, sd, (sd / m if m else 0.0)
 
 
+def local_variation(values, half=5):
+    """the variation about each value's own neighbourhood (the mean of the 2 * half + 1 around
+    it): judder, not the motion's own changes of speed (a walk that stops at a wall)"""
+    if len(values) <= 2 * half:
+        return 0.0
+    dev = means = 0.0
+    for i in range(half, len(values) - half):
+        m = sum(values[i - half:i + half + 1]) / (2 * half + 1)
+        dev += (values[i] - m) ** 2
+        means += m
+    n = len(values) - 2 * half
+    return math.sqrt(dev / n) / (means / n) if means else 0.0
+
+
 def wrap(a):
     return (a + 1024) % 2048 - 1024
 
@@ -142,16 +157,19 @@ def measure(path):
     if walk:
         steps = [step(i) for i in walk]
         m, sd, cv = stats(steps)
-        print("  walk: %d presents, a step of %.2f units (sd %.2f, variation %.1f%%), %d repeated "
-              "(a step under a fifth of the mean)" % (len(steps), m, sd, cv * 100,
-                                                      sum(s < m / 5 for s in steps)))
+        print("  walk: %d presents, a step of %.2f units (sd %.2f, variation %.1f%%, about its "
+              "neighbours %.1f%%), %d repeated (a step under a fifth of the mean)" % (
+                  len(steps), m, sd, cv * 100, local_variation(steps) * 100,
+                  sum(s < m / 5 for s in steps)))
     else:
         print("  walk: no motion found")
     if turning:
         turns = [turn(i) for i in turning]
         m, sd, cv = stats(turns)
-        print("  turn: %d presents, %.3f of 2048 a present (sd %.3f, variation %.1f%%), %d repeated"
-              % (len(turns), m, sd, cv * 100, sum(t < m / 5 for t in turns)))
+        print("  turn: %d presents, %.3f of 2048 a present (sd %.3f, variation %.1f%%, about its "
+              "neighbours %.1f%%), %d repeated" % (len(turns), m, sd, cv * 100,
+                                                   local_variation(turns) * 100,
+                                                   sum(t < m / 5 for t in turns)))
         prof = {}
         shifts = []
         for i in turning:

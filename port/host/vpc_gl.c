@@ -823,6 +823,61 @@ static void push_pose(const pgl_scene *s)
     clock_set = 1;
 }
 
+/* The game keeps the eye in whole world units, so a slow move (along a wall, up a slope)
+   comes as a unit every few frames and a line between two frames is a step, then nothing.
+   Between frames the eye's position is a line fitted to the frames within two frame times of
+   t, nearer ones weighing more: the frames' own positions where the motion is even, and an
+   even motion where the units come unevenly. It needs frames on both sides of t and three in
+   all (else the line between the two frames stands). */
+static void fit_position(double t, pose *out)
+{
+    double span = 2.0 * frame_dt, sw = 0, st = 0, sx = 0, sy = 0, sz = 0;
+    double stt = 0, stx = 0, sty = 0, stz = 0, mt, d;
+    int i, n = 0, before = 0, after = 0;
+    static int on = -1;
+
+    if (on < 0) {
+        const char *e = SDL_getenv("PORT_GL_FIT");     /* 0: the line between two frames */
+
+        on = !(e && *e == '0');
+    }
+    if (!on)
+        return;
+    for (i = 0; i < nhist; i++) {
+        double w = 1.0 - fabs(hist[i].t - t) / span;
+
+        if (w <= 0)
+            continue;
+        n++;
+        before += hist[i].t <= t;
+        after += hist[i].t >= t;
+        sw += w;
+        st += w * hist[i].t;
+        sx += w * hist[i].x;
+        sy += w * hist[i].y;
+        sz += w * hist[i].z;
+    }
+    if (n < 3 || !before || !after)
+        return;
+    mt = st / sw;
+    for (i = 0; i < nhist; i++) {
+        double w = 1.0 - fabs(hist[i].t - t) / span, dt = hist[i].t - mt;
+
+        if (w <= 0)
+            continue;
+        stt += w * dt * dt;
+        stx += w * dt * (hist[i].x - sx / sw);
+        sty += w * dt * (hist[i].y - sy / sw);
+        stz += w * dt * (hist[i].z - sz / sw);
+    }
+    if (stt <= 0)
+        return;
+    d = t - mt;
+    out->x = sx / sw + stx / stt * d;
+    out->y = sy / sw + sty / stt * d;
+    out->z = sz / sw + stz / stt * d;
+}
+
 /* the eye at the game's time t (between the frames around it; the newest's after it) */
 static void pose_at(double t, pose *out)
 {
@@ -849,6 +904,7 @@ static void pose_at(double t, pose *out)
             out->x = a->x + (b->x - a->x) * k;
             out->y = a->y + (b->y - a->y) * k;
             out->z = a->z + (b->z - a->z) * k;
+            fit_position(t, out);
             out->pitch = a->pitch + wrap(b->pitch - a->pitch) * k;
             out->yaw = a->yaw + wrap(b->yaw - a->yaw) * k;
             out->roll = a->roll + wrap(b->roll - a->roll) * k;

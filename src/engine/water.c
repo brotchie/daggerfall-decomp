@@ -184,6 +184,29 @@ static void water_row(const struct xn_span *head, u8 *line, const s32 *jitter, s
     xn_water_span(line, jitter, x, xn_cam_centre_x + xn_cam_half_width);
 }
 
+#ifdef DAGGER_PORT
+/* The wide pass (port/engine_gl/wide.c): a row's jitters are read a column at a time from
+   phase + base (up to 131) on, and the 512 entries run out past 381 columns. A wide frame
+   takes them from this table instead, the original's over and over, from 512 entries before
+   its start, so that column dx (the game's column 0) reads what column 0 reads in the 320
+   columns: the game's screen gets the same ripple. */
+#define WIDE_JITTER_BEFORE 512
+static s32 wide_jitter[WIDE_JITTER_BEFORE + 512 + 1024 + 16];
+
+static void wide_jitter_fill(void)
+{
+    int i;
+
+    for (i = 0; i < (int)(sizeof wide_jitter / sizeof *wide_jitter); i++)
+        wide_jitter[i] = xn_water_jitter[(i + 512 * 4 - WIDE_JITTER_BEFORE) & 511];
+}
+
+static const s32 *wide_jitter_row(s32 phase, s32 base)
+{
+    return wide_jitter + WIDE_JITTER_BEFORE + phase + base - port_wide_dx;
+}
+#endif
+
 void xn_water_draw(void)
 {
     struct xn_poly_vertex p0, p1;
@@ -214,6 +237,10 @@ void xn_water_draw(void)
         return;
     step = (inv_bottom - inv_top) / rows;
     inv = inv_top;
+#ifdef DAGGER_PORT
+    if (port_wide_cols)
+        wide_jitter_fill();
+#endif
     line = screen_buffer + xn_gfx_row_offset[top];
     head = &xn_render_span_rows[top];
     for (r = top; rows != 0; rows--, r++, inv += step, line += xn_gfx_width, head++) {
@@ -222,6 +249,12 @@ void xn_water_draw(void)
         if (phase > 4 || phase < -4)
             xn_water_row_velocity[r] = -xn_water_row_velocity[r];
         xn_water_row_phase[r] = phase;
+#ifdef DAGGER_PORT
+        if (port_wide_cols) {
+            water_row(head, line, wide_jitter_row(phase, xn_water_row_base[r]), inv);
+            continue;
+        }
+#endif
         water_row(head, line, xn_water_jitter + phase + xn_water_row_base[r], inv);
     }
 }
