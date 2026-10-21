@@ -38,7 +38,7 @@
    show, so a view moved this way has something at its edges.
 
    Settings (<overlay>/settings.txt; each PORT_GL_* environment variable overrides its line):
-     aspect=4:3|fill        PORT_GL_ASPECT       the view's shape (Shift+F11 switches)
+     aspect=fill|4:3        PORT_GL_ASPECT       the view's shape (Shift+F11 switches)
      fov_max=DEGREES        PORT_GL_FOV_MAX      the widest horizontal view (110; 0 none):
                                                  a wider window is pillarboxed
      hud_filter=sharp|nearest PORT_GL_HUD_FILTER how the 320x200 pixels are scaled
@@ -65,7 +65,7 @@ static SDL_GLContext context;
 static int ready, gl_on = 1, smooth, msaa = 4;
 
 /* the settings */
-static int aspect_fill;                 /* the view fills the window (else 4:3) */
+static int aspect_fill = 1;             /* the view fills the window (else 4:3) */
 static int fov_max = 110;               /* degrees; 0 none */
 static int hud_sharp = 1;
 static int vsync = 1;                   /* 1 on, -1 adaptive, 0 off */

@@ -240,7 +240,7 @@ is at that moment, not only the ~54 frames a second the game draws. Both are set
 
 | Setting | settings.txt | Environment | Key | Default |
 |---|---|---|---|---|
-| the view's shape | `aspect=4:3\|fill` | `PORT_GL_ASPECT` | Shift+F11 switches | `4:3` |
+| the view's shape | `aspect=fill\|4:3` | `PORT_GL_ASPECT` | Shift+F11 switches | `fill` |
 | the widest horizontal view, degrees (0: none) | `fov_max=N` | `PORT_GL_FOV_MAX` | | `110` |
 | how the 320x200 pixels scale | `hud_filter=sharp\|nearest` | `PORT_GL_HUD_FILTER` | | `sharp` |
 | presents paced by the display | `vsync=on\|adaptive\|off` | `PORT_GL_VSYNC` | | `on` |
