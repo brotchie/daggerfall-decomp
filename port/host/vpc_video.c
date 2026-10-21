@@ -371,13 +371,16 @@ int vpc_screenshot(const char *path)
            wide frame's software picture (NAME_swwide.bmp: the sides the software renderer
            drew, the game's screen in the middle) */
         const char *both = SDL_getenv("PORT_GL_SW_SHOTS");
-        int sw_too = both && *both == '1';
+        int sw_too = both && (*both == '1' || strcmp(both, "live") == 0);
+        /* (live: the screen as it is after the present, as it was taken before: a test of the
+           difference) */
+        int live = both && strcmp(both, "live") == 0;
 
         /* the software screen of the frame the present showed: the picture it composited
            (the game may show its next frame while the swap waits for the display) */
         present_now();
         if (sw_too)
-            render_pixels_of(vpc_gl_last_vga());
+            render_pixels_of(live ? port_low_memory + 0xA0000 : vpc_gl_last_vga());
 
         if (sw_too) {
             char sw[1024];

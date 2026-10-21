@@ -75,7 +75,7 @@ def run(name, out, gl, shots, keys, aspect="4:3", interp=False):
                PORT_SCRIPT=script)
     if gl:
         env["PORT_GL"] = "1"
-        env["PORT_GL_SW_SHOTS"] = "1"
+        env["PORT_GL_SW_SHOTS"] = os.environ.get("PORT_GL_SW_SHOTS", "1")
         env["PORT_GL_INTERP"] = "on" if interp else "off"
         env["PORT_WINDOW"] = "%dx%d" % WINDOWS[aspect]
         env["PORT_GL_ASPECT"] = "4:3" if aspect == "4:3" else "fill"

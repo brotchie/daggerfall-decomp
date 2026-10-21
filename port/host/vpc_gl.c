@@ -79,7 +79,7 @@ static GLuint tex_vga, tex_pre, tex_post, tex_side, tex_tables, tex_pal, tex_fal
     tex_tint;
 static GLuint scene_fbo, scene_colour, scene_depth;     /* (resolved) colour, and its FBO */
 static GLuint scene_index;                              /* (resolved) index, covered, water */
-static GLuint ms_fbo, ms_colour, ms_depth, ms_index;    /* the multisampled target */
+static GLuint ms_fbo, ms_colour, ms_depth;              /* the multisampled target */
 static GLuint out_fbo, out_colour;
 static int fbo_w, fbo_h;
 static GLuint *textures;
@@ -604,12 +604,9 @@ int vpc_gl_init(void *sdl_window)
     if (env)
         msaa = atoi(env);
     {
-        GLint max = 1, max_int = 1;
+        GLint max = 1;
 
         glGetIntegerv(GL_MAX_SAMPLES, &max);
-        glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_int);     /* the index attachment's */
-        if (max_int < max)
-            max = max_int;
         if (msaa > max)
             msaa = max;
         if (msaa < 1)
@@ -617,6 +614,7 @@ int vpc_gl_init(void *sdl_window)
     }
     env = SDL_getenv("PORT_GL_SMOOTH");
     smooth = env && *env == '1';
+    fprintf(stderr, "port: OpenGL multisampling %dx\n", msaa);
     ready = 1;
     pgl_enabled = 1;
     return 1;
@@ -733,7 +731,6 @@ static void make_fbos(int w, int h)
         if (ms_fbo) {
             glDeleteFramebuffers(1, &ms_fbo);
             glDeleteRenderbuffers(1, &ms_colour);
-            glDeleteRenderbuffers(1, &ms_index);
             glDeleteRenderbuffers(1, &ms_depth);
             ms_fbo = 0;
         }
@@ -766,16 +763,12 @@ static void make_fbos(int w, int h)
         glGenRenderbuffers(1, &ms_colour);
         glBindRenderbuffer(GL_RENDERBUFFER, ms_colour);
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_RGBA8, w, h);
-        glGenRenderbuffers(1, &ms_index);
-        glBindRenderbuffer(GL_RENDERBUFFER, ms_index);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_RGBA8UI, w, h);
         glGenRenderbuffers(1, &ms_depth);
         glBindRenderbuffer(GL_RENDERBUFFER, ms_depth);
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa, GL_DEPTH_COMPONENT32F, w, h);
         glGenFramebuffers(1, &ms_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, ms_fbo);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ms_colour);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_RENDERBUFFER, ms_index);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ms_depth);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             fprintf(stderr, "port: GL multisampled framebuffer incomplete: no MSAA\n");
@@ -1153,6 +1146,23 @@ typedef struct view {
     float presh[2];             /* the sky backdrop's move (composite) */
 } view;
 
+/* the world (depth tested and written), then the flats back to front (tested against the
+   world, not each other; the water's test stays the world's: they leave it alone) */
+static void draw_layers(const pgl_scene *s, const int *order, int nworld, int nflat)
+{
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
+    draw_runs(s, order, nworld);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_FALSE, GL_FALSE);
+    draw_runs(s, order + nworld, nflat);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glDepthMask(GL_TRUE);
+    glDisable(GL_DEPTH_TEST);
+}
+
 static void draw_scene(const pgl_scene *s, const view *v)
 {
     static int *order;
@@ -1164,14 +1174,15 @@ static void draw_scene(const pgl_scene *s, const view *v)
     static const GLenum both[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
     glBindFramebuffer(GL_FRAMEBUFFER, ms_fbo ? ms_fbo : scene_fbo);
-    /* the colour indices only for the water */
-    glDrawBuffers(s->water_on ? 2 : 1, both);
+    /* the colour indices only for the water, and in this pass only without multisampling
+       (Apple's GL multisamples no integer attachment: a pass of their own, below) */
+    glDrawBuffers(s->water_on && !ms_fbo ? 2 : 1, both);
     glViewport(0, 0, fbo_w, fbo_h);
     glDisable(GL_SCISSOR_TEST);
     glClearDepth(1.0);
     glDepthMask(GL_TRUE);
     glClearBufferfv(GL_COLOR, 0, clear);
-    if (s->water_on)
+    if (s->water_on && !ms_fbo)
         glClearBufferuiv(GL_COLOR, 1, index_clear);
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -1235,19 +1246,7 @@ static void draw_scene(const pgl_scene *s, const view *v)
         if (s->draws[i].layer == 1)
             order[nworld + nflat++] = i;
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-    draw_runs(s, order, nworld);
-    /* the flats: back to front, tested against the world, not each other; the water's test
-       stays the world's */
-    glDepthFunc(GL_LEQUAL);
-    glDepthMask(GL_FALSE);
-    glColorMaski(1, GL_TRUE, GL_TRUE, GL_FALSE, GL_FALSE);
-    draw_runs(s, order + nworld, nflat);
-    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glDepthMask(GL_TRUE);
-    glDisable(GL_DEPTH_TEST);
+    draw_layers(s, order, nworld, nflat);
     glDisable(GL_SCISSOR_TEST);
     if (ms_fbo) {               /* resolve: the edges' coverage becomes their alpha */
         glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo);
@@ -1256,14 +1255,19 @@ static void draw_scene(const pgl_scene *s, const view *v)
         glDrawBuffers(1, both);
         glBlitFramebuffer(0, 0, fbo_w, fbo_h, 0, 0, fbo_w, fbo_h, GL_COLOR_BUFFER_BIT,
                           GL_NEAREST);
-        if (s->water_on) {      /* the indices: one sample each */
+        if (s->water_on) {
+            /* the indices, one sample each: the scene again into the resolved framebuffer's
+               index attachment alone (its colour, the resolve's, untouched) */
             static const GLenum second[2] = { GL_NONE, GL_COLOR_ATTACHMENT1 };
 
-            glReadBuffer(GL_COLOR_ATTACHMENT1);
+            glBindFramebuffer(GL_FRAMEBUFFER, scene_fbo);
             glDrawBuffers(2, second);
-            glBlitFramebuffer(0, 0, fbo_w, fbo_h, 0, 0, fbo_w, fbo_h, GL_COLOR_BUFFER_BIT,
-                              GL_NEAREST);
-            glReadBuffer(GL_COLOR_ATTACHMENT0);
+            glClearBufferuiv(GL_COLOR, 1, index_clear);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            glEnable(GL_SCISSOR_TEST);
+            draw_layers(s, order, nworld, nflat);
+            glDisable(GL_SCISSOR_TEST);
+            glDrawBuffers(1, both);
         }
     }
 }

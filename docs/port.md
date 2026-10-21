@@ -177,7 +177,7 @@ How it works:
     pixel's colour index (the nearest texel's, through its rows), covered, and the world's
     test against the plane (the flats leave it alone: the S-buffer the software tests has
     none; where no polygon is, it stays set, as the software draws the water between the
-    spans). Integer, so the multisample resolve takes one sample. In the composite a pixel
+    spans). Apple's GL multisamples no integer attachment (`GL_MAX_INTEGER_SAMPLES` is 1), so with multisampling the indices are a pass of their own, one sample a pixel, into the resolved framebuffer after the colour's resolve (the water once shared the multisampled framebuffer and took it down to one sample: every scene lost its smoothed edges). In the composite a pixel
     on the water's rows with the test set becomes the tint of the pixel jitter columns along
     its row (a frame column is several window pixels: the shift is scaled, the sub-column
     position kept). In a wide frame the ripple is the wide pass's (water.c's longer jitter
