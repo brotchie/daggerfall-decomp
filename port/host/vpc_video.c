@@ -10,8 +10,9 @@
 
    PORT_GL=1 (fall --gl) shows the screen through OpenGL instead of SDL's renderer, with the 3D
    view drawn by OpenGL (port/host/vpc_gl.c); F11 switches the 3D view between OpenGL and the
-   software renderer, F10 OpenGL's textures between texels and smooth, Shift+F11 the view
-   between 4:3 and the window's shape, Shift+F10 smooth motion. With vsync (vpc_gl.c's
+   software renderer, F10 OpenGL's textures between texels and smooth, Shift+F11 (or
+   Cmd+Shift+W: macOS may keep F11 for Show Desktop) the view between 4:3 and the window's
+   shape, Shift+F10 (or Cmd+Shift+M) smooth motion. With vsync (vpc_gl.c's
    setting) OpenGL shows a picture at every refresh of the display. F8 sends feedback
    (port/host/report.c). */
 #include <stdio.h>
@@ -509,6 +510,16 @@ int vpc_video_handle_event(const void *ev)
             report_feedback();
             return 1;
         }
+        /* the view's keys where macOS keeps F11 (Show Desktop): Cmd+Shift+W the wide view,
+           Cmd+Shift+M smooth motion */
+        if (use_gl && (e->key.mod & SDL_KMOD_GUI) && (e->key.mod & SDL_KMOD_SHIFT) &&
+            (e->key.scancode == SDL_SCANCODE_W || e->key.scancode == SDL_SCANCODE_M)) {
+            if (e->key.scancode == SDL_SCANCODE_W)
+                vpc_gl_toggle_aspect();
+            else
+                vpc_gl_toggle_interp();
+            return 1;
+        }
         if (e->key.scancode == SDL_SCANCODE_F11 && use_gl) {
             if (e->key.mod & SDL_KMOD_SHIFT)
                 vpc_gl_toggle_aspect();
@@ -535,6 +546,8 @@ int vpc_video_handle_event(const void *ev)
         (e->key.scancode == SDL_SCANCODE_F12 || e->key.scancode == SDL_SCANCODE_F11 ||
          e->key.scancode == SDL_SCANCODE_F8 ||
          (e->key.scancode == SDL_SCANCODE_F10 && use_gl) ||
+         (use_gl && (e->key.mod & SDL_KMOD_GUI) && (e->key.mod & SDL_KMOD_SHIFT) &&
+          (e->key.scancode == SDL_SCANCODE_W || e->key.scancode == SDL_SCANCODE_M)) ||
          (e->key.scancode == SDL_SCANCODE_RETURN && (e->key.mod & SDL_KMOD_ALT))))
         return 1;
     return 0;

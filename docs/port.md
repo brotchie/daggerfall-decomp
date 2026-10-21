@@ -240,11 +240,11 @@ is at that moment, not only the ~54 frames a second the game draws. Both are set
 
 | Setting | settings.txt | Environment | Key | Default |
 |---|---|---|---|---|
-| the view's shape | `aspect=fill\|4:3` | `PORT_GL_ASPECT` | Shift+F11 switches | `fill` |
+| the view's shape | `aspect=fill\|4:3` | `PORT_GL_ASPECT` | Shift+F11 or Cmd+Shift+W | `fill` |
 | the widest horizontal view, degrees (0: none) | `fov_max=N` | `PORT_GL_FOV_MAX` | | `110` |
 | how the 320x200 pixels scale | `hud_filter=sharp\|nearest` | `PORT_GL_HUD_FILTER` | | `sharp` |
 | presents paced by the display | `vsync=on\|adaptive\|off` | `PORT_GL_VSYNC` | | `on` |
-| smooth motion | `interpolate=on\|off` | `PORT_GL_INTERP` | Shift+F10 switches | `on` |
+| smooth motion | `interpolate=on\|off` | `PORT_GL_INTERP` | Shift+F10 or Cmd+Shift+M | `on` |
 | the margin each side for smooth motion, columns | `overscan=N` | `PORT_GL_OVERSCAN` | | `24` |
 
 With the view filling the window, the window opens at 80% of the main display's usable area in its shape (a 4:3 window shows a 4:3 view however it fills it); Alt+Enter is full screen. The keys save their setting. OpenGL itself is `PORT_GL=1` (`--gl`, `--wide`), or `gl=on` in
