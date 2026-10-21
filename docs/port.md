@@ -394,6 +394,8 @@ Checks:
   game's screen as before, and the sides against the software renderer's wide frame
   (`gl_T_swwide.bmp`, `PORT_GL_SW_SHOTS`).
 - `PORT_GL_WIDE_CHECK=N` over the saves (above).
+- `tools/port_compare.py` (the software renderer against FALL.EXE in the emulator), 2026-10-20
+  after these changes: all 18 saves 0.951-1.000, as before.
 - `tools/port_gl_motion.py run [--interp on|off] [NAME]` walks and turns with `PORT_GL_RECORD`
   (whose header now has the eye each present was drawn from) and measures the eye's step per
   present, and the picture's shift per present turning.
