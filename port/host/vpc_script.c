@@ -155,6 +155,9 @@ static void run(const struct step *st)
         port_fatal("a crash the script asked for (testing the crash report)");
     } else if (!strcmp(st->cmd, "feedback")) {
         report_feedback();              /* F8 (PORT_FEEDBACK_NOTES gives the notes) */
+    } else if (!strcmp(st->cmd, "view")) {
+        /* the window's own keys: view aspect (Shift+F11), view interp (Shift+F10) */
+        vpc_video_view_key(st->arg);
     } else if (!strcmp(st->cmd, "resize")) {
         /* the window to W x H points (a test of the view's shapes) */
         if (sscanf(st->arg, "%d %d", &x, &y) == 2)

@@ -649,6 +649,19 @@ void vpc_gl_toggle_aspect(void)
     aspect_fill = !aspect_fill;
     launch_set_setting("aspect", aspect_fill ? "fill" : "4:3");
     fprintf(stderr, "port: the view %s\n", aspect_fill ? "fills the window" : "is 4:3");
+    /* a window of 4:3 or narrower shows a 4:3 view however it fills it: to fill, the window
+       takes the main display's shape, 80% of its usable area, as a filling view opens at */
+    if (aspect_fill && !(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN)) {
+        int ww, wh;
+        SDL_Rect r;
+
+        SDL_GetWindowSize(window, &ww, &wh);
+        if (ww * 3 <= wh * 4 + 3 && SDL_GetDisplayUsableBounds(SDL_GetDisplayForWindow(window), &r) &&
+            r.w * 3 > r.h * 4) {
+            SDL_SetWindowSize(window, r.w * 4 / 5, r.h * 4 / 5);
+            SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        }
+    }
 }
 
 void vpc_gl_toggle_interp(void)

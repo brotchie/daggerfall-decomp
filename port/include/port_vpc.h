@@ -182,6 +182,8 @@ void vpc_video_maybe_present(void);
 int vpc_video_paced(void);
 /* the window to w x h points (the script's resize) */
 void vpc_video_resize(int w, int h);
+/* the window's own view keys, by name: "aspect" (Shift+F11), "interp" (Shift+F10) */
+void vpc_video_view_key(const char *name);
 int vpc_video_handle_event(const void *sdl_event);
 
 void vpc_input_init(void);

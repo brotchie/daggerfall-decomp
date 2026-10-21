@@ -70,6 +70,16 @@ static int crosshair(int *cx, int *cy)
            *cx < VGA_W - 4 && *cy > 4 && *cy < VGA_H - 4;
 }
 
+void vpc_video_view_key(const char *name)
+{
+    if (!use_gl)
+        return;
+    if (strcmp(name, "aspect") == 0)
+        vpc_gl_toggle_aspect();
+    else if (strcmp(name, "interp") == 0)
+        vpc_gl_toggle_interp();
+}
+
 void vpc_video_resize(int w, int h)
 {
     if (window && w > 0 && h > 0)
