@@ -89,14 +89,27 @@ static void first_size(int *w, int *h)
     }
 }
 
-void vpc_video_init(const char *title)
+/* OpenGL: PORT_GL (fall --gl, --wide), else the settings file's gl=on, or aspect=fill (the
+   wide view is OpenGL's): an app started from the Finder has no flags */
+static int want_gl(void)
 {
     const char *gl = SDL_getenv("PORT_GL");
+    char v[32];
+
+    if (gl && *gl)
+        return *gl != '0';
+    if (launch_setting("gl", v, sizeof v))
+        return strcmp(v, "on") == 0 || strcmp(v, "1") == 0;
+    return launch_setting("aspect", v, sizeof v) && strcmp(v, "fill") == 0;
+}
+
+void vpc_video_init(const char *title)
+{
     int ww, wh;
 
     first_size(&ww, &wh);
 
-    if (gl && *gl && *gl != '0') {
+    if (want_gl()) {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);

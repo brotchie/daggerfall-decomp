@@ -1636,8 +1636,8 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
     }
     glBlitFramebuffer(0, 0, rw, rh, rx, ry, rx + rw, ry + rh, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    record(s, &e, rw, rh);
     SDL_GL_SwapWindow(window);
+    record(s, &e, rw, rh);              /* (its time: the swap's return, the display's) */
     {
         /* a swap the display did not wait for (a hidden window): no faster than 250 a second */
         Uint64 now = SDL_GetTicksNS();

@@ -247,7 +247,10 @@ is at that moment, not only the ~54 frames a second the game draws. Both are set
 | smooth motion | `interpolate=on\|off` | `PORT_GL_INTERP` | Shift+F10 switches | `on` |
 | the margin each side for smooth motion, columns | `overscan=N` | `PORT_GL_OVERSCAN` | | `24` |
 
-The keys save their setting. The settings file keeps every line now (`launch_set_setting`);
+The keys save their setting. OpenGL itself is `PORT_GL=1` (`--gl`, `--wide`), or `gl=on` in
+the settings file, and `aspect=fill` there turns it on too: the app, started from the Finder,
+takes no flags. A wide view in the app is these two lines in
+`~/Library/Application Support/Daggerfall/settings.txt`, or `aspect=fill` alone. The settings file keeps every line now (`launch_set_setting`);
 it used to hold only `game=`.
 
 **The wide pass** (`port/engine_gl/wide.c`, on the game's thread). The game draws into a
@@ -358,7 +361,11 @@ the 4:3 column's, as before (`picture_scale`).
    as before.
 
 Measured (`tools/port_gl_motion.py run`, 4:3, a 60 Hz display; the game draws 57-60 frames a
-second on an M4): presents every 16.67 ms (sd 0.9). The eye's step per present, its
+second on an M4): presents every 16.67 ms, none missing a refresh (the swap's returns, 2,519
+presents on kral, 14.3-19.1 ms apart: a missed refresh would be 33). macOS's GL swap returns a
+millisecond or two either side of the refresh, so only 67% of them land within 1 ms of the
+period: that is the swap's timing, not the display's, and the eye's time read on the display's
+own grid instead (a refresh period on from the last present's) left the motion as it was. The eye's step per present, its
 variation about each step's neighbours (judder, apart from the walk's own changes of speed):
 
 | | smooth motion off | the line between two frames | the fitted line |

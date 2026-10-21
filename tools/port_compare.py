@@ -130,17 +130,21 @@ def native_shots(name, out):
     # script's timings hold (unpacking takes a few seconds)
     os.makedirs(os.path.join(overlay, "ARENA2"), exist_ok=True)
     for a in ("ARCH3D.BSA", "DAGGER.SND"):
-        src = os.path.join(ROOT, "build", "port", "run_fresh", "ARENA2", a)
         dst = os.path.join(overlay, "ARENA2", a)
-        if os.path.exists(src) and not os.path.exists(dst):
-            os.link(src, dst)
+        for src in (os.path.join(ROOT, "build", "port", "run_fresh", "ARENA2", a),
+                    os.path.join(ROOT, "build", "emu", "packed", a)):
+            if os.path.exists(src) and not os.path.exists(dst):
+                os.link(os.path.realpath(src), dst)
     shots = [os.path.join(out, "native_%d.bmp" % t) for t in range(34, 43)]
     # the shots a while after the load: some saves' skies are still settling at 33 s (ming)
     env = dict(os.environ, DAGGER_GAME=GAME, PORT_EXIT_AFTER="44",
                PORT_SCRIPT="22 key L; 26 click 80 28; 28 click 160 10; " +
                "; ".join("%d shot %s" % (t, p) for t, p in zip(range(34, 43), shots)))
-    subprocess.run(["timeout", "-k", "5", "80", FALL, "--game", GAME, "--overlay", overlay],
-                   env=env, capture_output=True, timeout=120)
+    try:            # (macOS has no timeout(1): the run's own limit)
+        subprocess.run([FALL, "--game", GAME, "--overlay", overlay], env=env,
+                       capture_output=True, timeout=80)
+    except subprocess.TimeoutExpired:
+        pass
     return [p for p in shots if os.path.exists(p)]
 
 
