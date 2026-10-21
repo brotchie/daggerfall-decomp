@@ -1359,39 +1359,46 @@ const unsigned char *vpc_gl_last_vga(void)
 
 /* The frame pacer (vsync on). macOS's GL swap returns a millisecond or two either side of the
    display's refresh, so frames started when it returns would start unevenly, and the eye
-   drawn at those times would move unevenly too. Each present starts on a grid of the
-   refresh period instead (SDL_DelayPrecise until its time): one period after the last, its
-   phase kept just after the swaps' returns (a start the swap made late moves it later, by up
-   to half a millisecond a frame; otherwise it creeps 20 us a frame earlier, toward the
-   least delay). After a stall (a load, a hidden window) it starts again from the clock.
+   drawn at those times would move unevenly too. The swap's returns are followed by a loop
+   locked to them (pace_swapped): the next return predicted a period after the last
+   prediction, drawn 5% toward each return, its period 0.1%. Each present starts a fixed
+   3 ms after the predicted return (SDL_DelayPrecise), past the returns' scatter, so it
+   starts on the display's own cadence. After a stall (a load, a hidden window, a present
+   in between such as a screenshot's) it starts again from the clock.
    present_ns: when this present started, the time its eye is drawn at. */
+#define PACE_AFTER_NS 3000000ull
+static double pace_pred, pace_period;   /* the predicted swap return, ns; the period */
+
+static void pace_swapped(Uint64 ret)
+{
+    double err;
+
+    if (pace_period == 0) {
+        const SDL_DisplayMode *m = SDL_GetCurrentDisplayMode(SDL_GetDisplayForWindow(window));
+
+        pace_period = 1e9 / (m && m->refresh_rate > 1 ? m->refresh_rate : 60.0);
+    }
+    err = (double)ret - (pace_pred + pace_period);
+    if (pace_pred == 0 || err > pace_period / 2 || err < -pace_period / 2) {
+        pace_pred = (double)ret;
+        return;
+    }
+    pace_pred += pace_period + err * 0.05;
+    pace_period += err * 0.001;
+}
 
 static void pace(void)
 {
-    static Uint64 grid, period;
-    Uint64 now = SDL_GetTicksNS(), target;
+    Uint64 now = SDL_GetTicksNS();
+    double target;
 
-    if (!vsync) {
-        present_ns = now;
+    present_ns = now;
+    if (!vsync || pace_pred == 0)
         return;
-    }
-    if (period == 0) {
-        const SDL_DisplayMode *m = SDL_GetCurrentDisplayMode(SDL_GetDisplayForWindow(window));
-
-        period = (Uint64)(1e9 / (m && m->refresh_rate > 1 ? m->refresh_rate : 60.0));
-    }
-    target = grid + period;
-    if (grid == 0 || now > target + period / 2 || now + period < grid) {
-        grid = present_ns = now;
-        return;
-    }
-    if (now < target) {
-        SDL_DelayPrecise(target - now);
-        grid = target > 20000 ? target - 20000 : target;
-        present_ns = target;
-    } else {
-        grid = target + (now - target < 500000 ? now - target : 500000);
-        present_ns = now;
+    target = pace_pred + PACE_AFTER_NS;
+    if ((double)now < target && target - (double)now < pace_period) {
+        SDL_DelayPrecise((Uint64)(target - (double)now));
+        present_ns = (Uint64)target;
     }
 }
 
@@ -1677,6 +1684,7 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
     glBlitFramebuffer(0, 0, rw, rh, rx, ry, rx + rw, ry + rh, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     SDL_GL_SwapWindow(window);
+    pace_swapped(SDL_GetTicksNS());
     record(s, &e, rw, rh);
     {
         /* a swap the display did not wait for (a hidden window): no faster than 250 a second */

@@ -361,11 +361,7 @@ the 4:3 column's, as before (`picture_scale`).
    as before.
 
 Measured (`tools/port_gl_motion.py run`, 4:3, a 60 Hz display; the game draws 57-60 frames a
-second on an M4): presents every 16.67 ms, none missing a refresh (the swap's returns, 2,519
-presents on kral, 14.3-19.1 ms apart: a missed refresh would be 33). macOS's GL swap returns a
-millisecond or two either side of the refresh, so only 67% of them land within 1 ms of the
-period: that is the swap's timing, not the display's, and the eye's time read on the display's
-own grid instead (a refresh period on from the last present's) left the motion as it was. The eye's step per present, its
+second on an M4). macOS's GL swap returns a millisecond or two either side of the refresh (only 67% of them within 1 ms of the period), so the presents are paced: a loop locked to the swaps' returns predicts the next one, and each present starts 3 ms after it (`SDL_DelayPrecise`). 99.84-100% of the presents then start within 1 ms of 16.67 ms (kral, orcs, wayrest; 4:3 and a 2556-pixel window), and the eye is drawn at those times. The eye's step per present, its
 variation about each step's neighbours (judder, apart from the walk's own changes of speed):
 
 | | smooth motion off | the line between two frames | the fitted line |
