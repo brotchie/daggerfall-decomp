@@ -155,6 +155,28 @@ static void run(const struct step *st)
         port_fatal("a crash the script asked for (testing the crash report)");
     } else if (!strcmp(st->cmd, "feedback")) {
         report_feedback();              /* F8 (PORT_FEEDBACK_NOTES gives the notes) */
+    } else if (!strcmp(st->cmd, "sdlkey")) {
+        /* a key as SDL delivers it, through the event pump and the window's own keys:
+           sdlkey MODS KEY (MODS: any of c s a g for Ctrl Shift Alt Cmd, or -) */
+        char mods[8], key[32];
+
+        if (sscanf(st->arg, "%7s %31s", mods, key) == 2) {
+            SDL_Event e;
+
+            SDL_zero(e);
+            e.type = SDL_EVENT_KEY_DOWN;
+            e.key.scancode = SDL_GetScancodeFromName(key);
+            e.key.key = SDL_GetKeyFromScancode(e.key.scancode, SDL_KMOD_NONE, false);
+            e.key.mod = (strchr(mods, 'c') ? SDL_KMOD_LCTRL : 0) |
+                        (strchr(mods, 's') ? SDL_KMOD_LSHIFT : 0) |
+                        (strchr(mods, 'a') ? SDL_KMOD_LALT : 0) |
+                        (strchr(mods, 'g') ? SDL_KMOD_LGUI : 0);
+            e.key.down = true;
+            SDL_PushEvent(&e);
+            e.type = SDL_EVENT_KEY_UP;
+            e.key.down = false;
+            SDL_PushEvent(&e);
+        }
     } else if (!strcmp(st->cmd, "view")) {
         /* the window's own keys: view aspect (Shift+F11), view interp (Shift+F10) */
         vpc_video_view_key(st->arg);
