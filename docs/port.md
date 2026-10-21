@@ -247,7 +247,7 @@ is at that moment, not only the ~54 frames a second the game draws. Both are set
 | smooth motion | `interpolate=on\|off` | `PORT_GL_INTERP` | Shift+F10 switches | `on` |
 | the margin each side for smooth motion, columns | `overscan=N` | `PORT_GL_OVERSCAN` | | `24` |
 
-The keys save their setting. OpenGL itself is `PORT_GL=1` (`--gl`, `--wide`), or `gl=on` in
+With the view filling the window, the window opens at 80% of the main display's usable area in its shape (a 4:3 window shows a 4:3 view however it fills it); Alt+Enter is full screen. The keys save their setting. OpenGL itself is `PORT_GL=1` (`--gl`, `--wide`), or `gl=on` in
 the settings file, and `aspect=fill` there turns it on too: the app, started from the Finder,
 takes no flags. A wide view in the app is these two lines in
 `~/Library/Application Support/Daggerfall/settings.txt`, or `aspect=fill` alone. The settings file keeps every line now (`launch_set_setting`);

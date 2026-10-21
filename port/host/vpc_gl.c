@@ -63,6 +63,7 @@
 static SDL_Window *window;
 static SDL_GLContext context;
 static int ready, gl_on = 1, smooth, msaa = 4;
+static Uint64 present_ns;               /* when this present started (pace) */
 
 /* the settings */
 static int aspect_fill = 1;             /* the view fills the window (else 4:3) */
@@ -1327,7 +1328,7 @@ static void record(const pgl_scene *s, const pose *e, int w, int h)
     else
         glReadPixels(0, h * 6 / 10, w, 32, GL_RGBA, GL_UNSIGNED_BYTE, rows);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    head[0] = (long long)SDL_GetTicksNS();
+    head[0] = (long long)present_ns;        /* when the present started (its eye's time) */
     head[1] = s ? (long long)s->serial : 0;
     head[2] = s ? s->cam_yaw : 0;
     head[3] = s ? s->cam_pitch : 0;
@@ -1356,10 +1357,48 @@ const unsigned char *vpc_gl_last_vga(void)
     return last_vga;
 }
 
+/* The frame pacer (vsync on). macOS's GL swap returns a millisecond or two either side of the
+   display's refresh, so frames started when it returns would start unevenly, and the eye
+   drawn at those times would move unevenly too. Each present starts on a grid of the
+   refresh period instead (SDL_DelayPrecise until its time): one period after the last, its
+   phase kept just after the swaps' returns (a start the swap made late moves it later, by up
+   to half a millisecond a frame; otherwise it creeps 20 us a frame earlier, toward the
+   least delay). After a stall (a load, a hidden window) it starts again from the clock.
+   present_ns: when this present started, the time its eye is drawn at. */
+
+static void pace(void)
+{
+    static Uint64 grid, period;
+    Uint64 now = SDL_GetTicksNS(), target;
+
+    if (!vsync) {
+        present_ns = now;
+        return;
+    }
+    if (period == 0) {
+        const SDL_DisplayMode *m = SDL_GetCurrentDisplayMode(SDL_GetDisplayForWindow(window));
+
+        period = (Uint64)(1e9 / (m && m->refresh_rate > 1 ? m->refresh_rate : 60.0));
+    }
+    target = grid + period;
+    if (grid == 0 || now > target + period / 2 || now + period < grid) {
+        grid = present_ns = now;
+        return;
+    }
+    if (now < target) {
+        SDL_DelayPrecise(target - now);
+        grid = target > 20000 ? target - 20000 : target;
+        present_ns = target;
+    } else {
+        grid = target + (now - target < 500000 ? now - target : 500000);
+        present_ns = now;
+    }
+}
+
 /* where the eye is drawn from at this present, and the move to it from the scene's frame */
 static void eye_now(const pgl_scene *s, const int *look, pose *e, int *moved)
 {
-    double now = (double)SDL_GetTicksNS() / 1e6;
+    double now = (double)present_ns / 1e6;
 
     *moved = 0;
     e->x = s->cam_x;
@@ -1426,6 +1465,7 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
 
     if (!ready)
         return;
+    pace();
     SDL_GL_MakeCurrent(window, context);
     upload_textures();
     view_rect(&rx, &ry, &rw, &rh, &cols);
@@ -1637,7 +1677,7 @@ void vpc_gl_present(const unsigned char *vga_live, const unsigned char *rgb, con
     glBlitFramebuffer(0, 0, rw, rh, rx, ry, rx + rw, ry + rh, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     SDL_GL_SwapWindow(window);
-    record(s, &e, rw, rh);              /* (its time: the swap's return, the display's) */
+    record(s, &e, rw, rh);
     {
         /* a swap the display did not wait for (a hidden window): no faster than 250 a second */
         Uint64 now = SDL_GetTicksNS();

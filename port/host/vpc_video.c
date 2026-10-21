@@ -76,16 +76,35 @@ void vpc_video_resize(int w, int h)
         SDL_SetWindowSize(window, w, h);
 }
 
-/* PORT_WINDOW=WxH: the window's first size in points (960x720) */
-static void first_size(int *w, int *h)
+/* the OpenGL view fills the window (vpc_gl.c's aspect setting: fill unless 4:3) */
+static int view_fills(void)
+{
+    const char *e = SDL_getenv("PORT_GL_ASPECT");
+    char v[32];
+
+    if (e && *e)
+        return strcmp(e, "4:3") != 0;
+    return !(launch_setting("aspect", v, sizeof v) && strcmp(v, "4:3") == 0);
+}
+
+/* PORT_WINDOW=WxH: the window's first size in points. Else 960x720 (4:3), or with OpenGL
+   filling the window, 80% of the main display's usable area, in its shape: a 4:3 window
+   would show a 4:3 view however it fills it */
+static void first_size(int *w, int *h, int gl)
 {
     const char *e = SDL_getenv("PORT_WINDOW");
+    SDL_Rect r;
 
     *w = 960;
     *h = 720;
-    if (e && sscanf(e, "%dx%d", w, h) != 2) {
-        *w = 960;
-        *h = 720;
+    if (e && sscanf(e, "%dx%d", w, h) == 2)
+        return;
+    *w = 960;
+    *h = 720;
+    if (gl && view_fills() && SDL_GetDisplayUsableBounds(SDL_GetPrimaryDisplay(), &r) &&
+        r.w > 0 && r.h > 0 && r.w * 3 > r.h * 4) {
+        *w = r.w * 4 / 5;
+        *h = r.h * 4 / 5;
     }
 }
 
@@ -105,11 +124,11 @@ static int want_gl(void)
 
 void vpc_video_init(const char *title)
 {
-    int ww, wh;
+    int ww, wh, gl = want_gl();
 
-    first_size(&ww, &wh);
+    first_size(&ww, &wh, gl);
 
-    if (want_gl()) {
+    if (gl) {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -127,6 +146,8 @@ void vpc_video_init(const char *title)
         if (window)
             SDL_DestroyWindow(window);
     }
+    if (gl)                             /* OpenGL failed: the software path's 4:3 window */
+        first_size(&ww, &wh, 0);
     window = SDL_CreateWindow(title, ww, wh, SDL_WINDOW_RESIZABLE);
     if (window == NULL) {
         fprintf(stderr, "port: SDL_CreateWindow: %s\n", SDL_GetError());
